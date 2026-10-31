@@ -1,0 +1,125 @@
+/* Inherited role measurements. Original Lumo Sans faces load in clarity-type.css; the wordmark is an SVG. */
+:root {
+  --font-ui: 'Lumo Sans', Arial, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --type-title: clamp(2rem, 8.4vw, 2.375rem);
+  --type-consequence: clamp(1.5rem, 6.6vw, 1.875rem);
+  --type-amount: clamp(2.5rem, 11.4vw, 3rem);
+  --type-body: 1rem;
+  --type-support: .9375rem;
+  --type-meta: .8125rem;
+}
+
+html { font-synthesis: none; }
+body { font-family: var(--font-ui); font-size: var(--type-body); font-weight: 400; line-height: 1.5; }
+button, input, select, textarea { font-family: inherit; }
+b, strong { font-weight: 600; }
+h1, h2, h3 { font-weight: 700; }
+
+/* Titles orient; conclusions state the change; amounts make it concrete. */
+.screen .page-heading h1,
+.screen .hero h1,
+.screen .focus-pay-heading h1,
+.screen .destination-heading h1,
+.screen .focus-story-heading h1 {
+  font-size: var(--type-title);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.045em;
+}
+.screen .focus-pause-insight h1,
+.screen-chat .chat-reply .lead,
+.lumo-conclusion {
+  font-size: var(--type-consequence);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -.035em;
+}
+.screen-home .home-plan-summary strong,
+.screen .focus-payment-title h1,
+.screen .plan-room>strong,
+.screen .focus-story-total>strong,
+.lumo-amount {
+  font-size: var(--type-amount);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.money,
+.focus-amount,
+.balance-main,
+.focus-payment-title h1,
+.focus-story-total>strong,
+.home-plan-summary strong,
+.plan-room>strong,
+.metric,
+.amount-input,
+.receipt strong,
+.summary-line strong,
+.focus-receipt strong,
+.chat-calculation dd,
+.lumo-amount {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.screen .primary,
+.screen .secondary,
+.screen .danger,
+.screen .pause-decisions .pause-equal-choice,
+.screen .focus-main-actions button {
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.015em;
+}
+.screen .text-btn,
+.screen .row-copy strong,
+.screen .menu-choice strong,
+.screen .you-options strong,
+.screen .chip,
+.screen .focus-period,
+.screen .chat-context summary,
+.screen .chat-prompts summary,
+.screen .chat-calculation summary,
+.nav-item {
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+.nav-item.active { font-weight: 700; }
+.screen .field>span,
+.screen .home-intro p,
+.screen .home-plan-summary small,
+.screen .plan-benefit-choice,
+.screen .focus-choice { font-weight: 500; }
+.screen .pause-decision-consequence p,
+.screen .chat-reply .impact-secondary,
+.screen .home-plan-math,
+.screen .page-heading p,
+.screen .destination-heading p {
+  font-size: var(--type-support);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -.01em;
+}
+.screen .pause-decision-consequence .pause-goal-impact { font-weight: 500; }
+.screen .tiny,
+.screen .focus-footnote,
+.screen .privacy-hint,
+.screen .plan-explanation,
+.screen .chat-boundary,
+.screen .demo-note {
+  font-size: var(--type-meta);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+.screen .eyebrow,
+.screen .mini-label,
+.screen .plan-benefit-pause-label,
+.screen .focus-pause-label {
+  font-weight: 600;
+  letter-spacing: .09em;
+  line-height: 1.4;
+}

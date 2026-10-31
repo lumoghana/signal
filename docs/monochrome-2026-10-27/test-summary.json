@@ -1,0 +1,52 @@
+{
+  "command": "node scripts/check-edition-parity.cjs --regression --sequential",
+  "exitCode": 0,
+  "regression": {
+    "files": 85,
+    "nodeChecks": 103,
+    "passed": 103,
+    "failed": 0
+  },
+  "newAdapterTests": {
+    "file": "tests/monochrome-design.test.cjs",
+    "checks": 15,
+    "passed": 15,
+    "failed": 0,
+    "includedInRequiredGate": true,
+    "focusedEvidence": "adapter-tests.final.log",
+    "coverage": [
+      "actual amounts and no financial mutation",
+      "calculation versus Budget destination",
+      "all three quick actions and cancellation",
+      "no Budget and saved Budget draft",
+      "privacy and neutral sizing",
+      "long and markup-like name escaping",
+      "locked and closed navigation",
+      "fresh/resumed/returning Welcome",
+      "Pause disclosure staged reveal and exact existing quotes",
+      "disclosed lower amount changes only the original draft",
+      "unchanged reading minimum/hold/separate PIN",
+      "immediate cancellation returns native parent without later approval"
+    ]
+  },
+  "contract": {
+    "passed": 8,
+    "peerComparison": "Skipped: no peer checkout; local pinned source, storage, route, financial and authorization checks passed."
+  },
+  "initialRun": {
+    "passed": 79,
+    "failed": 9,
+    "evidence": "regression.initial.log",
+    "reason": "Obsolete welcome/Home wording, action ordering and greeting selectors after authorized redesign."
+  },
+  "testChanges": "Only presentation wording, grouping, placement, count and selectors changed in existing tests. Money, privacy, route, authentication, draft and record preservation assertions retained.",
+  "inputPins": "final-test-inputs.json",
+  "outputPins": "final-test-output-pins.json",
+  "cssChangedDuringRun": [
+    "dist/index.html",
+    "dist/mono-design.css",
+    "dist/mono-planning.css",
+    "dist/mono-payments.css"
+  ],
+  "behaviorInputsStable": false
+}

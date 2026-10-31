@@ -1,0 +1,3428 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/build-platform-assets.cjs",
+  "entry": {
+    "schemaVersion": 1,
+    "scripts": [
+      "/core.js?v=deep-review-20261027-1",
+      "/auth-policy.js?v=readiness-fixes-20261029",
+      "/two-account-engine.js?v=flows-sync-1",
+      "/home-funding-state.js?v=minna-1",
+      "/onboarding.js?v=deep-review-20261027-1",
+      "/pause-engine.js?v=flows-sync-1",
+      "/plan-impact.js?v=minna-1",
+      "/mobile-network.js?v=minna-1",
+      "/payments.js?v=deep-review-20261027-1",
+      "/account.js?v=deep-review-20261027-1",
+      "/plan-setup.js?v=experience-1",
+      "/pause.js?v=minna-1",
+      "/motion.js?v=minna-1",
+      "/illustrations.js?v=minna-1",
+      "/app.js?v=deep-review-20261027-1",
+      "/compact.js?v=deep-review-20261027-1",
+      "/focus.js?v=deep-review-20261027-1",
+      "/chat-coach.js?v=deep-review-20261027-1",
+      "/plan-benefit.js?v=minna-1",
+      "/decision-system.js?v=deep-review-20261027-1",
+      "/clarity-art.js?v=minna-1",
+      "/clarity-pause.js?v=minna-1",
+      "/expressive-art.js?v=minna-1",
+      "/bold-system.js?v=minna-1",
+      "/campus-art.js?v=minna-1",
+      "/native-decisions.js?v=minna-1",
+      "/task-sheet.js?v=deep-review-20261027-1",
+      "/pause-hero.js?v=minna-1",
+      "/payment-balance.js?v=minna-1",
+      "/plan-adjustment.js?v=minna-1",
+      "/pause-interaction.js?v=avatar-pause-clock-20261029",
+      "/category-intelligence.js?v=deep-review-20261027-1",
+      "/transaction-journey.js?v=deep-review-20261027-1",
+      "/money-boxes.js?v=deep-review-20261027-1",
+      "/money-box-protection.js?v=minna-1",
+      "/money-box-protection-ui.js?v=deep-review-20261027-1",
+      "/product-accounts.js?v=start-correction-1",
+      "/funding-budget.js?v=minna-1",
+      "/plan-hub.js?v=compact-ui-1",
+      "/ambassador.js?v=deep-review-20261027-3",
+      "/vendor/jsqr.js?v=minna-1",
+      "/vendor/qrcode-generator.js?v=minna-1",
+      "/qr-payments.js?v=qr-corner-hub-2",
+      "/biometric-auth.js?v=minna-1",
+      "/chat-banking.js?v=deep-review-20261027-1",
+      "/budget-everyday.js?v=deep-review-20261027-1",
+      "/chat-everyday.js?v=deep-review-20261027-1",
+      "/daily-insights.js?v=deep-review-20261027-1",
+      "/campus-everyday.js?v=deep-review-20261027-1",
+      "/shared-expenses.js?v=chat-refine-2",
+      "/saving-rules.js?v=savings-hacks-1",
+      "/budget-estimate.js?v=companion-1",
+      "/chat-planning.js?v=experience-1",
+      "/spending-outlook.js?v=compact-ui-1",
+      "/budget-history.js?v=deep-review-20261027-5",
+      "/pause-recovery.js?v=compact-ui-1",
+      "/budget-categories.js?v=experience-1",
+      "/budget-guide.js?v=experience-1",
+      "/budget-guide-ui.js?v=guide-1",
+      "/budget-overview.js?v=clean-home-1",
+      "/payment-budget-result.js?v=experience-1",
+      "/contextual-chat.js?v=experience-1",
+      "/budget-period-review.js?v=deep-review-20261027-1",
+      "/hibiscus-chat.js?v=deep-review-20261027-1",
+      "/hibiscus-payment-refinement.js?v=flows-sync-1",
+      "/virtual-cards-engine.js?v=savings-hacks-1",
+      "/virtual-cards-ui.js?v=deep-review-20261027-1",
+      "/virtual-cards-payments.js?v=flows-sync-1",
+      "/budget-readability.js?v=flows-sync-1",
+      "/money-story-analytics.js?v=deep-review-20261027-1",
+      "/hibiscus-navigation.js?v=home-budget-direct-1",
+      "/hibiscus-balance-clarity.js?v=flows-sync-1",
+      "/hibiscus-budget-clarity.js?v=flows-sync-1",
+      "/hibiscus-chat-clarity.js?v=flows-sync-1",
+      "/getting-started.js?v=deep-review-20261027-2",
+      "/personal-qr.js?v=deep-review-20261027-1",
+      "/qr-floating.js?v=qr-corner-hub-2",
+      "/minna-edition.js?v=minna-1",
+      "/everyday-home.js?v=overflow-review-1",
+      "/pause-intro.js?v=goal-delay-3",
+      "/mono-conversation.js?v=readiness-1",
+      "/mono-design.js?v=first-box-20261029",
+      "/mono-chat-gesture.js?v=personality-1",
+      "/mono-collections.js?v=payouts-20261029-1",
+      "/mono-brand.js?v=readiness-1",
+      "/mono-preferences.js?v=readiness-1",
+      "/mono-group-usability.js?v=readiness-1",
+      "/mono-review.js?v=readiness-1",
+      "/group-money-engine.js?v=payout-rails-20261029",
+      "/group-money-ui.js?v=payouts-20261029-1",
+      "/collection-evidence.js?v=payout-rails-20261029",
+      "/payment-consequence.js?v=clarity-1",
+      "/experience-clarity.js?v=home-budget-direct-1",
+      "/chat-context-starters.js?v=clarity-1",
+      "/savings-hacks-engine.js?v=savings-hacks-1",
+      "/savings-hacks-ui.js?v=deep-review-20261027-1",
+      "/page-guidance.js?v=deep-review-20261027-1",
+      "/product-finish.js?v=deep-review-20261027-3",
+      "/collection-contributions-engine.js?v=own-payments-20261029",
+      "/collection-contributions-ui.js?v=own-payments-20261029",
+      "/collection-payout-rails.js?v=payout-rails-20261029",
+      "/mono-pause.js?v=all-pause-entrypoints-20261029",
+      "/mono-chrome-consistency.js?v=consistency-20261029",
+      "/money-life-engine.js?v=money-journeys-20261030",
+      "/money-life-ui.js?v=money-journeys-20261030",
+      "/signal-edition.js?v=signal-20261030",
+      "/signal-account.js?v=signal-bold-20261030",
+      "/signal-planning.js?v=signal-bold-20261030",
+      "/signal-payments.js?v=signal-bold-20261030",
+      "/signal-navigation.js?v=signal-pages-20261031",
+      "/platform-runtime.js?v=readiness-fixes-20261029",
+      "/persistence-recovery.js?v=readiness-fixes-20261029",
+      "/platform-init.js?v=readiness-fixes-20261029"
+    ],
+    "styles": [
+      "/style.css?v=minna-1",
+      "/pause.css?v=minna-1",
+      "/motion.css?v=minna-1",
+      "/illustrations.css?v=minna-1",
+      "/compact.css?v=minna-1",
+      "/focus.css?v=minna-1",
+      "/decision-layout.css?v=minna-1",
+      "/chat-layout.css?v=minna-1",
+      "/type-system.css?v=minna-1",
+      "/design-system.css?v=minna-1",
+      "/illustration-system.css?v=minna-1",
+      "/journey-refinement.css?v=minna-1",
+      "/clarity-type.css?v=minna-1",
+      "/clarity-edition.css?v=minna-1",
+      "/task-sheet.css?v=minna-1",
+      "/clarity-bold.css?v=minna-1",
+      "/native-refinement.css?v=compact-ui-1",
+      "/everyday-edition.css?v=minna-1",
+      "/plan-clarity.css?v=minna-1",
+      "/payment-balance.css?v=minna-1",
+      "/pause-hero.css?v=minna-1",
+      "/pause-interaction.css?v=minna-1",
+      "/category-intelligence.css?v=minna-1",
+      "/transaction-journey.css?v=minna-1",
+      "/product-accounts.css?v=minna-1",
+      "/home-plan-refinement.css?v=clean-home-2",
+      "/ui-consistency.css?v=minna-1",
+      "/qr-payments.css?v=deep-review-20261027-1",
+      "/biometric-auth.css?v=minna-1",
+      "/minna-edition.css?v=clean-home-1",
+      "/minna-transactions.css?v=minna-1",
+      "/minna-flows.css?v=minna-1",
+      "/chat-banking.css?v=chat-refine-2",
+      "/budget-everyday.css?v=everyday-value-1",
+      "/chat-everyday.css?v=everyday-value-1",
+      "/daily-insights.css?v=chat-refine-2",
+      "/campus-everyday.css?v=everyday-value-1",
+      "/shared-expenses.css?v=everyday-value-1",
+      "/saving-rules.css?v=everyday-value-1",
+      "/budget-estimate.css?v=companion-1",
+      "/spending-outlook.css?v=compact-ui-1",
+      "/budget-history.css?v=compact-ui-1",
+      "/pause-recovery.css?v=compact-ui-1",
+      "/budget-guide.css?v=guide-1",
+      "/budget-overview.css?v=experience-1",
+      "/payment-budget-result.css?v=experience-1",
+      "/contextual-chat.css?v=experience-1",
+      "/budget-period-review.css?v=experience-1",
+      "/feature-flows.css?v=flows-sync-1",
+      "/edition-home.css?v=start-correction-1",
+      "/getting-started.css?v=start-correction-1",
+      "/personal-qr.css?v=personal-qr-1",
+      "/qr-floating.css?v=qr-corner-hub-2",
+      "/everyday-home.css?v=illustrations-2",
+      "/minna-home.css?v=hierarchy-1",
+      "/page-chrome.css?v=quiet-headers-1",
+      "/pause-intro.css?v=goal-delay-3",
+      "/group-money.css?v=payouts-20261029-1",
+      "/payment-consequence.css?v=clarity-1",
+      "/experience-clarity.css?v=clarity-1",
+      "/overflow-shell.css?v=overflow-review-1",
+      "/overflow-components.css?v=overflow-review-1",
+      "/savings-hacks.css?v=quiet-pages-1",
+      "/page-guidance.css?v=quiet-pages-1",
+      "/product-finish.css?v=deep-review-20261027-3",
+      "/mono-design.css?v=home-story-1",
+      "/mono-planning.css?v=refine-1",
+      "/mono-payments.css?v=refine-1",
+      "/mono-life.css?v=refine-1",
+      "/mono-navigation.css?v=first-box-20261029",
+      "/mono-collections.css?v=refine-1",
+      "/mono-brand.css?v=readiness-1",
+      "/mono-review.css?v=readiness-1",
+      "/collection-contributions.css?v=own-payments-20261029",
+      "/collection-payout-rails.css?v=payout-rails-20261029",
+      "/mono-pause.css?v=all-pause-entrypoints-20261029",
+      "/mono-type-consistency.css?v=consistency-20261029",
+      "/mono-surface-consistency.css?v=consistency-20261029",
+      "/platform-runtime.css?v=readiness-fixes-20261029",
+      "/persistence-recovery.css?v=readiness-fixes-20261029",
+      "/money-life.css?v=money-journeys-20261030",
+      "/signal-system.css?v=signal-20261030",
+      "/signal-home.css?v=signal-20261030",
+      "/signal-account.css?v=signal-bold-20261030",
+      "/signal-planning.css?v=signal-bold-20261030",
+      "/signal-payments.css?v=signal-bold-20261030",
+      "/signal-page-chrome.css?v=signal-chrome-20261030",
+      "/signal-account-home.css?v=signal-account-home-20261030",
+      "/signal-ring-home.css?v=signal-ring-home-20261030"
+    ]
+  },
+  "bundles": {
+    "script": {
+      "path": "lumo-runtime.d864e008eee5.js",
+      "sha256": "d864e008eee5b984d8c9b45b579f4bc4694c5781e9731b838523e0625dcc43a5",
+      "sizeBytes": 2097676,
+      "sources": [
+        {
+          "url": "/core.js?v=deep-review-20261027-1",
+          "path": "core.js",
+          "sha256": "fc6eeeab44a0ae59e8cd48ddaf6aa309be95a15cb0d04bea9ab58bc6cb774ac3",
+          "sizeBytes": 29322,
+          "startLine": 4,
+          "endLine": 182
+        },
+        {
+          "url": "/auth-policy.js?v=readiness-fixes-20261029",
+          "path": "auth-policy.js",
+          "sha256": "4bc244089b69612160ed2ca5833a8077201a6edfb4b6a736d21a592cb828b989",
+          "sizeBytes": 2636,
+          "startLine": 185,
+          "endLine": 229
+        },
+        {
+          "url": "/two-account-engine.js?v=flows-sync-1",
+          "path": "two-account-engine.js",
+          "sha256": "6c6fca7af86ea2778240403bea1158ed9346d8c23308c599b2ca1e071ed858e5",
+          "sizeBytes": 7298,
+          "startLine": 232,
+          "endLine": 320
+        },
+        {
+          "url": "/home-funding-state.js?v=minna-1",
+          "path": "home-funding-state.js",
+          "sha256": "79853d0438f98f7d3a65a883a009e2fc5fc12cd42b438d884db0b1b6a7b8df4c",
+          "sizeBytes": 1334,
+          "startLine": 323,
+          "endLine": 349
+        },
+        {
+          "url": "/onboarding.js?v=deep-review-20261027-1",
+          "path": "onboarding.js",
+          "sha256": "3a6c152e557b927552525a1954cd598e9147e6831f03ecfcac4fd456db8ed791",
+          "sizeBytes": 56088,
+          "startLine": 352,
+          "endLine": 790
+        },
+        {
+          "url": "/pause-engine.js?v=flows-sync-1",
+          "path": "pause-engine.js",
+          "sha256": "e857f0abc7a425aeccf716a86bc5c985f1da9c22c8241283b9bd5056a883e54e",
+          "sizeBytes": 13548,
+          "startLine": 793,
+          "endLine": 906
+        },
+        {
+          "url": "/plan-impact.js?v=minna-1",
+          "path": "plan-impact.js",
+          "sha256": "26d3006e337575e68b48937579bb5920bb96a4608ce5c6c2fdd2073cfedc1e2a",
+          "sizeBytes": 5189,
+          "startLine": 909,
+          "endLine": 956
+        },
+        {
+          "url": "/mobile-network.js?v=minna-1",
+          "path": "mobile-network.js",
+          "sha256": "c9f2c12ebcb6681e5764f963d3de841130b7431b73d29b8d92b11ddffca106b9",
+          "sizeBytes": 6933,
+          "startLine": 959,
+          "endLine": 1046
+        },
+        {
+          "url": "/payments.js?v=deep-review-20261027-1",
+          "path": "payments.js",
+          "sha256": "8820061fd62611b7f98208d5837c321c4cb6a696939fb7d96c667fa25cda7ddb",
+          "sizeBytes": 82806,
+          "startLine": 1049,
+          "endLine": 1624
+        },
+        {
+          "url": "/account.js?v=deep-review-20261027-1",
+          "path": "account.js",
+          "sha256": "726a5ea53c240a9439d6a32c203a825ba1b011b588827c91fbc26c1e6a1d27ba",
+          "sizeBytes": 63170,
+          "startLine": 1627,
+          "endLine": 1818
+        },
+        {
+          "url": "/plan-setup.js?v=experience-1",
+          "path": "plan-setup.js",
+          "sha256": "aba92522f286ef63daf0c5021931dfb67c1c72535f2de269b1acd33a63f32043",
+          "sizeBytes": 37930,
+          "startLine": 1821,
+          "endLine": 2147
+        },
+        {
+          "url": "/pause.js?v=minna-1",
+          "path": "pause.js",
+          "sha256": "e9e4929715bad37f2cbb5e1becaf90b93f7b2b88cd6997a7c30c263279902e3b",
+          "sizeBytes": 5040,
+          "startLine": 2150,
+          "endLine": 2186
+        },
+        {
+          "url": "/motion.js?v=minna-1",
+          "path": "motion.js",
+          "sha256": "5b74a9c45ffce8f2f3cbe42e08e67427d8d32a8e1ab4b58f9b48270412333ae6",
+          "sizeBytes": 7159,
+          "startLine": 2189,
+          "endLine": 2313
+        },
+        {
+          "url": "/illustrations.js?v=minna-1",
+          "path": "illustrations.js",
+          "sha256": "5a976df0d2e0d32782a27afd5e437790fcddbde3608f5a60312e70fba7b6a4ee",
+          "sizeBytes": 9411,
+          "startLine": 2316,
+          "endLine": 2380
+        },
+        {
+          "url": "/app.js?v=deep-review-20261027-1",
+          "path": "app.js",
+          "sha256": "067628886b976cb50fc602432c57055b1f6e8f50af0288fe8702bc3846d1a4f9",
+          "sizeBytes": 35195,
+          "startLine": 2383,
+          "endLine": 2462
+        },
+        {
+          "url": "/compact.js?v=deep-review-20261027-1",
+          "path": "compact.js",
+          "sha256": "5f3701d2f1fee4aea1507cc185e63470d64c43a76d2d86518768707e51b9d279",
+          "sizeBytes": 26806,
+          "startLine": 2465,
+          "endLine": 2647
+        },
+        {
+          "url": "/focus.js?v=deep-review-20261027-1",
+          "path": "focus.js",
+          "sha256": "528cd9617deebea459d9e80829cc0cf533c244946018754d1edc85cc72875764",
+          "sizeBytes": 22941,
+          "startLine": 2650,
+          "endLine": 2759
+        },
+        {
+          "url": "/chat-coach.js?v=deep-review-20261027-1",
+          "path": "chat-coach.js",
+          "sha256": "c1cca8df9948c546e7c2ed09e441ddf932d059d1c23a76afe7a74081ebfdeb70",
+          "sizeBytes": 62593,
+          "startLine": 2762,
+          "endLine": 3268
+        },
+        {
+          "url": "/plan-benefit.js?v=minna-1",
+          "path": "plan-benefit.js",
+          "sha256": "be3882fcae3f45dfb50a0fe6cdb4484b38c9bc136e3d7672b52791f9c7f22d79",
+          "sizeBytes": 7136,
+          "startLine": 3271,
+          "endLine": 3344
+        },
+        {
+          "url": "/decision-system.js?v=deep-review-20261027-1",
+          "path": "decision-system.js",
+          "sha256": "22ddbe4dcbf21c32d3a39d6398187193b7283107652215a37fb9b2c58b522342",
+          "sizeBytes": 6172,
+          "startLine": 3347,
+          "endLine": 3402
+        },
+        {
+          "url": "/clarity-art.js?v=minna-1",
+          "path": "clarity-art.js",
+          "sha256": "0a4b060e863851db53ac4bc6852344881ba63f9df829fca78417aca76e604ab9",
+          "sizeBytes": 6502,
+          "startLine": 3405,
+          "endLine": 3495
+        },
+        {
+          "url": "/clarity-pause.js?v=minna-1",
+          "path": "clarity-pause.js",
+          "sha256": "ad34ba2556dbe43db7a9398061e05c6f66154a9bcdccea31862b5bc0c9042d3b",
+          "sizeBytes": 6170,
+          "startLine": 3498,
+          "endLine": 3568
+        },
+        {
+          "url": "/expressive-art.js?v=minna-1",
+          "path": "expressive-art.js",
+          "sha256": "1e5ed0de7e84468fcecb6b32ab9787b219a20ece3b5145e00b15d877f09136a0",
+          "sizeBytes": 1863,
+          "startLine": 3571,
+          "endLine": 3599
+        },
+        {
+          "url": "/bold-system.js?v=minna-1",
+          "path": "bold-system.js",
+          "sha256": "7ae72dd4ffab88c21c1eae67e99be361c28b92d9691edffc33931efd993b9cbe",
+          "sizeBytes": 11743,
+          "startLine": 3602,
+          "endLine": 3734
+        },
+        {
+          "url": "/campus-art.js?v=minna-1",
+          "path": "campus-art.js",
+          "sha256": "5352f9ee3a09cfe1ef3599934f1d9e46188f3ef86435c962a2f56f57754a7100",
+          "sizeBytes": 10515,
+          "startLine": 3737,
+          "endLine": 3855
+        },
+        {
+          "url": "/native-decisions.js?v=minna-1",
+          "path": "native-decisions.js",
+          "sha256": "4a5174420b9dfcd9f7c256096dd0a651ba384017ba501e39f624a7202de3199b",
+          "sizeBytes": 4826,
+          "startLine": 3858,
+          "endLine": 3924
+        },
+        {
+          "url": "/task-sheet.js?v=deep-review-20261027-1",
+          "path": "task-sheet.js",
+          "sha256": "d582a867b6fc07526552588ade8cbf61213fff4ca277382aaae0d26a6ac0cac8",
+          "sizeBytes": 34935,
+          "startLine": 3927,
+          "endLine": 4331
+        },
+        {
+          "url": "/pause-hero.js?v=minna-1",
+          "path": "pause-hero.js",
+          "sha256": "ecb65fe2eb1a4f9ed40c0be03409d87f69a0b43c266bb5ee73ce3a9fe699063f",
+          "sizeBytes": 8115,
+          "startLine": 4334,
+          "endLine": 4430
+        },
+        {
+          "url": "/payment-balance.js?v=minna-1",
+          "path": "payment-balance.js",
+          "sha256": "599790f2bcf86d294d384847987107aa9e11f088b08eb2b2279cf55c265d04fb",
+          "sizeBytes": 2187,
+          "startLine": 4433,
+          "endLine": 4465
+        },
+        {
+          "url": "/plan-adjustment.js?v=minna-1",
+          "path": "plan-adjustment.js",
+          "sha256": "5bc97e2dce3879fa8c6fc4035dec5d13f49de7b1841abb06831394b1abc4dcd4",
+          "sizeBytes": 3476,
+          "startLine": 4468,
+          "endLine": 4521
+        },
+        {
+          "url": "/pause-interaction.js?v=avatar-pause-clock-20261029",
+          "path": "pause-interaction.js",
+          "sha256": "b16997d4c43c0d4fe954dfc35ce7faf13189d7248d567e94fb2f2d14eb22ff7b",
+          "sizeBytes": 10311,
+          "startLine": 4524,
+          "endLine": 4670
+        },
+        {
+          "url": "/category-intelligence.js?v=deep-review-20261027-1",
+          "path": "category-intelligence.js",
+          "sha256": "5313fb69d1d46e162da6e4e0b95cc60a7e515d67c2195cef2fb13fb996802c7e",
+          "sizeBytes": 31734,
+          "startLine": 4673,
+          "endLine": 4973
+        },
+        {
+          "url": "/transaction-journey.js?v=deep-review-20261027-1",
+          "path": "transaction-journey.js",
+          "sha256": "213e24da717deff7c9e969f8dd4c7b8583460a51237d24c9736e64bc5db7e40c",
+          "sizeBytes": 3329,
+          "startLine": 4976,
+          "endLine": 5023
+        },
+        {
+          "url": "/money-boxes.js?v=deep-review-20261027-1",
+          "path": "money-boxes.js",
+          "sha256": "9e52f9adeb1291ccb46cf0901693e4bb566114aa750c047123a4b9557cfd3272",
+          "sizeBytes": 28778,
+          "startLine": 5026,
+          "endLine": 5231
+        },
+        {
+          "url": "/money-box-protection.js?v=minna-1",
+          "path": "money-box-protection.js",
+          "sha256": "5747939fabf83a0c0695761dfadf618a5ad0f9b88abec76c4e26eb0674bb32a4",
+          "sizeBytes": 14032,
+          "startLine": 5234,
+          "endLine": 5387
+        },
+        {
+          "url": "/money-box-protection-ui.js?v=deep-review-20261027-1",
+          "path": "money-box-protection-ui.js",
+          "sha256": "6d85450ac1e8b66914d25de72cb106a019a54b32b0c644e6caf47b9f5339a7c1",
+          "sizeBytes": 17535,
+          "startLine": 5390,
+          "endLine": 5532
+        },
+        {
+          "url": "/product-accounts.js?v=start-correction-1",
+          "path": "product-accounts.js",
+          "sha256": "04603cc23b305625ebcf3fca990373485285fffa107af1e73cc639f0f3e0ae24",
+          "sizeBytes": 11708,
+          "startLine": 5535,
+          "endLine": 5603
+        },
+        {
+          "url": "/funding-budget.js?v=minna-1",
+          "path": "funding-budget.js",
+          "sha256": "97f98d51a79c283fb390f7b15c20ad890230241b7381941eaede5e32a0591e2a",
+          "sizeBytes": 11382,
+          "startLine": 5606,
+          "endLine": 5740
+        },
+        {
+          "url": "/plan-hub.js?v=compact-ui-1",
+          "path": "plan-hub.js",
+          "sha256": "b53ead35cb0b241bee0d79306489d116c7ceaa7c1726c129d846506f190903b6",
+          "sizeBytes": 3345,
+          "startLine": 5743,
+          "endLine": 5775
+        },
+        {
+          "url": "/ambassador.js?v=deep-review-20261027-3",
+          "path": "ambassador.js",
+          "sha256": "72206268ebdf08eff0c766c2929a08bfa324954f62725da48c54feb0550d1f55",
+          "sizeBytes": 8000,
+          "startLine": 5778,
+          "endLine": 5817
+        },
+        {
+          "url": "/vendor/jsqr.js?v=minna-1",
+          "path": "vendor/jsqr.js",
+          "sha256": "bc40c8a15196236b2314db0856f72ca0b49980cd5413b8c852a7349f5fee0859",
+          "sizeBytes": 256885,
+          "startLine": 5820,
+          "endLine": 15921
+        },
+        {
+          "url": "/vendor/qrcode-generator.js?v=minna-1",
+          "path": "vendor/qrcode-generator.js",
+          "sha256": "79ec86f82856005b1c887905cfccfcfbec3821ca61c7fd5a952faa5f778f791c",
+          "sizeBytes": 56694,
+          "startLine": 15924,
+          "endLine": 18221
+        },
+        {
+          "url": "/qr-payments.js?v=qr-corner-hub-2",
+          "path": "qr-payments.js",
+          "sha256": "a2ee030edb405d16e5de9ddc3ef8ed4c55baa472597fb5a050d575344f4e06ed",
+          "sizeBytes": 20848,
+          "startLine": 18224,
+          "endLine": 18451
+        },
+        {
+          "url": "/biometric-auth.js?v=minna-1",
+          "path": "biometric-auth.js",
+          "sha256": "93c193df82b49e8ba91707aad9399f4a11b01f34f88d22a210caca2f6bb1aa2d",
+          "sizeBytes": 7371,
+          "startLine": 18454,
+          "endLine": 18532
+        },
+        {
+          "url": "/chat-banking.js?v=deep-review-20261027-1",
+          "path": "chat-banking.js",
+          "sha256": "be0911132099cdc149962736d3ad52030d4e114f775105f485923e918d21030b",
+          "sizeBytes": 11952,
+          "startLine": 18535,
+          "endLine": 18701
+        },
+        {
+          "url": "/budget-everyday.js?v=deep-review-20261027-1",
+          "path": "budget-everyday.js",
+          "sha256": "b5eacabff4c1db651f1ab9f63254c69c390425afc00410def749e8e8818d9a25",
+          "sizeBytes": 24449,
+          "startLine": 18704,
+          "endLine": 18912
+        },
+        {
+          "url": "/chat-everyday.js?v=deep-review-20261027-1",
+          "path": "chat-everyday.js",
+          "sha256": "287621867ce7c0787a4fd9504d9f076ebac4a6054718ee99dcaaabef7db8f020",
+          "sizeBytes": 25162,
+          "startLine": 18915,
+          "endLine": 19144
+        },
+        {
+          "url": "/daily-insights.js?v=deep-review-20261027-1",
+          "path": "daily-insights.js",
+          "sha256": "c605aa9955143d0b66e23f3e45c006fdb786022f351f3b8423225f53bc43c369",
+          "sizeBytes": 25919,
+          "startLine": 19147,
+          "endLine": 19359
+        },
+        {
+          "url": "/campus-everyday.js?v=deep-review-20261027-1",
+          "path": "campus-everyday.js",
+          "sha256": "14a1a64d3491f776f79fcc08286e09f050ce965dc9dad1a947ef65921218dada",
+          "sizeBytes": 18403,
+          "startLine": 19362,
+          "endLine": 19531
+        },
+        {
+          "url": "/shared-expenses.js?v=chat-refine-2",
+          "path": "shared-expenses.js",
+          "sha256": "cbed82bd726c9f3633f0f0038a77fe2877c19d96f375a9c1d5bd53d8ccbd7bce",
+          "sizeBytes": 23966,
+          "startLine": 19534,
+          "endLine": 19716
+        },
+        {
+          "url": "/saving-rules.js?v=savings-hacks-1",
+          "path": "saving-rules.js",
+          "sha256": "4c200df6e004a4d63eeca5ae480163e5e638cb891710bdd28620c729a79121a2",
+          "sizeBytes": 20267,
+          "startLine": 19719,
+          "endLine": 19959
+        },
+        {
+          "url": "/budget-estimate.js?v=companion-1",
+          "path": "budget-estimate.js",
+          "sha256": "77c4e25e9beb89246df54b911eaae7fc9ec296ef1b08f5a54ed6062d083e6d1f",
+          "sizeBytes": 7380,
+          "startLine": 19962,
+          "endLine": 20036
+        },
+        {
+          "url": "/chat-planning.js?v=experience-1",
+          "path": "chat-planning.js",
+          "sha256": "0ada0a5acfdfc7d21c156a1ed3b8659791068f037e42f73db9d7ef86d4825e6e",
+          "sizeBytes": 19495,
+          "startLine": 20039,
+          "endLine": 20238
+        },
+        {
+          "url": "/spending-outlook.js?v=compact-ui-1",
+          "path": "spending-outlook.js",
+          "sha256": "df25608140baf89915e0364b3d8813e843a20690d2d08ad2d600ee7534da9ce7",
+          "sizeBytes": 11355,
+          "startLine": 20241,
+          "endLine": 20328
+        },
+        {
+          "url": "/budget-history.js?v=deep-review-20261027-5",
+          "path": "budget-history.js",
+          "sha256": "7b5bf0e6cb558e83c97df8617bbd51a7501cb1ab65404c236145043bf6eda3db",
+          "sizeBytes": 20071,
+          "startLine": 20331,
+          "endLine": 20466
+        },
+        {
+          "url": "/pause-recovery.js?v=compact-ui-1",
+          "path": "pause-recovery.js",
+          "sha256": "c8391afd2dabd549a8a4ec04b1233485833c1006e638137bb749b57e9beea0ab",
+          "sizeBytes": 6932,
+          "startLine": 20469,
+          "endLine": 20557
+        },
+        {
+          "url": "/budget-categories.js?v=experience-1",
+          "path": "budget-categories.js",
+          "sha256": "2f0a0155a93fb6f6ed33debf397f952424b089e76b1dfe3ed9a36b6b81340cce",
+          "sizeBytes": 14909,
+          "startLine": 20560,
+          "endLine": 20734
+        },
+        {
+          "url": "/budget-guide.js?v=experience-1",
+          "path": "budget-guide.js",
+          "sha256": "d89d3bb8fea7a7a833bbec04823421cf4902f0c243f1097817ae7637104aa015",
+          "sizeBytes": 48803,
+          "startLine": 20737,
+          "endLine": 21197
+        },
+        {
+          "url": "/budget-guide-ui.js?v=guide-1",
+          "path": "budget-guide-ui.js",
+          "sha256": "23e584e64923a85810ad80b3b6c165fd4006fc9f43b7a5a3e5872329e86078df",
+          "sizeBytes": 6136,
+          "startLine": 21200,
+          "endLine": 21274
+        },
+        {
+          "url": "/budget-overview.js?v=clean-home-1",
+          "path": "budget-overview.js",
+          "sha256": "23b31904c59d37a75d2c6447fa72a7df0c0d76eac6cb986ffeb24621fe46e838",
+          "sizeBytes": 13925,
+          "startLine": 21277,
+          "endLine": 21383
+        },
+        {
+          "url": "/payment-budget-result.js?v=experience-1",
+          "path": "payment-budget-result.js",
+          "sha256": "1a6c252ca8cbf70c935a5d38845d23225869da5671e0fa2223970a8e6eff1465",
+          "sizeBytes": 10363,
+          "startLine": 21386,
+          "endLine": 21501
+        },
+        {
+          "url": "/contextual-chat.js?v=experience-1",
+          "path": "contextual-chat.js",
+          "sha256": "ac31c60ea42f251fd3df65c9b00ec31042d20a4bc69d3a9261c5240d78c80448",
+          "sizeBytes": 13158,
+          "startLine": 21504,
+          "endLine": 21644
+        },
+        {
+          "url": "/budget-period-review.js?v=deep-review-20261027-1",
+          "path": "budget-period-review.js",
+          "sha256": "5d3cee13846fc25cf991840e4178af4a150490167106810683c2efdc6fddd39f",
+          "sizeBytes": 18307,
+          "startLine": 21647,
+          "endLine": 21795
+        },
+        {
+          "url": "/hibiscus-chat.js?v=deep-review-20261027-1",
+          "path": "hibiscus-chat.js",
+          "sha256": "a045fe0621f4e1adc19efb211ad2f7a985834cb19cd4613cc896358a7baefbb8",
+          "sizeBytes": 12216,
+          "startLine": 21798,
+          "endLine": 21916
+        },
+        {
+          "url": "/hibiscus-payment-refinement.js?v=flows-sync-1",
+          "path": "hibiscus-payment-refinement.js",
+          "sha256": "1530bb6492f37811acb5d937c7630d2b86203734fb46bd3c7cc45b76efd2b1e3",
+          "sizeBytes": 1457,
+          "startLine": 21919,
+          "endLine": 21943
+        },
+        {
+          "url": "/virtual-cards-engine.js?v=savings-hacks-1",
+          "path": "virtual-cards-engine.js",
+          "sha256": "74666193f9a3bf975dfa9c3e5b93c3611d1be336b754b80f7806afe2d6ae14a4",
+          "sizeBytes": 21187,
+          "startLine": 21946,
+          "endLine": 22180
+        },
+        {
+          "url": "/virtual-cards-ui.js?v=deep-review-20261027-1",
+          "path": "virtual-cards-ui.js",
+          "sha256": "c740e0c805b5bbff070dbafb74d9c3809c635927898891e079cbf1f87fc7290e",
+          "sizeBytes": 35705,
+          "startLine": 22183,
+          "endLine": 22425
+        },
+        {
+          "url": "/virtual-cards-payments.js?v=flows-sync-1",
+          "path": "virtual-cards-payments.js",
+          "sha256": "a9695bcab044de9d389990e52363449ecd6efb53e5079c1bd00eebad880d3cf3",
+          "sizeBytes": 23084,
+          "startLine": 22428,
+          "endLine": 22612
+        },
+        {
+          "url": "/budget-readability.js?v=flows-sync-1",
+          "path": "budget-readability.js",
+          "sha256": "9e19978d2e26f7beed0714aff988c434b7df38d224eb33b0fbceb7325a74f479",
+          "sizeBytes": 5951,
+          "startLine": 22615,
+          "endLine": 22692
+        },
+        {
+          "url": "/money-story-analytics.js?v=deep-review-20261027-1",
+          "path": "money-story-analytics.js",
+          "sha256": "65a8442a64c0bcdf843cb263a600cfce93cd35b9aca118ed73d96bbbb4e1d930",
+          "sizeBytes": 17559,
+          "startLine": 22695,
+          "endLine": 22825
+        },
+        {
+          "url": "/hibiscus-navigation.js?v=home-budget-direct-1",
+          "path": "hibiscus-navigation.js",
+          "sha256": "69cc08adc7a943b551884874683a239eb64975598a082cb9e6666d638e422604",
+          "sizeBytes": 7208,
+          "startLine": 22828,
+          "endLine": 22925
+        },
+        {
+          "url": "/hibiscus-balance-clarity.js?v=flows-sync-1",
+          "path": "hibiscus-balance-clarity.js",
+          "sha256": "02e00623460c424ad1c32ca27cd026851a87105220ec2d26153c7b94d81df869",
+          "sizeBytes": 1513,
+          "startLine": 22928,
+          "endLine": 22946
+        },
+        {
+          "url": "/hibiscus-budget-clarity.js?v=flows-sync-1",
+          "path": "hibiscus-budget-clarity.js",
+          "sha256": "1bb5d347dbc33eee52ddc5891ab42ea1dd5c51570f88be57748241c841ff8a26",
+          "sizeBytes": 2405,
+          "startLine": 22949,
+          "endLine": 22975
+        },
+        {
+          "url": "/hibiscus-chat-clarity.js?v=flows-sync-1",
+          "path": "hibiscus-chat-clarity.js",
+          "sha256": "ecd497dc1859f7f30ee05b9e3ed4b7f3e41ef7a2298cac52acf3e42b74c52f5e",
+          "sizeBytes": 2469,
+          "startLine": 22978,
+          "endLine": 23022
+        },
+        {
+          "url": "/getting-started.js?v=deep-review-20261027-2",
+          "path": "getting-started.js",
+          "sha256": "eb39906e79581862462309a6801667c4cb8bb6febc6af508ed43c47498071549",
+          "sizeBytes": 1844,
+          "startLine": 23025,
+          "endLine": 23050
+        },
+        {
+          "url": "/personal-qr.js?v=deep-review-20261027-1",
+          "path": "personal-qr.js",
+          "sha256": "6a859920752a3f43e8d1edd8649ed8230839364b59f74425caf717a50a96ce81",
+          "sizeBytes": 10917,
+          "startLine": 23053,
+          "endLine": 23194
+        },
+        {
+          "url": "/qr-floating.js?v=qr-corner-hub-2",
+          "path": "qr-floating.js",
+          "sha256": "3f632c1663c8caa4426d8eeb484030a659bb502f47e62947a840bf2ad456edd0",
+          "sizeBytes": 2709,
+          "startLine": 23197,
+          "endLine": 23243
+        },
+        {
+          "url": "/minna-edition.js?v=minna-1",
+          "path": "minna-edition.js",
+          "sha256": "ace16777b7dac2a581451e86d7bf05b0e63fb8dbe68858acbf1e1a5088c288a5",
+          "sizeBytes": 215,
+          "startLine": 23246,
+          "endLine": 23252
+        },
+        {
+          "url": "/everyday-home.js?v=overflow-review-1",
+          "path": "everyday-home.js",
+          "sha256": "a59e6161cf6ea137f392f1442c91df0298bd615fd05db76244cd931e5a4da74a",
+          "sizeBytes": 5611,
+          "startLine": 23255,
+          "endLine": 23292
+        },
+        {
+          "url": "/pause-intro.js?v=goal-delay-3",
+          "path": "pause-intro.js",
+          "sha256": "ffcda9a3e397c04b300b99ba4de599fe22b4ee9dc3bfdda723acd24f2e044523",
+          "sizeBytes": 2962,
+          "startLine": 23295,
+          "endLine": 23326
+        },
+        {
+          "url": "/mono-conversation.js?v=readiness-1",
+          "path": "mono-conversation.js",
+          "sha256": "f23ff58155410fc583f717b0887b898d7ba550124eaecb1949bf44b7b2b6a136",
+          "sizeBytes": 6567,
+          "startLine": 23329,
+          "endLine": 23395
+        },
+        {
+          "url": "/mono-design.js?v=first-box-20261029",
+          "path": "mono-design.js",
+          "sha256": "1fb90fa3ba3d9eb4c0892a3d57ab6cd2a9f8bcd53d2bc7ed989c07302c97930f",
+          "sizeBytes": 22279,
+          "startLine": 23398,
+          "endLine": 23622
+        },
+        {
+          "url": "/mono-chat-gesture.js?v=personality-1",
+          "path": "mono-chat-gesture.js",
+          "sha256": "635c38eb6a57f80338ffd47a6c7cf708d85e04d6414592183a986101de3c6d33",
+          "sizeBytes": 8180,
+          "startLine": 23625,
+          "endLine": 23751
+        },
+        {
+          "url": "/mono-collections.js?v=payouts-20261029-1",
+          "path": "mono-collections.js",
+          "sha256": "c36a3efd910205585063df58805ca8b175b3bef6b79bcbbc1b14c8f908be6315",
+          "sizeBytes": 8984,
+          "startLine": 23754,
+          "endLine": 23852
+        },
+        {
+          "url": "/mono-brand.js?v=readiness-1",
+          "path": "mono-brand.js",
+          "sha256": "c14020edd87f22f3fe5d1a19e4dd568fa93ba299aed8924630199d566ecdcbcd",
+          "sizeBytes": 4324,
+          "startLine": 23855,
+          "endLine": 23901
+        },
+        {
+          "url": "/mono-preferences.js?v=readiness-1",
+          "path": "mono-preferences.js",
+          "sha256": "72ec1d68d2d5c598bed9530ac741e6a3a70ba556a182562cfb3fa3693fc2ab18",
+          "sizeBytes": 2782,
+          "startLine": 23904,
+          "endLine": 23962
+        },
+        {
+          "url": "/mono-group-usability.js?v=readiness-1",
+          "path": "mono-group-usability.js",
+          "sha256": "8e11a8b951c14fc8a88004261707c156674cb92d96bd6d0093b9cbf92202a00d",
+          "sizeBytes": 9695,
+          "startLine": 23965,
+          "endLine": 24094
+        },
+        {
+          "url": "/mono-review.js?v=readiness-1",
+          "path": "mono-review.js",
+          "sha256": "9765a19a437133f46c5e5fa66af919042cb888e10b4f612497b77e91f9f68aa5",
+          "sizeBytes": 1912,
+          "startLine": 24097,
+          "endLine": 24124
+        },
+        {
+          "url": "/group-money-engine.js?v=payout-rails-20261029",
+          "path": "group-money-engine.js",
+          "sha256": "dbfd9685dfc044f2f2dc6e19a0aeeac2e93db9d12585bb812ab31b39ad0407ae",
+          "sizeBytes": 78563,
+          "startLine": 24127,
+          "endLine": 24834
+        },
+        {
+          "url": "/group-money-ui.js?v=payouts-20261029-1",
+          "path": "group-money-ui.js",
+          "sha256": "0ebc90870fd6552742b213f67cdefc3f22e40174564234c4a52a8d72fab0a407",
+          "sizeBytes": 99092,
+          "startLine": 24837,
+          "endLine": 25343
+        },
+        {
+          "url": "/collection-evidence.js?v=payout-rails-20261029",
+          "path": "collection-evidence.js",
+          "sha256": "bc4ba4aa1146d63fd4ca657afe4ec3db90c2fb53900a65bc408bda4236d61fea",
+          "sizeBytes": 8221,
+          "startLine": 25346,
+          "endLine": 25438
+        },
+        {
+          "url": "/payment-consequence.js?v=clarity-1",
+          "path": "payment-consequence.js",
+          "sha256": "0e4341fc64160a6626447da83efcf0ee78cbe1c9bbe7c0e904edf6d31abad710",
+          "sizeBytes": 5148,
+          "startLine": 25441,
+          "endLine": 25501
+        },
+        {
+          "url": "/experience-clarity.js?v=home-budget-direct-1",
+          "path": "experience-clarity.js",
+          "sha256": "ade21faff2707e83a9e094623288ce96f248ced762ccbc0baa8c31ca3e09e30f",
+          "sizeBytes": 15604,
+          "startLine": 25504,
+          "endLine": 25681
+        },
+        {
+          "url": "/chat-context-starters.js?v=clarity-1",
+          "path": "chat-context-starters.js",
+          "sha256": "47e8d1e7b67a046a47ec06c187d4d590554360f5fe0853f5a5ed9706da14069c",
+          "sizeBytes": 4175,
+          "startLine": 25684,
+          "endLine": 25746
+        },
+        {
+          "url": "/savings-hacks-engine.js?v=savings-hacks-1",
+          "path": "savings-hacks-engine.js",
+          "sha256": "27e1c7c60d9c199cf451232dfb6d1df7c2ff1135214b7e5c319dc7628690aecf",
+          "sizeBytes": 18934,
+          "startLine": 25749,
+          "endLine": 25989
+        },
+        {
+          "url": "/savings-hacks-ui.js?v=deep-review-20261027-1",
+          "path": "savings-hacks-ui.js",
+          "sha256": "2c39b111a308f2790200b030f0640520bc7f867e3da8571bd11aa6687375574f",
+          "sizeBytes": 18127,
+          "startLine": 25992,
+          "endLine": 26151
+        },
+        {
+          "url": "/page-guidance.js?v=deep-review-20261027-1",
+          "path": "page-guidance.js",
+          "sha256": "19e16bc35189e7f65eb8889742e5789ebfc6e3ff3800dd672f566aed32ddbec5",
+          "sizeBytes": 9730,
+          "startLine": 26154,
+          "endLine": 26275
+        },
+        {
+          "url": "/product-finish.js?v=deep-review-20261027-3",
+          "path": "product-finish.js",
+          "sha256": "f23b8e65586393d34fbd8c8107795a6ab3b1c931bd0a4bee474ee25f85df103d",
+          "sizeBytes": 3662,
+          "startLine": 26278,
+          "endLine": 26339
+        },
+        {
+          "url": "/collection-contributions-engine.js?v=own-payments-20261029",
+          "path": "collection-contributions-engine.js",
+          "sha256": "6930a3af87e329627ad53bfc987e807280ab780d698e9a5ea37edb5e781ae36f",
+          "sizeBytes": 17838,
+          "startLine": 26342,
+          "endLine": 26528
+        },
+        {
+          "url": "/collection-contributions-ui.js?v=own-payments-20261029",
+          "path": "collection-contributions-ui.js",
+          "sha256": "b7ddb8282f5f30abf784d3c29417dfb80301fe0c25878a85733816ac6ae2443c",
+          "sizeBytes": 19179,
+          "startLine": 26531,
+          "endLine": 26698
+        },
+        {
+          "url": "/collection-payout-rails.js?v=payout-rails-20261029",
+          "path": "collection-payout-rails.js",
+          "sha256": "85e08c93856151e5d58f916d37d3eef028eeb3658d4ea29ef58104ac221d8980",
+          "sizeBytes": 19129,
+          "startLine": 26701,
+          "endLine": 26848
+        },
+        {
+          "url": "/mono-pause.js?v=all-pause-entrypoints-20261029",
+          "path": "mono-pause.js",
+          "sha256": "21aa329a36b45d8b9c4e9c7b028a604480ea4117268018d506927f236c884c8a",
+          "sizeBytes": 10367,
+          "startLine": 26851,
+          "endLine": 26957
+        },
+        {
+          "url": "/mono-chrome-consistency.js?v=consistency-20261029",
+          "path": "mono-chrome-consistency.js",
+          "sha256": "e8a4ea8f53ecb83510453bc15d689a1aab0ff786c685579a4f836f89185f8c09",
+          "sizeBytes": 3071,
+          "startLine": 26960,
+          "endLine": 27009
+        },
+        {
+          "url": "/money-life-engine.js?v=money-journeys-20261030",
+          "path": "money-life-engine.js",
+          "sha256": "45438fd73bd606a643896d823321274ba5f7b54121ff4f8ec75f9063e2900eb0",
+          "sizeBytes": 24061,
+          "startLine": 27012,
+          "endLine": 27204
+        },
+        {
+          "url": "/money-life-ui.js?v=money-journeys-20261030",
+          "path": "money-life-ui.js",
+          "sha256": "6a58b642114dbbca228db9ad9d3a0684888e63115f3cbf8ccf87046365130e6b",
+          "sizeBytes": 47227,
+          "startLine": 27207,
+          "endLine": 27403
+        },
+        {
+          "url": "/signal-edition.js?v=signal-20261030",
+          "path": "signal-edition.js",
+          "sha256": "79ad0a45dc70302088ffdd1b0661168372437a64752770a18d644546a52f17c1",
+          "sizeBytes": 14996,
+          "startLine": 27406,
+          "endLine": 27515
+        },
+        {
+          "url": "/signal-account.js?v=signal-bold-20261030",
+          "path": "signal-account.js",
+          "sha256": "1c3dcdc982a4f634434cf5a51a9d5cd6785b95a24d7f0561f05e0ac28f39f58e",
+          "sizeBytes": 2311,
+          "startLine": 27518,
+          "endLine": 27555
+        },
+        {
+          "url": "/signal-planning.js?v=signal-bold-20261030",
+          "path": "signal-planning.js",
+          "sha256": "2a2880f0551235920c1bd6c5bdba26645b0f97a363023024380c6d12057bdbf9",
+          "sizeBytes": 3882,
+          "startLine": 27558,
+          "endLine": 27619
+        },
+        {
+          "url": "/signal-payments.js?v=signal-bold-20261030",
+          "path": "signal-payments.js",
+          "sha256": "e4cf4cede31ed4f370b9652a5b7112dba6becaab8ac51c08130d60b6a8b26dd9",
+          "sizeBytes": 2673,
+          "startLine": 27622,
+          "endLine": 27665
+        },
+        {
+          "url": "/signal-navigation.js?v=signal-pages-20261031",
+          "path": "signal-navigation.js",
+          "sha256": "702040133dea90b2d01ad092e42831a082b91f26e41e8fae5bcc662385732a3e",
+          "sizeBytes": 18717,
+          "startLine": 27668,
+          "endLine": 27945
+        },
+        {
+          "url": "/platform-runtime.js?v=readiness-fixes-20261029",
+          "path": "platform-runtime.js",
+          "sha256": "6de656fcc2f8225db33fd1ccf7140c3711a77c4063b1901be325dc41220166f2",
+          "sizeBytes": 9838,
+          "startLine": 27948,
+          "endLine": 28070
+        },
+        {
+          "url": "/persistence-recovery.js?v=readiness-fixes-20261029",
+          "path": "persistence-recovery.js",
+          "sha256": "b432297133949f4a197699160b1262eddec5cd252ca98f530a0f07aff9ad8b22",
+          "sizeBytes": 8035,
+          "startLine": 28073,
+          "endLine": 28154
+        },
+        {
+          "url": "/platform-init.js?v=readiness-fixes-20261029",
+          "path": "platform-init.js",
+          "sha256": "67c2d14c7242c5d55671a67886e302f997d4f2911a5f420da7197c6511f48397",
+          "sizeBytes": 930,
+          "startLine": 28157,
+          "endLine": 28174
+        }
+      ]
+    },
+    "stylesheet": {
+      "path": "lumo-ui.afac6d043f39.css",
+      "sha256": "afac6d043f393e19f386d0fdb9cd132c41d9f738f33c26def6f980f1c97dc565",
+      "sizeBytes": 1045310,
+      "sources": [
+        {
+          "url": "/style.css?v=minna-1",
+          "path": "style.css",
+          "sha256": "99cfb5d950e7e7fe479d7d3cc635aec3bbe7f634b4e77bf1dbdc797a4e56830d",
+          "sizeBytes": 13194,
+          "startLine": 3,
+          "endLine": 5
+        },
+        {
+          "url": "/pause.css?v=minna-1",
+          "path": "pause.css",
+          "sha256": "084c9ca034c63814f00b571802277f7e64436fccf04ca9663facd91b498fe9b7",
+          "sizeBytes": 9058,
+          "startLine": 7,
+          "endLine": 32
+        },
+        {
+          "url": "/motion.css?v=minna-1",
+          "path": "motion.css",
+          "sha256": "df5d19b9a877184ba66415f3d160f88d5303688b6194223a4897c6840a61793d",
+          "sizeBytes": 3078,
+          "startLine": 34,
+          "endLine": 79
+        },
+        {
+          "url": "/illustrations.css?v=minna-1",
+          "path": "illustrations.css",
+          "sha256": "979fab145e24f3b1aaac8ba0fcd7d87893827e3726476b2042b810fd51fe4fa8",
+          "sizeBytes": 4382,
+          "startLine": 81,
+          "endLine": 85
+        },
+        {
+          "url": "/compact.css?v=minna-1",
+          "path": "compact.css",
+          "sha256": "dd8b8cfcbdc4a0116a91c0c92eaacde35d94b6b67c0c4fe33da6aeffa1053dac",
+          "sizeBytes": 28192,
+          "startLine": 87,
+          "endLine": 459
+        },
+        {
+          "url": "/focus.css?v=minna-1",
+          "path": "focus.css",
+          "sha256": "2d183550b5ce75a9a02317d6d01c1717b5c0667cdb97f542d7b2d06ce3d85a68",
+          "sizeBytes": 33411,
+          "startLine": 461,
+          "endLine": 667
+        },
+        {
+          "url": "/decision-layout.css?v=minna-1",
+          "path": "decision-layout.css",
+          "sha256": "9c9c877cb85f9d96cc0222095d1053297f9498f3912c3c80a048763182b82628",
+          "sizeBytes": 8609,
+          "startLine": 669,
+          "endLine": 760
+        },
+        {
+          "url": "/chat-layout.css?v=minna-1",
+          "path": "chat-layout.css",
+          "sha256": "fd2889d41bc59ca90565c5d1a4a2d229cd0a8ccbabc3a9938d9f08912a03e367",
+          "sizeBytes": 3250,
+          "startLine": 762,
+          "endLine": 799
+        },
+        {
+          "url": "/type-system.css?v=minna-1",
+          "path": "type-system.css",
+          "sha256": "07368700800a8d55a24aa6f85e2a029b2ee6f794ebe794594d5b005777100160",
+          "sizeBytes": 3255,
+          "startLine": 801,
+          "endLine": 926
+        },
+        {
+          "url": "/design-system.css?v=minna-1",
+          "path": "design-system.css",
+          "sha256": "376c80176f5d73ddf7ba12c18661e31c5b401d0ef750a6290deb81b4c8fb6b21",
+          "sizeBytes": 15017,
+          "startLine": 928,
+          "endLine": 1089
+        },
+        {
+          "url": "/illustration-system.css?v=minna-1",
+          "path": "illustration-system.css",
+          "sha256": "44719f64de03e2a9370da9a97352834a2144d531af7082f61a124c3a80de66cd",
+          "sizeBytes": 1377,
+          "startLine": 1091,
+          "endLine": 1112
+        },
+        {
+          "url": "/journey-refinement.css?v=minna-1",
+          "path": "journey-refinement.css",
+          "sha256": "7d49cdfa648a0c1a08ba6bc3fccb495000b6ecb5c5883630765d5736eef517c2",
+          "sizeBytes": 7778,
+          "startLine": 1114,
+          "endLine": 1209
+        },
+        {
+          "url": "/clarity-type.css?v=minna-1",
+          "path": "clarity-type.css",
+          "sha256": "838d5c0c394141c34c88ad6fe0bb5f17ad5a0f90eb6531983902904b1f0f7f7b",
+          "sizeBytes": 2701,
+          "startLine": 1211,
+          "endLine": 1319
+        },
+        {
+          "url": "/clarity-edition.css?v=minna-1",
+          "path": "clarity-edition.css",
+          "sha256": "28d4bbe08a6bb25fd690296750b5154859cb3d5525422b2831d389bac132f4b2",
+          "sizeBytes": 31615,
+          "startLine": 1321,
+          "endLine": 1641
+        },
+        {
+          "url": "/task-sheet.css?v=minna-1",
+          "path": "task-sheet.css",
+          "sha256": "892ad112a81fe8d200d447af10468707f5c0212f4ad54dfd4cf3efc9a8929ac1",
+          "sizeBytes": 14641,
+          "startLine": 1643,
+          "endLine": 1932
+        },
+        {
+          "url": "/clarity-bold.css?v=minna-1",
+          "path": "clarity-bold.css",
+          "sha256": "6316baac11c7031261c25d2de55e3ecaa321d2e340a19a75e46b911891d5fd12",
+          "sizeBytes": 21059,
+          "startLine": 1934,
+          "endLine": 2233
+        },
+        {
+          "url": "/native-refinement.css?v=compact-ui-1",
+          "path": "native-refinement.css",
+          "sha256": "9294411cb7000bb998fd7b347c0efbca5966b9b12cfaea7071532627bfa7314c",
+          "sizeBytes": 37831,
+          "startLine": 2235,
+          "endLine": 2651
+        },
+        {
+          "url": "/everyday-edition.css?v=minna-1",
+          "path": "everyday-edition.css",
+          "sha256": "08330ae701685ced2e1d006bb3ffdeaa0c310ba5b1e4cd31f4e19dced2169bc6",
+          "sizeBytes": 30188,
+          "startLine": 2653,
+          "endLine": 3195
+        },
+        {
+          "url": "/plan-clarity.css?v=minna-1",
+          "path": "plan-clarity.css",
+          "sha256": "546740eecdf00a81ca92993a15bf168d52a5e5aa9bc100dad4a79fef2936e211",
+          "sizeBytes": 769,
+          "startLine": 3197,
+          "endLine": 3207
+        },
+        {
+          "url": "/payment-balance.css?v=minna-1",
+          "path": "payment-balance.css",
+          "sha256": "c529baab9e67728456605ebbd5fe42ea8f87ab846057ebf04e46cd108bbd17bd",
+          "sizeBytes": 998,
+          "startLine": 3209,
+          "endLine": 3227
+        },
+        {
+          "url": "/pause-hero.css?v=minna-1",
+          "path": "pause-hero.css",
+          "sha256": "b1ce9dd13f0882440ec304e89017a52386b946a789263e69c8a40410ea468781",
+          "sizeBytes": 6408,
+          "startLine": 3229,
+          "endLine": 3304
+        },
+        {
+          "url": "/pause-interaction.css?v=minna-1",
+          "path": "pause-interaction.css",
+          "sha256": "e6db557492574a214218e8eb03b5bdab66f104858d3536ae62b9ad0178057d1a",
+          "sizeBytes": 2035,
+          "startLine": 3306,
+          "endLine": 3324
+        },
+        {
+          "url": "/category-intelligence.css?v=minna-1",
+          "path": "category-intelligence.css",
+          "sha256": "a455ca1656c9235bb534c1f546be350229d8003040c77bd4b1d0f3e4bad5a03d",
+          "sizeBytes": 3809,
+          "startLine": 3326,
+          "endLine": 3336
+        },
+        {
+          "url": "/transaction-journey.css?v=minna-1",
+          "path": "transaction-journey.css",
+          "sha256": "1335d84629e253bd54d22626487ae683ba860d6f463d5b645dc9fcb801f1040d",
+          "sizeBytes": 3513,
+          "startLine": 3338,
+          "endLine": 3350
+        },
+        {
+          "url": "/product-accounts.css?v=minna-1",
+          "path": "product-accounts.css",
+          "sha256": "60beaf49f5e8f0968e650de88954cfc13461ab6674396092999039f64e8b7ec7",
+          "sizeBytes": 5112,
+          "startLine": 3352,
+          "endLine": 3359
+        },
+        {
+          "url": "/home-plan-refinement.css?v=clean-home-2",
+          "path": "home-plan-refinement.css",
+          "sha256": "9d1b8fda66cf41010b1a3ca666766405e08b6610cecee5254f8c3241b614594c",
+          "sizeBytes": 14363,
+          "startLine": 3361,
+          "endLine": 3515
+        },
+        {
+          "url": "/ui-consistency.css?v=minna-1",
+          "path": "ui-consistency.css",
+          "sha256": "20865a69c597376f779988d63ae8e68167a8bdd43ee3d1024c3c371a55f0819a",
+          "sizeBytes": 23168,
+          "startLine": 3517,
+          "endLine": 3842
+        },
+        {
+          "url": "/qr-payments.css?v=deep-review-20261027-1",
+          "path": "qr-payments.css",
+          "sha256": "943d31c354c162bddb18a861e9a56e861ab30e503420386a4f2986648e5676d1",
+          "sizeBytes": 13711,
+          "startLine": 3844,
+          "endLine": 3992
+        },
+        {
+          "url": "/biometric-auth.css?v=minna-1",
+          "path": "biometric-auth.css",
+          "sha256": "3f41aae409076a5095d2529275917593593db1a6f7d82ae7469a36a9fa54e5fb",
+          "sizeBytes": 1767,
+          "startLine": 3994,
+          "endLine": 4015
+        },
+        {
+          "url": "/minna-edition.css?v=clean-home-1",
+          "path": "minna-edition.css",
+          "sha256": "918929909f8590d11da8766871bf5e9385f8453da58de51b80b22108d90ac25a",
+          "sizeBytes": 18545,
+          "startLine": 4017,
+          "endLine": 4190
+        },
+        {
+          "url": "/minna-transactions.css?v=minna-1",
+          "path": "minna-transactions.css",
+          "sha256": "00fc99ea7b974be808a1e9f6767ed0e22998a23c10bb4f26dd1afdced0734d17",
+          "sizeBytes": 24011,
+          "startLine": 4192,
+          "endLine": 4413
+        },
+        {
+          "url": "/minna-flows.css?v=minna-1",
+          "path": "minna-flows.css",
+          "sha256": "97668bc3d900af015b3fce6cb99c2ada7a89c8d06d039019157a3ec256d23a88",
+          "sizeBytes": 15099,
+          "startLine": 4415,
+          "endLine": 4713
+        },
+        {
+          "url": "/chat-banking.css?v=chat-refine-2",
+          "path": "chat-banking.css",
+          "sha256": "c235c1408cf04f3500997074d13e5c6ec706dcd0e016308bfd4b3141baaa8529",
+          "sizeBytes": 16397,
+          "startLine": 4715,
+          "endLine": 5007
+        },
+        {
+          "url": "/budget-everyday.css?v=everyday-value-1",
+          "path": "budget-everyday.css",
+          "sha256": "21d8327ecfe7f6886d09b97e63e0243142c69a720bbdc4e1e1d2ea552e45c59f",
+          "sizeBytes": 2493,
+          "startLine": 5009,
+          "endLine": 5035
+        },
+        {
+          "url": "/chat-everyday.css?v=everyday-value-1",
+          "path": "chat-everyday.css",
+          "sha256": "76fc0681ccf9f43fc89c26e76357d0e04cbeefa1b197a1d79b0478b091158b3f",
+          "sizeBytes": 797,
+          "startLine": 5037,
+          "endLine": 5048
+        },
+        {
+          "url": "/daily-insights.css?v=chat-refine-2",
+          "path": "daily-insights.css",
+          "sha256": "022f364cffa090d6775a9d07a0765d8dd532469441709f83804cb92b077119c1",
+          "sizeBytes": 3817,
+          "startLine": 5050,
+          "endLine": 5087
+        },
+        {
+          "url": "/campus-everyday.css?v=everyday-value-1",
+          "path": "campus-everyday.css",
+          "sha256": "1c7a87509c1d31183b331373ddf24a07093291733a2ddd07e9706e55540789e0",
+          "sizeBytes": 4329,
+          "startLine": 5089,
+          "endLine": 5126
+        },
+        {
+          "url": "/shared-expenses.css?v=everyday-value-1",
+          "path": "shared-expenses.css",
+          "sha256": "aabd7b48487e2966d398d9ab9d16cee116b6497266d6d4fd2f5f6528e35c2a6a",
+          "sizeBytes": 3590,
+          "startLine": 5128,
+          "endLine": 5163
+        },
+        {
+          "url": "/saving-rules.css?v=everyday-value-1",
+          "path": "saving-rules.css",
+          "sha256": "dd64723fcb0b61a81b2b47c760e66a433c25ee1f0d1b847eb22f317ebfb32a16",
+          "sizeBytes": 2464,
+          "startLine": 5165,
+          "endLine": 5181
+        },
+        {
+          "url": "/budget-estimate.css?v=companion-1",
+          "path": "budget-estimate.css",
+          "sha256": "8184ee0bf90ab536744ed8856f3a48fe4bc721223e5882eb0eb824286fb781fc",
+          "sizeBytes": 850,
+          "startLine": 5183,
+          "endLine": 5191
+        },
+        {
+          "url": "/spending-outlook.css?v=compact-ui-1",
+          "path": "spending-outlook.css",
+          "sha256": "4bfc24a3671360b9a5440917461c9a9ec1a6514555daf5e1e032e8194f8b972f",
+          "sizeBytes": 1805,
+          "startLine": 5193,
+          "endLine": 5209
+        },
+        {
+          "url": "/budget-history.css?v=compact-ui-1",
+          "path": "budget-history.css",
+          "sha256": "98f0e96fb344957e60f9eb2bce61fecf376a1a49ad2c14afeeae9cbefcc2439a",
+          "sizeBytes": 2315,
+          "startLine": 5211,
+          "endLine": 5236
+        },
+        {
+          "url": "/pause-recovery.css?v=compact-ui-1",
+          "path": "pause-recovery.css",
+          "sha256": "9e6eeb72b80c00ca3b46b0d609fc1e1a9cb04d8bc3b0d21a127f7c2b1ef987c8",
+          "sizeBytes": 4222,
+          "startLine": 5238,
+          "endLine": 5275
+        },
+        {
+          "url": "/budget-guide.css?v=guide-1",
+          "path": "budget-guide.css",
+          "sha256": "7e159f2d551c39ab4c94bb5884662d661a1310371a077ba65a4ca93e4083c275",
+          "sizeBytes": 3359,
+          "startLine": 5277,
+          "endLine": 5305
+        },
+        {
+          "url": "/budget-overview.css?v=experience-1",
+          "path": "budget-overview.css",
+          "sha256": "223a36870dcf8981c36f2fcb2c8125c58add0dc4a44d1324055b7a2608ce9d0c",
+          "sizeBytes": 5405,
+          "startLine": 5307,
+          "endLine": 5362
+        },
+        {
+          "url": "/payment-budget-result.css?v=experience-1",
+          "path": "payment-budget-result.css",
+          "sha256": "7b48284866b53ad8e283da8b4341756b18819a1c00af876881a6e264d971f453",
+          "sizeBytes": 1797,
+          "startLine": 5364,
+          "endLine": 5384
+        },
+        {
+          "url": "/contextual-chat.css?v=experience-1",
+          "path": "contextual-chat.css",
+          "sha256": "d0667a05c6ba791d6a71a7fa4b22599c228c9f288f63c8519e3921e12a0d7578",
+          "sizeBytes": 2367,
+          "startLine": 5386,
+          "endLine": 5415
+        },
+        {
+          "url": "/budget-period-review.css?v=experience-1",
+          "path": "budget-period-review.css",
+          "sha256": "1e032ccdfc74fa664f6dcbcceabfc2dc17a41be046fbdb8072bac0267ee28c88",
+          "sizeBytes": 1528,
+          "startLine": 5417,
+          "endLine": 5433
+        },
+        {
+          "url": "/feature-flows.css?v=flows-sync-1",
+          "path": "feature-flows.css",
+          "sha256": "daf642cecdbeac6d10bf013ccbf8b418b21e17f45873d64b4364d7c23e615ee1",
+          "sizeBytes": 37021,
+          "startLine": 5435,
+          "endLine": 5840
+        },
+        {
+          "url": "/edition-home.css?v=start-correction-1",
+          "path": "edition-home.css",
+          "sha256": "ed7a7478b2d84b751150289822c05c3ff2f301386c46ca65a3294e55e81d7608",
+          "sizeBytes": 4626,
+          "startLine": 5842,
+          "endLine": 5881
+        },
+        {
+          "url": "/getting-started.css?v=start-correction-1",
+          "path": "getting-started.css",
+          "sha256": "a6c0179c312c74485b3c775a34c66eadaa7a5b2e30790a18e77cd47a317fa200",
+          "sizeBytes": 6441,
+          "startLine": 5883,
+          "endLine": 5936
+        },
+        {
+          "url": "/personal-qr.css?v=personal-qr-1",
+          "path": "personal-qr.css",
+          "sha256": "9e6d67079fa9a549a2bf3f8f2568bfa6b083a1c1608279365932d11824204d77",
+          "sizeBytes": 2620,
+          "startLine": 5938,
+          "endLine": 5972
+        },
+        {
+          "url": "/qr-floating.css?v=qr-corner-hub-2",
+          "path": "qr-floating.css",
+          "sha256": "b3ec29baa65513deccd6b561489235f1e046eb16d4247c2b52d4aae6181e864b",
+          "sizeBytes": 1141,
+          "startLine": 5974,
+          "endLine": 5984
+        },
+        {
+          "url": "/everyday-home.css?v=illustrations-2",
+          "path": "everyday-home.css",
+          "sha256": "097e202f027854ad580dd759dd17e59d5e3411307bc29ded7e2d495b69d9977b",
+          "sizeBytes": 16024,
+          "startLine": 5986,
+          "endLine": 6118
+        },
+        {
+          "url": "/minna-home.css?v=hierarchy-1",
+          "path": "minna-home.css",
+          "sha256": "28d5c41ad329a7767a8a35a225d3eb69a01d5928462fdedf394b1327544fdee7",
+          "sizeBytes": 5306,
+          "startLine": 6120,
+          "endLine": 6164
+        },
+        {
+          "url": "/page-chrome.css?v=quiet-headers-1",
+          "path": "page-chrome.css",
+          "sha256": "f251ce7f50bff99543350ca01417db3aff0ef56ad50be37cda4f8283f647d052",
+          "sizeBytes": 2564,
+          "startLine": 6166,
+          "endLine": 6188
+        },
+        {
+          "url": "/pause-intro.css?v=goal-delay-3",
+          "path": "pause-intro.css",
+          "sha256": "014a3a118a6cf6b3cecb49694f8d6b65ca79f43af57f50e9815c0f3ff4f28c02",
+          "sizeBytes": 9277,
+          "startLine": 6190,
+          "endLine": 6262
+        },
+        {
+          "url": "/group-money.css?v=payouts-20261029-1",
+          "path": "group-money.css",
+          "sha256": "97ea5ab78e6841df65bbf3c37e9ba3b85daa5df4badb3eec388a8a8ed6ccf9f8",
+          "sizeBytes": 21787,
+          "startLine": 6264,
+          "endLine": 6470
+        },
+        {
+          "url": "/payment-consequence.css?v=clarity-1",
+          "path": "payment-consequence.css",
+          "sha256": "7c307b7eeb1d05739041d851e37a30c6efb1100d8d84f742b6a15a90d20197d0",
+          "sizeBytes": 4200,
+          "startLine": 6472,
+          "endLine": 6521
+        },
+        {
+          "url": "/experience-clarity.css?v=clarity-1",
+          "path": "experience-clarity.css",
+          "sha256": "a264815c125475c2e1e84371f6010f9cf9d7a4582f0b2e66833f554720c9da6c",
+          "sizeBytes": 2126,
+          "startLine": 6523,
+          "endLine": 6556
+        },
+        {
+          "url": "/overflow-shell.css?v=overflow-review-1",
+          "path": "overflow-shell.css",
+          "sha256": "85292bfc35dfeb39e248698d9775aa1140a89af0c6421d778e100459e9721aed",
+          "sizeBytes": 5857,
+          "startLine": 6558,
+          "endLine": 6642
+        },
+        {
+          "url": "/overflow-components.css?v=overflow-review-1",
+          "path": "overflow-components.css",
+          "sha256": "89e92a2069d386b2aa246dfd0b69af290d67205a50abc8ac89573f445fedeea8",
+          "sizeBytes": 8280,
+          "startLine": 6644,
+          "endLine": 6801
+        },
+        {
+          "url": "/savings-hacks.css?v=quiet-pages-1",
+          "path": "savings-hacks.css",
+          "sha256": "945dc553b498cf6c62dcc2a04f1de8e2185fda40f7b60a5105c6b85b07d80f72",
+          "sizeBytes": 4990,
+          "startLine": 6803,
+          "endLine": 6837
+        },
+        {
+          "url": "/page-guidance.css?v=quiet-pages-1",
+          "path": "page-guidance.css",
+          "sha256": "21fd44fac142bd5f6a3fdaa6fffc71473b7d37f8cb322ce830fb4d9cdfe88b96",
+          "sizeBytes": 959,
+          "startLine": 6839,
+          "endLine": 6847
+        },
+        {
+          "url": "/product-finish.css?v=deep-review-20261027-3",
+          "path": "product-finish.css",
+          "sha256": "ba01a58da3a6b128de99d8d1e1d4a8fac4e526267cdd10eb803cef7102a667b4",
+          "sizeBytes": 9327,
+          "startLine": 6849,
+          "endLine": 7000
+        },
+        {
+          "url": "/mono-design.css?v=home-story-1",
+          "path": "mono-design.css",
+          "sha256": "97944a016c268b8c3c1bb0f3ca007a35ebb1949d032909267609e14f782d5bad",
+          "sizeBytes": 26774,
+          "startLine": 7002,
+          "endLine": 7234
+        },
+        {
+          "url": "/mono-planning.css?v=refine-1",
+          "path": "mono-planning.css",
+          "sha256": "4fbdbc7a4da8a2630fb0969fcb9e499d2165b96a47aa8075bebcca89672272f2",
+          "sizeBytes": 30557,
+          "startLine": 7236,
+          "endLine": 7502
+        },
+        {
+          "url": "/mono-payments.css?v=refine-1",
+          "path": "mono-payments.css",
+          "sha256": "df3980e686c59df26aaaf7d260d8a72438d7825db2012705613f286b2dbc6b2b",
+          "sizeBytes": 39565,
+          "startLine": 7504,
+          "endLine": 7847
+        },
+        {
+          "url": "/mono-life.css?v=refine-1",
+          "path": "mono-life.css",
+          "sha256": "fe414cc4feacfa32072e4c1745b649aec33a70244ab4a2abd9030612c0e2751c",
+          "sizeBytes": 27788,
+          "startLine": 7849,
+          "endLine": 8305
+        },
+        {
+          "url": "/mono-navigation.css?v=first-box-20261029",
+          "path": "mono-navigation.css",
+          "sha256": "42b6ee6acd98ca58a51488f88823a34dd33df1c38024fef8572e11a444a30de6",
+          "sizeBytes": 32071,
+          "startLine": 8307,
+          "endLine": 8612
+        },
+        {
+          "url": "/mono-collections.css?v=refine-1",
+          "path": "mono-collections.css",
+          "sha256": "8b6b20ed1b29b33168c10fe02dd8abb98a53da79f312b93765e1368441e7c4c8",
+          "sizeBytes": 3515,
+          "startLine": 8614,
+          "endLine": 8665
+        },
+        {
+          "url": "/mono-brand.css?v=readiness-1",
+          "path": "mono-brand.css",
+          "sha256": "0b4f0a501a8422b54363c30b3018f1dce88ba42fa6ad69ca6562dae298deed38",
+          "sizeBytes": 8356,
+          "startLine": 8667,
+          "endLine": 8750
+        },
+        {
+          "url": "/mono-review.css?v=readiness-1",
+          "path": "mono-review.css",
+          "sha256": "baf6f4119a4fd6006c74475c6b778ab69261c673b64dcf92085c068ac09ecbd3",
+          "sizeBytes": 939,
+          "startLine": 8752,
+          "endLine": 8756
+        },
+        {
+          "url": "/collection-contributions.css?v=own-payments-20261029",
+          "path": "collection-contributions.css",
+          "sha256": "2f5dc650645af354dc7cc781745f2d6389cb97dfb06561c8079a028712ba25a0",
+          "sizeBytes": 3041,
+          "startLine": 8758,
+          "endLine": 8786
+        },
+        {
+          "url": "/collection-payout-rails.css?v=payout-rails-20261029",
+          "path": "collection-payout-rails.css",
+          "sha256": "4a88ece00b5df6410579633eb0619826a1d4b6bc998fffbebe77e21914869e27",
+          "sizeBytes": 1449,
+          "startLine": 8788,
+          "endLine": 8790
+        },
+        {
+          "url": "/mono-pause.css?v=all-pause-entrypoints-20261029",
+          "path": "mono-pause.css",
+          "sha256": "b33299491e13ff7af53be925aec9f959b5fc959e986a07cbe75d9399c35e4093",
+          "sizeBytes": 18966,
+          "startLine": 8792,
+          "endLine": 9084
+        },
+        {
+          "url": "/mono-type-consistency.css?v=consistency-20261029",
+          "path": "mono-type-consistency.css",
+          "sha256": "7575cd9fb9868285da6c3d0b97b05f857101d14e1363a7e3ebf096759baeea61",
+          "sizeBytes": 3595,
+          "startLine": 9086,
+          "endLine": 9157
+        },
+        {
+          "url": "/mono-surface-consistency.css?v=consistency-20261029",
+          "path": "mono-surface-consistency.css",
+          "sha256": "9c575465cb1abbe5910942311221c4edd9413e3e7e3d19823ecb32ad0eda9ead",
+          "sizeBytes": 2954,
+          "startLine": 9159,
+          "endLine": 9229
+        },
+        {
+          "url": "/platform-runtime.css?v=readiness-fixes-20261029",
+          "path": "platform-runtime.css",
+          "sha256": "ef36feb88998b6335d48e047cf4be9f4f2325abc3c6fc1c1c8ca68482ba34242",
+          "sizeBytes": 1694,
+          "startLine": 9231,
+          "endLine": 9248
+        },
+        {
+          "url": "/persistence-recovery.css?v=readiness-fixes-20261029",
+          "path": "persistence-recovery.css",
+          "sha256": "7e4193dd73f213f1321424184dbdbcdf1c078c9464afc4f6dc09147163b4b7d7",
+          "sizeBytes": 1290,
+          "startLine": 9250,
+          "endLine": 9254
+        },
+        {
+          "url": "/money-life.css?v=money-journeys-20261030",
+          "path": "money-life.css",
+          "sha256": "1a082725d59009dc70a2927de07649ab6530d71d36bbdf18ad070677b980f2b8",
+          "sizeBytes": 7270,
+          "startLine": 9256,
+          "endLine": 9326
+        },
+        {
+          "url": "/signal-system.css?v=signal-20261030",
+          "path": "signal-system.css",
+          "sha256": "b36c96ffb0d81a8b2e4ef0943cd9dfe4cb2103f9a8d637214edf00ff5bbfe03b",
+          "sizeBytes": 35917,
+          "startLine": 9328,
+          "endLine": 9770
+        },
+        {
+          "url": "/signal-home.css?v=signal-20261030",
+          "path": "signal-home.css",
+          "sha256": "31352a55fe956b83ccc47b2da8618852b80546951d1b398c9a836b242e179432",
+          "sizeBytes": 31596,
+          "startLine": 9772,
+          "endLine": 9934
+        },
+        {
+          "url": "/signal-account.css?v=signal-bold-20261030",
+          "path": "signal-account.css",
+          "sha256": "ab554a52ce684728d28c93cdc9b089f45fb762a906842c91e69f6e5d224ce581",
+          "sizeBytes": 34652,
+          "startLine": 9936,
+          "endLine": 10147
+        },
+        {
+          "url": "/signal-planning.css?v=signal-bold-20261030",
+          "path": "signal-planning.css",
+          "sha256": "4e8e0a17e7552194993cc2d8fd891fc05540373ec51220e94be5bb545a812748",
+          "sizeBytes": 31133,
+          "startLine": 10149,
+          "endLine": 10343
+        },
+        {
+          "url": "/signal-payments.css?v=signal-bold-20261030",
+          "path": "signal-payments.css",
+          "sha256": "087738b1ecd109248d0c01aada118a85b01b4f6ae7472084254d30f25df1a7b6",
+          "sizeBytes": 27941,
+          "startLine": 10345,
+          "endLine": 10643
+        },
+        {
+          "url": "/signal-page-chrome.css?v=signal-chrome-20261030",
+          "path": "signal-page-chrome.css",
+          "sha256": "dd790826f425488404f8d58bbd7da6b68d6600cf956dfe5d345fb611c73798ac",
+          "sizeBytes": 22849,
+          "startLine": 10645,
+          "endLine": 11004
+        },
+        {
+          "url": "/signal-account-home.css?v=signal-account-home-20261030",
+          "path": "signal-account-home.css",
+          "sha256": "aa33cf8d72d1e0add9c4c5285d4cf30d0bc2a5c4ebddf5a0f5bfb4f2459d503c",
+          "sizeBytes": 13779,
+          "startLine": 11006,
+          "endLine": 11204
+        },
+        {
+          "url": "/signal-ring-home.css?v=signal-ring-home-20261030",
+          "path": "signal-ring-home.css",
+          "sha256": "466e58e82eab3785c6e0a519428d71b3f596e617a56438459b27f5976c8ff6e8",
+          "sizeBytes": 25901,
+          "startLine": 11206,
+          "endLine": 11377
+        }
+      ]
+    }
+  },
+  "sourceAssets": [
+    {
+      "path": "account.js",
+      "sha256": "726a5ea53c240a9439d6a32c203a825ba1b011b588827c91fbc26c1e6a1d27ba",
+      "sizeBytes": 63170
+    },
+    {
+      "path": "ambassador.js",
+      "sha256": "72206268ebdf08eff0c766c2929a08bfa324954f62725da48c54feb0550d1f55",
+      "sizeBytes": 8000
+    },
+    {
+      "path": "app.js",
+      "sha256": "067628886b976cb50fc602432c57055b1f6e8f50af0288fe8702bc3846d1a4f9",
+      "sizeBytes": 35195
+    },
+    {
+      "path": "assets/ask-lumo-campus-cartoon/affordability.webp",
+      "sha256": "05e373340f1236581bacb5bf5a28a334d6f5c7eb7323059f41302471742837a5",
+      "sizeBytes": 137652
+    },
+    {
+      "path": "assets/ask-lumo-campus-cartoon/goal.webp",
+      "sha256": "18d4cb327f0616bac5c31e0f48d766b6bbc82b3fde38bc10df94dabdccf59ea9",
+      "sizeBytes": 128654
+    },
+    {
+      "path": "assets/ask-lumo-campus-cartoon/runway.webp",
+      "sha256": "8e94b9e877d4b373d45d014182765b1266ad96775e69d54d6cda8e4803895566",
+      "sizeBytes": 124858
+    },
+    {
+      "path": "assets/ask-lumo-campus-cartoon/spending.webp",
+      "sha256": "c233a83a89066698676dc908c2d938d5124ebf36a418844fd4f0a14e4b2c813d",
+      "sizeBytes": 130806
+    },
+    {
+      "path": "assets/ask-lumo-campus-immersive/affordability.webp",
+      "sha256": "aa5b72c121dd6e7fbe163b2f70b07c45fdb6d3268d73065f0409953d2cee03ad",
+      "sizeBytes": 216380
+    },
+    {
+      "path": "assets/ask-lumo-campus-immersive/goal.webp",
+      "sha256": "ce8fad1be5072119da914054324ad1b6ea23dc08b1dc67d33b6a22f1d012bad2",
+      "sizeBytes": 193020
+    },
+    {
+      "path": "assets/ask-lumo-campus-immersive/runway.webp",
+      "sha256": "e50e223bf5100361dbc31d7a3615705e84872a668e66ebe59438f52274395b0f",
+      "sizeBytes": 209022
+    },
+    {
+      "path": "assets/ask-lumo-campus-immersive/spending.webp",
+      "sha256": "173805489d3e0273eef061839ecc1766cf076a07f7f69c52c2d7efb953608385",
+      "sizeBytes": 228718
+    },
+    {
+      "path": "assets/ask-lumo-campus-mono/affordability.webp",
+      "sha256": "024d1d0611582d1c85822b1b29be0583efea182724caf71406059ddd0115241f",
+      "sizeBytes": 100984
+    },
+    {
+      "path": "assets/ask-lumo-campus-mono/goal.webp",
+      "sha256": "2748934ee9f14ff03de583ba3a7311c32c51da3d456da5ce12c336537fc3ab16",
+      "sizeBytes": 102780
+    },
+    {
+      "path": "assets/ask-lumo-campus-mono/runway.webp",
+      "sha256": "721dab395d89a743546855c06c5492a11c4bbbed7bd2a56ef1e691988ed4a16e",
+      "sizeBytes": 96658
+    },
+    {
+      "path": "assets/ask-lumo-campus-mono/spending.webp",
+      "sha256": "f4781c0e2c84864ef97ba75e08f34012e51dcbfbf14c39c94524fe98a4f52cf8",
+      "sizeBytes": 110656
+    },
+    {
+      "path": "assets/ask-lumo-campus/affordability.webp",
+      "sha256": "61d4664dcb50876a324bbc0fea5012fd20ee511aeba4936a922b81952fdfe12c",
+      "sizeBytes": 105938
+    },
+    {
+      "path": "assets/ask-lumo-campus/goal.webp",
+      "sha256": "69276514a2a4621727adda076321d0d9d4992fade4d3f98961ae74b3e6873869",
+      "sizeBytes": 104040
+    },
+    {
+      "path": "assets/ask-lumo-campus/runway.webp",
+      "sha256": "d14b1c9f7c75183b3575a833379365c452bd3d24976bcd8ada0c60e36d602556",
+      "sizeBytes": 100946
+    },
+    {
+      "path": "assets/ask-lumo-campus/spending.webp",
+      "sha256": "cd6a15d114fbc6a5942799a82f4ea73aa24ef3a9dbe81a2ffabcf1e963ee248a",
+      "sizeBytes": 116562
+    },
+    {
+      "path": "assets/clarity-bold/bold-chat.png",
+      "sha256": "26cbab8b95491fa366f4c049aa4724d63ba626b3c2978570e3983be8341aa46f",
+      "sizeBytes": 1336826
+    },
+    {
+      "path": "assets/clarity-bold/bold-confirmed.png",
+      "sha256": "785ac24794ac4684ff09571109af6e9561422a787f4a50caf69a47dfa77dd5f6",
+      "sizeBytes": 1444052
+    },
+    {
+      "path": "assets/clarity-bold/bold-funding.png",
+      "sha256": "600f82b561d6ffce102e601836d09985f5a617d1c0bda6f78edd1b5a0f42bfb3",
+      "sizeBytes": 1173634
+    },
+    {
+      "path": "assets/clarity-bold/bold-home.png",
+      "sha256": "38bae836a0e94f2061ff88b775fafcb2df97a11b6659fc9e219c726d0199f573",
+      "sizeBytes": 1183497
+    },
+    {
+      "path": "assets/clarity-bold/bold-pause.png",
+      "sha256": "87b03ff4104fab1cadc36c3f387982aa885865a73ebb2f4dd53bcd9d5a1fe6aa",
+      "sizeBytes": 1262778
+    },
+    {
+      "path": "assets/clarity-bold/bold-payment.png",
+      "sha256": "67529769e712630e1a12448f9a6749f405d3542d065ff1c41e83b0facb0cd069",
+      "sizeBytes": 1314776
+    },
+    {
+      "path": "assets/clarity-bold/bold-plan.png",
+      "sha256": "6d2e89f2c60e9ac8bc77f4990774c3d8da055ab742e094cad2dc918bafedba15",
+      "sizeBytes": 1206553
+    },
+    {
+      "path": "assets/clarity-bold/bold-support.png",
+      "sha256": "5c4aff70d89d13ea3426407f71c7b0aacc9e4e9806ab0ee5242700a2a74768d1",
+      "sizeBytes": 1322999
+    },
+    {
+      "path": "assets/clarity-bold/bold-welcome.png",
+      "sha256": "308f3825934b8b2e8ec530c85b6d067387c70a6e8d75f8b0b531b2d190838365",
+      "sizeBytes": 1418915
+    },
+    {
+      "path": "assets/clarity-bold/legon-avenue-clean.png",
+      "sha256": "bd1c13a77650204d49d2106b54c28dc48931b13071c87442fa169d5e28d24848",
+      "sizeBytes": 821563
+    },
+    {
+      "path": "assets/clarity-bold/legon-balme-clean.png",
+      "sha256": "9c9d312b802a1ec01bb23a52b3105d24f37132e5102841ba5253866020dede69",
+      "sizeBytes": 706750
+    },
+    {
+      "path": "assets/clarity-context/account-records.png",
+      "sha256": "da2bf5693bf1e398608b1c82c8e92ff5e47f3e62e1141b31fcbba6f8e1a1c9e2",
+      "sizeBytes": 1420730
+    },
+    {
+      "path": "assets/clarity-context/chat-question.png",
+      "sha256": "ef3fbcdeb159d9c75b9e6c04a458fbb8f2868a22067af8043481e0a38c293b3c",
+      "sizeBytes": 1126139
+    },
+    {
+      "path": "assets/clarity-context/decision-phone.png",
+      "sha256": "4898e612d6d2f17e1519659bd256fa3fe022fbb63c5fce76bbf0ac614ca33f6f",
+      "sizeBytes": 1124809
+    },
+    {
+      "path": "assets/clarity-context/home-clarity-mirror-v13.png",
+      "sha256": "2ae1c436d82e4b88714e9397cec54b5ba355f23a469360a9bef9762cdeddfdf9",
+      "sizeBytes": 1617989
+    },
+    {
+      "path": "assets/clarity-context/home-clarity-mirror-v14.png",
+      "sha256": "a576c68ed1916fdbc8f41c176a36fcfb18b78cbf9f7105389346210ccd8c148a",
+      "sizeBytes": 1769193
+    },
+    {
+      "path": "assets/clarity-context/home-clarity-mirror-v15.png",
+      "sha256": "d6b488b83f4b9ab407bdc6a5da367a7739233753c6047e4afe41166784545c52",
+      "sizeBytes": 1464050
+    },
+    {
+      "path": "assets/clarity-context/home-clarity-mirror-v16.png",
+      "sha256": "27e35e8da6278fe1235a1084d388eb161a85e9ccebd220ff6d150a292b4b1c80",
+      "sizeBytes": 1472024
+    },
+    {
+      "path": "assets/clarity-context/home-clarity-mirror-v17.png",
+      "sha256": "18a1d3bc8dfc9b98dda6a19a0e0a741bfe30df1e9bf8f011d1e6f455024f25fc",
+      "sizeBytes": 1434302
+    },
+    {
+      "path": "assets/clarity-context/home-clarity-mirror-v18.png",
+      "sha256": "bb3cb674c0e713e1d4749947c6caecb099e25c001e3d1a058707da1a7d1d94f9",
+      "sizeBytes": 1636028
+    },
+    {
+      "path": "assets/clarity-context/home-clarity.png",
+      "sha256": "cb505e5d7005f0b735e0ab80903ee9ae9bb44ca7a4522c1ff4045e5ebeb1eb6f",
+      "sizeBytes": 1384735
+    },
+    {
+      "path": "assets/clarity-context/home-intelligence-v10.png",
+      "sha256": "85d8ef83be20463ac059c5967805c9eade817bb5f70a85ee67254a06e2ce0bd0",
+      "sizeBytes": 1441520
+    },
+    {
+      "path": "assets/clarity-context/identity-check.png",
+      "sha256": "0da0074d2ed4522bbfda494140d102d23255f0e59270ddeceb4e455e37d99fe7",
+      "sizeBytes": 1110791
+    },
+    {
+      "path": "assets/clarity-context/payment-phone.png",
+      "sha256": "b41dd17b8bab202423f3db6116023f2f6a255593e7333ed46e4a53e102122852",
+      "sizeBytes": 1065753
+    },
+    {
+      "path": "assets/clarity-tasks/bank-details.png",
+      "sha256": "f088a3d24ca4f1f2be86e3a6901523617aef10954907ceb4499c183885ccbf65",
+      "sizeBytes": 1271849
+    },
+    {
+      "path": "assets/clarity-tasks/campus-scan.png",
+      "sha256": "27547ab5dd037ff6d17bfb6886f4ec24e3b5024645892f835c365da6e271c49d",
+      "sizeBytes": 1414922
+    },
+    {
+      "path": "assets/clarity-tasks/chat-conversation.png",
+      "sha256": "f33b9dcd9dc3954f9717fb49e1efe96bd9282f750e2b781c5afb47963c293d3c",
+      "sizeBytes": 1515386
+    },
+    {
+      "path": "assets/clarity-tasks/funding-wallet.png",
+      "sha256": "c0f8260d67b9f9e3c76749874d0d0e7dd883ebfcd763f0a85f082518254cfb0b",
+      "sizeBytes": 1518418
+    },
+    {
+      "path": "assets/clarity-tasks/help-question.png",
+      "sha256": "7a6d3ea3d296e35e50e4a4944e5ae02b299c21f169ca1538ae46693d6c2e3829",
+      "sizeBytes": 1450505
+    },
+    {
+      "path": "assets/clarity-tasks/notifications-bell.png",
+      "sha256": "74552db0fb7d3348904c781dc346577c8c81ab69f54dc9fdaead95564fe1eb8c",
+      "sizeBytes": 1361444
+    },
+    {
+      "path": "assets/clarity-tasks/planning-calendar.png",
+      "sha256": "2a6d4aee74b3a688e2467a070647b7353ccbf61639ae96fa57e9f4c07315b5d2",
+      "sizeBytes": 1443733
+    },
+    {
+      "path": "assets/clarity-tasks/privacy-curtain.png",
+      "sha256": "e878736547ced67904a04d1c8095d5d34e1797960dd1f0afde3517a730a530ac",
+      "sizeBytes": 1388784
+    },
+    {
+      "path": "assets/clarity-tasks/profile-card.png",
+      "sha256": "975cd28e87dad84225361963658d01c5bdd45fbdb036f579aa75fc7be28127c1",
+      "sizeBytes": 1377871
+    },
+    {
+      "path": "assets/clarity-tasks/records-receipts.png",
+      "sha256": "4b1f7b16a52e3f1a88d3ca9dc91ba8f3d875334fbcf0d063414657e257fc0337",
+      "sizeBytes": 1459292
+    },
+    {
+      "path": "assets/clarity-tasks/security-lock.png",
+      "sha256": "806025a924a8f6656f9ed2489aff890f47a0fcf106d7f3265c8e19c59c806bb1",
+      "sizeBytes": 1491871
+    },
+    {
+      "path": "assets/clarity/campus-pay-editorial.png",
+      "sha256": "b4208efb1b9bc187a8dc166febbb0ec3fa6283ebc9d05735a96f450a110104b2",
+      "sizeBytes": 1362612
+    },
+    {
+      "path": "assets/clarity/essentials-pause-editorial.png",
+      "sha256": "42f2d7631cd3cb5e0c7f3663a610b90281bc973233be65698a684f8104bbcbe7",
+      "sizeBytes": 1198144
+    },
+    {
+      "path": "assets/clarity/friends-editorial.png",
+      "sha256": "4a3ad9646adaddc24c0d1a2dfd16e0379b137cc003ccf7c2ea2f1a22894aaa6c",
+      "sizeBytes": 1267892
+    },
+    {
+      "path": "assets/clarity/goal-study-4.16.png",
+      "sha256": "9062fb49de0df31df6c948b75a46ebfd1e580315261b89afb459c1150344f855",
+      "sizeBytes": 1157633
+    },
+    {
+      "path": "assets/clarity/money-review-refined-4.13.png",
+      "sha256": "d066e3e22cf681a5d449136f997f764e38f67111576db3ec76dc91881a4fff74",
+      "sizeBytes": 1293281
+    },
+    {
+      "path": "assets/clarity/payment-complete-editorial.png",
+      "sha256": "50229e6c7d4dae4a2cb67675866f739f3a179b6a9bc1f569b3c5f53b9d5d66d6",
+      "sizeBytes": 1410739
+    },
+    {
+      "path": "assets/clarity/student-expressive.png",
+      "sha256": "cfd4d16e8132be91c6c1decb2c3dd4a92f7e9fc006ca27116a4ba8c7469400c6",
+      "sizeBytes": 1309135
+    },
+    {
+      "path": "assets/clarity/thoughtful-refined-4.13.png",
+      "sha256": "a0eff30b70e883816453d2a798b480c7130cc095d62114065d2238e1e68eeb3c",
+      "sizeBytes": 961095
+    },
+    {
+      "path": "assets/expressive/lumo-home-open-v2.png",
+      "sha256": "ec236e5ecfa88b92dfb184399edbb94d4ea6945b56ea4acec608d622ce404676",
+      "sizeBytes": 1517947
+    },
+    {
+      "path": "assets/expressive/lumo-pause-space-v2.png",
+      "sha256": "d56dd347442e09d978d9ac9a5fdbfb856334431ffbc884a8115b837cb5f4509f",
+      "sizeBytes": 1232458
+    },
+    {
+      "path": "assets/expressive/lumo-result-done-v2.png",
+      "sha256": "8856b55f64855a3c9cda9fd26460077258ead2ca3e6c2600d929724b207800d4",
+      "sizeBytes": 1124187
+    },
+    {
+      "path": "assets/fonts/PlusJakartaSans-OFL.txt",
+      "sha256": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99",
+      "sizeBytes": 4402
+    },
+    {
+      "path": "assets/fonts/PlusJakartaSans-v2.071.woff",
+      "sha256": "544f24a30716c85c425cd2c37e9fbcf4b8134290815742d512bfe3e633aae4ef",
+      "sizeBytes": 78380
+    },
+    {
+      "path": "assets/icon.svg",
+      "sha256": "59adfcc4aa166df93aa588b5599412f9a76d79a3fb7d20a53389d538afcfd63f",
+      "sizeBytes": 310
+    },
+    {
+      "path": "assets/legon-avenue-v21.webp",
+      "sha256": "a055fdd397145004093470ed3b14df6672d3b769b1e0885d062fe0e851f6ca0f",
+      "sizeBytes": 216146
+    },
+    {
+      "path": "assets/legon-balme-v21.webp",
+      "sha256": "14d30dc91747f717b35afc6e4dfadea8c74b728368a450ccf27779a566af5f5e",
+      "sizeBytes": 245708
+    },
+    {
+      "path": "assets/legon-hill-v21.webp",
+      "sha256": "917bdca0664b93bc5bb1e0be838119566433273593c327d8e1d0cd4c20eabb2a",
+      "sizeBytes": 201348
+    },
+    {
+      "path": "assets/lumo-add-money-v22.webp",
+      "sha256": "27610b91ef6e232d21ea3266e0a67195ebbe8ef8e7a74bb1d35ddcd3d4717a7a",
+      "sizeBytes": 325592
+    },
+    {
+      "path": "assets/lumo-clarity-v22.webp",
+      "sha256": "53fe477969e7ccfff868a3558d7453be639451543cd62d0fa5e4771646bfc012",
+      "sizeBytes": 306048
+    },
+    {
+      "path": "assets/lumo-editorial-atlas-v22.webp",
+      "sha256": "b41e51b7069c4365d96ecc2418ce4efc7879b90162861271ed76b414f6c4b0d1",
+      "sizeBytes": 893868
+    },
+    {
+      "path": "assets/lumo-payment-atlas-v19.webp",
+      "sha256": "9d3b40c21a2caef03b8134306bfb647bcfa280012b40dc2801a1784c1a29abbb",
+      "sizeBytes": 662986
+    },
+    {
+      "path": "assets/lumo-you-atlas-v22.webp",
+      "sha256": "7cb248c99f64f5fd544a37c32c5c4baf4286d4ffffd00895e642696d471b8540",
+      "sizeBytes": 965098
+    },
+    {
+      "path": "assets/signal/lux-icon-warm.webp",
+      "sha256": "27c7bd889d965c7e8053ebccb3312292880102d2adea3c9510714b5df18c1d25",
+      "sizeBytes": 41330
+    },
+    {
+      "path": "assets/signal/lux-pause-bold.webp",
+      "sha256": "ee980718c75f2f74d9ad88906da31792bfa4868022f4b2c25a0193ccf3c0b227",
+      "sizeBytes": 178478
+    },
+    {
+      "path": "assets/signal/lux-pause-warm.webp",
+      "sha256": "420851870b33f5874d863169c76ccf6bb5c151070ecf911d8a959670c6d4f91f",
+      "sizeBytes": 48936
+    },
+    {
+      "path": "assets/signal/lux-pause.webp",
+      "sha256": "e4c7ad568ac7b8951f82e2d66155ab25902e7ee7f4902577b8ec181b1502d200",
+      "sizeBytes": 51058
+    },
+    {
+      "path": "assets/signal/lux-ring-hero.webp",
+      "sha256": "c71ab9fd9d86493eede0af4c69442c2429c6acff5d6c955a36485615113666b1",
+      "sizeBytes": 65426
+    },
+    {
+      "path": "assets/signal/lux-ring-icon.webp",
+      "sha256": "bae66540e43faaa3bc06f9b77a6ece7ae9ffb2a06242d972e0e5d9be6f67ed98",
+      "sizeBytes": 38832
+    },
+    {
+      "path": "assets/signal/lux-ring-pause.webp",
+      "sha256": "29d5b0af29206fc7d5e794d4637d92d7179fc2ce2621e99ee580b437ec33b75a",
+      "sizeBytes": 33790
+    },
+    {
+      "path": "assets/signal/lux-ring-welcome.webp",
+      "sha256": "9edb469cd7fc65e7547bdd6d879bc5bb1515d47aab057a83a175cc5db284d294",
+      "sizeBytes": 38986
+    },
+    {
+      "path": "assets/signal/lux-welcome-bold.webp",
+      "sha256": "8cb685a1fc458797582908a0ef12f11dc44f5908d82cd46738df9f8d08b38fe6",
+      "sizeBytes": 141458
+    },
+    {
+      "path": "assets/signal/lux-welcome-warm.webp",
+      "sha256": "aff7be7608c7442467d418d0ab3f9fad90b17b8fd1220904ccab4e5a6670578e",
+      "sizeBytes": 42140
+    },
+    {
+      "path": "assets/signal/lux-welcome.webp",
+      "sha256": "3ac2b0d8faea5a7e5082cc3fa628e00fe5271e9c1344653667dfb122347aed83",
+      "sizeBytes": 44146
+    },
+    {
+      "path": "assets/signal/signal-wordmark.webp",
+      "sha256": "a7b4c20ecb548476547e46308d4863dbddaef75a29caa122e3ee5af6d5057457",
+      "sizeBytes": 57940
+    },
+    {
+      "path": "auth-policy.js",
+      "sha256": "4bc244089b69612160ed2ca5833a8077201a6edfb4b6a736d21a592cb828b989",
+      "sizeBytes": 2636
+    },
+    {
+      "path": "biometric-auth.css",
+      "sha256": "3f41aae409076a5095d2529275917593593db1a6f7d82ae7469a36a9fa54e5fb",
+      "sizeBytes": 1767
+    },
+    {
+      "path": "biometric-auth.js",
+      "sha256": "93c193df82b49e8ba91707aad9399f4a11b01f34f88d22a210caca2f6bb1aa2d",
+      "sizeBytes": 7371
+    },
+    {
+      "path": "bold-system.js",
+      "sha256": "7ae72dd4ffab88c21c1eae67e99be361c28b92d9691edffc33931efd993b9cbe",
+      "sizeBytes": 11743
+    },
+    {
+      "path": "brand/Lumo-Wordmark-Black.svg",
+      "sha256": "e6a2e95d213dad264d1f01b277c6f8924004a0167a2bb01056b56b8398e80712",
+      "sizeBytes": 1711
+    },
+    {
+      "path": "brand/Lumo-Wordmark-White.svg",
+      "sha256": "82b5c0a63df5fdd89b0b28b5e437f81d76502dcb260ef5314172d9b2f016c739",
+      "sizeBytes": 1711
+    },
+    {
+      "path": "brand/app-icon.svg",
+      "sha256": "873a55169a3ea52f816b20041efa23ad7536d9bcd0e8a642b53764d6073b2c84",
+      "sizeBytes": 173661
+    },
+    {
+      "path": "brand/geometry.json",
+      "sha256": "5c5f8c464ec425cadd67262d370d3ffa6bf258ef51d6195ab7cb6e76e0fa10d4",
+      "sizeBytes": 642
+    },
+    {
+      "path": "brand/lumo-avatar-icon-180.png",
+      "sha256": "5596b45bb4dedd60abb74d9aedfe6d77c5f1e18a9dbdad855781515b2e1d2732",
+      "sizeBytes": 25171
+    },
+    {
+      "path": "brand/lumo-avatar-icon-192.png",
+      "sha256": "237705b7c4a0d265b928fef94a46cfa83c60429f6972fd0522f8465c50e9f34e",
+      "sizeBytes": 28891
+    },
+    {
+      "path": "brand/lumo-avatar-icon-512.png",
+      "sha256": "fce25adb56cfcd111cc2070b622b984a541703bce44457526502425123527e01",
+      "sizeBytes": 207061
+    },
+    {
+      "path": "brand/lumo-avatar-icon.svg",
+      "sha256": "218787759f7af890b6228ce7c78907939527ef68f8cbdbe64eb121aac99b40c0",
+      "sizeBytes": 38749
+    },
+    {
+      "path": "brand/lumo-avatar.webp",
+      "sha256": "ecc35868a0398b04e19c730ed99506801e3aee5ddfb264634a75b23ff81fd007",
+      "sizeBytes": 679772
+    },
+    {
+      "path": "budget-categories.js",
+      "sha256": "2f0a0155a93fb6f6ed33debf397f952424b089e76b1dfe3ed9a36b6b81340cce",
+      "sizeBytes": 14909
+    },
+    {
+      "path": "budget-estimate.css",
+      "sha256": "8184ee0bf90ab536744ed8856f3a48fe4bc721223e5882eb0eb824286fb781fc",
+      "sizeBytes": 850
+    },
+    {
+      "path": "budget-estimate.js",
+      "sha256": "77c4e25e9beb89246df54b911eaae7fc9ec296ef1b08f5a54ed6062d083e6d1f",
+      "sizeBytes": 7380
+    },
+    {
+      "path": "budget-everyday.css",
+      "sha256": "21d8327ecfe7f6886d09b97e63e0243142c69a720bbdc4e1e1d2ea552e45c59f",
+      "sizeBytes": 2493
+    },
+    {
+      "path": "budget-everyday.js",
+      "sha256": "b5eacabff4c1db651f1ab9f63254c69c390425afc00410def749e8e8818d9a25",
+      "sizeBytes": 24449
+    },
+    {
+      "path": "budget-guide-ui.js",
+      "sha256": "23e584e64923a85810ad80b3b6c165fd4006fc9f43b7a5a3e5872329e86078df",
+      "sizeBytes": 6136
+    },
+    {
+      "path": "budget-guide.css",
+      "sha256": "7e159f2d551c39ab4c94bb5884662d661a1310371a077ba65a4ca93e4083c275",
+      "sizeBytes": 3359
+    },
+    {
+      "path": "budget-guide.js",
+      "sha256": "d89d3bb8fea7a7a833bbec04823421cf4902f0c243f1097817ae7637104aa015",
+      "sizeBytes": 48803
+    },
+    {
+      "path": "budget-history.css",
+      "sha256": "98f0e96fb344957e60f9eb2bce61fecf376a1a49ad2c14afeeae9cbefcc2439a",
+      "sizeBytes": 2315
+    },
+    {
+      "path": "budget-history.js",
+      "sha256": "7b5bf0e6cb558e83c97df8617bbd51a7501cb1ab65404c236145043bf6eda3db",
+      "sizeBytes": 20071
+    },
+    {
+      "path": "budget-overview.css",
+      "sha256": "223a36870dcf8981c36f2fcb2c8125c58add0dc4a44d1324055b7a2608ce9d0c",
+      "sizeBytes": 5405
+    },
+    {
+      "path": "budget-overview.js",
+      "sha256": "23b31904c59d37a75d2c6447fa72a7df0c0d76eac6cb986ffeb24621fe46e838",
+      "sizeBytes": 13925
+    },
+    {
+      "path": "budget-period-review.css",
+      "sha256": "1e032ccdfc74fa664f6dcbcceabfc2dc17a41be046fbdb8072bac0267ee28c88",
+      "sizeBytes": 1528
+    },
+    {
+      "path": "budget-period-review.js",
+      "sha256": "5d3cee13846fc25cf991840e4178af4a150490167106810683c2efdc6fddd39f",
+      "sizeBytes": 18307
+    },
+    {
+      "path": "budget-readability.js",
+      "sha256": "9e19978d2e26f7beed0714aff988c434b7df38d224eb33b0fbceb7325a74f479",
+      "sizeBytes": 5951
+    },
+    {
+      "path": "campus-art.js",
+      "sha256": "5352f9ee3a09cfe1ef3599934f1d9e46188f3ef86435c962a2f56f57754a7100",
+      "sizeBytes": 10515
+    },
+    {
+      "path": "campus-everyday.css",
+      "sha256": "1c7a87509c1d31183b331373ddf24a07093291733a2ddd07e9706e55540789e0",
+      "sizeBytes": 4329
+    },
+    {
+      "path": "campus-everyday.js",
+      "sha256": "14a1a64d3491f776f79fcc08286e09f050ce965dc9dad1a947ef65921218dada",
+      "sizeBytes": 18403
+    },
+    {
+      "path": "category-intelligence.css",
+      "sha256": "a455ca1656c9235bb534c1f546be350229d8003040c77bd4b1d0f3e4bad5a03d",
+      "sizeBytes": 3809
+    },
+    {
+      "path": "category-intelligence.js",
+      "sha256": "5313fb69d1d46e162da6e4e0b95cc60a7e515d67c2195cef2fb13fb996802c7e",
+      "sizeBytes": 31734
+    },
+    {
+      "path": "chat-banking.css",
+      "sha256": "c235c1408cf04f3500997074d13e5c6ec706dcd0e016308bfd4b3141baaa8529",
+      "sizeBytes": 16397
+    },
+    {
+      "path": "chat-banking.js",
+      "sha256": "be0911132099cdc149962736d3ad52030d4e114f775105f485923e918d21030b",
+      "sizeBytes": 11952
+    },
+    {
+      "path": "chat-coach.js",
+      "sha256": "c1cca8df9948c546e7c2ed09e441ddf932d059d1c23a76afe7a74081ebfdeb70",
+      "sizeBytes": 62593
+    },
+    {
+      "path": "chat-context-starters.js",
+      "sha256": "47e8d1e7b67a046a47ec06c187d4d590554360f5fe0853f5a5ed9706da14069c",
+      "sizeBytes": 4175
+    },
+    {
+      "path": "chat-everyday.css",
+      "sha256": "76fc0681ccf9f43fc89c26e76357d0e04cbeefa1b197a1d79b0478b091158b3f",
+      "sizeBytes": 797
+    },
+    {
+      "path": "chat-everyday.js",
+      "sha256": "287621867ce7c0787a4fd9504d9f076ebac4a6054718ee99dcaaabef7db8f020",
+      "sizeBytes": 25162
+    },
+    {
+      "path": "chat-layout.css",
+      "sha256": "fd2889d41bc59ca90565c5d1a4a2d229cd0a8ccbabc3a9938d9f08912a03e367",
+      "sizeBytes": 3250
+    },
+    {
+      "path": "chat-planning.js",
+      "sha256": "0ada0a5acfdfc7d21c156a1ed3b8659791068f037e42f73db9d7ef86d4825e6e",
+      "sizeBytes": 19495
+    },
+    {
+      "path": "clarity-art.js",
+      "sha256": "0a4b060e863851db53ac4bc6852344881ba63f9df829fca78417aca76e604ab9",
+      "sizeBytes": 6502
+    },
+    {
+      "path": "clarity-bold.css",
+      "sha256": "6316baac11c7031261c25d2de55e3ecaa321d2e340a19a75e46b911891d5fd12",
+      "sizeBytes": 21059
+    },
+    {
+      "path": "clarity-edition.css",
+      "sha256": "28d4bbe08a6bb25fd690296750b5154859cb3d5525422b2831d389bac132f4b2",
+      "sizeBytes": 31615
+    },
+    {
+      "path": "clarity-pause.js",
+      "sha256": "ad34ba2556dbe43db7a9398061e05c6f66154a9bcdccea31862b5bc0c9042d3b",
+      "sizeBytes": 6170
+    },
+    {
+      "path": "clarity-type.css",
+      "sha256": "838d5c0c394141c34c88ad6fe0bb5f17ad5a0f90eb6531983902904b1f0f7f7b",
+      "sizeBytes": 2701
+    },
+    {
+      "path": "collection-contributions-engine.js",
+      "sha256": "6930a3af87e329627ad53bfc987e807280ab780d698e9a5ea37edb5e781ae36f",
+      "sizeBytes": 17838
+    },
+    {
+      "path": "collection-contributions-ui.js",
+      "sha256": "b7ddb8282f5f30abf784d3c29417dfb80301fe0c25878a85733816ac6ae2443c",
+      "sizeBytes": 19179
+    },
+    {
+      "path": "collection-contributions.css",
+      "sha256": "2f5dc650645af354dc7cc781745f2d6389cb97dfb06561c8079a028712ba25a0",
+      "sizeBytes": 3041
+    },
+    {
+      "path": "collection-evidence.js",
+      "sha256": "bc4ba4aa1146d63fd4ca657afe4ec3db90c2fb53900a65bc408bda4236d61fea",
+      "sizeBytes": 8221
+    },
+    {
+      "path": "collection-payout-rails.css",
+      "sha256": "4a88ece00b5df6410579633eb0619826a1d4b6bc998fffbebe77e21914869e27",
+      "sizeBytes": 1449
+    },
+    {
+      "path": "collection-payout-rails.js",
+      "sha256": "85e08c93856151e5d58f916d37d3eef028eeb3658d4ea29ef58104ac221d8980",
+      "sizeBytes": 19129
+    },
+    {
+      "path": "compact.css",
+      "sha256": "dd8b8cfcbdc4a0116a91c0c92eaacde35d94b6b67c0c4fe33da6aeffa1053dac",
+      "sizeBytes": 28192
+    },
+    {
+      "path": "compact.js",
+      "sha256": "5f3701d2f1fee4aea1507cc185e63470d64c43a76d2d86518768707e51b9d279",
+      "sizeBytes": 26806
+    },
+    {
+      "path": "contextual-chat.css",
+      "sha256": "d0667a05c6ba791d6a71a7fa4b22599c228c9f288f63c8519e3921e12a0d7578",
+      "sizeBytes": 2367
+    },
+    {
+      "path": "contextual-chat.js",
+      "sha256": "ac31c60ea42f251fd3df65c9b00ec31042d20a4bc69d3a9261c5240d78c80448",
+      "sizeBytes": 13158
+    },
+    {
+      "path": "core.js",
+      "sha256": "fc6eeeab44a0ae59e8cd48ddaf6aa309be95a15cb0d04bea9ab58bc6cb774ac3",
+      "sizeBytes": 29322
+    },
+    {
+      "path": "daily-insights.css",
+      "sha256": "022f364cffa090d6775a9d07a0765d8dd532469441709f83804cb92b077119c1",
+      "sizeBytes": 3817
+    },
+    {
+      "path": "daily-insights.js",
+      "sha256": "c605aa9955143d0b66e23f3e45c006fdb786022f351f3b8423225f53bc43c369",
+      "sizeBytes": 25919
+    },
+    {
+      "path": "decision-layout.css",
+      "sha256": "9c9c877cb85f9d96cc0222095d1053297f9498f3912c3c80a048763182b82628",
+      "sizeBytes": 8609
+    },
+    {
+      "path": "decision-system.js",
+      "sha256": "22ddbe4dcbf21c32d3a39d6398187193b7283107652215a37fb9b2c58b522342",
+      "sizeBytes": 6172
+    },
+    {
+      "path": "design-system.css",
+      "sha256": "376c80176f5d73ddf7ba12c18661e31c5b401d0ef750a6290deb81b4c8fb6b21",
+      "sizeBytes": 15017
+    },
+    {
+      "path": "edition-home.css",
+      "sha256": "ed7a7478b2d84b751150289822c05c3ff2f301386c46ca65a3294e55e81d7608",
+      "sizeBytes": 4626
+    },
+    {
+      "path": "everyday-edition.css",
+      "sha256": "08330ae701685ced2e1d006bb3ffdeaa0c310ba5b1e4cd31f4e19dced2169bc6",
+      "sizeBytes": 30188
+    },
+    {
+      "path": "everyday-home.css",
+      "sha256": "097e202f027854ad580dd759dd17e59d5e3411307bc29ded7e2d495b69d9977b",
+      "sizeBytes": 16024
+    },
+    {
+      "path": "everyday-home.js",
+      "sha256": "a59e6161cf6ea137f392f1442c91df0298bd615fd05db76244cd931e5a4da74a",
+      "sizeBytes": 5611
+    },
+    {
+      "path": "experience-clarity.css",
+      "sha256": "a264815c125475c2e1e84371f6010f9cf9d7a4582f0b2e66833f554720c9da6c",
+      "sizeBytes": 2126
+    },
+    {
+      "path": "experience-clarity.js",
+      "sha256": "ade21faff2707e83a9e094623288ce96f248ced762ccbc0baa8c31ca3e09e30f",
+      "sizeBytes": 15604
+    },
+    {
+      "path": "expressive-art.js",
+      "sha256": "1e5ed0de7e84468fcecb6b32ab9787b219a20ece3b5145e00b15d877f09136a0",
+      "sizeBytes": 1863
+    },
+    {
+      "path": "feature-flows.css",
+      "sha256": "daf642cecdbeac6d10bf013ccbf8b418b21e17f45873d64b4364d7c23e615ee1",
+      "sizeBytes": 37021
+    },
+    {
+      "path": "focus.css",
+      "sha256": "2d183550b5ce75a9a02317d6d01c1717b5c0667cdb97f542d7b2d06ce3d85a68",
+      "sizeBytes": 33411
+    },
+    {
+      "path": "focus.js",
+      "sha256": "528cd9617deebea459d9e80829cc0cf533c244946018754d1edc85cc72875764",
+      "sizeBytes": 22941
+    },
+    {
+      "path": "fonts/LumoSans-Bold.ttf",
+      "sha256": "6131c133e3db6f3cae3f2985ac64d07f44921fd561a2c34335873e5f1e713326",
+      "sizeBytes": 137200
+    },
+    {
+      "path": "fonts/LumoSans-Bold.woff2",
+      "sha256": "0dd7f2fe8d361af84a4e3cbda63c156e1abd65e02b0723707d37478248b12c11",
+      "sizeBytes": 32736
+    },
+    {
+      "path": "fonts/LumoSans-Medium.ttf",
+      "sha256": "fc9f513f9abe92c5c43b1d57ef2cc4beba77bf4049cc25d7c3668da1d8960083",
+      "sizeBytes": 133476
+    },
+    {
+      "path": "fonts/LumoSans-Medium.woff2",
+      "sha256": "73cf3b4597bc9486ad5b34949ebf813c03015700c1c9d816068d6e1ec659c3ce",
+      "sizeBytes": 31632
+    },
+    {
+      "path": "fonts/LumoSans-Regular.ttf",
+      "sha256": "4247abe8b6be05315334ba17974ae8da4a89c35c44342219258de0e60c94ed59",
+      "sizeBytes": 133556
+    },
+    {
+      "path": "fonts/LumoSans-Regular.woff2",
+      "sha256": "b5d60e8fd10f1d1a17448f678ff5dc5982723de6945f772f86e3bf37936d1a3a",
+      "sizeBytes": 31352
+    },
+    {
+      "path": "fonts/LumoSans-Semibold.ttf",
+      "sha256": "b7fbf8e6e8be5963d465cea3f8d3ac490f7aa43be7126c4fa1802d23f09ec6ba",
+      "sizeBytes": 141564
+    },
+    {
+      "path": "fonts/LumoSans-Semibold.woff2",
+      "sha256": "2031bc32245f2b380fa44d39713088c543ef988c5a69bdd4dc12f090653ffdfb",
+      "sizeBytes": 32696
+    },
+    {
+      "path": "fonts/Manrope-OFL.txt",
+      "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30",
+      "sizeBytes": 4383
+    },
+    {
+      "path": "fonts/Manrope-Variable.woff2",
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972",
+      "sizeBytes": 24836
+    },
+    {
+      "path": "fonts/NimbusSansNarrow-Bold.woff",
+      "sha256": "2865b866ddb0031f0bd9d3228ea26e88cabcf85b7d0d67db3693b7049e660c85",
+      "sizeBytes": 58280
+    },
+    {
+      "path": "fonts/NimbusSansNarrow-LICENSE.txt",
+      "sha256": "1315a62758a603a3e6e87a79b8389563789c59c1740b9db8bc2b20e2e2145458",
+      "sizeBytes": 52517
+    },
+    {
+      "path": "fonts/lumo-sans.css",
+      "sha256": "431965a97e8a17a868374e09cf72c42aaee79986e5227dcac88ea896fffc976d",
+      "sizeBytes": 621
+    },
+    {
+      "path": "funding-budget.js",
+      "sha256": "97f98d51a79c283fb390f7b15c20ad890230241b7381941eaede5e32a0591e2a",
+      "sizeBytes": 11382
+    },
+    {
+      "path": "getting-started.css",
+      "sha256": "a6c0179c312c74485b3c775a34c66eadaa7a5b2e30790a18e77cd47a317fa200",
+      "sizeBytes": 6441
+    },
+    {
+      "path": "getting-started.js",
+      "sha256": "eb39906e79581862462309a6801667c4cb8bb6febc6af508ed43c47498071549",
+      "sizeBytes": 1844
+    },
+    {
+      "path": "group-money-engine.js",
+      "sha256": "dbfd9685dfc044f2f2dc6e19a0aeeac2e93db9d12585bb812ab31b39ad0407ae",
+      "sizeBytes": 78563
+    },
+    {
+      "path": "group-money-ui.js",
+      "sha256": "0ebc90870fd6552742b213f67cdefc3f22e40174564234c4a52a8d72fab0a407",
+      "sizeBytes": 99092
+    },
+    {
+      "path": "group-money.css",
+      "sha256": "97ea5ab78e6841df65bbf3c37e9ba3b85daa5df4badb3eec388a8a8ed6ccf9f8",
+      "sizeBytes": 21787
+    },
+    {
+      "path": "hibiscus-balance-clarity.js",
+      "sha256": "02e00623460c424ad1c32ca27cd026851a87105220ec2d26153c7b94d81df869",
+      "sizeBytes": 1513
+    },
+    {
+      "path": "hibiscus-budget-clarity.js",
+      "sha256": "1bb5d347dbc33eee52ddc5891ab42ea1dd5c51570f88be57748241c841ff8a26",
+      "sizeBytes": 2405
+    },
+    {
+      "path": "hibiscus-chat-clarity.js",
+      "sha256": "ecd497dc1859f7f30ee05b9e3ed4b7f3e41ef7a2298cac52acf3e42b74c52f5e",
+      "sizeBytes": 2469
+    },
+    {
+      "path": "hibiscus-chat.js",
+      "sha256": "a045fe0621f4e1adc19efb211ad2f7a985834cb19cd4613cc896358a7baefbb8",
+      "sizeBytes": 12216
+    },
+    {
+      "path": "hibiscus-navigation.js",
+      "sha256": "69cc08adc7a943b551884874683a239eb64975598a082cb9e6666d638e422604",
+      "sizeBytes": 7208
+    },
+    {
+      "path": "hibiscus-payment-refinement.js",
+      "sha256": "1530bb6492f37811acb5d937c7630d2b86203734fb46bd3c7cc45b76efd2b1e3",
+      "sizeBytes": 1457
+    },
+    {
+      "path": "home-funding-state.js",
+      "sha256": "79853d0438f98f7d3a65a883a009e2fc5fc12cd42b438d884db0b1b6a7b8df4c",
+      "sizeBytes": 1334
+    },
+    {
+      "path": "home-plan-refinement.css",
+      "sha256": "9d1b8fda66cf41010b1a3ca666766405e08b6610cecee5254f8c3241b614594c",
+      "sizeBytes": 14363
+    },
+    {
+      "path": "illustration-system.css",
+      "sha256": "44719f64de03e2a9370da9a97352834a2144d531af7082f61a124c3a80de66cd",
+      "sizeBytes": 1377
+    },
+    {
+      "path": "illustrations.css",
+      "sha256": "979fab145e24f3b1aaac8ba0fcd7d87893827e3726476b2042b810fd51fe4fa8",
+      "sizeBytes": 4382
+    },
+    {
+      "path": "illustrations.js",
+      "sha256": "5a976df0d2e0d32782a27afd5e437790fcddbde3608f5a60312e70fba7b6a4ee",
+      "sizeBytes": 9411
+    },
+    {
+      "path": "index.html",
+      "sha256": "e9bc82e4fdd9d4a44dd82ccdb1f779137e0b06f4358799f35b9f8cf2942f45e1",
+      "sizeBytes": 3131
+    },
+    {
+      "path": "journey-refinement.css",
+      "sha256": "7d49cdfa648a0c1a08ba6bc3fccb495000b6ecb5c5883630765d5736eef517c2",
+      "sizeBytes": 7778
+    },
+    {
+      "path": "manifest.webmanifest",
+      "sha256": "05a24fc8e5fbc8604bd0a4766558cb596ae1c7ac1cd0b0526da98f6d329d2317",
+      "sizeBytes": 458
+    },
+    {
+      "path": "minna-edition.css",
+      "sha256": "918929909f8590d11da8766871bf5e9385f8453da58de51b80b22108d90ac25a",
+      "sizeBytes": 18545
+    },
+    {
+      "path": "minna-edition.js",
+      "sha256": "ace16777b7dac2a581451e86d7bf05b0e63fb8dbe68858acbf1e1a5088c288a5",
+      "sizeBytes": 215
+    },
+    {
+      "path": "minna-flows.css",
+      "sha256": "97668bc3d900af015b3fce6cb99c2ada7a89c8d06d039019157a3ec256d23a88",
+      "sizeBytes": 15099
+    },
+    {
+      "path": "minna-home.css",
+      "sha256": "28d5c41ad329a7767a8a35a225d3eb69a01d5928462fdedf394b1327544fdee7",
+      "sizeBytes": 5306
+    },
+    {
+      "path": "minna-transactions.css",
+      "sha256": "00fc99ea7b974be808a1e9f6767ed0e22998a23c10bb4f26dd1afdced0734d17",
+      "sizeBytes": 24011
+    },
+    {
+      "path": "mobile-network.js",
+      "sha256": "c9f2c12ebcb6681e5764f963d3de841130b7431b73d29b8d92b11ddffca106b9",
+      "sizeBytes": 6933
+    },
+    {
+      "path": "money-box-protection-ui.js",
+      "sha256": "6d85450ac1e8b66914d25de72cb106a019a54b32b0c644e6caf47b9f5339a7c1",
+      "sizeBytes": 17535
+    },
+    {
+      "path": "money-box-protection.js",
+      "sha256": "5747939fabf83a0c0695761dfadf618a5ad0f9b88abec76c4e26eb0674bb32a4",
+      "sizeBytes": 14032
+    },
+    {
+      "path": "money-boxes.js",
+      "sha256": "9e52f9adeb1291ccb46cf0901693e4bb566114aa750c047123a4b9557cfd3272",
+      "sizeBytes": 28778
+    },
+    {
+      "path": "money-life-engine.js",
+      "sha256": "45438fd73bd606a643896d823321274ba5f7b54121ff4f8ec75f9063e2900eb0",
+      "sizeBytes": 24061
+    },
+    {
+      "path": "money-life-ui.js",
+      "sha256": "6a58b642114dbbca228db9ad9d3a0684888e63115f3cbf8ccf87046365130e6b",
+      "sizeBytes": 47227
+    },
+    {
+      "path": "money-life.css",
+      "sha256": "1a082725d59009dc70a2927de07649ab6530d71d36bbdf18ad070677b980f2b8",
+      "sizeBytes": 7270
+    },
+    {
+      "path": "money-story-analytics.js",
+      "sha256": "65a8442a64c0bcdf843cb263a600cfce93cd35b9aca118ed73d96bbbb4e1d930",
+      "sizeBytes": 17559
+    },
+    {
+      "path": "mono-brand.css",
+      "sha256": "0b4f0a501a8422b54363c30b3018f1dce88ba42fa6ad69ca6562dae298deed38",
+      "sizeBytes": 8356
+    },
+    {
+      "path": "mono-brand.js",
+      "sha256": "c14020edd87f22f3fe5d1a19e4dd568fa93ba299aed8924630199d566ecdcbcd",
+      "sizeBytes": 4324
+    },
+    {
+      "path": "mono-chat-gesture.js",
+      "sha256": "635c38eb6a57f80338ffd47a6c7cf708d85e04d6414592183a986101de3c6d33",
+      "sizeBytes": 8180
+    },
+    {
+      "path": "mono-chrome-consistency.js",
+      "sha256": "e8a4ea8f53ecb83510453bc15d689a1aab0ff786c685579a4f836f89185f8c09",
+      "sizeBytes": 3071
+    },
+    {
+      "path": "mono-collections.css",
+      "sha256": "8b6b20ed1b29b33168c10fe02dd8abb98a53da79f312b93765e1368441e7c4c8",
+      "sizeBytes": 3515
+    },
+    {
+      "path": "mono-collections.js",
+      "sha256": "c36a3efd910205585063df58805ca8b175b3bef6b79bcbbc1b14c8f908be6315",
+      "sizeBytes": 8984
+    },
+    {
+      "path": "mono-conversation.js",
+      "sha256": "f23ff58155410fc583f717b0887b898d7ba550124eaecb1949bf44b7b2b6a136",
+      "sizeBytes": 6567
+    },
+    {
+      "path": "mono-design.css",
+      "sha256": "97944a016c268b8c3c1bb0f3ca007a35ebb1949d032909267609e14f782d5bad",
+      "sizeBytes": 26774
+    },
+    {
+      "path": "mono-design.js",
+      "sha256": "1fb90fa3ba3d9eb4c0892a3d57ab6cd2a9f8bcd53d2bc7ed989c07302c97930f",
+      "sizeBytes": 22279
+    },
+    {
+      "path": "mono-group-usability.js",
+      "sha256": "8e11a8b951c14fc8a88004261707c156674cb92d96bd6d0093b9cbf92202a00d",
+      "sizeBytes": 9695
+    },
+    {
+      "path": "mono-life.css",
+      "sha256": "fe414cc4feacfa32072e4c1745b649aec33a70244ab4a2abd9030612c0e2751c",
+      "sizeBytes": 27788
+    },
+    {
+      "path": "mono-navigation.css",
+      "sha256": "42b6ee6acd98ca58a51488f88823a34dd33df1c38024fef8572e11a444a30de6",
+      "sizeBytes": 32071
+    },
+    {
+      "path": "mono-pause.css",
+      "sha256": "b33299491e13ff7af53be925aec9f959b5fc959e986a07cbe75d9399c35e4093",
+      "sizeBytes": 18966
+    },
+    {
+      "path": "mono-pause.js",
+      "sha256": "21aa329a36b45d8b9c4e9c7b028a604480ea4117268018d506927f236c884c8a",
+      "sizeBytes": 10367
+    },
+    {
+      "path": "mono-payments.css",
+      "sha256": "df3980e686c59df26aaaf7d260d8a72438d7825db2012705613f286b2dbc6b2b",
+      "sizeBytes": 39565
+    },
+    {
+      "path": "mono-planning.css",
+      "sha256": "4fbdbc7a4da8a2630fb0969fcb9e499d2165b96a47aa8075bebcca89672272f2",
+      "sizeBytes": 30557
+    },
+    {
+      "path": "mono-preferences.js",
+      "sha256": "72ec1d68d2d5c598bed9530ac741e6a3a70ba556a182562cfb3fa3693fc2ab18",
+      "sizeBytes": 2782
+    },
+    {
+      "path": "mono-review.css",
+      "sha256": "baf6f4119a4fd6006c74475c6b778ab69261c673b64dcf92085c068ac09ecbd3",
+      "sizeBytes": 939
+    },
+    {
+      "path": "mono-review.js",
+      "sha256": "9765a19a437133f46c5e5fa66af919042cb888e10b4f612497b77e91f9f68aa5",
+      "sizeBytes": 1912
+    },
+    {
+      "path": "mono-surface-consistency.css",
+      "sha256": "9c575465cb1abbe5910942311221c4edd9413e3e7e3d19823ecb32ad0eda9ead",
+      "sizeBytes": 2954
+    },
+    {
+      "path": "mono-type-consistency.css",
+      "sha256": "7575cd9fb9868285da6c3d0b97b05f857101d14e1363a7e3ebf096759baeea61",
+      "sizeBytes": 3595
+    },
+    {
+      "path": "motion.css",
+      "sha256": "df5d19b9a877184ba66415f3d160f88d5303688b6194223a4897c6840a61793d",
+      "sizeBytes": 3078
+    },
+    {
+      "path": "motion.js",
+      "sha256": "5b74a9c45ffce8f2f3cbe42e08e67427d8d32a8e1ab4b58f9b48270412333ae6",
+      "sizeBytes": 7159
+    },
+    {
+      "path": "native-decisions.js",
+      "sha256": "4a5174420b9dfcd9f7c256096dd0a651ba384017ba501e39f624a7202de3199b",
+      "sizeBytes": 4826
+    },
+    {
+      "path": "native-refinement.css",
+      "sha256": "9294411cb7000bb998fd7b347c0efbca5966b9b12cfaea7071532627bfa7314c",
+      "sizeBytes": 37831
+    },
+    {
+      "path": "onboarding.js",
+      "sha256": "3a6c152e557b927552525a1954cd598e9147e6831f03ecfcac4fd456db8ed791",
+      "sizeBytes": 56088
+    },
+    {
+      "path": "overflow-components.css",
+      "sha256": "89e92a2069d386b2aa246dfd0b69af290d67205a50abc8ac89573f445fedeea8",
+      "sizeBytes": 8280
+    },
+    {
+      "path": "overflow-shell.css",
+      "sha256": "85292bfc35dfeb39e248698d9775aa1140a89af0c6421d778e100459e9721aed",
+      "sizeBytes": 5857
+    },
+    {
+      "path": "page-chrome.css",
+      "sha256": "f251ce7f50bff99543350ca01417db3aff0ef56ad50be37cda4f8283f647d052",
+      "sizeBytes": 2564
+    },
+    {
+      "path": "page-guidance.css",
+      "sha256": "21fd44fac142bd5f6a3fdaa6fffc71473b7d37f8cb322ce830fb4d9cdfe88b96",
+      "sizeBytes": 959
+    },
+    {
+      "path": "page-guidance.js",
+      "sha256": "19e16bc35189e7f65eb8889742e5789ebfc6e3ff3800dd672f566aed32ddbec5",
+      "sizeBytes": 9730
+    },
+    {
+      "path": "pause-engine.js",
+      "sha256": "e857f0abc7a425aeccf716a86bc5c985f1da9c22c8241283b9bd5056a883e54e",
+      "sizeBytes": 13548
+    },
+    {
+      "path": "pause-hero.css",
+      "sha256": "b1ce9dd13f0882440ec304e89017a52386b946a789263e69c8a40410ea468781",
+      "sizeBytes": 6408
+    },
+    {
+      "path": "pause-hero.js",
+      "sha256": "ecb65fe2eb1a4f9ed40c0be03409d87f69a0b43c266bb5ee73ce3a9fe699063f",
+      "sizeBytes": 8115
+    },
+    {
+      "path": "pause-interaction.css",
+      "sha256": "e6db557492574a214218e8eb03b5bdab66f104858d3536ae62b9ad0178057d1a",
+      "sizeBytes": 2035
+    },
+    {
+      "path": "pause-interaction.js",
+      "sha256": "b16997d4c43c0d4fe954dfc35ce7faf13189d7248d567e94fb2f2d14eb22ff7b",
+      "sizeBytes": 10311
+    },
+    {
+      "path": "pause-intro.css",
+      "sha256": "014a3a118a6cf6b3cecb49694f8d6b65ca79f43af57f50e9815c0f3ff4f28c02",
+      "sizeBytes": 9277
+    },
+    {
+      "path": "pause-intro.js",
+      "sha256": "ffcda9a3e397c04b300b99ba4de599fe22b4ee9dc3bfdda723acd24f2e044523",
+      "sizeBytes": 2962
+    },
+    {
+      "path": "pause-recovery.css",
+      "sha256": "9e6eeb72b80c00ca3b46b0d609fc1e1a9cb04d8bc3b0d21a127f7c2b1ef987c8",
+      "sizeBytes": 4222
+    },
+    {
+      "path": "pause-recovery.js",
+      "sha256": "c8391afd2dabd549a8a4ec04b1233485833c1006e638137bb749b57e9beea0ab",
+      "sizeBytes": 6932
+    },
+    {
+      "path": "pause.css",
+      "sha256": "084c9ca034c63814f00b571802277f7e64436fccf04ca9663facd91b498fe9b7",
+      "sizeBytes": 9058
+    },
+    {
+      "path": "pause.js",
+      "sha256": "e9e4929715bad37f2cbb5e1becaf90b93f7b2b88cd6997a7c30c263279902e3b",
+      "sizeBytes": 5040
+    },
+    {
+      "path": "payment-balance.css",
+      "sha256": "c529baab9e67728456605ebbd5fe42ea8f87ab846057ebf04e46cd108bbd17bd",
+      "sizeBytes": 998
+    },
+    {
+      "path": "payment-balance.js",
+      "sha256": "599790f2bcf86d294d384847987107aa9e11f088b08eb2b2279cf55c265d04fb",
+      "sizeBytes": 2187
+    },
+    {
+      "path": "payment-budget-result.css",
+      "sha256": "7b48284866b53ad8e283da8b4341756b18819a1c00af876881a6e264d971f453",
+      "sizeBytes": 1797
+    },
+    {
+      "path": "payment-budget-result.js",
+      "sha256": "1a6c252ca8cbf70c935a5d38845d23225869da5671e0fa2223970a8e6eff1465",
+      "sizeBytes": 10363
+    },
+    {
+      "path": "payment-consequence.css",
+      "sha256": "7c307b7eeb1d05739041d851e37a30c6efb1100d8d84f742b6a15a90d20197d0",
+      "sizeBytes": 4200
+    },
+    {
+      "path": "payment-consequence.js",
+      "sha256": "0e4341fc64160a6626447da83efcf0ee78cbe1c9bbe7c0e904edf6d31abad710",
+      "sizeBytes": 5148
+    },
+    {
+      "path": "payments.js",
+      "sha256": "8820061fd62611b7f98208d5837c321c4cb6a696939fb7d96c667fa25cda7ddb",
+      "sizeBytes": 82806
+    },
+    {
+      "path": "persistence-recovery.css",
+      "sha256": "7e4193dd73f213f1321424184dbdbcdf1c078c9464afc4f6dc09147163b4b7d7",
+      "sizeBytes": 1290
+    },
+    {
+      "path": "persistence-recovery.js",
+      "sha256": "b432297133949f4a197699160b1262eddec5cd252ca98f530a0f07aff9ad8b22",
+      "sizeBytes": 8035
+    },
+    {
+      "path": "personal-qr.css",
+      "sha256": "9e6d67079fa9a549a2bf3f8f2568bfa6b083a1c1608279365932d11824204d77",
+      "sizeBytes": 2620
+    },
+    {
+      "path": "personal-qr.js",
+      "sha256": "6a859920752a3f43e8d1edd8649ed8230839364b59f74425caf717a50a96ce81",
+      "sizeBytes": 10917
+    },
+    {
+      "path": "plan-adjustment.js",
+      "sha256": "5bc97e2dce3879fa8c6fc4035dec5d13f49de7b1841abb06831394b1abc4dcd4",
+      "sizeBytes": 3476
+    },
+    {
+      "path": "plan-benefit.js",
+      "sha256": "be3882fcae3f45dfb50a0fe6cdb4484b38c9bc136e3d7672b52791f9c7f22d79",
+      "sizeBytes": 7136
+    },
+    {
+      "path": "plan-clarity.css",
+      "sha256": "546740eecdf00a81ca92993a15bf168d52a5e5aa9bc100dad4a79fef2936e211",
+      "sizeBytes": 769
+    },
+    {
+      "path": "plan-hub.js",
+      "sha256": "b53ead35cb0b241bee0d79306489d116c7ceaa7c1726c129d846506f190903b6",
+      "sizeBytes": 3345
+    },
+    {
+      "path": "plan-impact.js",
+      "sha256": "26d3006e337575e68b48937579bb5920bb96a4608ce5c6c2fdd2073cfedc1e2a",
+      "sizeBytes": 5189
+    },
+    {
+      "path": "plan-setup.js",
+      "sha256": "aba92522f286ef63daf0c5021931dfb67c1c72535f2de269b1acd33a63f32043",
+      "sizeBytes": 37930
+    },
+    {
+      "path": "platform-init.js",
+      "sha256": "67c2d14c7242c5d55671a67886e302f997d4f2911a5f420da7197c6511f48397",
+      "sizeBytes": 930
+    },
+    {
+      "path": "platform-runtime.css",
+      "sha256": "ef36feb88998b6335d48e047cf4be9f4f2325abc3c6fc1c1c8ca68482ba34242",
+      "sizeBytes": 1694
+    },
+    {
+      "path": "platform-runtime.js",
+      "sha256": "6de656fcc2f8225db33fd1ccf7140c3711a77c4063b1901be325dc41220166f2",
+      "sizeBytes": 9838
+    },
+    {
+      "path": "product-accounts.css",
+      "sha256": "60beaf49f5e8f0968e650de88954cfc13461ab6674396092999039f64e8b7ec7",
+      "sizeBytes": 5112
+    },
+    {
+      "path": "product-accounts.js",
+      "sha256": "04603cc23b305625ebcf3fca990373485285fffa107af1e73cc639f0f3e0ae24",
+      "sizeBytes": 11708
+    },
+    {
+      "path": "product-finish.css",
+      "sha256": "ba01a58da3a6b128de99d8d1e1d4a8fac4e526267cdd10eb803cef7102a667b4",
+      "sizeBytes": 9327
+    },
+    {
+      "path": "product-finish.js",
+      "sha256": "f23b8e65586393d34fbd8c8107795a6ab3b1c931bd0a4bee474ee25f85df103d",
+      "sizeBytes": 3662
+    },
+    {
+      "path": "qr-floating.css",
+      "sha256": "b3ec29baa65513deccd6b561489235f1e046eb16d4247c2b52d4aae6181e864b",
+      "sizeBytes": 1141
+    },
+    {
+      "path": "qr-floating.js",
+      "sha256": "3f632c1663c8caa4426d8eeb484030a659bb502f47e62947a840bf2ad456edd0",
+      "sizeBytes": 2709
+    },
+    {
+      "path": "qr-payments.css",
+      "sha256": "943d31c354c162bddb18a861e9a56e861ab30e503420386a4f2986648e5676d1",
+      "sizeBytes": 13711
+    },
+    {
+      "path": "qr-payments.js",
+      "sha256": "a2ee030edb405d16e5de9ddc3ef8ed4c55baa472597fb5a050d575344f4e06ed",
+      "sizeBytes": 20848
+    },
+    {
+      "path": "saving-rules.css",
+      "sha256": "dd64723fcb0b61a81b2b47c760e66a433c25ee1f0d1b847eb22f317ebfb32a16",
+      "sizeBytes": 2464
+    },
+    {
+      "path": "saving-rules.js",
+      "sha256": "4c200df6e004a4d63eeca5ae480163e5e638cb891710bdd28620c729a79121a2",
+      "sizeBytes": 20267
+    },
+    {
+      "path": "savings-hacks-engine.js",
+      "sha256": "27e1c7c60d9c199cf451232dfb6d1df7c2ff1135214b7e5c319dc7628690aecf",
+      "sizeBytes": 18934
+    },
+    {
+      "path": "savings-hacks-ui.js",
+      "sha256": "2c39b111a308f2790200b030f0640520bc7f867e3da8571bd11aa6687375574f",
+      "sizeBytes": 18127
+    },
+    {
+      "path": "savings-hacks.css",
+      "sha256": "945dc553b498cf6c62dcc2a04f1de8e2185fda40f7b60a5105c6b85b07d80f72",
+      "sizeBytes": 4990
+    },
+    {
+      "path": "shared-expenses.css",
+      "sha256": "aabd7b48487e2966d398d9ab9d16cee116b6497266d6d4fd2f5f6528e35c2a6a",
+      "sizeBytes": 3590
+    },
+    {
+      "path": "shared-expenses.js",
+      "sha256": "cbed82bd726c9f3633f0f0038a77fe2877c19d96f375a9c1d5bd53d8ccbd7bce",
+      "sizeBytes": 23966
+    },
+    {
+      "path": "signal-account-home.css",
+      "sha256": "aa33cf8d72d1e0add9c4c5285d4cf30d0bc2a5c4ebddf5a0f5bfb4f2459d503c",
+      "sizeBytes": 13779
+    },
+    {
+      "path": "signal-account.css",
+      "sha256": "ab554a52ce684728d28c93cdc9b089f45fb762a906842c91e69f6e5d224ce581",
+      "sizeBytes": 34652
+    },
+    {
+      "path": "signal-account.js",
+      "sha256": "1c3dcdc982a4f634434cf5a51a9d5cd6785b95a24d7f0561f05e0ac28f39f58e",
+      "sizeBytes": 2311
+    },
+    {
+      "path": "signal-edition.js",
+      "sha256": "79ad0a45dc70302088ffdd1b0661168372437a64752770a18d644546a52f17c1",
+      "sizeBytes": 14996
+    },
+    {
+      "path": "signal-home.css",
+      "sha256": "31352a55fe956b83ccc47b2da8618852b80546951d1b398c9a836b242e179432",
+      "sizeBytes": 31596
+    },
+    {
+      "path": "signal-navigation.js",
+      "sha256": "702040133dea90b2d01ad092e42831a082b91f26e41e8fae5bcc662385732a3e",
+      "sizeBytes": 18717
+    },
+    {
+      "path": "signal-page-chrome.css",
+      "sha256": "dd790826f425488404f8d58bbd7da6b68d6600cf956dfe5d345fb611c73798ac",
+      "sizeBytes": 22849
+    },
+    {
+      "path": "signal-payments.css",
+      "sha256": "087738b1ecd109248d0c01aada118a85b01b4f6ae7472084254d30f25df1a7b6",
+      "sizeBytes": 27941
+    },
+    {
+      "path": "signal-payments.js",
+      "sha256": "e4cf4cede31ed4f370b9652a5b7112dba6becaab8ac51c08130d60b6a8b26dd9",
+      "sizeBytes": 2673
+    },
+    {
+      "path": "signal-planning.css",
+      "sha256": "4e8e0a17e7552194993cc2d8fd891fc05540373ec51220e94be5bb545a812748",
+      "sizeBytes": 31133
+    },
+    {
+      "path": "signal-planning.js",
+      "sha256": "2a2880f0551235920c1bd6c5bdba26645b0f97a363023024380c6d12057bdbf9",
+      "sizeBytes": 3882
+    },
+    {
+      "path": "signal-ring-home.css",
+      "sha256": "466e58e82eab3785c6e0a519428d71b3f596e617a56438459b27f5976c8ff6e8",
+      "sizeBytes": 25901
+    },
+    {
+      "path": "signal-system.css",
+      "sha256": "b36c96ffb0d81a8b2e4ef0943cd9dfe4cb2103f9a8d637214edf00ff5bbfe03b",
+      "sizeBytes": 35917
+    },
+    {
+      "path": "spending-outlook.css",
+      "sha256": "4bfc24a3671360b9a5440917461c9a9ec1a6514555daf5e1e032e8194f8b972f",
+      "sizeBytes": 1805
+    },
+    {
+      "path": "spending-outlook.js",
+      "sha256": "df25608140baf89915e0364b3d8813e843a20690d2d08ad2d600ee7534da9ce7",
+      "sizeBytes": 11355
+    },
+    {
+      "path": "style.css",
+      "sha256": "99cfb5d950e7e7fe479d7d3cc635aec3bbe7f634b4e77bf1dbdc797a4e56830d",
+      "sizeBytes": 13194
+    },
+    {
+      "path": "sw.js",
+      "sha256": "941ac7e6054a4d04f97e9e0a9c8d71d7e8954ef725ee492d9f731b8a11c9ffee",
+      "sizeBytes": 3558
+    },
+    {
+      "path": "task-sheet.css",
+      "sha256": "892ad112a81fe8d200d447af10468707f5c0212f4ad54dfd4cf3efc9a8929ac1",
+      "sizeBytes": 14641
+    },
+    {
+      "path": "task-sheet.js",
+      "sha256": "d582a867b6fc07526552588ade8cbf61213fff4ca277382aaae0d26a6ac0cac8",
+      "sizeBytes": 34935
+    },
+    {
+      "path": "transaction-journey.css",
+      "sha256": "1335d84629e253bd54d22626487ae683ba860d6f463d5b645dc9fcb801f1040d",
+      "sizeBytes": 3513
+    },
+    {
+      "path": "transaction-journey.js",
+      "sha256": "213e24da717deff7c9e969f8dd4c7b8583460a51237d24c9736e64bc5db7e40c",
+      "sizeBytes": 3329
+    },
+    {
+      "path": "two-account-engine.js",
+      "sha256": "6c6fca7af86ea2778240403bea1158ed9346d8c23308c599b2ca1e071ed858e5",
+      "sizeBytes": 7298
+    },
+    {
+      "path": "type-system.css",
+      "sha256": "07368700800a8d55a24aa6f85e2a029b2ee6f794ebe794594d5b005777100160",
+      "sizeBytes": 3255
+    },
+    {
+      "path": "ui-consistency.css",
+      "sha256": "20865a69c597376f779988d63ae8e68167a8bdd43ee3d1024c3c371a55f0819a",
+      "sizeBytes": 23168
+    },
+    {
+      "path": "vendor/QR-LIBRARIES.txt",
+      "sha256": "1f87f3fa326d30883f31237973dc6000b98c6484db97f05f1d65a4d317b0c468",
+      "sizeBytes": 688
+    },
+    {
+      "path": "vendor/jsqr-LICENSE.txt",
+      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "sizeBytes": 11358
+    },
+    {
+      "path": "vendor/jsqr.js",
+      "sha256": "bc40c8a15196236b2314db0856f72ca0b49980cd5413b8c852a7349f5fee0859",
+      "sizeBytes": 256885
+    },
+    {
+      "path": "vendor/qrcode-generator-LICENSE.txt",
+      "sha256": "5d8c853a2b6e9a4228b3b13eca3eacd1bd7358591576b0aee813a3b20027ba78",
+      "sizeBytes": 1160
+    },
+    {
+      "path": "vendor/qrcode-generator.js",
+      "sha256": "79ec86f82856005b1c887905cfccfcfbec3821ca61c7fd5a952faa5f778f791c",
+      "sizeBytes": 56694
+    },
+    {
+      "path": "virtual-cards-engine.js",
+      "sha256": "74666193f9a3bf975dfa9c3e5b93c3611d1be336b754b80f7806afe2d6ae14a4",
+      "sizeBytes": 21187
+    },
+    {
+      "path": "virtual-cards-payments.js",
+      "sha256": "a9695bcab044de9d389990e52363449ecd6efb53e5079c1bd00eebad880d3cf3",
+      "sizeBytes": 23084
+    },
+    {
+      "path": "virtual-cards-ui.js",
+      "sha256": "c740e0c805b5bbff070dbafb74d9c3809c635927898891e079cbf1f87fc7290e",
+      "sizeBytes": 35705
+    }
+  ],
+  "shell": {
+    "namespace": "lumo-signal-edition-v1",
+    "version": "81a122b11c44d96d86dc",
+    "precacheBytes": 4644861,
+    "assetCount": 22
+  }
+}

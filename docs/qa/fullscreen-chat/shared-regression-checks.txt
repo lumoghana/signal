@@ -1,0 +1,364 @@
+PASS new project identity and independent namespace
+PASS 44 shared scripts match the approved feature baseline and load order
+PASS foreign saved records are never imported, overwritten or reset
+PASS all existing destinations remain registered
+PASS four actual-index financial journeys agree with Chat and confirmed ledger
+PASS pending, failure and repeated submissions keep their existing rules
+PASS QR selects only a recipient; simulated biometrics authorise only once
+PASS Money Box withdrawal needs partner approval and separate authorisation
+PASS peer source and financial outcomes remain in parity
+Edition contract checked against the pinned Everyday v19 baseline.
+PASS identity confirmation precedes an editable details review with authoritative fields read-only
+PASS non-Legon notice appears above the details heading and permits signup
+PASS details validation keeps the editable information and prevents incomplete confirmation
+PASS phone correction still requires OTP and returns to the saved detail review
+PASS successful signup creates two distinct empty accounts and makes Add money the next action
+PASS pending account approval cannot create either account or bypass existing consent/security
+PASS an unapproved or locked account cannot expose a ready-account confirmation
+PASS legacy approved records do not fabricate missing verified card or birth date
+PASS saved non-Legon interest is disclosed immediately and Ghana university spellings are recognised
+9 account onboarding checks passed.
+✔ tests/account-onboarding.test.cjs (309.727879ms)
+PASS Ordinary and ambassador links render one correct entry, with sample boundaries and discoverable choices
+PASS Feedback works before onboarding and while locked, downloads explicitly, and reset is a separate decision
+PASS Student sample signup reaches fresh Home and the guide stays reachable from You
+PASS Sample account creates the promised GH₵50.00 essentials consequence and replacement is explicit
+All ambassador entry checks passed.
+✔ tests/ambassador-entry.test.cjs (243.926861ms)
+PASS authorisation offers an explicit biometric demo alongside the unchanged PIN
+PASS approval creates exactly one ordinary payment without reading or filling a PIN
+PASS cancel returns to the PIN field with no financial or authentication mutation
+PASS an unsuccessful check cannot approve and offers retry or PIN fallback
+PASS a amount change invalidates the prompt and cannot authorise a stale payment
+PASS a recipient change invalidates the prompt and cannot authorise a stale payment
+PASS a balance change invalidates the prompt and cannot authorise a stale payment
+PASS a account change invalidates the prompt and cannot authorise a stale payment
+PASS a expired change invalidates the prompt and cannot authorise a stale payment
+PASS a locked change invalidates the prompt and cannot authorise a stale payment
+PASS a closed change invalidates the prompt and cannot authorise a stale payment
+PASS direct calls outside authorisation and forged proof objects cannot replace PIN
+PASS a direct authorisation route cannot bypass the Pause or current review
+PASS the complete Pause still precedes biometric authorisation
+PASS Pending remains a truthful provider state after biometric approval
+PASS Failed remains a truthful provider state after biometric approval
+PASS bill payment uses the same biometric authorisation and confirmed result logic
+PASS Money Box in uses the same scoped biometric option
+PASS Money Box out uses the same scoped biometric option
+PASS protected withdrawal still requires fresh partner approval before biometrics
+PASS changed protected withdrawal amount requires a new code and cannot reuse biometric consent
+PASS closing or navigating away from the prompt never authorises
+PASS backgrounding cancels the visible prompt and restores a working PIN fallback
+PASS retry and PIN fallback retain the chosen simulated provider outcome
+24 biometric authorisation checks passed.
+✔ tests/biometric-auth.test.cjs (2354.730492ms)
+PASS Budget comparison gives the current operational shortfall without a zero goal row
+PASS Compact entry copy shares the same shortfall and budget vocabulary
+PASS A payment can link to an existing budget item using the current label
+PASS A Money Box transfer cannot fulfil a budget item through the UI or a direct action
+PASS Budget-item editing retains the working field IDs with customer-facing budget language
+5 budget presentation and link checks passed.
+✔ tests/budget-copy.test.cjs (139.079771ms)
+PASS Home has a discoverable Chat control and Chat opens as a full-screen destination
+PASS full-screen Chat keeps a working Home return and restores the normal navigation
+PASS a deliberate left swipe from Home opens Chat and a right swipe returns Home
+PASS vertical scrolling, short drags, mouse drags and cancelled touches never change destination
+PASS swiping over inputs, buttons or an open task never hijacks a task
+PASS Chat actions use one contextual sheet and preserve the exact conversation and composer
+PASS a payment launched from Chat still needs review and authorisation, then returns to the conversation
+PASS confirmed funding and deferring optional Budget setup return to the same full-screen Chat
+PASS leaving and reopening Chat keeps unsent text, history and reading position
+PASS an unfinished affordability clarification survives a visit to Home
+PASS browser back returns Home without authorising or losing the unsent draft
+PASS reduced motion preserves Chat navigation, calculation and safe task dismissal
+12 full-screen Chat banking checks passed; 0 failed.
+✔ tests/chat-banking.test.cjs (971.222896ms)
+PASS Essentials shortfall compares only relevant money covering essentials
+PASS Goal impact compares allocation coverage after essentials, not a second account deduction
+PASS Covered spending uses spare room, including the narrow-cushion fixture
+PASS A linked essential fulfils the plan once and exposes its changed requirement
+PASS Pending holds, fees and pre-existing shortfalls come directly from the engine
+PASS Wrapper retains one illustration, the direct headline and every existing action
+PASS A covered behavioral Pause gains the room comparison without changing its trigger
+PASS Non-Pause, missing-draft and submitted-result paths stay untouched
+PASS No plan and several goals receive honest labels rather than invented detail
+PASS Small amounts and escaped names retain exact real financial text
+PASS Brief shared motion never counts money, hides information or blocks actions
+11 Clarity Edition Pause checks passed.
+✔ tests/clarity-pause.test.cjs (101.848784ms)
+PASS creating empty accounts does not count as first funding
+PASS only confirmed external incoming money changes the milestone, without changing amounts
+PASS pending and failed incoming credits do not activate the funded Home action
+PASS a pending credit activates the milestone only when its existing reference succeeds
+PASS the milestone remains true after spending to zero and reloading
+PASS internal savings movement cannot stand in for an incoming funding confirmation
+PASS legacy funded accounts and sample money are recognised while migration preserves total money
+PASS bank instruction, debit claim and optional setup state do not imply receipt
+PASS wallet approval stays unfunded until confirmation, including payment-return funding
+PASS unfunded Home offers one Add money primary action with Request money and no Campus Pay
+PASS confirmed first funding switches the main action while placing Add money inside the operational account
+PASS the Home Campus Pay action opens a working merchant sheet and returns to the retained Home
+PASS the operational Add money action opens funding over Home and dismisses without another credit
+PASS Campus Pay stays on Home after the confirmed money has been spent
+PASS pending and failed first funding leave the Home primary action as Add money
+15 confirmed-first-funding Home state checks passed.
+✔ tests/home-funding-state.test.cjs (837.285866ms)
+PASS one shared privacy button belongs to the trailing Home header controls, outside both accounts
+PASS the budget conclusion owns the main amount format while available balance is supporting text
+PASS a newly opened customer account shows all overview figures without a discovery tap
+PASS the header control hides and reveals all three values together without changing money
+PASS without a Budget the actual available balance is the main amount and privacy has no missing target
+PASS opening and dismissing Campus Pay retains the masked Home amounts, header and user position
+PASS backgrounding during a sheet masks every retained overview amount before Home returns
+PASS a restored browser page stays masked until an explicit privacy action
+PASS locked access cannot reveal existing overview markup or bypass the sign-in screen
+PASS refreshed figures remain accurate after an authorised transfer while the privacy choice is retained
+PASS funded Home keeps Campus Pay and Request money, with Add money in the operational card
+11 Home hierarchy and shared privacy checks passed. Rendered position and text scale require browser QA.
+✔ tests/home-hierarchy.test.cjs (571.985339ms)
+PASS Home gives the same completed-money-out total as the sheet and Chat, including fees and transfers
+PASS a plan allocation or incoming allowance cannot become recorded spending
+PASS an empty seven-day window does not imply the account has no older history
+PASS close restores the same Home, focus, scroll, direct actions and privacy without moving money
+PASS backdrop restores the same Home, focus, scroll, direct actions and privacy without moving money
+PASS browser Back restores the same Home, focus, scroll, direct actions and privacy without moving money
+PASS revealed balances remain independent of the visible story and sheet history
+PASS correcting a category in the open detail refreshes Home while keeping the account amount
+PASS narrow, enlarged-content and reduced-motion contracts keep actual values, controls and nonbreaking currency
+PASS one category explains all recorded money out and shows the amount once
+PASS two equal leaders are named truthfully rather than claiming a unique biggest category
+PASS three tied leaders disclose the tie without listing every category on Home
+PASS a transfer-led story describes money out without presenting transfers as purchases
+13 Home money story checks passed. No browser or physical-phone layout claims.
+✔ tests/home-money-story.test.cjs (928.8369ms)
+INVENTORY 121 views, 666 handlers, 48 rendered asset references
+PASS every shipped view has callable handlers, existing literal route targets and local assets
+PASS payment → Help → saved report → return retains the merchant, amount and Pay parent
+PASS a receipt restored as a full page keeps its reference through Help and return
+PASS receipt support saves the transaction reference and returns to that same receipt
+4 link audit checks passed. Handler existence is separate from task-flow behavior and browser layout QA.
+✔ tests/link-audit.test.cjs (531.348321ms)
+PASS new Money Box protection is optional and refuses the owner number without creating a box
+PASS accepting the sample invitation makes protection visibly active without moving money
+PASS withdrawal review creates one scoped code and rerendering does not resend or lose the amount
+PASS wrong partner codes and wrong PINs preserve the transfer and never move funds
+PASS editing the withdrawal amount invalidates its old approval and keeps the edited value
+PASS expired partner approval returns from PIN to review and requests a fresh code explicitly
+PASS a pending protected transfer holds savings only and does not ask for approval again on settlement
+PASS switching protection off requires approval and preserves the unchecked choice on native back
+PASS changing partners keeps old protection until acceptance and allows cancelling the new invitation
+PASS support request remains locked until a verified sample decision, then the original transfer still needs PIN
+PASS declined support keeps the protection and entered payment, with no dead approval controls
+PASS verified support can approve a protection change without removing it at request time
+PASS partner recovery during a temporary withdrawal preserves and resumes the original campus payment
+PASS typed approval codes are not retained when returning to edit or saved as form values
+PASS unsaved protection choices survive Help, native back and sheet reopen with the phone field visible
+PASS returning after replacement acceptance reports protection updated rather than switched off
+PASS cancelling an initial invitation leaves the saved box unprotected and can be enabled again
+PASS saving the original partner after backing out of a change clears the abandoned edit choice
+18 Money Box protection UI checks passed.
+✔ tests/money-box-protection-ui.test.cjs (2010.183986ms)
+PASS existing boxes remain unprotected and optional invitations create no money
+PASS own number and an invalid partner number are refused, including changed ownership during invitation
+PASS partner acceptance activates protection; direct, addTx and reversal withdrawals cannot bypass it
+PASS partner approval alone is insufficient and the customer PIN issues a scoped submission grant
+PASS the request identifies its actual amount and box; amount, draft and box changes invalidate approval
+PASS expiry, attempt limits and resending never release money and invalidate old codes
+PASS pending reserves savings once and settlement uses captured approval without a new code
+PASS failed transfers consume their request; a new attempt needs a fresh code
+PASS depositing remains available and does not require partner approval
+PASS protection removal needs its own approved change request and invalidates withdrawal approvals
+PASS changing partners retains old protection until the new partner accepts
+PASS expired or locked replacement invitations can be resent only for the same approved partner
+PASS support request alone never approves or unlocks; verified simulated approval stays scoped and requires PIN
+PASS rejected support leaves protection active and money untouched
+PASS owner phone changing to the partner cannot approve or submit; verified support can rescue the scoped request
+PASS locked sessions cannot approve, alter protection or move savings
+16 Money Box protection service checks passed.
+✔ tests/money-box-protection.test.cjs (590.724864ms)
+PASS Money Box creation accepts no target, creates no money and exposes the next choices
+PASS a deposit moves operational money into savings only after a separately entered PIN
+PASS funding that underfunds the operational budget receives the existing Pause
+PASS withdrawal uses the Money Box balance, so an empty operational account does not block it
+PASS in Pending reserves the correct ledger and never claims confirmed arrival
+PASS in Failed reserves the correct ledger and never claims confirmed arrival
+PASS out Pending reserves the correct ledger and never claims confirmed arrival
+PASS out Failed reserves the correct ledger and never claims confirmed arrival
+PASS a changed Money Box quote returns to review and retains the entered amount
+PASS five incorrect withdrawal PINs lock the account without moving money
+PASS funded or pending Money Boxes cannot be archived, and empty archive is reversible
+PASS cancelling or closing a transfer never authorises it
+PASS temporary savings transfers preserve and resume the original payment draft
+PASS internal receipt uses transfer status and saved legacy metadata can become a zero-funded box
+14 Money Box journey checks passed.
+✔ tests/money-boxes-journey.test.cjs (1336.949884ms)
+PASS GH₵280 Pause keeps its real conclusion and single essentials comparison
+PASS Money slips use one finite projected movement with no financial text tween
+PASS each money slip reaches the ring at 900ms without a global easing time warp
+PASS The clarity lens reveals relevant essentials, without holding notes or implying a recipient
+PASS A Food consequence uses only its relevant symbol
+PASS A Transport consequence uses only its relevant symbol
+PASS A Fees consequence uses only its relevant symbol
+PASS Continue observes the minimum and brief hold, then opens separate PIN without debit
+PASS Editing during motion keeps the draft and refreshes the consequence
+PASS Close during Pause asks about the draft and cannot authorise or debit
+PASS GH₵80 keeps the existing noninterrupting rule and calculation
+PASS GH₵140 keeps the existing noninterrupting rule and calculation
+PASS A linked GH₵80 planned cost is fulfilled once without an extra Pause
+PASS A covered behavioural Pause uses spending room instead of inventing a shortfall
+PASS legacy goal comparison still renders explicit allocation coverage without touching funded savings
+PASS Replay is explicit and does not duplicate financial data or exposure events
+PASS Unchanged rerender and disclosure do not replay the signature automatically
+PASS Changed amount creates a fresh projection and honest exposure
+PASS Reduced motion keeps the same facts and uses the same minimum before PIN
+PASS hidden cancels current motion without altering the projected facts
+PASS preference cancels current motion without altering the projected facts
+PASS The early sample animates bundled facts without creating a payment or exposure
+PASS Pending result never reuses the projected-money hero
+PASS Failed result never reuses the projected-money hero
+24 signature Pause checks passed.
+✔ tests/pause-hero.test.cjs (2446.509624ms)
+PASS Pause gives three full reading seconds after the 900ms reveal
+PASS projected effects reveal at the ring arrival, not on entry
+PASS the initial focus is visible, then the revealed consequence is announced and remains focusable
+PASS revealing the consequence does not steal focus from a choice the student reached
+PASS pointer press of 89ms cancels; a new continuous 90ms press and release opens PIN
+PASS pointercancel cancels an otherwise sufficient hold
+PASS pointerleave cancels an otherwise sufficient hold
+PASS Space supports the same continuous 90ms hold and release
+PASS Enter supports the same continuous 90ms hold and release
+PASS assistive click receives the same short confirmation after the three-second minimum
+PASS early presses cannot queue authorisation for later
+PASS editing and cancelling remain available throughout the minimum
+PASS rerender preserves the arrival and minimum timings for the same decision
+PASS changed amount gets a fresh three-second decision and fresh projected effect
+PASS reduced motion shows every effect immediately but preserves the three-second decision
+PASS leaving a held control cancels its pending completion and cannot reappear as PIN later
+PASS background time never unlocks the Pause or completes a hold
+PASS time spent in Help is excluded while the same decision keeps its visible progress
+PASS missing animation support reveals static effects immediately and still requires the minimum
+PASS the browser click following a completed pointer hold cannot restart PIN or submit twice
+PASS Replay starts a fresh three-second Pause and reveals effects only at its new ring arrival
+PASS only a later PIN confirmation can create the simulated payment
+22 exact Pause dwell, reveal and hold checks passed.
+✔ tests/pause-hold.test.cjs (2633.206244ms)
+PASS all 20 payment, funding, request and record routes display the authoritative current balance
+PASS hiding Home balance does not hide payment context or reveal the retained Home
+PASS entry, Review and PIN retain GH₵600 until a successful GH₵80 payment confirms GH₵520
+PASS Pending results show actual available money, and a status refresh updates the same fact
+PASS Failed results show actual available money, and a status refresh updates the same fact
+PASS Pause labels the current GH₵600 separately from projected GH₵320
+PASS the top-up chooser has one balance fact and pending incoming funding is not spendable
+PASS public, locked, closed, isolated sample and unrelated routes never gain a real-balance row
+8 current payment-balance checks passed.
+✔ tests/payment-balance.test.cjs (1127.585749ms)
+PASS four budget lines expose five native source choices without another shelf
+PASS a fully covered budget line remains selectable while archived lines do not appear
+PASS explicit source supplies purpose before merchant, note or recipient memory
+PASS source selection is the category answer and a linked GH₵80 is not counted twice
+PASS a mixed or custom customer purpose stays exact instead of guessing a narrower category
+PASS an unambiguous budget name maps to a canonical category but preserves its source label
+PASS manual category correction leaves the chosen source and financial facts intact
+PASS reselecting the same source preserves a correction; choosing another source resets its stale label
+PASS Left after budget retains existing automatic classification and extra-spending arithmetic
+PASS source, note and amount persist through category and edit returns in the saved demo state
+PASS excess beyond the selected budget line still uses after-budget room
+PASS Pending source-linked payment preserves holds, reconciliation and purpose without duplicate debit
+PASS Failed source-linked payment preserves holds, reconciliation and purpose without duplicate debit
+PASS a removed source blocks authorisation and requires a new explicit choice
+PASS changing source after review invalidates the old quote rather than approving a different purpose
+15 Pay from source checks passed.
+✔ tests/payment-sources.test.cjs (1312.228026ms)
+PASS a pure alternative covers all saved commitments at the exact boundary
+PASS momo alternative includes its fee rather than overstating spending room
+PASS bank alternative includes its fee rather than overstating spending room
+PASS a linked essential is fulfilled once when calculating the smaller amount
+PASS pending extra spending changes the alternative through the shared authority
+PASS pending planned spending changes the alternative through the shared authority
+PASS a one-pesewa boundary remains exact
+PASS an already uncovered plan and missing essentials never get a misleading covered alternative
+PASS fixed requests, merchant sales, products and completed drafts cannot be repriced
+PASS the suggestion reveals with the effect and changes only the draft before a new Review and PIN
+PASS a stale quote returns to the current decision without silently changing the amount
+PASS a detached old suggestion cannot change a different payment
+PASS the early example states its sample starting facts before the consequence without changing account data
+13 calculated adjustment and sample premise checks passed.
+✔ tests/plan-adjustment.test.cjs (943.945338ms)
+PASS Plan contains separate Budget and Money Box sections with their account roles
+PASS Budget edit opens its existing sheet and leaves Money Box funds untouched
+PASS Adding a budget item opens the existing editor with no transfer
+PASS View Money Boxes opens saved boxes, while add opens a zero-funded creation form
+PASS Budget period and calculation remain working optional detail actions
+PASS A new account can create a Money Box before saving any Budget
+PASS An unfinished Budget resumes its saved setup step without changing saved savings
+PASS Uncovered Budget and pending savings show distinct, factual status
+8 Plan hub journey checks passed.
+✔ tests/plan-hub.test.cjs (567.062861ms)
+PASS Campus Pay shows scan and manual code entry without requesting a camera
+PASS known merchant and sale formats parse but foreign URLs and amount payloads do not
+PASS a scanned merchant opens entered details without moving money or trusting an amount
+PASS manual merchant code remains a complete working alternative
+PASS invalid QR keeps the saved draft and leaves a useful code fallback
+PASS sample SVG is an actual QR and both local decoders recover the exact identifier
+PASS sample scanning goes through the decoder and shared lookup without authorising
+PASS an existing open sale supplies the shared fixed amount rather than QR amount fields
+PASS Confirmed sale QR cannot create a replacement payment
+PASS Cancelled sale QR cannot create a replacement payment
+PASS Failed sale QR cannot create a replacement payment
+PASS Expired sale QR cannot create a replacement payment
+PASS an unknown local sale QR reports failure without replacing a current draft
+PASS camera unsupported state keeps photo and code choices visible
+PASS camera denial is recoverable and never authorises a payment
+PASS leaving while camera permission is pending stops a late stream
+PASS active camera stops on code fallback and a decoded merchant
+PASS closing the scanner sheet stops active capture and restores the parent
+PASS hidden document stops capture and offers an explicit restart
+PASS hiding during a pending permission returns to a usable camera choice
+PASS returning a cached page keeps the camera off and its controls accurate
+PASS invalid image type is rejected before decoding and code remains available
+PASS a detached scanner callback cannot overwrite the next task
+23 QR payment checks passed.
+✔ tests/qr-payments.test.cjs (1540.430715ms)
+PASS a real sample sale opens customer preview, validates approval and stays separate from student money
+PASS settlement pending, failure, retry and confirmation keep one obligation and truthful record views
+PASS expired and cancelled valid sale references remain inspectable and cannot authorise another payment
+PASS long local support content and context preserve the record and return action without exposing fields as markup
+4 valid-record simulation and long-content smoke checks passed. Browser geometry is checked separately.
+✔ tests/screen-render-audit.test.cjs (666.012363ms)
+PASS University of Ghana completes signup with university and email, without a Student ID or waitlist
+PASS Kwame Nkrumah University of Science and Technology completes signup with university and email, without a Student ID or waitlist
+PASS university and email validation keeps the entered form and does not advance setup
+PASS unfinished drafts survive help, leaving and phone-confirmed resume
+PASS legacy campus pending, attention and unavailable routes offer the same editable continuation
+PASS saved another-campus interest resumes signup and keeps its university and email
+PASS application correction edits university and email while retaining completed checks and pending semantics
+PASS previously completed campus checks remain compatible and do not discard saved account details
+8 signup university checks passed
+✔ tests/signup-university.test.cjs (761.98028ms)
+PASS Campus Pay 80 has one decision stage and agrees with Chat and final account
+PASS Campus Pay 140 has one decision stage and agrees with Chat and final account
+PASS Campus Pay 280 has one decision stage and agrees with Chat and final account
+PASS linked cost still fulfils essentials once through the three-stage path
+PASS Lumo recipient and amount share details; recipient choice retains entered values
+PASS momo checks destination and amount together then includes fee on Pause
+PASS bank checks destination and amount together then includes fee on Pause
+PASS invalid lookup stays in details with amount retained and no transaction
+PASS airtime account, package or amount are one details stage
+PASS data account, package or amount are one details stage
+PASS electricity account, package or amount are one details stage
+PASS water account, package or amount are one details stage
+PASS tv account, package or amount are one details stage
+PASS internet account, package or amount are one details stage
+PASS plan edits, fixed request payments and stale quotes all use the same decision selector
+PASS Pending result is truthful and repeated submission cannot create a second payment
+PASS Failed result is truthful and repeated submission cannot create a second payment
+PASS insufficient account money remains a blocked review, never a Pause or authorisation
+18 three-stage journey checks passed.
+✔ tests/transaction-journey.test.cjs (1712.508379ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4494.860082

@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-30",
+  "edition": "Signal",
+  "reference": "Original user-selected Signal image, supplied again with this redesign request.",
+  "images": [
+    {
+      "file": "dist/assets/signal/lux-welcome-bold.webp",
+      "source": "Existing approved Signal Lux. Canvas crop only.",
+      "sourceFile": "dist/assets/signal/lux-welcome.webp",
+      "cropAlphaThreshold": 8,
+      "cropPaddingPixels": 2,
+      "dimensions": [
+        567,
+        537
+      ],
+      "sha256": "8cb685a1fc458797582908a0ef12f11dc44f5908d82cd46738df9f8d08b38fe6"
+    },
+    {
+      "file": "dist/assets/signal/lux-pause-bold.webp",
+      "source": "Existing approved raised-palm Lux. Canvas crop only.",
+      "sourceFile": "dist/assets/signal/lux-pause.webp",
+      "cropAlphaThreshold": 8,
+      "cropPaddingPixels": 2,
+      "dimensions": [
+        514,
+        546
+      ],
+      "sha256": "ee980718c75f2f74d9ad88906da31792bfa4868022f4b2c25a0193ccf3c0b227"
+    }
+  ],
+  "font": {
+    "file": "dist/fonts/NimbusSansNarrow-Bold.woff",
+    "source": "Local installed NimbusSansNarrow-Bold.otf from fonts-urw-base35. Converted to WOFF without outline modification.",
+    "license": "AGPL-3 with Font exception",
+    "licenseFile": "dist/fonts/NimbusSansNarrow-LICENSE.txt",
+    "use": "Lead financial numerals; Manrope remains the reading face.",
+    "sha256": "2865b866ddb0031f0bd9d3228ea26e88cabcf85b7d0d67db3693b7049e660c85"
+  }
+}

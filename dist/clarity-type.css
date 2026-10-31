@@ -1,0 +1,108 @@
+/* Clarity Edition: the original Lumo Sans 1.120 files, never synthesised. */
+@font-face {
+  font-family: 'Lumo Sans';
+  src: url('/fonts/LumoSans-Regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lumo Sans';
+  src: url('/fonts/LumoSans-Medium.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lumo Sans';
+  src: url('/fonts/LumoSans-Semibold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lumo Sans';
+  src: url('/fonts/LumoSans-Bold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --font-ui: 'Lumo Sans', Arial, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --type-title: clamp(2rem, 8.4vw, 2.375rem);
+  --type-consequence: clamp(1.5rem, 6.6vw, 1.875rem);
+  --type-amount: clamp(2.5rem, 11.4vw, 3rem);
+  --type-body: 1rem;
+  --type-support: .9375rem;
+  --type-meta: .8125rem;
+}
+
+html { font-synthesis: none; }
+body { font-family: var(--font-ui); font-weight: 400; }
+button, input, select, textarea { font-family: inherit; }
+
+/* Native tnum alternates are 640 units wide at every authentic weight. */
+.money,
+.focus-amount,
+.balance-main,
+.focus-payment-title h1,
+.focus-story-total>strong,
+.home-plan-summary strong,
+.plan-room>strong,
+.metric,
+.amount-input,
+.receipt strong,
+.summary-line strong,
+.focus-receipt strong,
+.chat-calculation dd,
+.lumo-amount,
+.clarity-comparison strong {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* The original face has open, generous counters; avoid Jakarta's tight fit. */
+.screen .page-heading h1,
+.screen .hero h1,
+.screen .focus-pay-heading h1,
+.screen .destination-heading h1,
+.screen .focus-story-heading h1 {
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+.screen .focus-pause-insight h1,
+.screen-chat .chat-reply .lead,
+.lumo-conclusion {
+  font-weight: 600;
+  letter-spacing: -.018em;
+}
+.screen-home .home-plan-summary strong,
+.screen .focus-payment-title h1,
+.screen .plan-room>strong,
+.lumo-amount {
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+.screen .primary,
+.screen .secondary,
+.screen .danger,
+.screen .pause-decisions .pause-equal-choice,
+.screen .focus-main-actions button {
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+/* Capital-L wordmark artwork remains its native 2502:712 ratio. */
+.lumo-wordmark-asset {
+  display: block;
+  width: 5.5rem;
+  min-width: 80px;
+  height: auto;
+  aspect-ratio: 2502 / 712;
+  object-fit: contain;
+}
+.lumo-wordmark-asset.is-intro { width: 8.75rem; }

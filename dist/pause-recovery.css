@@ -1,0 +1,37 @@
+/* Keep the Pause focused: consequence, projected change, then the choice.
+   Alternatives use the existing control treatment, not a second set of cards. */
+#app .screen-pause .pause-recovery-context{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 12px;margin:0 0 6px}
+#app .screen-pause .pause-recovery-context .pause-payment-context{margin:0;min-width:0;font-size:.875rem;line-height:1.4}
+#app .screen-pause .pause-recovery-context .pause-payment-context small{display:block;margin-top:1px}
+#app .screen-pause .pause-recovery-context .decision-payment-summary{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin:0;padding:0;border:0;background:none;font-size:.875rem;line-height:1.4;white-space:nowrap}
+#app .screen-pause .pause-recovery-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 4px}
+#app .screen-pause .pause-recovery-options.pause-recovery-single{grid-template-columns:1fr}
+#app .screen-pause .pause-recovery-options .pause-recovery-choice{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:44px;width:100%;margin:0;padding:8px;border:1px solid currentColor;border-radius:var(--curve-control,12px);text-align:center;text-decoration:none;font:inherit;font-size:.875rem;font-weight:600;line-height:1.35;background:transparent;color:inherit;box-shadow:none}
+#app .screen-pause .pause-recovery-options .pause-recovery-choice span{overflow-wrap:anywhere}
+#app .screen-pause .pause-recovery-options .pause-recovery-choice .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#app .screen-pause .pause-recovery-options .pause-recovery-choice:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+#app .screen-pause .pause-recovery-calculation h3{font-size:1rem;margin:12px 0 7px}
+#app .screen-pause .pause-recovery-calculation dd small{display:block;font-weight:400;margin-top:3px}
+#app .screen-pause .pause-recovery-calculation p,.pause-recovery-funding-note{font-size:.875rem;line-height:1.45}
+.pause-recovery-funding-note{margin:0 0 12px}
+
+/* Short phones give the ring less surrounding space. Text and all actions
+   remain readable, with natural scrolling for larger text or longer names. */
+@media(max-height:720px){
+ #app .task-sheet-layer .screen-pause:has(.pause-recovery-options) .pause-decision-heading{margin-bottom:6px}
+ #app .task-sheet-layer .screen-pause:has(.pause-recovery-options) .pause-decision-consequence{padding:0;border:0}
+ #app .task-sheet-layer .screen-pause:has(.pause-recovery-options) .pause-comparison.pause-hero{margin:6px 0;padding-top:0;padding-bottom:8px}
+ #app .screen-pause:has(.pause-recovery-options) .pause-hero-toolbar{min-height:44px}
+ #app .screen-pause:has(.pause-recovery-options) .pause-hero-intro{padding:3px 0}
+ #app .screen-pause:has(.pause-recovery-options) .pause-money-stage{height:44px;margin:-4px 0 2px}
+ #app .screen-pause:has(.pause-recovery-options) .pause-comparison-values{padding-top:0;padding-bottom:0}
+ #app .screen-pause:has(.pause-recovery-options) .pause-actions{margin-top:6px;gap:3px}
+ #app .task-sheet-layer .screen-pause:has(.pause-recovery-options) .pause-decisions .pause-equal-choice{min-height:48px;padding-top:10px;padding-bottom:10px}
+ #app .screen-pause:has(.pause-recovery-options) .pause-link-cost{margin:0;padding-top:7px;padding-bottom:7px}
+ #app .screen-pause:has(.pause-recovery-options) .focus-footnote{margin-top:2px}
+}
+@media(max-width:340px){#app .screen-pause .pause-recovery-context{grid-template-columns:minmax(0,1fr)}#app .screen-pause .pause-recovery-context .decision-payment-summary{flex-direction:row;justify-content:space-between;align-items:baseline;flex-wrap:wrap;white-space:normal}}
+body.minna-edition #app .screen-pause .pause-recovery-options .pause-recovery-choice{color:#fff;border-color:#fff;text-decoration:none;border-radius:2px}
+body.minna-edition #app .screen-pause .pause-recovery-context .decision-payment-summary{background:none;border:0}
+
+@media(max-height:720px){body.minna-edition #app .screen-pause:has(.pause-recovery-options) .pause-comparison-values{padding-top:0;padding-bottom:0}}

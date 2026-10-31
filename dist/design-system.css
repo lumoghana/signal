@@ -1,0 +1,161 @@
+/* Lumo: the consequence comes into focus. Shared primitives, then route compositions. */
+:root{
+ --ink:#20261e;--muted:#53614b;--paper:#f8f9f4;--white:#fff;
+ --green:#b5e96a;--green-ink:#314b1f;--green-soft:#eaf3df;--soft:#eef1e8;
+ --line:#d7decf;--control-line:#7a896f;--red:#8a3d2b;--shortfall-soft:#f4e8e0;
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;
+ --curve-control:16px;--curve-panel:24px;--curve-bubble:24px 24px 24px 8px;
+ --stroke:1.5px;--motion-reveal:180ms;--motion-hold:80ms;--motion-resolve:220ms;--ease-focus:cubic-bezier(.2,.75,.3,1);
+}
+/* Preserve the existing wordmark's face, proportions and offset dot. */
+.wordmark{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-synthesis:weight style;font-weight:750;letter-spacing:-3px}
+.wordmark-small{letter-spacing:-1.8px}
+body{background:#e9ede4;color:var(--ink);font-size:16px;line-height:1.5}
+.screen{padding:8px 22px 24px;letter-spacing:0;overflow-wrap:anywhere}
+.screen .topline{min-height:44px;margin-bottom:12px}
+.screen .eyebrow{font-size:11px;letter-spacing:1.2px;font-weight:600}
+.screen .muted,.screen .row-copy small{color:var(--muted)}
+.screen .small,.screen small{font-size:14px;line-height:1.5}
+.screen .tiny{font-size:12px;line-height:1.45}
+.screen .page-heading>p,.screen .hero>p{font-size:15px;line-height:1.45;color:var(--muted)}
+.screen .primary,.screen .secondary,.screen .danger{min-height:54px;border-radius:var(--curve-control);font-size:15px;font-weight:700;line-height:1.35;padding:14px 16px}
+.screen .primary{background:var(--ink);color:var(--white);border:var(--stroke) solid var(--ink)}
+.screen .secondary{background:transparent;border:var(--stroke) solid var(--ink);color:var(--ink)}
+.screen .text-btn,.screen .chip,.screen summary,.screen .link{min-height:44px}
+.screen .text-btn{font-size:14px;font-weight:600;line-height:1.45}
+.screen .icon-btn,.screen .avatar{width:44px;min-width:44px;height:44px}
+.screen .field>span,.screen label.field{font-size:14px;font-weight:500;line-height:1.5}
+.screen input:not([type=checkbox]):not([type=radio]),.screen select,.screen textarea{font-size:16px;min-height:54px;border:var(--stroke) solid var(--control-line);border-radius:var(--curve-control);line-height:1.45}
+.screen input:focus,.screen select:focus,.screen textarea:focus{border-color:var(--green-ink);box-shadow:0 0 0 3px #b5e96a70}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--green-ink);outline-offset:3px}
+.screen .notice,.screen .soft{background:var(--soft);color:var(--muted);border-radius:var(--curve-control);font-size:14px;line-height:1.5}
+.screen .warning{background:var(--shortfall-soft);color:var(--red);font-size:14px;line-height:1.5}
+.screen .row{min-height:68px;padding:14px 0}
+.screen .row-copy strong{font-size:16px;font-weight:600;line-height:1.35;letter-spacing:-.2px}
+.screen .row-copy small{font-size:13px;line-height:1.45}
+.screen .row-end{max-width:49%;font-size:14px;font-variant-numeric:tabular-nums}
+.screen .row-end .pill{white-space:normal}
+.screen .receipt,.screen .card{border-radius:var(--curve-panel);padding:20px;background:var(--white)}
+.screen .summary-line{font-size:14px;gap:12px;align-items:baseline}
+.screen .summary-line strong,.screen .focus-receipt strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.screen .summary-line strong{min-width:0}
+.screen .balance-main,.screen .metric,.screen .money,.screen .amount-input,.screen .focus-amount,.screen .focus-plan strong,.screen .plan-room>strong{font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:-1.5px;line-height:1.15}
+.screen .currency{font-size:.43em!important;letter-spacing:-.1px!important;vertical-align:baseline!important;position:static!important;margin-right:4px!important;white-space:nowrap}
+.screen .cents{font-size:.66em!important;color:inherit!important;letter-spacing:-.4px!important}
+.screen .whole{font:inherit;letter-spacing:inherit}
+.screen .currency,.screen .cents{font-weight:inherit;line-height:inherit}
+.screen-home .home-plan-summary .whole{font:inherit;letter-spacing:inherit}
+.clarity-ring{display:inline-block;position:relative;width:13px;height:13px;flex:none;border:1.5px solid currentColor;border-radius:50%}
+.clarity-ring:after{content:'';position:absolute;width:3px;height:3px;border-radius:50%;right:-2px;top:0;background:currentColor}
+.insight-kicker{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;line-height:1.4;margin-bottom:7px;color:var(--green-ink)}
+.insight-conclusion,.screen .focus-pause-insight h1,.screen-chat .chat-reply .lead{font-size:25px;line-height:1.18;font-weight:600;letter-spacing:-.7px;text-wrap:pretty}
+.insight-support{font-size:14px;line-height:1.45;margin-top:9px}
+.decision-insight{border-radius:var(--curve-panel);background:var(--green-soft);padding:16px 18px;margin:12px 0 16px;position:relative}
+.decision-insight[data-decision-state=shortfall]{background:var(--shortfall-soft)}
+.decision-insight[data-decision-state=shortfall] .insight-kicker{color:var(--red)}
+.decision-insight[data-decision-state=unknown],.decision-insight[data-decision-state=funding]{background:var(--soft)}
+.projection-fact{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;line-height:1.5;margin-top:11px}
+.projection-fact strong{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.projection-boundary{display:block;font-size:12px;line-height:1.5;margin-top:8px;color:var(--muted)}
+.projection-placeholder{font-size:14px;line-height:1.45;color:var(--muted);padding:12px 0}
+.payment-projection .decision-insight{margin:8px 0 16px}
+.payment-projection .insight-conclusion{font-size:21px;line-height:1.25}
+.screen .payment-plan-link{background:var(--soft);border-radius:var(--curve-control);padding:12px 14px}
+.screen .payment-plan-link select{font-size:14px}
+.screen .payment-plan-link p{font-size:13px;line-height:1.45;color:var(--muted)}
+/* Home: account context, a clear conclusion, then the next action. */
+.screen-home .home-intro p{font-size:16px;font-weight:500}
+.screen-home .home-intro>span{font-size:13px;color:var(--muted)}
+.screen-home .has-saved-plan .home-account-line{min-height:48px;margin:0 0 10px;gap:8px;flex-wrap:wrap}
+.screen-home .has-saved-plan .balance-caption{font-size:13px;color:var(--muted)}
+.screen-home .has-saved-plan .focus-amount{font-size:26px;letter-spacing:-.7px;color:var(--ink);max-width:100%;overflow-wrap:anywhere}
+.screen-home .has-saved-plan .focus-amount .whole{font:inherit}
+.screen-home .home-plan-summary{border:0;border-radius:var(--curve-panel);padding:17px 18px 18px;background:var(--green-soft);gap:8px}
+.screen-home .home-plan-summary>span{flex:1;min-width:0}
+.screen-home .home-plan-summary small{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--green-ink)}
+.screen-home .home-plan-summary strong{font-size:clamp(38px,11.5vw,52px);line-height:1.12;letter-spacing:-1.6px;color:var(--green-ink);margin:7px 0 9px;overflow-wrap:anywhere}
+.screen-home .home-plan-summary .currency{font-size:.41em!important}
+.screen-home .home-plan-summary .home-plan-math{font-size:13px;line-height:1.5;color:var(--muted);max-width:34ch}
+.screen-home .home-plan-summary em{display:flex;align-items:center;gap:5px;font-size:13px;line-height:1.45;color:var(--red);margin-top:8px}
+.screen-home .home-plan-summary[data-decision-state=shortfall]{background:var(--shortfall-soft)}
+.screen-home .home-plan-period{display:block;width:100%;text-align:left;padding:10px 2px 6px;font-size:13px;color:var(--muted);font-weight:500}
+.screen-home .home-plan-period u{color:var(--ink);font-weight:600;text-underline-offset:3px}
+.screen-home .has-saved-plan .privacy-hint{font-size:12px;color:var(--muted);margin:4px 0 0}
+.screen-home .has-saved-plan .balance-details-link{font-size:12px;min-height:44px}
+.screen-home .balance-details-link{font-size:12px;min-width:44px;min-height:44px;width:auto;position:static;display:inline-flex;align-items:center;gap:4px;margin-left:auto}
+.screen-home .home-stage:before{display:none}
+.screen-home .focus-story-link .home-story-copy strong{font-size:22px;font-weight:600;letter-spacing:-.6px}
+.screen-home .focus-story-link .home-story-copy small{font-size:13px;letter-spacing:0;line-height:1.5}
+.screen-home .focus-latest small{font-size:12px}.screen-home .focus-latest strong{font-size:13px}
+.screen-home .focus-small-actions button{min-height:44px;font-size:13px}
+/* Projected payment -> short specific Pause -> confirmed fact. */
+.screen-paymentReview .focus-payment-title{margin:3px 0 14px}
+.screen-paymentReview .focus-payment-title h1{font-size:clamp(38px,12vw,52px);line-height:1.1;letter-spacing:-1.6px}
+.screen-paymentReview .focus-payment-title p{font-size:16px}
+.screen-paymentReview .focus-payment-title small{font-size:12px;line-height:1.4}
+.screen-paymentReview .decision-insight{margin:12px 0 14px}
+.screen-paymentReview .decision-insight .insight-conclusion{font-size:23px}
+.screen-paymentReview .decision-insight .projection-fact{display:none}
+.screen-paymentReview .focus-receipt{border-color:var(--line)}
+.screen-paymentReview .focus-receipt>div{font-size:14px;padding:7px 0}
+.screen-paymentReview .focus-receipt .focus-after{font-size:13px;background:var(--soft);border-radius:12px;margin:7px 0 3px}
+.screen-paymentReview .focus-details summary{min-height:44px;font-size:14px}
+.screen-paymentReview .actions{margin-top:14px}
+.screen-paymentReview .focus-footnote,.screen-pause .focus-footnote{font-size:12px;line-height:1.4;color:var(--muted)}
+.screen.screen-pause{background:var(--green);padding:8px 22px 20px}
+.screen-pause .pause-decision-heading{grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:center}
+.screen-pause .pause-decision-heading .focus-pause-insight h1{font-size:25px;line-height:1.17;letter-spacing:-.7px;font-weight:600;text-align:left;max-width:none;margin:0}
+.screen-pause .pause-payment-context{font-size:13px;color:var(--ink);line-height:1.5;margin:8px 0 12px}
+.projection-tag{font-size:11px;font-weight:600;margin-right:5px;text-transform:uppercase;letter-spacing:.7px}
+.screen-pause .pause-decision-consequence{border-color:#526a3c80;padding:12px 0}
+.screen-pause .pause-decision-consequence p{font-size:14px;line-height:1.45}
+.screen-pause .pause-decision-consequence .pause-goal-impact{font-weight:600;margin-top:7px}
+.screen-pause .pause-decision-consequence .pause-total-impact,.screen-pause .pause-decision-consequence .pause-existing-gap{font-size:12px;color:var(--green-ink);line-height:1.45}
+.screen-pause .pause-decisions .pause-equal-choice{font-size:14px;min-height:54px;border:var(--stroke) solid var(--ink);background:var(--paper);font-weight:700;border-radius:var(--curve-control);padding:12px 8px;line-height:1.35}
+.screen-pause .focus-pause-compact .focus-choice{font-size:13px;margin-top:10px;font-weight:500}
+.screen-pause .pause-actions .pause-link-cost,.screen-pause .focus-pause-exits .text-btn{min-height:44px;font-size:13px;font-weight:600}
+.screen-pause .focus-pause-compact .focus-footnote{font-size:12px;margin-top:5px;color:var(--green-ink)}
+.screen-paymentResult .hero{gap:10px!important;margin-bottom:18px}
+.screen-paymentResult .hero h1{font-size:29px;line-height:1.16;letter-spacing:-.8px;font-weight:600}
+.screen-paymentResult .result-mark{height:58px;width:58px;border-radius:50%;margin:10px 0 8px;background:var(--soft);border:var(--stroke) solid var(--control-line)}
+.screen-paymentResult [data-payment-state=confirmed] .result-mark{background:var(--green-soft);border-color:var(--green-ink)}
+.screen-paymentResult [data-payment-state=failed] .result-mark,.screen-paymentResult [data-payment-state=delivery-failed] .result-mark{background:var(--shortfall-soft);border-color:var(--red)}
+.screen-paymentResult .receipt{padding:18px}
+/* The same conclusion style leads the conversation. */
+.screen-chat .chat-has-conversation .page-heading h1{font-size:26px;font-weight:600;letter-spacing:-.7px}
+.screen-chat .chat-bubble.user{font-size:14px;background:var(--soft);border-radius:20px 20px 8px 20px}
+.screen-chat .chat-reply{border-radius:var(--curve-bubble);padding:18px 18px 16px;background:var(--white);border-left:3px solid var(--green)}
+.screen-chat .chat-reply .lead{font-size:23px;line-height:1.23;font-weight:600;letter-spacing:-.6px}
+.screen-chat .chat-reply .impact-secondary{font-size:14px;line-height:1.5;color:var(--muted)}
+.screen-chat .chat-calculation{font-size:13px;border-color:var(--line)}
+.screen-chat .chat-calculation>summary,.screen-chat .chat-context>summary,.screen-chat .chat-prompts>summary{color:var(--muted);font-size:13px;min-height:44px;line-height:1.5}
+.screen-chat .chat-calculation dl>div{align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+.screen-chat .chat-calculation dt{flex-basis:50%}.screen-chat .chat-calculation dd{margin-left:auto;font-weight:600;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.projection-fact strong{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.screen-chat .chat-calculation p,.screen-chat .chat-boundary{font-size:12px;color:var(--muted)}
+.screen-chat .chat-entry{border:var(--stroke) solid var(--control-line);background:var(--white);border-radius:var(--curve-control);padding:3px}
+.screen-chat .chat-entry input{border:0!important;box-shadow:none!important;min-height:46px;background:none}
+.screen-chat .chat-entry:focus-within{outline:3px solid #b5e96a70;border-color:var(--green-ink)}
+.screen-chat .chat-entry button{border-radius:13px}
+#nav{background:var(--paper);border-color:var(--line);padding-top:9px;padding-bottom:calc(9px + env(safe-area-inset-bottom));gap:2px}
+.nav-item{min-height:49px;font-size:11px;color:var(--muted);font-weight:600;line-height:1.25}
+.nav-item.active{color:var(--ink);font-weight:700}.nav-item.active:before{display:none}
+.nav-item.active svg{background:var(--green-soft);box-shadow:0 0 0 5px var(--green-soft);border-radius:50%}
+.prototype-boundary{font-size:11px;line-height:1.4;text-align:center;padding:3px 10px 5px;color:var(--muted);background:var(--paper);flex:none}
+@media(max-width:359px){
+ .screen{padding-left:16px;padding-right:16px}
+ .screen-home .home-plan-summary{padding:15px 14px}
+ .screen-home .home-plan-summary strong{font-size:38px}
+ .screen-home .has-saved-plan .focus-amount{font-size:23px}
+ .screen-pause .pause-decision-heading{grid-template-columns:48px minmax(0,1fr);gap:7px}
+ .screen-pause .pause-decision-heading .focus-pause-insight h1{font-size:23px}
+ .screen-chat .chat-reply .lead{font-size:21px}
+ .projection-fact{flex-wrap:wrap;gap:3px 10px}
+}
+@media(max-height:700px){
+ .screen .topline{margin-bottom:7px}
+ .screen-pause .pause-decision-heading .focus-pause-insight h1{font-size:23px}
+ .screen-pause .pause-decision-consequence{padding:9px 0}
+ .screen-pause .focus-pause-compact .pause-actions{margin-top:8px}
+ .screen-paymentReview .focus-payment-title{margin-bottom:10px}
+}

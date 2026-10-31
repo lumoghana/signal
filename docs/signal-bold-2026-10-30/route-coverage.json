@@ -1,0 +1,2240 @@
+{
+  "capturedDate": "2026-10-30",
+  "basis": "Actual index.html script sequence in tests/helpers/task-sheet-dom.cjs",
+  "bundle": "lumo-runtime.59741250d3af.js",
+  "routeCount": 217,
+  "taskCount": 163,
+  "parentRoutes": [
+    "home",
+    "pay",
+    "plan",
+    "chat",
+    "more",
+    "moneyStoryHome",
+    "cardsHome"
+  ],
+  "inMemoryRegistrationObserver": true,
+  "observerCount": 1,
+  "harnessErrors": [],
+  "rows": [
+    {
+      "route": "accountInfo",
+      "styleFamily": "account",
+      "task": {
+        "route": "accountInfo",
+        "family": "account",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "accountReady",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "accountReview",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "accountTerms",
+      "styleFamily": "account",
+      "task": {
+        "route": "accountTerms",
+        "family": "account",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "actionConfirm",
+      "styleFamily": "support",
+      "task": {
+        "route": "actionConfirm",
+        "family": "support",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "activity",
+      "styleFamily": "activity",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "addMoney",
+      "styleFamily": "funding",
+      "task": {
+        "route": "addMoney",
+        "family": "funding",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "allMoney",
+      "styleFamily": "holdings",
+      "task": {
+        "route": "allMoney",
+        "family": "records",
+        "treatment": "detail",
+        "label": "All Your Money",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "allocate",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "allocate",
+        "family": "plan",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "allocationReview",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "allocationReview",
+        "family": "plan",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "allowance",
+      "styleFamily": "plan",
+      "task": {
+        "route": "allowance",
+        "family": "plan",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "ambassadorGuide",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "ambassadorReset",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "ambassadorSample",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "ambassadorWelcome",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "applicationCorrection",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "applicationStatus",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "authorize",
+      "styleFamily": "payment",
+      "task": {
+        "route": "authorize",
+        "family": "payment",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "balances",
+      "styleFamily": "holdings",
+      "task": {
+        "route": "balances",
+        "family": "records",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "bankAdd",
+      "styleFamily": "funding",
+      "task": {
+        "route": "bankAdd",
+        "family": "funding",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "bill",
+      "styleFamily": "payment",
+      "task": {
+        "route": "bill",
+        "family": "payment",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "boxProtectionChange",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "boxProtectionChange",
+        "family": "plan",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "boxProtectionInvite",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "boxProtectionInvite",
+        "family": "plan",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "boxProtectionSupport",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "boxProtectionSupport",
+        "family": "plan",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetAfterFunding",
+      "styleFamily": "funding",
+      "task": {
+        "route": "budgetAfterFunding",
+        "family": "funding",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetCategory",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetCategory",
+        "family": "plan",
+        "treatment": "detail",
+        "label": "Budget item",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetCycle",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetCycle",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Fresh budget",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetCycleReview",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetCycleReview",
+        "family": "plan",
+        "treatment": "confirmation",
+        "label": "Review budget",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetDelete",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetDelete",
+        "family": "plan",
+        "treatment": "confirmation",
+        "label": "Delete Budget",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetEstimate",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetEstimate",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Budget estimate",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetHistory",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetHistory",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Budget from spending",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetPeriodReview",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetPeriodReview",
+        "family": "plan",
+        "treatment": "detail",
+        "label": "Budget review",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetReviewDates",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetReviewDates",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Review dates",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "budgetReviewNext",
+      "styleFamily": "plan",
+      "task": {
+        "route": "budgetReviewNext",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Next Budget dates",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "campus",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "campusInterest",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "campusInterestSaved",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "campusPay",
+      "styleFamily": "qr",
+      "task": {
+        "route": "campusPay",
+        "family": "payment",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "campusStatus",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "cardsHome",
+      "styleFamily": "cards",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "caseDetail",
+      "styleFamily": "support",
+      "task": {
+        "route": "caseDetail",
+        "family": "support",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "categoryEdit",
+      "styleFamily": "story",
+      "task": {
+        "route": "categoryEdit",
+        "family": "records",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "categoryMatch",
+      "styleFamily": "story",
+      "task": {
+        "route": "categoryMatch",
+        "family": "records",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "categorySort",
+      "styleFamily": "story",
+      "task": {
+        "route": "categorySort",
+        "family": "records",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "changePin",
+      "styleFamily": "account",
+      "task": {
+        "route": "changePin",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "chat",
+      "styleFamily": "chat",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "chatBankingActions",
+      "styleFamily": "chat",
+      "task": {
+        "route": "chatBankingActions",
+        "family": "records",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "chatBankingChoice",
+      "styleFamily": "chat",
+      "task": {
+        "route": "chatBankingChoice",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Complete your payment draft",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "chatBankingReplace",
+      "styleFamily": "chat",
+      "task": {
+        "route": "chatBankingReplace",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Keep your saved payment?",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "chatCalculation",
+      "styleFamily": "chat",
+      "task": {
+        "route": "chatCalculation",
+        "family": "records",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "chatCalendarPayments",
+      "styleFamily": "chat",
+      "task": {
+        "route": "chatCalendarPayments",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Completed payments",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "chatExpectedDate",
+      "styleFamily": "chat",
+      "task": {
+        "route": "chatExpectedDate",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Expected allowance",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "closeAccount",
+      "styleFamily": "account",
+      "task": {
+        "route": "closeAccount",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "collectionPayoutRail",
+      "styleFamily": "groups",
+      "task": {
+        "route": "collectionPayoutRail",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Payout method",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "confirmPin",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "dailyAccountNotice",
+      "styleFamily": "account",
+      "task": {
+        "route": "dailyAccountNotice",
+        "family": "account",
+        "treatment": "detail",
+        "label": "Account notice",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "dailyMoneyStory",
+      "styleFamily": "story",
+      "task": {
+        "route": "dailyMoneyStory",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Your money story",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "dailyUpdatePrefs",
+      "styleFamily": "account",
+      "task": {
+        "route": "dailyUpdatePrefs",
+        "family": "account",
+        "treatment": "edit",
+        "label": "Update preferences",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "dataExport",
+      "styleFamily": "account",
+      "task": {
+        "route": "dataExport",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "devices",
+      "styleFamily": "account",
+      "task": {
+        "route": "devices",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "essentialEdit",
+      "styleFamily": "plan",
+      "task": {
+        "route": "essentialEdit",
+        "family": "plan",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "essentials",
+      "styleFamily": "plan",
+      "task": {
+        "route": "essentials",
+        "family": "plan",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "everydayPayments",
+      "styleFamily": "payment",
+      "task": {
+        "route": "everydayPayments",
+        "family": "payment",
+        "treatment": "selection",
+        "label": "Everyday payments",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "everydayRepeatChoice",
+      "styleFamily": "payment",
+      "task": {
+        "route": "everydayRepeatChoice",
+        "family": "payment",
+        "treatment": "confirmation",
+        "label": "Saved payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "feedback",
+      "styleFamily": "support",
+      "task": {
+        "route": "feedback",
+        "family": "support",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "firstBudgetExample",
+      "styleFamily": "plan",
+      "task": {
+        "route": "firstBudgetExample",
+        "family": "plan",
+        "treatment": "detail",
+        "label": "Your Budget in action",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "firstEssentials",
+      "styleFamily": "plan",
+      "task": {
+        "route": "firstEssentials",
+        "family": "plan",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "firstGoal",
+      "styleFamily": "plan",
+      "task": {
+        "route": "firstGoal",
+        "family": "plan",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "firstPlanReview",
+      "styleFamily": "plan",
+      "task": {
+        "route": "firstPlanReview",
+        "family": "plan",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "goal",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "goal",
+        "family": "plan",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "goalEdit",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "goalEdit",
+        "family": "plan",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "goals",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "goals",
+        "family": "plan",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyApprovers",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyApprovers",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Choose approvers",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyCollection",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyCollection",
+        "family": "records",
+        "treatment": "form",
+        "label": "Collect together",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyContacts",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyContacts",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Choose people",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyDetail",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyDetail",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Shared money",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyHome",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyHome",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Collect",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyInvitation",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyInvitation",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Collection invitation",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyInvitationDecline",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyInvitationDecline",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Decline invitation",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyInvitationMandate",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyInvitationMandate",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Collection mandate",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyInvitations",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyInvitations",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Invitations",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyLifecycle",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyLifecycle",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Collection changes",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyList",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyList",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Splits & collections",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyMandate",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyMandate",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Collection mandate",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyMember",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyMember",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Try member view",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyPayments",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyPayments",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Payments & approvals",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyPayoutRelease",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyPayoutRelease",
+        "family": "records",
+        "treatment": "form",
+        "label": "Release payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyPayoutWithdraw",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyPayoutWithdraw",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Withdraw payout request",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyPeople",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyPeople",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Choose people",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyProposal",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyProposal",
+        "family": "records",
+        "treatment": "form",
+        "label": "Propose a payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyProposalDecline",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyProposalDecline",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Decline payout",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyProposalDetail",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyProposalDetail",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Payout request",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyProposalReview",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyProposalReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review proposal",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyRemoveGroup",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyRemoveGroup",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Remove saved group",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyReview",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review details",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneyRules",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneyRules",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Details & activity",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneySample",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneySample",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Sample payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneySampleInvitations",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneySampleInvitations",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Try an invitation",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneySaveGroup",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneySaveGroup",
+        "family": "records",
+        "treatment": "form",
+        "label": "Save group",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneySource",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneySource",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Choose a payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "groupMoneySplit",
+      "styleFamily": "groups",
+      "task": {
+        "route": "groupMoneySplit",
+        "family": "records",
+        "treatment": "form",
+        "label": "Split an expense",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "help",
+      "styleFamily": "support",
+      "task": {
+        "route": "help",
+        "family": "support",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "hibiscusChatHistory",
+      "styleFamily": "chat",
+      "task": {
+        "route": "hibiscusChatHistory",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Conversation history",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "home",
+      "styleFamily": "home",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "homeMoneyStory",
+      "styleFamily": "story",
+      "task": {
+        "route": "homeMoneyStory",
+        "family": "records",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "identity",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "identityResult",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "incomePlan",
+      "styleFamily": "plan",
+      "task": {
+        "route": "incomePlan",
+        "family": "funding",
+        "treatment": "confirmation",
+        "label": "Money arrived",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouClose",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouClose",
+        "family": "records",
+        "treatment": "form",
+        "label": "Close IOU",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouCorrect",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouCorrect",
+        "family": "records",
+        "treatment": "form",
+        "label": "Correct repayment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouDetail",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouDetail",
+        "family": "records",
+        "treatment": "detail",
+        "label": "IOU",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouForm",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouForm",
+        "family": "records",
+        "treatment": "form",
+        "label": "IOU details",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouHome",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouHome",
+        "family": "records",
+        "treatment": "selection",
+        "label": "IOUs",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouPayment",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouPayment",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Repay IOU",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouReceipt",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouReceipt",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Received payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouReceiptReview",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouReceiptReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review receipt",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouRecord",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouRecord",
+        "family": "records",
+        "treatment": "form",
+        "label": "Repayment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouRecordReview",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouRecordReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review repayment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouRequestReview",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouRequestReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Request repayment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "iouReview",
+      "styleFamily": "iou",
+      "task": {
+        "route": "iouReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review IOU",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "livecheck",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "makeRoom",
+      "styleFamily": "plan",
+      "task": {
+        "route": "makeRoom",
+        "family": "plan",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "merchant",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "merchantApply",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "merchantCollect",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "merchantCollection",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "merchantDestination",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "merchantPayer",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "merchantSales",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "missions",
+      "styleFamily": "plan",
+      "task": {
+        "route": "missions",
+        "family": "plan",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "momoAdd",
+      "styleFamily": "funding",
+      "task": {
+        "route": "momoAdd",
+        "family": "funding",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "moneySource",
+      "styleFamily": "holdings",
+      "task": {
+        "route": "moneySource",
+        "family": "records",
+        "treatment": "form",
+        "label": "Recorded balance",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "moneySourceRemove",
+      "styleFamily": "holdings",
+      "task": {
+        "route": "moneySourceRemove",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Remove source",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "moneySourceReview",
+      "styleFamily": "holdings",
+      "task": {
+        "route": "moneySourceReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review balance",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "moneyStoryHome",
+      "styleFamily": "story",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "monoGroupDraftReplace",
+      "styleFamily": "groups",
+      "task": {
+        "route": "monoGroupDraftReplace",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Unfinished request",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "monoMenu",
+      "styleFamily": "home",
+      "task": {
+        "route": "monoMenu",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Menu",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "more",
+      "styleFamily": "home",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "myQr",
+      "styleFamily": "qr",
+      "task": {
+        "route": "myQr",
+        "family": "records",
+        "treatment": "detail",
+        "label": "My QR",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "notificationPrefs",
+      "styleFamily": "account",
+      "task": {
+        "route": "notificationPrefs",
+        "family": "account",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "notifications",
+      "styleFamily": "account",
+      "task": {
+        "route": "notifications",
+        "family": "account",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "otp",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "pause",
+      "styleFamily": "pause",
+      "task": {
+        "route": "pause",
+        "family": "payment",
+        "treatment": "pause",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "pauseDemo",
+      "styleFamily": "pause",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "pauseLog",
+      "styleFamily": "pause",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "pay",
+      "styleFamily": "payment",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "paymentCancel",
+      "styleFamily": "payment",
+      "task": {
+        "route": "paymentCancel",
+        "family": "payment",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "paymentPlanLink",
+      "styleFamily": "payment",
+      "task": {
+        "route": "paymentPlanLink",
+        "family": "payment",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "paymentRecovery",
+      "styleFamily": "payment",
+      "task": {
+        "route": "paymentRecovery",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Payment status",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "paymentResult",
+      "styleFamily": "payment",
+      "task": {
+        "route": "paymentResult",
+        "family": "payment",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "paymentReview",
+      "styleFamily": "payment",
+      "task": {
+        "route": "paymentReview",
+        "family": "payment",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "pending",
+      "styleFamily": "activity",
+      "task": {
+        "route": "pending",
+        "family": "records",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "phone",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "pilotUnavailable",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "pin",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "plan",
+      "styleFamily": "plan",
+      "task": null,
+      "parent": true
+    },
+    {
+      "route": "planBenefit",
+      "styleFamily": "plan",
+      "task": {
+        "route": "planBenefit",
+        "family": "plan",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "planDraftRestart",
+      "styleFamily": "plan",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "planEdit",
+      "styleFamily": "plan",
+      "task": {
+        "route": "planEdit",
+        "family": "plan",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "planExplanation",
+      "styleFamily": "plan",
+      "task": {
+        "route": "planExplanation",
+        "family": "records",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "planPeriod",
+      "styleFamily": "plan",
+      "task": {
+        "route": "planPeriod",
+        "family": "plan",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "planSetup",
+      "styleFamily": "plan",
+      "task": {
+        "route": "planSetup",
+        "family": "plan",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "privacy",
+      "styleFamily": "account",
+      "task": {
+        "route": "privacy",
+        "family": "account",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "privacyNotice",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "profile",
+      "styleFamily": "account",
+      "task": {
+        "route": "profile",
+        "family": "account",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "profileEdit",
+      "styleFamily": "account",
+      "task": {
+        "route": "profileEdit",
+        "family": "account",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "profilePhone",
+      "styleFamily": "account",
+      "task": {
+        "route": "profilePhone",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "recovery",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "recoveryAdjust",
+      "styleFamily": "recovery",
+      "task": {
+        "route": "recoveryAdjust",
+        "family": "plan",
+        "treatment": "form",
+        "label": "Protect essentials",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "recoveryComplete",
+      "styleFamily": "recovery",
+      "task": {
+        "route": "recoveryComplete",
+        "family": "plan",
+        "treatment": "selection",
+        "label": "Confirm incoming money",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "recoveryOwnership",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "recoveryPlan",
+      "styleFamily": "recovery",
+      "task": {
+        "route": "recoveryPlan",
+        "family": "plan",
+        "treatment": "detail",
+        "label": "Recovery plan",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "recoveryReplacement",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "recoveryReview",
+      "styleFamily": "recovery",
+      "task": {
+        "route": "recoveryReview",
+        "family": "plan",
+        "treatment": "confirmation",
+        "label": "Review recovery",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "recoveryStart",
+      "styleFamily": "recovery",
+      "task": {
+        "route": "recoveryStart",
+        "family": "plan",
+        "treatment": "form",
+        "label": "Allowance recovery",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "recoveryStatus",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "releaseGoal",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "releaseGoal",
+        "family": "plan",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "releaseReview",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "releaseReview",
+        "family": "plan",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "requestConfirm",
+      "styleFamily": "activity",
+      "task": {
+        "route": "requestConfirm",
+        "family": "records",
+        "treatment": "confirmation",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "requestCreate",
+      "styleFamily": "activity",
+      "task": {
+        "route": "requestCreate",
+        "family": "records",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "requestDetail",
+      "styleFamily": "activity",
+      "task": {
+        "route": "requestDetail",
+        "family": "records",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "requests",
+      "styleFamily": "activity",
+      "task": {
+        "route": "requests",
+        "family": "records",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "resetConfirm",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "sampleConfirm",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "samplePause",
+      "styleFamily": "pause",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "savingMilestones",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "savingMilestones",
+        "family": "plan",
+        "treatment": "detail",
+        "label": "Savings progress",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "savingRule",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "savingRule",
+        "family": "plan",
+        "treatment": "edit",
+        "label": "Saving prompt",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "savingsHackOverview",
+      "styleFamily": "boxes",
+      "task": {
+        "route": "savingsHackOverview",
+        "family": "plan",
+        "treatment": "detail",
+        "label": "Savings hacks",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "security",
+      "styleFamily": "account",
+      "task": {
+        "route": "security",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "send",
+      "styleFamily": "payment",
+      "task": {
+        "route": "send",
+        "family": "payment",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "sendOptions",
+      "styleFamily": "payment",
+      "task": {
+        "route": "sendOptions",
+        "family": "payment",
+        "treatment": "selection",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "settlementDetail",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "settlements",
+      "styleFamily": "merchant",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "setupChoice",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "setupProgress",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "sharedExpenses",
+      "styleFamily": "groups",
+      "task": {
+        "route": "sharedExpenses",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Shared costs",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "sharedGroup",
+      "styleFamily": "groups",
+      "task": {
+        "route": "sharedGroup",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Shared cost",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "sharedReceive",
+      "styleFamily": "groups",
+      "task": {
+        "route": "sharedReceive",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Sample repayment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "sharedSplit",
+      "styleFamily": "groups",
+      "task": {
+        "route": "sharedSplit",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Split payment",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "sharedSplitReview",
+      "styleFamily": "groups",
+      "task": {
+        "route": "sharedSplitReview",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Review shared cost",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "signin",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "spendingOutlook",
+      "styleFamily": "plan",
+      "task": {
+        "route": "spendingOutlook",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Spending outlook",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "statements",
+      "styleFamily": "account",
+      "task": {
+        "route": "statements",
+        "family": "account",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "story",
+      "styleFamily": "story",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "storyTx",
+      "styleFamily": "story",
+      "task": {
+        "route": "storyTx",
+        "family": "records",
+        "treatment": "edit",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "supportCase",
+      "styleFamily": "support",
+      "task": {
+        "route": "supportCase",
+        "family": "support",
+        "treatment": "form",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "testing",
+      "styleFamily": "preview",
+      "task": null,
+      "parent": false
+    },
+    {
+      "route": "txDetail",
+      "styleFamily": "activity",
+      "task": {
+        "route": "txDetail",
+        "family": "records",
+        "treatment": "detail",
+        "source": "native base"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCard",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCard",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Your virtual card",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCardAuthorize",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCardAuthorize",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Authorise card action",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCardCreate",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCardCreate",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Create virtual card",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCardDemo",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCardDemo",
+        "family": "records",
+        "treatment": "form",
+        "label": "Online checkout demo",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCardDetails",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCardDetails",
+        "family": "records",
+        "treatment": "detail",
+        "label": "Card details",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCardManage",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCardManage",
+        "family": "records",
+        "treatment": "edit",
+        "label": "Manage card",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCardStatus",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCardStatus",
+        "family": "records",
+        "treatment": "confirmation",
+        "label": "Card status",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "virtualCards",
+      "styleFamily": "cards",
+      "task": {
+        "route": "virtualCards",
+        "family": "records",
+        "treatment": "selection",
+        "label": "Virtual cards",
+        "source": "native successful registration"
+      },
+      "parent": false
+    },
+    {
+      "route": "welcome",
+      "styleFamily": "onboarding",
+      "task": null,
+      "parent": false
+    }
+  ],
+  "adapterCoverage": {
+    "signal": true,
+    "account": true,
+    "planningRoutes": 71,
+    "paymentFamilyRoutes": 79,
+    "overlap": [
+      "budgetAfterFunding"
+    ]
+  }
+}

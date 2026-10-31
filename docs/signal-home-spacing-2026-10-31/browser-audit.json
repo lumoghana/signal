@@ -1,0 +1,1679 @@
+[
+  {
+    "edition": "signal",
+    "name": "home · standard",
+    "variant": "standard",
+    "size": [
+      390,
+      844,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 844,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 844,
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 746,
+      "scroll": 746
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 250 Available balance ₵600 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 2% saved. GH₵3,400.00 to go. What’s left to save? Money Boxes GH₵100.00 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 2% saved.GH₵3,400.00 to go.What’s left to save?",
+        "Money BoxesGH₵100.001 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 374,
+        "top": 148.640625,
+        "bottom": 378.453125,
+        "width": 358,
+        "height": 229.8125
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 190.5,
+        "top": 628.453125,
+        "bottom": 716.453125,
+        "width": 174.5,
+        "height": 88
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 374,
+        "top": 388.453125,
+        "bottom": 492.453125,
+        "width": 358,
+        "height": 104
+      },
+      "#overview-room": {
+        "left": 37.46875,
+        "right": 240.71875,
+        "top": 209.625,
+        "bottom": 289.625,
+        "width": 203.25,
+        "height": 80
+      },
+      "#overview-balance": {
+        "left": 37.46875,
+        "right": 188,
+        "top": 344.828125,
+        "bottom": 369.515625,
+        "width": 150.53125,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 73.265625,
+        "right": 147.234375,
+        "top": 673.25,
+        "bottom": 691.4375,
+        "width": 73.96875,
+        "height": 18.1875
+      },
+      ".everyday-budget-link": {
+        "left": 164.140625,
+        "right": 164.140625,
+        "top": 202.53125,
+        "bottom": 398.40625,
+        "width": 0,
+        "height": 195.875
+      },
+      "#balance-eye": {
+        "left": 314.53125,
+        "right": 358.53125,
+        "top": 163.53125,
+        "bottom": 207.53125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵250",
+      "balance": "₵600",
+      "savings": "GH₵100.00",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · standard",
+    "variant": "standard",
+    "size": [
+      375,
+      667,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 375,
+    "height": 667,
+    "app": {
+      "left": 0,
+      "right": 375,
+      "top": 0,
+      "bottom": 667,
+      "width": 375,
+      "height": 667
+    },
+    "documentWidth": 375,
+    "appScrollWidth": 375,
+    "viewScroll": {
+      "client": 578,
+      "scroll": 578
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 250 Available balance ₵600 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 2% saved. GH₵3,400.00 to go. What’s left to save? Money Boxes GH₵100.00 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 2% saved.GH₵3,400.00 to go.What’s left to save?",
+        "Money BoxesGH₵100.001 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 14,
+        "right": 361,
+        "top": 106.984375,
+        "bottom": 331.8125,
+        "width": 347,
+        "height": 224.828125
+      },
+      ".account-savings": {
+        "left": 14,
+        "right": 183,
+        "top": 503.8125,
+        "bottom": 569.8125,
+        "width": 169,
+        "height": 66
+      },
+      ".everyday-home-actions": {
+        "left": 14,
+        "right": 361,
+        "top": 335.8125,
+        "bottom": 415.8125,
+        "width": 347,
+        "height": 80
+      },
+      "#overview-room": {
+        "left": 34.8125,
+        "right": 231.5625,
+        "top": 166.921875,
+        "bottom": 239.234375,
+        "width": 196.75,
+        "height": 72.3125
+      },
+      "#overview-balance": {
+        "left": 34.8125,
+        "right": 180.5,
+        "top": 298.453125,
+        "bottom": 323.140625,
+        "width": 145.6875,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 71.15625,
+        "right": 139.84375,
+        "top": 537.65625,
+        "bottom": 554.546875,
+        "width": 68.6875,
+        "height": 16.890625
+      },
+      ".everyday-budget-link": {
+        "left": 161.484375,
+        "right": 161.484375,
+        "top": 160.328125,
+        "bottom": 356.203125,
+        "width": 0,
+        "height": 195.875
+      },
+      "#balance-eye": {
+        "left": 302.1875,
+        "right": 346.1875,
+        "top": 121.328125,
+        "bottom": 165.328125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵250",
+      "balance": "₵600",
+      "savings": "GH₵100.00",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · standard",
+    "variant": "standard",
+    "size": [
+      1100,
+      900,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 1100,
+    "height": 900,
+    "app": {
+      "left": 516,
+      "right": 956,
+      "top": 24,
+      "bottom": 876,
+      "width": 440,
+      "height": 852
+    },
+    "documentWidth": 1100,
+    "appScrollWidth": 438,
+    "viewScroll": {
+      "client": 752,
+      "scroll": 752
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 250 Available balance ₵600 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 2% saved. GH₵3,400.00 to go. What’s left to save? Money Boxes GH₵100.00 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 2% saved.GH₵3,400.00 to go.What’s left to save?",
+        "Money BoxesGH₵100.001 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 533,
+        "right": 924,
+        "top": 173.640625,
+        "bottom": 422.3125,
+        "width": 391,
+        "height": 248.671875
+      },
+      ".account-savings": {
+        "left": 533,
+        "right": 724,
+        "top": 672.3125,
+        "bottom": 760.3125,
+        "width": 191,
+        "height": 88
+      },
+      ".everyday-home-actions": {
+        "left": 533,
+        "right": 924,
+        "top": 432.3125,
+        "bottom": 536.3125,
+        "width": 391,
+        "height": 104
+      },
+      "#overview-room": {
+        "left": 556.453125,
+        "right": 779.171875,
+        "top": 239.96875,
+        "bottom": 319.96875,
+        "width": 222.71875,
+        "height": 80
+      },
+      "#overview-balance": {
+        "left": 556.453125,
+        "right": 721.5,
+        "top": 386.15625,
+        "bottom": 410.84375,
+        "width": 165.046875,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 598.515625,
+        "right": 672.484375,
+        "top": 717.109375,
+        "bottom": 735.296875,
+        "width": 73.96875,
+        "height": 18.1875
+      },
+      ".everyday-budget-link": {
+        "left": 683.125,
+        "right": 683.125,
+        "top": 229.1875,
+        "bottom": 425.0625,
+        "width": 0,
+        "height": 195.875
+      },
+      "#balance-eye": {
+        "left": 862.546875,
+        "right": 906.546875,
+        "top": 190.1875,
+        "bottom": 234.1875,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵250",
+      "balance": "₵600",
+      "savings": "GH₵100.00",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · long-values",
+    "variant": "long-values",
+    "size": [
+      390,
+      844,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "long-values",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 844,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 844,
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 746,
+      "scroll": 784
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. This preview is optimised for University of Ghana students. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 999,649 .99 Available balance ₵999,999.99 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop, books and research equipment for my final university project · 99% saved. GH₵0.01 to go. What’s left to save? Money Boxes GH₵999,999.99 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop, books and research equipment for my final university project · 99% saved.GH₵0.01 to go.What’s left to save?",
+        "Money BoxesGH₵999,999.991 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "lumo-balances-revealed",
+        "client": 746,
+        "scroll": 784,
+        "rect": {
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "bottom": 746.40625,
+          "width": 390,
+          "height": 746.40625
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 359,
+        "top": 177.484375,
+        "bottom": 400.671875,
+        "width": 343,
+        "height": 223.1875
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 183,
+        "top": 687.53125,
+        "bottom": 775.53125,
+        "width": 167,
+        "height": 88
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 359,
+        "top": 410.671875,
+        "bottom": 514.671875,
+        "width": 343,
+        "height": 104
+      },
+      "#overview-room": {
+        "left": 36.578125,
+        "right": 230.953125,
+        "top": 237.21875,
+        "bottom": 286.21875,
+        "width": 194.375,
+        "height": 49
+      },
+      "#overview-balance": {
+        "left": 36.578125,
+        "right": 180.5,
+        "top": 367.421875,
+        "bottom": 392.109375,
+        "width": 143.921875,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 58,
+        "right": 155,
+        "top": 724.625,
+        "bottom": 758.21875,
+        "width": 97,
+        "height": 33.59375
+      },
+      ".everyday-budget-link": {
+        "left": 51.578125,
+        "right": 323.421875,
+        "top": 250.21875,
+        "bottom": 294.21875,
+        "width": 271.84375,
+        "height": 44
+      },
+      "#balance-eye": {
+        "left": 300.421875,
+        "right": 344.421875,
+        "top": 191.625,
+        "bottom": 235.625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵999,649.99",
+      "balance": "₵999,999.99",
+      "savings": "GH₵999,999.99",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · long-values-hidden",
+    "variant": "long-values-hidden",
+    "size": [
+      390,
+      844,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "long-values-hidden",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 844,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 844,
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 746,
+      "scroll": 747
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. This preview is optimised for University of Ghana students. Everyday money Room to spend View budget Through 14 Nov After planned costs Show ••••• Available balance ••••• Planned costs ••••• Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed ••••• What’s left to save? Money Boxes ••••• 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Show balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticed•••••What’s left to save?",
+        "Money Boxes•••••1 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 359,
+        "top": 177.484375,
+        "bottom": 400.671875,
+        "width": 343,
+        "height": 223.1875
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 183,
+        "top": 650.671875,
+        "bottom": 738.671875,
+        "width": 167,
+        "height": 88
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 359,
+        "top": 410.671875,
+        "bottom": 514.671875,
+        "width": 343,
+        "height": 104
+      },
+      "#overview-room": {
+        "left": 36.578125,
+        "right": 230.953125,
+        "top": 237.21875,
+        "bottom": 286.21875,
+        "width": 194.375,
+        "height": 49
+      },
+      "#overview-balance": {
+        "left": 36.578125,
+        "right": 180.5,
+        "top": 367.421875,
+        "bottom": 392.109375,
+        "width": 143.921875,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 78.796875,
+        "right": 134.203125,
+        "top": 695.46875,
+        "bottom": 713.65625,
+        "width": 55.40625,
+        "height": 18.1875
+      },
+      ".everyday-budget-link": {
+        "left": 51.578125,
+        "right": 323.421875,
+        "top": 250.21875,
+        "bottom": 294.21875,
+        "width": 271.84375,
+        "height": 44
+      },
+      "#balance-eye": {
+        "left": 300.421875,
+        "right": 344.421875,
+        "top": 191.625,
+        "bottom": 235.625,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "false",
+      "room": "•••••",
+      "balance": "•••••",
+      "savings": "•••••",
+      "masks": 5
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · budget-heavy-values",
+    "variant": "budget-heavy-values",
+    "size": [
+      375,
+      667,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "budget-heavy-values",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 375,
+    "height": 667,
+    "app": {
+      "left": 0,
+      "right": 375,
+      "top": 0,
+      "bottom": 667,
+      "width": 375,
+      "height": 667
+    },
+    "documentWidth": 375,
+    "appScrollWidth": 375,
+    "viewScroll": {
+      "client": 578,
+      "scroll": 578
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 400 Available balance ₵10,000 Planned costs ₵9,600 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 99% saved. GH₵0.01 to go. What’s left to save? Money Boxes GH₵999,999.99 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 99% saved.GH₵0.01 to go.What’s left to save?",
+        "Money BoxesGH₵999,999.991 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 14,
+        "right": 361,
+        "top": 106.984375,
+        "bottom": 331.8125,
+        "width": 347,
+        "height": 224.828125
+      },
+      ".account-savings": {
+        "left": 14,
+        "right": 183,
+        "top": 503.8125,
+        "bottom": 569.8125,
+        "width": 169,
+        "height": 66
+      },
+      ".everyday-home-actions": {
+        "left": 14,
+        "right": 361,
+        "top": 335.8125,
+        "bottom": 415.8125,
+        "width": 347,
+        "height": 80
+      },
+      "#overview-room": {
+        "left": 34.8125,
+        "right": 231.5625,
+        "top": 166.921875,
+        "bottom": 239.234375,
+        "width": 196.75,
+        "height": 72.3125
+      },
+      "#overview-balance": {
+        "left": 34.8125,
+        "right": 180.5,
+        "top": 298.453125,
+        "bottom": 323.140625,
+        "width": 145.6875,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 57.953125,
+        "right": 153.03125,
+        "top": 537.65625,
+        "bottom": 554.546875,
+        "width": 95.078125,
+        "height": 16.890625
+      },
+      ".everyday-budget-link": {
+        "left": 161.484375,
+        "right": 161.484375,
+        "top": 160.328125,
+        "bottom": 356.203125,
+        "width": 0,
+        "height": 195.875
+      },
+      "#balance-eye": {
+        "left": 302.1875,
+        "right": 346.1875,
+        "top": 121.328125,
+        "bottom": 165.328125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵400",
+      "balance": "₵10,000",
+      "savings": "GH₵999,999.99",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · multiple-boxes",
+    "variant": "multiple-boxes",
+    "size": [
+      390,
+      844,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "multiple-boxes",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 250,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 844,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 844,
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 746,
+      "scroll": 746
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 250 Available balance ₵600 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 2% saved. GH₵3,400.00 to go. What’s left to save? Money Boxes GH₵250.00 4 boxes · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 2% saved.GH₵3,400.00 to go.What’s left to save?",
+        "Money BoxesGH₵250.004 boxes · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 374,
+        "top": 148.640625,
+        "bottom": 378.453125,
+        "width": 358,
+        "height": 229.8125
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 190.5,
+        "top": 628.453125,
+        "bottom": 716.453125,
+        "width": 174.5,
+        "height": 88
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 374,
+        "top": 388.453125,
+        "bottom": 492.453125,
+        "width": 358,
+        "height": 104
+      },
+      "#overview-room": {
+        "left": 37.46875,
+        "right": 240.71875,
+        "top": 209.625,
+        "bottom": 289.625,
+        "width": 203.25,
+        "height": 80
+      },
+      "#overview-balance": {
+        "left": 37.46875,
+        "right": 188,
+        "top": 344.828125,
+        "bottom": 369.515625,
+        "width": 150.53125,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 73.265625,
+        "right": 147.234375,
+        "top": 673.25,
+        "bottom": 691.4375,
+        "width": 73.96875,
+        "height": 18.1875
+      },
+      ".everyday-budget-link": {
+        "left": 164.140625,
+        "right": 164.140625,
+        "top": 202.53125,
+        "bottom": 398.40625,
+        "width": 0,
+        "height": 195.875
+      },
+      "#balance-eye": {
+        "left": 314.53125,
+        "right": 358.53125,
+        "top": 163.53125,
+        "bottom": 207.53125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵250",
+      "balance": "₵600",
+      "savings": "GH₵250.00",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · empty",
+    "variant": "empty",
+    "size": [
+      390,
+      844,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "empty",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 0,
+        "savings": 0,
+        "room": 0,
+        "essentials": 0
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 844,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 844,
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 746,
+      "scroll": 746
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Available balance Create your budget Start with the costs that matter. In your account Hide ₵ 0 Everyday money In your account Planned costs ₵0 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed No Everyday money is available right now. What can I spend without getting caught short? Create a Money Box Put money aside for a goal. Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "Create your budget",
+        "Hide balances",
+        "Available balance. See account breakdown",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedNo Everyday money is available right now.What can I spend without getting caught short?",
+        "Create a Money BoxPut money aside for a goal.",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 374,
+        "top": 148.640625,
+        "bottom": 378.453125,
+        "width": 358,
+        "height": 229.8125
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 190.5,
+        "top": 628.453125,
+        "bottom": 719.046875,
+        "width": 174.5,
+        "height": 90.59375
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 374,
+        "top": 388.453125,
+        "bottom": 492.453125,
+        "width": 358,
+        "height": 104
+      },
+      "#overview-balance": {
+        "left": 37.46875,
+        "right": 240.71875,
+        "top": 209.625,
+        "bottom": 289.625,
+        "width": 203.25,
+        "height": 80
+      },
+      ".everyday-budget-link": {
+        "left": 181.53125,
+        "right": 181.53125,
+        "top": 202.53125,
+        "bottom": 507.53125,
+        "width": 0,
+        "height": 305
+      },
+      "#balance-eye": {
+        "left": 314.53125,
+        "right": 358.53125,
+        "top": 163.53125,
+        "bottom": 207.53125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "balance": "₵0",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · standard",
+    "variant": "standard",
+    "size": [
+      320,
+      568,
+      2
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 320,
+    "height": 568,
+    "app": {
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "width": 320,
+      "height": 568
+    },
+    "documentWidth": 320,
+    "appScrollWidth": 320,
+    "viewScroll": {
+      "client": 382,
+      "scroll": 1782
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 250 Available balance ₵600 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 2% saved. GH₵3,400.00 to go. What’s left to save? Money Boxes GH₵100.00 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 2% saved.GH₵3,400.00 to go.What’s left to save?",
+        "Money BoxesGH₵100.001 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "lumo-balances-revealed",
+        "client": 382,
+        "scroll": 1782,
+        "rect": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 381.625,
+          "width": 320,
+          "height": 381.625
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 289,
+        "top": 288.9375,
+        "bottom": 988.046875,
+        "width": 273,
+        "height": 699.109375
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 289,
+        "top": 1591.984375,
+        "bottom": 1681.96875,
+        "width": 273,
+        "height": 89.984375
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 289,
+        "top": 998.046875,
+        "bottom": 1307.828125,
+        "width": 273,
+        "height": 309.78125
+      },
+      "#overview-room": {
+        "left": 32.375,
+        "right": 272.625,
+        "top": 448.734375,
+        "bottom": 679.453125,
+        "width": 240.25,
+        "height": 230.71875
+      },
+      "#overview-balance": {
+        "left": 32.375,
+        "right": 272.625,
+        "top": 832.453125,
+        "bottom": 881.84375,
+        "width": 240.25,
+        "height": 49.390625
+      },
+      "#overview-savings": {
+        "left": 90.8125,
+        "right": 228.1875,
+        "top": 1637.171875,
+        "bottom": 1670.96875,
+        "width": 137.375,
+        "height": 33.796875
+      },
+      ".everyday-budget-link": {
+        "left": 214.484375,
+        "right": 214.484375,
+        "top": 366.96875,
+        "bottom": 744.875,
+        "width": 0,
+        "height": 377.90625
+      },
+      "#balance-eye": {
+        "left": 234.625,
+        "right": 278.625,
+        "top": 299.578125,
+        "bottom": 343.578125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵250",
+      "balance": "₵600",
+      "savings": "GH₵100.00",
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "home · standard",
+    "variant": "standard",
+    "size": [
+      390,
+      480,
+      1
+    ],
+    "setup": {
+      "requested": "home",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "home",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [],
+      "renderedView": "home",
+      "actual": "home",
+      "sheet": false,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 480,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 480,
+      "width": 390,
+      "height": 480
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 391,
+      "scroll": 574
+    },
+    "route": "home",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "home",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "Home K Hey, Kwame Let’s make room for what’s next. Everyday money Room to spend View budget Through 14 Nov After planned costs Hide ₵ 250 Available balance ₵600 Planned costs ₵350 Add money Top up your balance Pay Send, pay or top up Collect Request or collect Lumo noticed Laptop · 2% saved. GH₵3,400.00 to go. What’s left to save? Money Boxes GH₵100.00 1 box · Total saved Money Story This week, clearer",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "You. Profile, security and settings",
+        "Scan QR or show my code",
+        "View budget",
+        "Hide balances",
+        "Left after planned costs. See calculation",
+        "Add money",
+        "Pay",
+        "Collect. Request money, split costs or collect together",
+        "Lumo noticedLaptop · 2% saved.GH₵3,400.00 to go.What’s left to save?",
+        "Money BoxesGH₵100.001 box · Total saved",
+        "Money StoryThis week, clearer"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "lumo-balances-revealed",
+        "client": 391,
+        "scroll": 574,
+        "rect": {
+          "left": 0,
+          "right": 390,
+          "top": 0,
+          "bottom": 391.40625,
+          "width": 390,
+          "height": 391.40625
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 14,
+        "right": 361,
+        "top": 106.984375,
+        "bottom": 331.8125,
+        "width": 347,
+        "height": 224.828125
+      },
+      ".account-savings": {
+        "left": 14,
+        "right": 183,
+        "top": 503.8125,
+        "bottom": 569.8125,
+        "width": 169,
+        "height": 66
+      },
+      ".everyday-home-actions": {
+        "left": 14,
+        "right": 361,
+        "top": 335.8125,
+        "bottom": 415.8125,
+        "width": 347,
+        "height": 80
+      },
+      "#overview-room": {
+        "left": 34.8125,
+        "right": 231.5625,
+        "top": 166.921875,
+        "bottom": 239.234375,
+        "width": 196.75,
+        "height": 72.3125
+      },
+      "#overview-balance": {
+        "left": 34.8125,
+        "right": 180.5,
+        "top": 298.453125,
+        "bottom": 323.140625,
+        "width": 145.6875,
+        "height": 24.6875
+      },
+      "#overview-savings": {
+        "left": 71.15625,
+        "right": 139.84375,
+        "top": 537.65625,
+        "bottom": 554.546875,
+        "width": 68.6875,
+        "height": 16.890625
+      },
+      ".everyday-budget-link": {
+        "left": 161.484375,
+        "right": 161.484375,
+        "top": 160.328125,
+        "bottom": 356.203125,
+        "width": 0,
+        "height": 195.875
+      },
+      "#balance-eye": {
+        "left": 302.1875,
+        "right": 346.1875,
+        "top": 121.328125,
+        "bottom": 165.328125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    "homeMoney": {
+      "eyePressed": "true",
+      "room": "₵250",
+      "balance": "₵600",
+      "savings": "GH₵100.00",
+      "masks": 0
+    }
+  }
+]

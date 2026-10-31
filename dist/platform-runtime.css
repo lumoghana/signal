@@ -1,0 +1,17 @@
+/* Uses each edition's existing palette. Exceptional connectivity/status content
+   grows naturally instead of squeezing financial controls or hiding records. */
+#app .platform-connection-status,#app .platform-update-status{
+ display:block;min-width:0;margin:0 0 16px;padding:14px 16px;
+ border:1px solid var(--line,#dedede);border-radius:12px;
+ background:var(--soft,#f0f0f0);color:var(--ink,#161616);
+ font-size:.875rem;line-height:1.55;overflow-wrap:anywhere;
+}
+#app .platform-connection-status[data-connection=offline]{border-style:dashed}
+#app :is(.platform-status-dismiss,.platform-update-button){
+ display:block;min-height:44px;margin-top:6px;padding:8px 0;border:0;
+ background:transparent;color:inherit;text-decoration:underline;text-underline-offset:3px;
+ font:inherit;font-weight:600;text-align:left;white-space:normal;
+}
+#app :is(.platform-status-dismiss,.platform-update-button):focus-visible{outline:2px solid currentColor;outline-offset:3px}
+#app :is(.platform-update-status,.platform-connection-status) p{font-size:inherit;line-height:inherit;margin:0}
+#lumo-load-recovery:not([hidden]){position:fixed;inset:0;z-index:100001;display:grid;place-items:center;padding:24px;background:#fafafa;color:#161616;font-family:inherit}#lumo-load-recovery>div{width:min(100%,360px);overflow-wrap:anywhere}#lumo-load-recovery h1{font-size:28px;line-height:1.15;margin:0 0 16px}#lumo-load-recovery p{font-size:16px;line-height:1.5;margin:0 0 24px}#lumo-load-recovery button{min-height:48px;width:100%;padding:12px 18px;border:1px solid #161616;border-radius:14px;background:#161616;color:#fff;font:inherit}#lumo-load-recovery button:focus-visible{outline:3px solid #161616;outline-offset:4px}

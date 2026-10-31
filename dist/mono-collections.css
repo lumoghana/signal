@@ -1,0 +1,51 @@
+/* Edition-owned orientation, within the existing task body's scroll surface. */
+body.minna-edition #app #view .gm-page .mono-collection-steps{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;
+ list-style:none;margin:0 0 22px;padding:0;min-width:0;
+}
+body.minna-edition #app #view .gm-page .mono-collection-steps>li{
+ display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;
+ border-top:2px solid var(--mono-line);padding:10px 0 0;color:var(--mono-muted);
+}
+body.minna-edition #app #view .gm-page .mono-collection-steps>li>span{
+ display:grid;place-items:center;width:24px;height:24px;flex:none;border-radius:50%;
+ background:var(--mono-soft);font-size:.8125rem;line-height:1;color:var(--mono-muted);
+}
+body.minna-edition #app #view .gm-page .mono-collection-steps>li>strong{
+ font-size:.8125rem;line-height:1.4;font-weight:500;letter-spacing:0;overflow-wrap:normal;
+}
+body.minna-edition #app #view .gm-page .mono-collection-steps>li[aria-current="step"]{border-color:var(--mono-ink);color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .mono-collection-steps>li[aria-current="step"]>span{background:var(--mono-acid);color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .mono-collection-steps>li.is-complete{border-color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .mono-collection-context{
+ display:block;min-width:0;margin:0 0 20px;padding:15px 0;
+ border-block:1px solid var(--mono-line);background:transparent;color:var(--mono-ink);
+}
+body.minna-edition #app #view .gm-page .mono-collection-facts{
+ display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px;
+ padding:0;margin:0;min-width:0;
+}
+body.minna-edition #app #view .gm-page .mono-collection-facts>div{min-width:0}
+body.minna-edition #app #view .gm-page .mono-collection-facts dt{
+ margin:0 0 5px;font-size:.8125rem;line-height:1.4;color:var(--mono-muted);font-weight:400;
+}
+body.minna-edition #app #view .gm-page .mono-collection-facts dd{
+ margin:0;font-size:.875rem;line-height:1.45;color:var(--mono-ink);font-weight:600;overflow-wrap:anywhere;
+}
+body.minna-edition #app #view .gm-page .mono-collection-next{
+ display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin:14px 0 0!important;
+ font-size:.875rem;line-height:1.5;color:var(--mono-ink);
+}
+body.minna-edition #app #view .gm-page .mono-collection-next>strong{font-size:.8125rem;font-weight:500;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .mono-collection-context .gm-mandate-summary{
+ margin:16px 0 0;padding:0;border:0;border-radius:0;background:transparent;
+}
+body.minna-edition #app #view .gm-page .mono-collection-context .gm-mandate-summary>h2{font-size:1.0625rem;line-height:1.4;margin:5px 0}
+body.minna-edition #app #view .gm-page .mono-collection-invitation{padding-top:0;border-top:0}
+body.minna-edition #app #view .gm-page .mono-collection-invitation .gm-invitation-role,
+body.minna-edition #app #view .gm-page .mono-collection-invitation .gm-invitation-mandate{
+ margin:0;padding:0;border:0;border-radius:0;background:transparent;
+}
+body.minna-edition #app #view .gm-page .mono-collection-invitation .gm-invitation-mandate{margin-top:16px;padding-top:15px;border-top:1px solid var(--mono-line)}
+body.minna-edition #app #view .gm-page .mono-collection-invitation .gm-invitation-mandate h2{font-size:1.0625rem;line-height:1.4}
+@media(max-width:359px){body.minna-edition #app #view .gm-page .mono-collection-facts{grid-template-columns:minmax(0,1fr);gap:12px}}

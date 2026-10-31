@@ -1,0 +1,542 @@
+/* Lumo · Everyday Edition
+   Campus Pilot's authentic type and familiar colour system, composed around
+   Clarity's task hierarchy. Load after native-refinement.css. Behaviour,
+   calculations, illustration assets and overlay sizing remain in their owners.
+   See docs/EVERYDAY-EDITION.md for the source responsibilities. */
+@font-face{
+ font-family:'Lumo Jakarta';
+ src:url('/assets/fonts/PlusJakartaSans-v2.071.woff') format('woff');
+ font-style:normal;
+ font-weight:400 700;
+ font-display:swap;
+}
+:root{
+ --font-ui:'Lumo Jakarta',Arial,sans-serif;
+ --ink:#20261e;--focus-ink:#20261e;--muted:#53614b;
+ --paper:#f8f9f4;--white:#ffffff;
+ --green:#b5e96a;--green-ink:#314b1f;--green-soft:#eaf3df;
+ --soft:#eef1e8;--line:#d7decf;--control-line:#7a896f;
+ --control-border:#7a896f;--red:#8a3d2b;--shortfall-soft:#f4e8e0;
+ --radius:16px;--curve-control:16px;--curve-panel:24px;
+ --curve-bubble:24px 24px 24px 8px;
+ --bold-lens-colour:#b5e96a;
+ --task-sheet-curve:24px;
+ --task-sheet-backdrop:rgb(32 38 30 / .42);
+ --motion-reveal:180ms;--motion-resolve:220ms;
+ --ease-focus:cubic-bezier(.2,.75,.3,1);
+}
+html{font-synthesis:none}
+body{font-family:var(--font-ui);font-weight:400;background:#e9ede4;color:var(--ink)}
+button,input,select,textarea{font-family:var(--font-ui)}
+#app,#view,#task-parent-view,.screen,.prototype-boundary,.demo-strip{background:var(--paper);color:var(--ink)}
+#app{box-shadow:0 0 0 1px rgb(32 38 30 / .08),0 24px 72px rgb(32 38 30 / .08)}
+.screen{--focus-ink:var(--ink);font-family:var(--font-ui);font-size:1rem;line-height:1.5;letter-spacing:0}
+.screen h1,.screen h2,.screen h3{font-weight:700;color:var(--ink)}
+.screen .page-heading h1,
+.screen[data-density] .page-heading h1,
+.screen .destination-heading h1,
+.screen .focus-pay-heading h1,
+.screen .focus-story-heading h1{
+ font-size:clamp(1.875rem,8.2vw,2.25rem);line-height:1.16;
+ font-weight:700;letter-spacing:-.04em;
+}
+.screen .page-heading>p,.screen .destination-heading>p,
+.screen .focus-pay-heading>p,.screen .focus-story-heading>p,
+.screen .hero>p{color:var(--muted);font-size:.9375rem;line-height:1.5;letter-spacing:0}
+.screen .muted,.screen .row-copy small,.screen .menu-choice small,
+.screen .illustrated-choice small,.screen .focus-footnote,
+.screen .chat-boundary,.screen .privacy-hint,.screen .plan-explanation{color:var(--muted)}
+.screen .eyebrow,.screen .mini-label{color:var(--muted);font-weight:600;letter-spacing:.08em}
+.screen .money,.screen .metric,.screen .focus-amount,.screen .amount-input,
+.screen .balance-main,.screen .focus-payment-title h1,
+.screen .home-plan-summary strong,.screen .plan-room>strong,
+.screen .pause-comparison strong,.screen .focus-story-total>strong,
+.screen .home-story-detail-total,.screen .first-plan-conclusion>strong{
+ font-family:var(--font-ui);font-weight:600;letter-spacing:-.04em;
+ font-variant-numeric:lining-nums tabular-nums;
+}
+.screen .currency,.screen .payment-currency,.story-currency{
+ white-space:nowrap;word-break:normal;overflow-wrap:normal;flex-shrink:0;
+}
+.screen strong,.screen b{font-weight:600}
+.screen .row-copy strong,.screen .menu-choice strong,.screen .you-options strong{font-weight:700}
+
+/* The same three action roles everywhere: forest, filled quiet, then text. */
+.screen .primary,.screen .secondary,.screen .danger,
+#app .task-sheet-layer .screen .primary,
+#app .task-sheet-layer .screen .secondary,
+#app .task-sheet-layer .screen .danger{
+ min-height:54px;border-radius:var(--curve-control);padding:13px 16px;
+ font-size:1rem;line-height:1.4;font-weight:700;letter-spacing:-.02em;
+ box-shadow:none;border:1.5px solid transparent;
+}
+.screen .primary{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.screen .secondary{background:var(--soft);color:var(--ink);border-color:var(--control-line)}
+.screen .danger{background:var(--shortfall-soft);color:var(--red);border-color:var(--red)}
+.screen .text-btn,.screen .link{color:var(--green-ink);font-weight:600;text-decoration-color:currentColor}
+.screen .icon-btn,.screen .avatar{
+ background:var(--soft);color:var(--ink);border:1px solid var(--line);
+ border-radius:16px;
+}
+.screen .icon-btn svg,.screen .balance-eye svg{color:currentColor;stroke-width:1.9}
+.screen .avatar{border-radius:50%;font-weight:700}
+.screen button:disabled{
+ background:var(--soft);color:var(--muted);border-color:var(--line);
+ opacity:.7;box-shadow:none;
+}
+.screen .chip,.screen .focus-period{
+ border:1px solid var(--control-line);border-radius:14px;
+ background:var(--white);color:var(--ink);font-weight:600;
+}
+.screen .chip.selected,.screen .focus-period.is-active,.screen .selected{
+ background:var(--green)!important;color:var(--green-ink)!important;
+ border-color:var(--green-ink)!important;
+}
+.screen input:not([type=checkbox]):not([type=radio]),.screen select,.screen textarea{
+ background:var(--white);color:var(--ink);border:1.5px solid var(--control-line);
+ border-radius:var(--curve-control);font-size:1rem;line-height:1.5;
+}
+.screen input::placeholder,.screen textarea::placeholder{color:var(--muted);opacity:.85}
+.screen input:focus,.screen select:focus,.screen textarea:focus{
+ border-color:var(--green-ink);box-shadow:0 0 0 3px rgb(181 233 106 / .4);
+}
+.screen input[type=checkbox],.screen input[type=radio]{accent-color:var(--green-ink)}
+button:focus-visible,a:focus-visible,summary:focus-visible,
+input:focus-visible,select:focus-visible,textarea:focus-visible,
+.screen button:focus-visible{
+ outline:3px solid var(--green-ink);outline-offset:3px;
+ box-shadow:0 0 0 2px var(--white);
+}
+.screen .field>span,.screen label.field{color:var(--ink);font-weight:600}
+.screen .phone-field>span{color:var(--ink)}
+.screen .card,.screen .receipt{
+ padding:16px;border:1px solid var(--line);border-radius:var(--curve-panel);
+ background:var(--white);
+}
+.screen .soft,.screen .notice{
+ border-radius:var(--curve-control);background:var(--soft);color:var(--muted);
+}
+.screen .warning{
+ background:var(--shortfall-soft);color:var(--red);border:1px solid #d5b4a8;
+ border-left:3px solid var(--red);border-radius:var(--curve-control);
+}
+.screen .warning strong{color:var(--red)}
+.screen #error:not(:empty),#task-parent-view [id$="-parent-error"]{color:var(--red)}
+.screen .row{border-color:var(--line)}
+.screen .row-copy strong,.screen .row-end{color:var(--ink)}
+.screen .row-icon,.screen .menu-icon{background:var(--soft);color:var(--green-ink);border-radius:14px}
+.screen .row-end svg{color:var(--muted)}
+.screen .pill{background:var(--soft);border-color:var(--line);color:var(--green-ink)}
+.screen .progress{background:var(--line);border-radius:8px}
+.screen .progress-bar{background:var(--green-ink);border-radius:8px}
+.status-dot{background:var(--green-ink)}
+.demo-strip,.prototype-boundary{color:var(--muted)}
+
+/* Home has one financial conclusion. Available cash remains separate context.
+   No new actions, extra campaign heading or additional illustration is added. */
+#app .screen-home .focus-home>.home-intro p{font-weight:600;letter-spacing:-.025em}
+#app .screen-home .home-greeting .icon-btn{background:var(--soft);border-color:var(--line)}
+#app .screen-home .home-account-line{margin-bottom:10px}
+#app .screen-home .balance-caption{color:var(--muted)}
+#app .screen-home .focus-amount,#app .screen-home .has-saved-plan .focus-amount{
+ color:var(--ink);font-weight:600;letter-spacing:-.035em;
+}
+#app .screen-home .balance-eye{
+ border:1px solid var(--control-line);border-radius:14px;background:var(--soft);
+ color:var(--green-ink);font-weight:600;
+}
+#app .screen-home .home-plan-summary,
+#app .screen-home .home-plan-summary.lumo-lens,
+#app .screen-home .home-plan-summary.lumo-lens[data-decision-state=shortfall]{
+ padding:14px 16px;margin:0;border:1px solid #d1dfc0;
+ border-radius:var(--curve-panel);background:var(--green-soft);gap:8px;
+}
+#app .screen-home .home-plan-summary small{font-weight:600;color:var(--green-ink)}
+#app .screen-home .home-plan-summary strong.lumo-lens-value{
+ font-size:2.75rem;line-height:1.14;font-weight:600;letter-spacing:-.045em;
+ color:var(--green-ink);background:none;margin:5px 0 7px;padding:0;
+}
+#app .screen-home .home-plan-summary .home-plan-math{color:var(--muted);line-height:1.5}
+#app .screen-home .home-plan-summary .home-plan-math b{color:var(--ink);font-weight:600}
+#app .screen-home .home-plan-summary.lumo-lens[data-decision-state=shortfall]{
+ background:var(--shortfall-soft);border-color:#d5b4a8;
+}
+#app .screen-home .home-plan-summary[data-decision-state=shortfall] small,
+#app .screen-home .home-plan-summary[data-decision-state=shortfall] strong.lumo-lens-value,
+#app .screen-home .home-plan-summary[data-decision-state=shortfall] em{color:var(--red)}
+#app .screen-home .home-plan-invite{
+ border:1px solid #d1dfc0;border-radius:var(--curve-panel);
+ padding:14px 16px;background:var(--green-soft);
+}
+#app .screen-home .home-plan-invite strong{font-size:1.125rem;font-weight:700;color:var(--green-ink)}
+#app .screen-home .home-plan-invite small{font-size:.875rem;color:var(--muted)}
+#app .screen-home .home-funding-actions button{
+ border:1.5px solid var(--ink);border-radius:var(--curve-control);
+ background:var(--ink);color:var(--white);font-weight:700;
+}
+#app .screen-home .home-funding-actions button.secondary{
+ background:var(--soft);color:var(--ink);border-color:var(--control-line);
+}
+#app .screen-home .home-money-story{border-top-color:var(--line)}
+#app .screen-home .home-story-title{font-weight:600;color:var(--muted)}
+#app .screen-home .home-story-insight{font-weight:600;color:var(--ink);line-height:1.5}
+#app .screen-home .home-story-arrow{color:var(--green-ink)}
+.home-story-detail h1{font-weight:700;letter-spacing:-.035em}
+.home-story-detail-total{font-weight:600;color:var(--green-ink)}
+
+/* Destination pages keep their open headings and existing contextual artwork;
+   real options share one softly defined group, rather than separate tiles. */
+.screen .destination-list,.screen .pay-option-list{
+ background:var(--white);border:1px solid var(--line);
+ border-radius:var(--curve-panel);padding:0 14px;
+}
+.screen .destination-list .row,.screen .pay-option-list .row{border-top:0;border-bottom:1px solid var(--line)}
+.screen .destination-list .row:last-child,.screen .pay-option-list .row:last-child{border-bottom:0}
+.screen .destination-list .row-icon,.screen-pay .pay-option-list .row-icon{
+ border:0;background:var(--soft);color:var(--green-ink);border-radius:14px;
+}
+.screen-pay .pay-tabs{
+ border:0;border-radius:18px;background:var(--soft);padding:4px;gap:4px;
+}
+.screen-pay .pay-tabs button{border:0;border-radius:14px;color:var(--muted);font-weight:600}
+.screen-pay .pay-tabs button[aria-selected=true]{
+ background:var(--green);color:var(--green-ink);border:0;box-shadow:none;font-weight:700;
+}
+.screen-pay .pay-tab-panel:focus-visible{outline-color:var(--green-ink)}
+.screen .funding-choices .menu-choice{
+ background:var(--white);border:1px solid var(--control-line);
+ border-radius:var(--curve-panel);padding:16px 10px;
+}
+.screen .funding-choices .menu-icon{background:var(--soft);color:var(--green-ink);border-radius:16px}
+.screen .funding-choices .menu-choice strong{font-weight:700}
+.screen .compact-draft{background:var(--green-soft);border:1px solid #d1dfc0;border-radius:16px;color:var(--green-ink)}
+.screen .you-options{gap:0 16px}
+.screen .you-options button{border-color:var(--line)}
+.screen .you-options button>span{color:var(--green-ink)}
+.screen .you-options strong{font-weight:700}
+.screen .testing-drawer{border-color:var(--line)}
+
+/* Planning remains cost-first. Colour supports the saved conclusion, while
+   optional dates, goals and incoming money keep the existing disclosure. */
+#app .simple-plan-setup .page-heading h1{font-weight:700;letter-spacing:-.035em}
+#app .simple-plan-setup .first-cost-suggestions .chip{border-radius:14px;background:var(--soft)}
+#app .simple-plan-setup .first-cost-preview{
+ padding:10px 12px;border:1px solid #d1dfc0;background:var(--green-soft);
+ border-radius:16px;color:var(--green-ink);
+}
+#app .simple-plan-setup .first-cost-list .summary-line{border-color:var(--line)}
+#app .simple-plan-setup .first-plan-conclusion{
+ background:var(--green-soft);border-radius:var(--curve-panel);padding:14px 16px;
+}
+#app .simple-plan-setup .first-plan-conclusion>span{color:var(--green-ink);font-weight:600}
+#app .simple-plan-setup .first-plan-conclusion>strong{
+ background:none;color:var(--green-ink);font-weight:600;letter-spacing:-.04em;
+}
+#app .simple-plan-setup .first-plan-math>div{border-color:var(--line)}
+#app .simple-plan-setup .first-plan-math dt{color:var(--muted)}
+#app .simple-plan-setup .first-plan-math dd{color:var(--ink);font-weight:600}
+#app .screen .essential-coverage{
+ margin:10px 0 14px;padding:6px 12px;background:var(--soft);
+ border:1px solid var(--line);border-radius:16px;
+}
+#app .screen .essential-coverage .summary-line{
+ display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+ padding:8px 0;font-size:.9375rem;line-height:1.5;border-bottom:1px solid var(--line);
+}
+#app .screen .essential-coverage .summary-line:last-child{border-bottom:0}
+#app .screen .essential-coverage dt{flex:1;min-width:0;margin:0;color:var(--muted);overflow-wrap:anywhere}
+#app .screen .essential-coverage dd{
+ min-width:0;max-width:58%;margin:0;text-align:right;color:var(--ink);
+ font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;
+}
+#app .simple-plan-setup .optional-fields>summary{color:var(--green-ink);font-weight:600}
+#app .simple-plan-page .destination-heading h1{font-weight:700;letter-spacing:-.035em}
+#app .screen .plan-room,
+#app .screen .plan-room.lumo-lens{
+ padding:14px 16px;margin-bottom:16px;border:1px solid #d1dfc0;
+ border-radius:var(--curve-panel);background:var(--green-soft);
+}
+#app .screen .plan-room>span{color:var(--green-ink);font-weight:600}
+#app .screen .plan-room>strong{font-weight:600;color:var(--green-ink);letter-spacing:-.04em}
+#app .screen .plan-room>p{color:var(--muted)}
+#app .simple-plan-benefit h1{font-weight:700;letter-spacing:-.035em}
+#app .simple-plan-benefit .plan-benefit-uses strong{font-weight:700}
+#app .simple-plan-benefit .plan-benefit-example-consequence{color:var(--red)}
+.plan-benefit-pause{border-radius:24px;background:var(--green-soft);border-color:#d1dfc0}
+.plan-benefit-impact strong{background:none;color:var(--green-ink)}
+
+/* Payment entry is compact; there is exactly one live consequence. */
+#app .task-sheet-layer .screen [data-payment-entry] .hero>h1,
+.screen [data-payment-entry] .hero>h1{font-weight:700;letter-spacing:-.035em}
+.screen [data-payment-entry] .payment-amount-row{border-bottom:1.5px solid var(--control-line);padding-bottom:5px}
+#app .task-sheet-layer .screen [data-payment-entry] .amount-input,
+.screen [data-payment-entry] .payment-amount-row .amount-input{
+ border:0;border-radius:0;background:none!important;font-weight:600;
+ color:var(--ink);letter-spacing:-.04em;box-shadow:none;
+}
+.screen [data-payment-entry] .payment-amount-row:focus-within{
+ border-color:var(--green-ink);box-shadow:0 3px 0 -1px var(--green);
+}
+.screen [data-payment-entry] .payment-plan-link{background:none}
+.screen [data-payment-entry] .payment-plan-link select{border-radius:16px;background:var(--white)}
+.screen [data-payment-entry] .entry-consequence,
+.screen [data-payment-entry] .entry-consequence.lumo-lens-small{
+ padding:9px 12px;border-radius:16px;background:var(--green-soft);
+ border:0;min-width:0;
+}
+.screen [data-payment-entry] .entry-consequence-copy.lumo-lens-value{
+ padding:0;background:none;color:var(--green-ink);font-weight:600;letter-spacing:-.01em;
+}
+.screen [data-payment-entry] .entry-consequence-label{color:var(--muted)}
+.screen [data-payment-entry] .entry-consequence[data-decision-state=shortfall],
+.screen [data-payment-entry] .entry-consequence:has([data-decision-state=shortfall]){background:var(--shortfall-soft)}
+.screen [data-payment-entry] .entry-consequence[data-decision-state=shortfall] .entry-consequence-copy.lumo-lens-value{color:var(--red)}
+.screen-paymentReview .focus-payment-title{
+ padding:14px 16px;background:var(--green-soft);border-radius:var(--curve-panel);
+}
+#app .task-sheet-layer .screen-paymentReview .focus-payment-title h1{
+ font-weight:600;letter-spacing:-.04em;color:var(--green-ink);
+}
+.screen-paymentReview .focus-payment-title .eyebrow,
+.screen-paymentReview .focus-payment-title small{color:var(--muted)}
+.screen-paymentReview .focus-payment-title p{color:var(--ink)}
+.screen-paymentReview .focus-receipt{
+ border:0;border-radius:var(--curve-panel);background:var(--soft);padding:7px 14px;
+}
+.screen-paymentReview .focus-receipt span{color:var(--muted)}
+.screen-paymentReview .focus-receipt .focus-total{border-color:var(--line)}
+.screen-paymentReview .focus-receipt .focus-total strong{color:var(--ink)}
+.screen .focus-details summary{color:var(--green-ink);font-weight:600}
+
+/* Pause is a recognisable warm-green decision surface. No success treatment
+   appears here: every figure remains a projection until PIN confirmation. */
+#app .task-sheet-layer .screen.screen-pause,
+#app .task-sheet-layer .screen.screen-pause[data-density],
+.screen.screen-pause{background:var(--green-soft);color:var(--ink)}
+#app .task-sheet[data-sheet-treatment=pause] .task-sheet-chrome,
+#app .task-sheet[data-sheet-treatment=pause] .task-sheet-body{
+ background:var(--green-soft);
+}
+#app .task-sheet[data-sheet-treatment=pause]{border-color:#cbdab9}
+.screen-pause .focus-pause-compact .focus-pause-label{
+ color:var(--green-ink);font-weight:700;letter-spacing:.06em;
+}
+#app .task-sheet-layer .screen-pause .pause-decision-heading .focus-pause-insight h1{
+ font-weight:700;letter-spacing:-.035em;color:var(--green-ink);line-height:1.25;
+}
+#app .task-sheet-layer .screen-pause .focus-pause-insight[data-decision-state=shortfall] h1{
+ color:var(--red);
+}
+.screen-pause .pause-payment-context{color:var(--ink)}
+.screen-pause .projection-tag{color:var(--muted)}
+#app .task-sheet-layer .screen-pause .pause-comparison{
+ padding:12px 14px;border:1px solid #d1dfc0;border-radius:24px;background:var(--white);
+}
+.screen-pause .pause-comparison h2{font-weight:600;color:var(--ink)}
+.screen-pause .pause-comparison-before strong{color:var(--ink);font-weight:600}
+.screen-pause .pause-comparison-after.lumo-lens strong,
+#app .task-sheet-layer .screen-pause .pause-comparison-after.lumo-lens strong{
+ background:none;color:var(--green-ink);font-weight:600;letter-spacing:-.04em;padding:0;
+}
+#app .task-sheet-layer .screen-pause:has(.focus-pause-insight[data-decision-state=shortfall]) .pause-comparison-after.lumo-lens strong{
+ color:var(--red);
+}
+.screen-pause .pause-decision-consequence .pause-goal-impact{color:var(--ink);font-weight:600}
+.screen-pause .pause-decision-consequence .pause-total-impact{color:var(--red)}
+.screen-pause .pause-decision-consequence p,
+.screen-pause .pause-comparison-note{color:var(--muted)}
+#app .task-sheet-layer .screen-pause .pause-decisions .pause-equal-choice,
+.screen-pause .pause-decisions .pause-equal-choice{
+ background:var(--white);color:var(--ink);border:1.5px solid var(--green-ink);
+ border-radius:16px;font-weight:700;
+}
+.screen-pause .focus-pause-exits .text-btn,.screen-pause .pause-link-cost{color:var(--green-ink)}
+.sample-pause .pause-comparison{border-color:var(--line)}
+.sample-pause .pause-comparison-after strong{color:var(--red);background:none}
+.sample-pause>h1{font-weight:700;letter-spacing:-.035em}
+
+/* Chat's light conversation surface belongs to the same system as Home.
+   A short answer stays a short answer; the input keeps its measured viewport. */
+#app[data-route=chat] .chat-workspace>.page-heading h1{font-weight:700;letter-spacing:-.04em}
+#app[data-route=chat] .chat-has-conversation>.page-heading h1{font-weight:700}
+#app[data-route=chat] .chat-bubble.user{
+ background:var(--soft);border:0;border-radius:20px 20px 6px 20px;color:var(--ink);
+}
+#app[data-route=chat] .chat-reply,
+#app[data-route=chat] .chat-reply.lumo-lens{
+ background:none;border:0;border-radius:0;padding:8px 0;
+}
+#app[data-route=chat] .chat-reply .lead{
+ background:none;color:var(--ink);font-weight:600;
+ font-size:1.125rem;line-height:1.5;letter-spacing:-.025em;padding:0;
+}
+#app[data-route=chat] .chat-reply.lumo-lens[data-insight] .lead.lumo-lens-value{
+ background:none;color:var(--green-ink);font-weight:700;
+ font-size:1.125rem;line-height:1.5;letter-spacing:-.025em;padding:0;
+}
+#app[data-route=chat] .chat-reply[data-decision-state=shortfall] .lead,
+#app[data-route=chat] .chat-reply.lumo-lens[data-insight][data-decision-state=shortfall] .lead.lumo-lens-value{color:var(--red)}
+#app[data-route=chat] .chat-reply.chat-reply-previous .lead{color:var(--ink);font-weight:600}
+#app[data-route=chat] .chat-snapshot-status{color:var(--muted);font-size:.875rem;line-height:1.5;margin-bottom:6px}
+#app[data-route=chat] .chat-recheck{min-height:44px;color:var(--green-ink);font-weight:600}
+#app[data-route=chat] .chat-reply .impact-secondary{color:var(--muted)}
+#app[data-route=chat] .chat-tools .chat-prompts .chip{
+ background:var(--white);border:1px solid var(--line);border-radius:16px;
+ font-weight:600;color:var(--ink);
+}
+#app[data-route=chat] .chat-tools summary{color:var(--green-ink);font-weight:600}
+#app[data-route=chat] .chat-entry{
+ background:var(--white);border-color:var(--control-line);border-radius:18px;
+}
+#app[data-route=chat] .chat-entry input{background:none}
+#app[data-route=chat] .chat-entry:focus-within{
+ outline:3px solid rgb(181 233 106 / .55);outline-offset:1px;border-color:var(--green-ink);
+}
+#app[data-route=chat] .chat-entry button{
+ background:var(--ink);border-color:var(--ink);color:var(--white);border-radius:14px;
+}
+.chat-calculation-body dt,.chat-calculation-body p{color:var(--muted)}
+.chat-calculation-body dd{color:var(--ink);font-weight:600}
+
+/* Confirmations describe one actual state; their symbol and text must agree. */
+.payment-result-compact>h1{font-weight:700;letter-spacing:-.035em}
+.payment-result-compact .result-mark{background:var(--soft);color:var(--ink);border-color:var(--control-line)}
+.payment-result-compact[data-payment-state=confirmed] .result-mark,
+.screen .success-mark{
+ background:var(--green);color:var(--green-ink);border:1.5px solid var(--green-ink);
+}
+.payment-result-compact[data-payment-state=pending] .result-mark,
+.payment-result-compact[data-payment-state=delivery-pending] .result-mark,
+.payment-result-compact[data-payment-state=reversed] .result-mark{
+ background:var(--soft);color:var(--ink);border-color:var(--control-line);
+}
+.payment-result-compact[data-payment-state=failed] .result-mark,
+.payment-result-compact[data-payment-state=delivery-failed] .result-mark{
+ background:var(--shortfall-soft);color:var(--red);border-color:var(--red);
+}
+.payment-result-compact .result-reference{
+ border:0;border-radius:16px;padding:12px 14px;background:var(--soft);
+}
+.payment-result-compact .result-reference>span{color:var(--muted)}
+.payment-result-compact .result-explanation{color:var(--muted)}
+.screen .native-decision-copy h1{font-weight:700;letter-spacing:-.035em}
+.screen .native-decision-copy p{color:var(--muted)}
+
+/* Sheets retain the six semantic treatments and their shared focus/history
+   controller. These rules change surface styling, never viewport or scrolling. */
+#app .task-sheet-layer .task-sheet{background:var(--white);border-radius:24px 24px 0 0;box-shadow:0 -10px 42px rgb(32 38 30 / .1)}
+#app .task-sheet-layer .task-sheet-chrome{background:var(--white);border-color:var(--line)}
+#app .task-sheet-layer .task-sheet-chrome #task-sheet-title{font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+#app .task-sheet-layer .task-sheet-chrome .icon-btn{border:0;background:var(--soft);border-radius:16px;color:var(--ink)}
+#app .task-sheet-layer .task-sheet-chrome .task-sheet-grab{background:var(--control-line)}
+#app .task-sheet-layer .task-sheet-body,
+#app .task-sheet-layer .task-sheet-body .screen{background:var(--white)}
+#app .task-sheet-layer .screen .page-heading h1,
+#app .task-sheet-layer .screen[data-density] .page-heading h1{font-weight:700;letter-spacing:-.035em}
+#app .task-sheet-layer .plan-explanation-page h1,.home-story-detail h1{font-weight:700;letter-spacing:-.035em}
+#app .task-sheet-layer .balance-calculation dt{color:var(--muted)}
+#app .task-sheet-layer .balance-calculation dd{color:var(--ink)}
+#app .task-sheet-layer .balance-calculation>div:last-child{
+ padding:12px;border:0;border-radius:16px;background:var(--green-soft);
+}
+#app .task-sheet-layer .balance-calculation>div:last-child dt,
+#app .task-sheet-layer .balance-calculation>div:last-child dd{color:var(--green-ink);font-weight:700}
+#app .task-sheet[data-sheet-treatment=pause] .task-sheet-chrome,
+#app .task-sheet[data-sheet-treatment=pause] .task-sheet-body,
+#app .task-sheet[data-sheet-treatment=pause] .task-sheet-body .screen{background:var(--green-soft)}
+#app .task-sheet[data-sheet-treatment=confirmation] .native-decision-copy .success-mark{background:var(--green)}
+
+/* A light, familiar campus tab bar: all destinations and their labels persist.
+   The active icon has a green shelf and the label remains dark and readable. */
+.native-app-header{background:var(--paper);border-color:var(--line)}
+.native-app-header .native-app-label{font-weight:700;color:var(--ink)}
+#nav:not([hidden]){
+ background:var(--paper);color:var(--muted);border-top:1px solid var(--line);
+ min-height:76px;padding-top:6px;padding-bottom:calc(8px + env(safe-area-inset-bottom));
+}
+#nav:not([hidden]) .nav-item{
+ color:var(--muted);background:none;border-radius:16px;font-weight:600;
+ padding:5px 2px;gap:4px;
+}
+#nav:not([hidden]) .nav-item span{color:inherit;font-weight:inherit;display:block;visibility:visible;opacity:1}
+#nav:not([hidden]) .nav-item svg{
+ width:36px;height:30px;padding:3px 6px;border-radius:12px;color:inherit;
+ background:none;stroke-width:1.9;
+}
+#nav:not([hidden]) .nav-item[aria-current=page]{color:var(--green-ink);font-weight:700;background:none}
+#nav:not([hidden]) .nav-item[aria-current=page] svg{background:var(--green);stroke-width:2.2}
+#nav:not([hidden]) .nav-item[aria-current=page]::after{content:none;display:none}
+#nav:not([hidden]) .nav-item:focus-visible{outline:3px solid var(--green-ink);outline-offset:-3px;box-shadow:none}
+.desktop-note h2{font-family:var(--font-ui);font-weight:700;letter-spacing:-.045em;color:var(--ink)}
+.desktop-note p,.desktop-test p{color:var(--muted)}
+
+/* No art is recoloured, stretched or replaced. No decorative ring is added.
+   Clarity's scene scale, cost-first flow, natural scrolling and visual viewport
+   measurements remain authoritative, including keyboard-open forms. */
+.screen-welcome .welcome-screen>h1{font-weight:700;letter-spacing:-.045em}
+.screen-welcome .welcome-screen>.muted{color:var(--muted)}
+.screen .onboarding-page .page-heading h1{font-weight:700;letter-spacing:-.035em}
+.screen .onboarding-page .field>span{font-weight:600}
+.screen .onboarding-page .check-row{color:var(--ink)}
+.screen .onboarding-page .notice{background:var(--green-soft);color:var(--green-ink)}
+.screen .onboarding-page .notice strong{font-weight:700}
+.screen .code-input{font-variant-numeric:tabular-nums}
+.screen .focus-category-track{background:var(--line)}
+.screen .focus-category-track>span,.screen .focus-category i{filter:none}
+
+@media(max-width:899px){body{background:var(--paper)}#app{box-shadow:none}}
+@media(max-width:359px){
+ #app .screen-home .home-plan-summary,
+ #app .screen-home .home-plan-summary.lumo-lens{padding:12px 14px}
+ #app .screen-home .home-plan-summary strong.lumo-lens-value{font-size:2.5rem}
+ .screen .destination-list,.screen .pay-option-list{padding-inline:12px}
+}
+@media(hover:hover){
+ .screen .primary:not(:disabled):hover,#app .screen-home .home-funding-actions button:not(:disabled):hover{background:#34472b;border-color:#34472b;color:var(--white)}
+ .screen .secondary:not(:disabled):hover,#app .screen-home .home-funding-actions button.secondary:not(:disabled):hover{background:#e1ead6;border-color:var(--green-ink);color:var(--ink)}
+ .screen .icon-btn:hover,.screen .balance-eye:hover,#app .screen-home .balance-eye:hover{background:#e1ead6}
+ .screen .menu-choice:hover,.screen .funding-choices .menu-choice:hover{background:var(--green-soft);border-color:var(--green-ink)}
+ #app .task-sheet-layer .screen-pause .pause-decisions .pause-equal-choice:hover{background:var(--paper);color:var(--ink)}
+ .native-app-header .icon-btn:hover{background:var(--soft)}
+}
+@media(prefers-reduced-motion:reduce){
+ #app .task-sheet-layer .task-sheet,#app .task-sheet-layer .task-sheet-backdrop,
+ #nav .nav-item,#nav .nav-item svg{transition:none!important;animation:none!important}
+}
+
+/* Welcome has one bounded, in-flow scene. Legacy illustration heights and SVG
+   margins must never let a character spill into the introduction below. */
+#app .screen.screen-welcome .welcome-art-stage{
+ position:relative;display:grid;isolation:isolate;
+ width:100%;height:clamp(132px,24dvh,196px);min-height:0;
+ margin:4px 0 16px;overflow:hidden;flex:none;
+}
+#app .screen.screen-welcome .welcome-art-stage>.scene-art.bold-scene{
+ position:relative;width:100%;height:100%!important;max-height:100%;
+ margin:0!important;overflow:hidden;
+}
+#app .screen.screen-welcome .welcome-art-stage .expressive-figure{
+ position:absolute;inset:0;display:block;width:100%;height:100%;overflow:hidden;
+}
+#app .screen.screen-welcome .welcome-art-stage .bold-figure-image{
+ display:block;width:100%;height:100%;max-width:100%;max-height:100%;
+ object-fit:contain;object-position:center;transform:none;
+}
+#app .screen.screen-welcome .welcome-screen>h1{
+ margin:0 0 10px;max-width:16ch;
+ font-size:clamp(2rem,8.8vw,2.5rem);line-height:1.12;
+}
+#app .screen.screen-welcome .welcome-screen>.muted{margin:0;max-width:30ch}
+#app .screen.screen-welcome .welcome-screen>.actions{margin-top:20px;gap:8px}
+#app .screen.screen-samplePause .sample-pause-intro{
+ color:var(--muted);font-size:.875rem;line-height:1.45;margin:0 0 12px;
+}
+#app .screen.screen-samplePause .sample-starting-point{
+ color:var(--ink);font-size:.9375rem;line-height:1.45;margin:0 0 14px;
+}
+#app .screen.screen-samplePause .sample-pause-skip{
+ padding:8px 0 8px 10px;white-space:nowrap;
+}
+@media(max-height:700px){
+ #app .screen.screen-welcome .welcome-art-stage{height:132px;margin-bottom:12px}
+}

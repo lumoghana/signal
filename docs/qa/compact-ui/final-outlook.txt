@@ -1,0 +1,23 @@
+PASS seven inclusive Budget days divide only GH140 outside covered costs into GH20 per day
+PASS allowance period ends before expected income day and never includes its amount
+PASS the last explicit Budget day is one day and an allowance expected today has no daily projection
+PASS missing, expired, changed and invalid dates offer review without inventing a daily figure
+PASS a shortfall leads with the actual gap and no daily spending suggestion
+PASS no saved Budget asks for costs even when savings and an allowance exist
+PASS rounding never suggests spending a pesewa more than the actual room
+PASS an extra successful GH80 reduces daily extras while a linked payment fulfils the saved cost once
+PASS pending extra and linked amounts reserve funds without double deducting planned spending
+PASS a stale loaded coverage cache is reconciled in a pure snapshot before the first quote
+PASS refunds and paid-outside coverage follow the ledger without altering the source records
+PASS Home daily amounts hide with the existing eye control, including accessible text
+PASS the outlook opens one sheet and Back restores Home position and its trigger
+PASS locked, closed and pre-account callers cannot read or open an outlook
+PASS adequately dated Chat answers use the same room and daily calculation and offer the detail sheet
+PASS missing allowance follow-up remains a date-confirmation conversation rather than a fabricated outlook
+PASS a daily Chat guide is marked historical after Ghana midnight and Check again uses the new day
+PASS Chat names the actual Budget end and exposes uncovered dates before a later expected allowance
+PASS ordinary daily-guide questions share GH20 a day instead of the aggregate Budget room
+PASS a direct daily question offers the missing period or Budget action without making up an amount
+PASS daily wording never shadows an amount affordability or historical spending question
+PASS an explicit daily guide does not describe an expired allowance date as the next expected income
+22 spending outlook checks passed.

@@ -1,0 +1,75 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-10-28",
+  "intent": "Immersive full-bleed cartoon Ask Lumo campus scenes; live white question remains HTML; only illustration colour is phone intelligence circle. No app UI edits.",
+  "phoneCircleMeasurement": "Measured source PNG lime pixel bounds, centre of bounds and max half-dimension; source dimensions1774×887. Display alignment must account for actual object-fit cover cropping and animated transforms.",
+  "scenes": {
+    "goal": {
+      "prompt": "Use case: style-transfer.\nAsset type: Lumo mobile Home Ask Lumo full-bleed illustration, panoramic1774x887,2:1.\nEdit target: the supplied flat cartoon campus image. Preserve its exact bold simple cartoon family, Ghanaian student friends, laptop, large held phone and lime intelligence circle, but RECOMPOSE THE ENTIRE CANVAS AS ONE IMMERSIVE FULL-BLEED SCENE.\nPrimary change: Remove the blank left panel entirely. Extend the Legon Balme Library building, steps, palms and campus landscaping continuously across the FULL WIDTH, right to every edge. Left and lower-left must show substantial visible campus scenery (steps/walkway/landscaping) rather than empty paper or blank sky. No vertical border, no split-panel appearance, no negative-space rectangle, no inset image, no collage, no uniform empty left half.\nComposition: Characters remain grouped on the RIGHT side, at a slightly more modest size so the campus setting can span behind them. They discuss a savings goal with laptop and phone. Building can run across midground behind them. Keep the left/lower-left foreground scenery visually simple so a live HTML white question can overlay it later under a soft dark transparent gradient. DO NOT add a gradient or panel yourself: draw an actual scene edge-to-edge. Camera frames a full scene, not a cutout.\nStyle: Same cartoon style exactly: bold black outlines, dot-and-line eyes and expressive simple features, graphic pure black/white/neutral gray, flat planar shapes. No realism, texture, engraving,3D,photorealistic faces.\nAccent: Only one acid lime #d7ff3f CIRCLE ON THE PHONE with central black sparkle, clearly visible at mobile size. No other colored surfaces or objects, no lime background.\nText: None whatsoever. The app overlays actual question text. No speech bubble, no letters/numbers, no logos or watermark.\nConstraints: Wide full-bleed composition2:1, no margins, preserve current student and style identities; continuous architecture and steps throughout whole image.",
+      "inputImagePaths": [
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-cartoon/goal.webp"
+      ],
+      "generated": "/workspace/scratch/3257d840b152/generated_images/exec-447269d5-0e5e-4869-9da9-09158da2fa87.png",
+      "output": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/goal.webp",
+      "encoding": "WebP q94 method6, no resizing/recoloring",
+      "width": 1774,
+      "height": 887,
+      "phoneCircleSourcePx": {
+        "cx": 1310.5,
+        "cy": 470.5,
+        "radius": 15.5
+      }
+    },
+    "runway": {
+      "prompt": "Use case: style-transfer.\nAsset type: Lumo Home Ask Lumo IMMERSIVE full-bleed cartoon illustration, panoramic1774x887,2:1.\nInput images: Image1 is EDIT TARGET for the student scenario. Image2 is DEFINITIVE COMPOSITION AND STYLE reference for immersive edge-to-edge campus scenery.\nPrimary change: Recompose Image1 to be a single full-bleed campus scene like Image2. Remove all blank left paper. Legon Balme Library building, steps or walkway, palms and campus landscaping must extend continuously ACROSS THE ENTIRE WIDTH, right to every edge.\nScene: Two Ghanaian university students walking after class. The male student checks his held phone and wristwatch, thinking about how long his money will last at current pace; braided female friend with books next to him. Preserve the topic and simple cartoon identities from Image1.\nComposition: Same expansive camera/scene scale as Image2, actual architecture and scenery spanning left and middle, characters grouped in RIGHT45percent at modest size. Left and lower-left show low-detail campus surroundings (steps/walkway/landscaping) so the app can overlay WHITE live HTML text there using a soft transparent dark gradient. Do not add a gradient or solid text panel yourself. No inset image, no margin, no vertical seam or split-screen, no blank left40percent.\nDrawing: Preserve Image1 simplified cartoon family and match Image2 cartoon linework. Bold black outlines, simple dot/line cartoon faces, playful relaxed anatomy, pure black/white/neutral gray graphic planar shapes, no realism or detailed portrait shading, no engraving,hatching,grain,texture,3D,airbrush gradients.\nOnly color: ONE lime #d7ff3f disk/circle clearly visible on the held PHONE SCREEN with a central tiny black sparkle, the intelligence indicator. Phone screen faces viewer. No other coloured objects or clothes, no lime background.\nNo text/letters/numbers/logos/speech bubbles/watermark. Actual question is live HTML in the app later.\nThe whole canvas must unequivocally be one immersive full-bleed cartoon campus setting rather than an illustration occupying half a card.",
+      "inputImagePaths": [
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-cartoon/runway.webp",
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/goal.webp"
+      ],
+      "generated": "/workspace/scratch/3257d840b152/generated_images/exec-48a2b74b-c5e1-4dd5-b486-b6134f42bb4a.png",
+      "output": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/runway.webp",
+      "encoding": "WebP q94 method6, no resizing/recoloring",
+      "width": 1774,
+      "height": 887,
+      "phoneCircleSourcePx": {
+        "cx": 1185.5,
+        "cy": 337.5,
+        "radius": 13.5
+      }
+    },
+    "spending": {
+      "prompt": "Use case: style-transfer.\nAsset type: Lumo Home Ask Lumo IMMERSIVE full-bleed cartoon illustration, panoramic1774x887,2:1.\nInput images: Image1 is EDIT TARGET for the student scenario. Image2 is DEFINITIVE COMPOSITION AND STYLE reference for immersive edge-to-edge campus scenery.\nPrimary change: Recompose Image1 to be a single full-bleed campus scene like Image2. Remove all blank left paper. Legon Balme Library building, steps or walkway, palms and campus landscaping must extend continuously ACROSS THE ENTIRE WIDTH, right to every edge.\nScene: Two Ghanaian university friends at a campus café table. A braided female student holds phone and a blank receipt as they discuss everyday spending. One simple meal carton and shopping bag, no clutter. Preserve the topic and simple cartoon identities from Image1.\nComposition: Same expansive camera/scene scale as Image2, actual architecture and scenery spanning left and middle, characters grouped in RIGHT45percent at modest size. Left and lower-left show low-detail campus surroundings (steps/walkway/landscaping) so the app can overlay WHITE live HTML text there using a soft transparent dark gradient. Do not add a gradient or solid text panel yourself. No inset image, no margin, no vertical seam or split-screen, no blank left40percent.\nDrawing: Preserve Image1 simplified cartoon family and match Image2 cartoon linework. Bold black outlines, simple dot/line cartoon faces, playful relaxed anatomy, pure black/white/neutral gray graphic planar shapes, no realism or detailed portrait shading, no engraving,hatching,grain,texture,3D,airbrush gradients.\nOnly color: ONE lime #d7ff3f disk/circle clearly visible on the held PHONE SCREEN with a central tiny black sparkle, the intelligence indicator. Phone screen faces viewer. No other coloured objects or clothes, no lime background.\nNo text/letters/numbers/logos/speech bubbles/watermark. Actual question is live HTML in the app later.\nThe whole canvas must unequivocally be one immersive full-bleed cartoon campus setting rather than an illustration occupying half a card.",
+      "inputImagePaths": [
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-cartoon/spending.webp",
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/goal.webp"
+      ],
+      "generated": "/workspace/scratch/3257d840b152/generated_images/exec-ca91b3e3-88c2-4bcb-8754-352684b2d1f9.png",
+      "output": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/spending.webp",
+      "encoding": "WebP q94 method6, no resizing/recoloring",
+      "width": 1774,
+      "height": 887,
+      "phoneCircleSourcePx": {
+        "cx": 1094,
+        "cy": 442.5,
+        "radius": 20
+      }
+    },
+    "affordability": {
+      "prompt": "Use case: style-transfer.\nAsset type: Lumo Home Ask Lumo IMMERSIVE full-bleed cartoon illustration, panoramic1774x887,2:1.\nInput images: Image1 is EDIT TARGET for the student scenario. Image2 is DEFINITIVE COMPOSITION AND STYLE reference for immersive edge-to-edge campus scenery.\nPrimary change: Recompose Image1 to be a single full-bleed campus scene like Image2. Remove all blank left paper. Legon Balme Library building, steps or walkway, palms and campus landscaping must extend continuously ACROSS THE ENTIRE WIDTH, right to every edge.\nScene: Two Ghanaian university friends seated on a campus bench. A braided female student thoughtfully checks a held phone while her friend holds a takeaway meal and gestures, considering an everyday purchase. Book on her lap. Preserve the topic and simple cartoon identities from Image1.\nComposition: Same expansive camera/scene scale as Image2, actual architecture and scenery spanning left and middle, characters grouped in RIGHT45percent at modest size. Left and lower-left show low-detail campus surroundings (steps/walkway/landscaping) so the app can overlay WHITE live HTML text there using a soft transparent dark gradient. Do not add a gradient or solid text panel yourself. No inset image, no margin, no vertical seam or split-screen, no blank left40percent.\nDrawing: Preserve Image1 simplified cartoon family and match Image2 cartoon linework. Bold black outlines, simple dot/line cartoon faces, playful relaxed anatomy, pure black/white/neutral gray graphic planar shapes, no realism or detailed portrait shading, no engraving,hatching,grain,texture,3D,airbrush gradients.\nOnly color: ONE lime #d7ff3f disk/circle clearly visible on the held PHONE SCREEN with a central tiny black sparkle, the intelligence indicator. Phone screen faces viewer. No other coloured objects or clothes, no lime background.\nNo text/letters/numbers/logos/speech bubbles/watermark. Actual question is live HTML in the app later.\nThe whole canvas must unequivocally be one immersive full-bleed cartoon campus setting rather than an illustration occupying half a card.",
+      "inputImagePaths": [
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-cartoon/affordability.webp",
+        "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/goal.webp"
+      ],
+      "generated": "/workspace/scratch/3257d840b152/generated_images/exec-370a0676-fe27-47b6-9200-78c5cd2b6563.png",
+      "output": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus-immersive/affordability.webp",
+      "encoding": "WebP q94 method6, no resizing/recoloring",
+      "width": 1774,
+      "height": 887,
+      "phoneCircleSourcePx": {
+        "cx": 1348,
+        "cy": 464.5,
+        "radius": 15
+      }
+    }
+  }
+}

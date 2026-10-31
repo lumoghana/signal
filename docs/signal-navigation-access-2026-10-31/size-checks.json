@@ -1,0 +1,567 @@
+[
+  {
+    "edition": "signal",
+    "name": "allMoney · standard",
+    "variant": "standard",
+    "size": [
+      375,
+      667,
+      1
+    ],
+    "setup": {
+      "requested": "allMoney",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "allMoney",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [
+        "allMoney"
+      ],
+      "renderedView": "allMoney",
+      "actual": "allMoney",
+      "sheet": true,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 375,
+    "height": 667,
+    "app": {
+      "left": 0,
+      "right": 375,
+      "top": 0,
+      "bottom": 667,
+      "width": 375,
+      "height": 667
+    },
+    "documentWidth": 375,
+    "appScrollWidth": 375,
+    "viewScroll": {
+      "client": 532,
+      "scroll": 721
+    },
+    "route": "allMoney",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "allMoney",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "All Your Money See what you hold, wherever it sits. Recorded so far · Lumo only GH₵ 700 .00 Lumo sample ledger + your recorded balances · Add your other money below Everyday money GH₵600.00 available to use in Lumo GH₵600.00 Money Boxes Your savings account, counted once GH₵100.00 Add cash, bank or MoMo What this total means Lumo accounts & cards GH₵700.00 Balances you recorded GH₵0.00 Included but held for pending payments GH₵0.00 Recorded balances are not connected to your bank or wallet. Update them after moving money. Money Boxes are part of savings, not an extra balance. Group collections belong to the group and are excluded. Pending incoming money and expected allowance are excluded. Total held is not the same as available to spend. IOUs & expected money Expected IOU repayments · excluded GH₵0.00 You owe · separate obligation GH₵0.00 Expected allowance · excluded GH₵600.00 View IOUs Money owed to you is expected income, not money you hold. It does not fund costs or reduce a shortfall before receipt. Money you owe is a separate obligation and does not change total held. Sample money · Saved on this device",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "Go back",
+        "Get help",
+        "Everyday moneyGH₵600.00 available to use in LumoGH₵600.00",
+        "Money BoxesYour savings account, counted onceGH₵100.00",
+        "Add cash, bank or MoMo",
+        "View IOUs"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "task-sheet-body lumo-balances-revealed",
+        "client": 532,
+        "scroll": 721,
+        "rect": {
+          "left": 0,
+          "right": 375,
+          "top": 61,
+          "bottom": 593,
+          "width": 375,
+          "height": 532
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 14,
+        "right": 346,
+        "top": 105.78125,
+        "bottom": 324.484375,
+        "width": 332,
+        "height": 218.703125
+      },
+      ".account-savings": {
+        "left": 14,
+        "right": 175.5,
+        "top": 496.484375,
+        "bottom": 562.484375,
+        "width": 161.5,
+        "height": 66
+      },
+      ".everyday-home-actions": {
+        "left": 14,
+        "right": 346,
+        "top": 328.484375,
+        "bottom": 408.484375,
+        "width": 332,
+        "height": 80
+      },
+      ".everyday-budget-link": {
+        "left": 160.578125,
+        "right": 160.578125,
+        "top": 158.375,
+        "bottom": 354.25,
+        "width": 0,
+        "height": 195.875
+      }
+    },
+    "homeMoney": {
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "allMoney · standard",
+    "variant": "standard",
+    "size": [
+      320,
+      568,
+      2
+    ],
+    "setup": {
+      "requested": "allMoney",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "allMoney",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [
+        "allMoney"
+      ],
+      "renderedView": "allMoney",
+      "actual": "allMoney",
+      "sheet": true,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 320,
+    "height": 568,
+    "app": {
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "width": 320,
+      "height": 568
+    },
+    "documentWidth": 320,
+    "appScrollWidth": 320,
+    "viewScroll": {
+      "client": 387,
+      "scroll": 1881
+    },
+    "route": "allMoney",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "allMoney",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "All Your Money See what you hold, wherever it sits. Recorded so far · Lumo only GH₵ 700 .00 Lumo sample ledger + your recorded balances · Add your other money below Everyday money GH₵600.00 available to use in Lumo GH₵600.00 Money Boxes Your savings account, counted once GH₵100.00 Add cash, bank or MoMo What this total means Lumo accounts & cards GH₵700.00 Balances you recorded GH₵0.00 Included but held for pending payments GH₵0.00 Recorded balances are not connected to your bank or wallet. Update them after moving money. Money Boxes are part of savings, not an extra balance. Group collections belong to the group and are excluded. Pending incoming money and expected allowance are excluded. Total held is not the same as available to spend. IOUs & expected money Expected IOU repayments · excluded GH₵0.00 You owe · separate obligation GH₵0.00 Expected allowance · excluded GH₵600.00 View IOUs Money owed to you is expected income, not money you hold. It does not fund costs or reduce a shortfall before receipt. Money you owe is a separate obligation and does not change total held. Sample money · Saved on this device",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "Go back",
+        "Get help",
+        "Everyday moneyGH₵600.00 available to use in LumoGH₵600.00",
+        "Money BoxesYour savings account, counted onceGH₵100.00",
+        "Add cash, bank or MoMo",
+        "View IOUs"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "task-sheet-body lumo-balances-revealed",
+        "client": 387,
+        "scroll": 1881,
+        "rect": {
+          "left": 0,
+          "right": 320,
+          "top": 61,
+          "bottom": 448,
+          "width": 320,
+          "height": 387
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 16,
+        "right": 289,
+        "top": 134.484375,
+        "bottom": 483.171875,
+        "width": 273,
+        "height": 348.6875
+      },
+      ".account-savings": {
+        "left": 16,
+        "right": 289,
+        "top": 839.171875,
+        "bottom": 917.171875,
+        "width": 273,
+        "height": 78
+      },
+      ".everyday-home-actions": {
+        "left": 16,
+        "right": 289,
+        "top": 493.171875,
+        "bottom": 711.171875,
+        "width": 273,
+        "height": 218
+      },
+      ".everyday-budget-link": {
+        "left": 159.046875,
+        "right": 159.046875,
+        "top": 184.125,
+        "bottom": 380,
+        "width": 0,
+        "height": 195.875
+      }
+    },
+    "homeMoney": {
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "authorize · standard",
+    "variant": "standard",
+    "size": [
+      390,
+      480,
+      1
+    ],
+    "setup": {
+      "requested": "authorize",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "authorize",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [
+        "authorize"
+      ],
+      "renderedView": "authorize",
+      "actual": "authorize",
+      "sheet": true,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 390,
+    "height": 480,
+    "app": {
+      "left": 0,
+      "right": 390,
+      "top": 0,
+      "bottom": 480,
+      "width": 390,
+      "height": 480
+    },
+    "documentWidth": 390,
+    "appScrollWidth": 390,
+    "viewScroll": {
+      "client": 357,
+      "scroll": 520
+    },
+    "route": "authorize",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "authorize",
+      "guideCount": 0,
+      "expanded": 0,
+      "outsideCopy": "3 of 3 Authorise Confirm payment Available balance GH₵ 600.00 GH₵80.00 to Akua’s Kitchen Campus Pay · AK01 After this payment GH₵170.00 left after budget. Use biometrics Demo Face or fingerprint demo. You can also use your PIN below. Your 6-digit Lumo PIN Pay GH₵80.00 Back to review",
+      "critical": true,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": true,
+      "controlIds": [
+        "payment-pin"
+      ],
+      "actionLabels": [
+        "Go back",
+        "Get help",
+        "Use biometrics Demo",
+        "Pay GH₵80.00",
+        "Back to review"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "task-sheet-body lumo-balances-revealed",
+        "client": 357,
+        "scroll": 520,
+        "rect": {
+          "left": 0,
+          "right": 390,
+          "top": 61,
+          "bottom": 417.75,
+          "width": 390,
+          "height": 356.75
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 14,
+        "right": 361,
+        "top": 105.78125,
+        "bottom": 330.609375,
+        "width": 347,
+        "height": 224.828125
+      },
+      ".account-savings": {
+        "left": 14,
+        "right": 183,
+        "top": 502.609375,
+        "bottom": 568.609375,
+        "width": 169,
+        "height": 66
+      },
+      ".everyday-home-actions": {
+        "left": 14,
+        "right": 361,
+        "top": 334.609375,
+        "bottom": 414.609375,
+        "width": 347,
+        "height": 80
+      },
+      ".everyday-budget-link": {
+        "left": 161.484375,
+        "right": 161.484375,
+        "top": 159.125,
+        "bottom": 355,
+        "width": 0,
+        "height": 195.875
+      }
+    },
+    "homeMoney": {
+      "masks": 0
+    }
+  },
+  {
+    "edition": "signal",
+    "name": "profile · standard",
+    "variant": "standard",
+    "size": [
+      1100,
+      900,
+      1
+    ],
+    "setup": {
+      "requested": "profile",
+      "variant": "standard",
+      "errors": [],
+      "initialActual": "profile",
+      "seededMoney": {
+        "operational": 600,
+        "savings": 100,
+        "room": 250,
+        "essentials": 350
+      },
+      "renderedViews": [
+        "profile"
+      ],
+      "renderedView": "profile",
+      "actual": "profile",
+      "sheet": true,
+      "fallback": false,
+      "renderFallback": false
+    },
+    "palette": {
+      "count": 0,
+      "findings": [],
+      "unfilteredImages": [],
+      "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+    },
+    "width": 1100,
+    "height": 900,
+    "app": {
+      "left": 516,
+      "right": 956,
+      "top": 24,
+      "bottom": 876,
+      "width": 440,
+      "height": 852
+    },
+    "documentWidth": 1100,
+    "appScrollWidth": 438,
+    "viewScroll": {
+      "client": 717,
+      "scroll": 865
+    },
+    "route": "profile",
+    "actualRoute": "home",
+    "horizontal": [],
+    "unreachable": [],
+    "fixedClipped": [],
+    "textClipping": [],
+    "contentClipping": [],
+    "homeArtworkOverlap": [],
+    "planBoxesOverlap": [],
+    "savingsHackPlacement": [],
+    "savingsHackGeometry": null,
+    "pageGuidance": {
+      "mode": "",
+      "route": "profile",
+      "guideCount": 1,
+      "expanded": 1,
+      "outsideCopy": "Profile K Name Kwame Mensah Lumo handle @kwame.m Phone 024 ••• •123 University University of Ghana Email kwame@example.test Edit profile My QR Let someone scan to pay you Change phone number Confirm your new number Correct account details Ask for a review Profile changes are saved on this device in the preview.",
+      "critical": false,
+      "essentialHelpOutside": null,
+      "essentialAmountOutside": null,
+      "pinOutside": null,
+      "controlIds": [],
+      "actionLabels": [
+        "Go back",
+        "Get help",
+        "Edit profile",
+        "My QRLet someone scan to pay you",
+        "Change phone numberConfirm your new number",
+        "Correct account detailsAsk for a review"
+      ]
+    },
+    "guidanceStateIssues": [],
+    "endOcclusion": [],
+    "endUnreachable": [],
+    "scrollers": [
+      {
+        "id": "view",
+        "cls": "task-sheet-body lumo-balances-revealed",
+        "client": 717,
+        "scroll": 865,
+        "rect": {
+          "left": 516,
+          "right": 956,
+          "top": 85,
+          "bottom": 802,
+          "width": 440,
+          "height": 717
+        }
+      }
+    ],
+    "collapsedScrollers": [],
+    "verifiedReachable": [],
+    "homeGeometry": {
+      ".account-operational": {
+        "left": 533,
+        "right": 924,
+        "top": 173.640625,
+        "bottom": 422.3125,
+        "width": 391,
+        "height": 248.671875
+      },
+      ".account-savings": {
+        "left": 533,
+        "right": 724,
+        "top": 672.3125,
+        "bottom": 760.3125,
+        "width": 191,
+        "height": 88
+      },
+      ".everyday-home-actions": {
+        "left": 533,
+        "right": 924,
+        "top": 432.3125,
+        "bottom": 536.3125,
+        "width": 391,
+        "height": 104
+      },
+      ".everyday-budget-link": {
+        "left": 683.125,
+        "right": 683.125,
+        "top": 229.1875,
+        "bottom": 425.0625,
+        "width": 0,
+        "height": 195.875
+      }
+    },
+    "homeMoney": {
+      "masks": 0
+    }
+  }
+]

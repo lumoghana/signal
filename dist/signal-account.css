@@ -1,0 +1,211 @@
+/* Signal's personal space: bold character, tactile choices and clear forms.
+   Every selector belongs to the independent Signal edition. */
+
+/* Welcome introduces the same ink stage and lime light as the Home balance. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-welcome{padding:20px 20px 22px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome{min-height:100%;gap:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-brand{align-items:center;gap:12px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-brand .actual-wordmark{width:128px!important;height:auto;filter:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-brand>span{font-size:.75rem;line-height:1.35;font-weight:750;letter-spacing:-.02em;color:var(--signal-muted);max-width:12ch;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-picture{position:relative;isolation:isolate;display:flex;align-items:flex-end;justify-content:flex-end;min-height:184px;flex:1 0 184px;max-height:224px;margin:20px 0;padding:12px 16px;border-radius:20px;background:radial-gradient(ellipse at 76% 94%,#b7ef3c30,transparent 53%),var(--signal-ink);overflow:hidden;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-welcome-hello{position:absolute;z-index:1;left:20px;top:20px;color:var(--signal-lime);font-size:2.25rem;line-height:1;letter-spacing:-.06em;font-weight:800;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-picture .mono-brand-avatar-hero{position:relative;z-index:1;width:166px!important;height:166px!important;background:transparent;overflow:visible;margin:0;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-copy{margin:0 0 18px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-copy .mono-kicker{display:block;font-size:.6875rem;font-weight:700;letter-spacing:.035em;margin:0 0 9px;color:var(--signal-muted);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome h1{font-size:clamp(2rem,9vw,2.5rem)!important;line-height:1.04!important;letter-spacing:-.06em!important;font-weight:800!important;margin:0 0 12px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-copy>p:last-child{font-size:.9375rem;line-height:1.45;letter-spacing:-.02em;font-weight:500;margin:0;color:var(--signal-muted);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-actions .actions{margin-top:0;gap:12px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-actions :is(.primary,.secondary){min-height:52px!important;border-radius:16px!important;font-size:.9375rem!important;font-weight:750!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-actions .primary{background:var(--signal-ink)!important;color:var(--signal-paper)!important;border-color:var(--signal-ink)!important;box-shadow:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-actions .secondary{border:1px solid var(--signal-line)!important;background:var(--signal-soft)!important;color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-actions .mono-demo-note{font-size:.6875rem;line-height:1.5;margin-top:10px;}
+
+/* Setup shares one title scale, neutral forms and permanent field guidance. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page>.page-heading{margin:18px 0 20px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page>.page-heading h1{font-size:clamp(1.5rem,7.2vw,1.75rem)!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.045em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page>.page-heading>p{font-size:.9375rem;line-height:1.5;letter-spacing:-.015em;color:var(--signal-muted);margin-top:10px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page>.topline{margin-bottom:20px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-setup-identity>.mono-brand-avatar{width:32px!important;height:32px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .setup-progress{gap:6px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page :is(.progress,.progress-bar){height:5px;border-radius:8px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .progress-bar{background:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .form{gap:14px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page :is(.notice,.verified-identity-data,.optional-address){border-radius:20px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-phone,.screen-signin) .page-heading{padding:0;background:transparent;border-radius:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-phone,.screen-signin) .page-heading h1{color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-phone,.screen-signin) .page-heading>p{color:var(--signal-muted)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .code-input{font-size:1.5rem!important;letter-spacing:.2em;font-weight:750!important;min-height:60px!important;text-align:center;padding:12px 10px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .phone-field{border:1px solid var(--signal-line);background:var(--signal-surface);border-radius:16px;overflow:hidden;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .phone-field>span{padding-left:15px;font-size:1rem;font-weight:750;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .phone-field>input{border:0!important;box-shadow:none!important;background:transparent!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .phone-field:focus-within{outline:3px solid #d7ff3f80;outline-offset:2px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .check-row{padding:15px;border:1px solid var(--signal-line);border-radius:16px;background:var(--signal-surface);gap:12px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .onboarding-page .list .row{min-height:68px;padding:14px;border-radius:16px;background:var(--signal-soft);border:0;margin-bottom:8px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-ready>.mono-brand-avatar{width:96px;height:100px;margin:0 auto 16px;display:block;}
+
+/* Chat carries the Home insight language into a calm place to talk. */
+body.signal-edition.minna-edition #app[data-chat-banking=true] :is(#view,#task-parent-view) .screen-chat{padding:0 18px 8px!important;}
+body.signal-edition.minna-edition #app[data-chat-banking=true] .chat-workspace .chat-banking-header{min-height:52px;margin-bottom:8px;padding:6px 0;}
+body.signal-edition.minna-edition #app .mono-brand-chat-title{font-size:.9375rem!important;font-weight:850!important;gap:6px;}
+body.signal-edition.minna-edition #app .mono-brand-chat-title>.mono-brand-avatar{width:32px!important;height:32px!important;}
+body.signal-edition.minna-edition #app .hibiscus-chat-feed{gap:12px;padding-top:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting{position:relative;isolation:isolate;grid-template-columns:minmax(0,1fr) 80px;align-items:center;column-gap:12px;min-height:128px;padding:18px;background:var(--signal-guide,#f0f5e6);border-radius:20px;overflow:visible;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting>.mono-brand-avatar{position:relative;grid-column:2;grid-row:1/4;align-self:center;width:80px!important;height:80px!important;margin:0;transform:none;z-index:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting .hibiscus-chat-hello{font-size:.8125rem;line-height:1.4;font-weight:650;letter-spacing:-.01em;color:#60743d;margin:0 0 7px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting h2{font-size:1.75rem!important;line-height:1.1!important;font-weight:800!important;letter-spacing:-.05em!important;max-width:11ch;margin:0 0 8px!important;color:var(--signal-ink);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting>p{font-size:.875rem;line-height:1.45;font-weight:500;max-width:25ch;color:var(--signal-muted);margin:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-insight{position:relative;min-height:108px;padding:17px 44px 17px 18px!important;border:1px solid var(--signal-line)!important;border-radius:20px!important;background:var(--signal-surface)!important;color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-insight-label{font-size:.75rem;font-weight:650;letter-spacing:0;color:#60743d!important;margin-bottom:8px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-insight>strong{font-size:1.125rem!important;line-height:1.28;font-weight:800!important;letter-spacing:-.035em;color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-insight-support{font-size:.8125rem;line-height:1.45;color:var(--signal-muted)!important;margin-top:6px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-insight>svg{color:var(--signal-ink)!important;right:17px;width:18px;height:18px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-starters{display:grid;gap:9px;border:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-starters>button{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:12px 15px!important;border:1px solid var(--signal-line)!important;border-radius:16px!important;background:var(--signal-surface)!important;font-size:.875rem!important;line-height:1.4;font-weight:700!important;letter-spacing:-.02em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-starters>button>svg{box-sizing:content-box;flex:none;width:16px;height:16px;padding:7px;border-radius:50%;background:var(--signal-soft);color:var(--signal-ink);transform:rotate(45deg);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-data-note{font-size:.75rem;line-height:1.4;margin:0 2px;color:var(--signal-muted);}
+body.signal-edition.minna-edition #app[data-chat-banking=true] .chat-workspace #chat-thread .chat-bubble{font-size:.9375rem;line-height:1.65;}
+body.signal-edition.minna-edition #app[data-chat-banking=true] .chat-workspace #chat-thread .chat-bubble.user{background:var(--signal-ink);color:var(--signal-paper);border-radius:18px 18px 6px 18px;padding:13px 16px;font-size:.9375rem;max-width:90%;}
+body.signal-edition.minna-edition #app[data-chat-banking=true] .chat-workspace #chat-thread .chat-reply .lead{font-size:1.25rem!important;line-height:1.3;font-weight:800!important;letter-spacing:-.04em;}
+body.signal-edition.minna-edition #app .chat-bubble>.mono-brand-attribution{gap:8px;margin:0 0 14px;color:var(--signal-muted);font-weight:850;font-size:.6875rem;}
+body.signal-edition.minna-edition #app .chat-bubble>.mono-brand-attribution>.mono-brand-avatar{width:28px;height:28px;}
+body.signal-edition.minna-edition #app[data-chat-banking=true] .chat-workspace .chat-entry{border:1px solid var(--signal-line)!important;background:var(--signal-surface)!important;border-radius:18px!important;padding:5px!important;min-height:56px;box-shadow:none!important;}
+body.signal-edition.minna-edition #app[data-chat-banking=true] .chat-workspace .chat-entry button{width:44px;min-width:44px;height:44px;min-height:44px;background:var(--signal-ink)!important;color:var(--signal-paper)!important;border-radius:14px!important;}
+body.signal-edition.minna-edition #app .chat-workspace .chat-prompts .chip{font-size:.8125rem;line-height:1.35;font-weight:750;min-height:44px;padding:11px 13px;border:1px solid var(--signal-line);background:var(--signal-soft);border-radius:15px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .chat-banking-action-item{min-height:68px;padding:14px 15px;margin-bottom:8px;border:0;background:var(--signal-soft);border-radius:16px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .chat-banking-action-item>svg:first-child{background:transparent;padding:6px;border-radius:12px;width:24px;height:24px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .chat-banking-action-item strong{font-size:1rem;font-weight:850;letter-spacing:-.025em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .chat-calculation-conclusion{font-size:1.35rem;line-height:1.3;font-weight:800;letter-spacing:-.04em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-history-list>li{margin-bottom:8px;background:var(--signal-soft);border:0;border-radius:16px;padding:8px 13px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .chat-history-search{padding:14px;background:var(--signal-soft);border-radius:20px;margin-bottom:16px;}
+
+/* Personal details, settings and support use the same restrained surfaces. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-heading{position:relative;display:block;min-height:0;margin:8px 0 18px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-heading>h1{font-size:1.75rem!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.045em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-heading>p{margin-top:10px;font-size:.9375rem;line-height:1.5;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark{display:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark>svg{width:24px;height:24px;stroke-width:2;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark-privacy{border-radius:50%;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark-notifications,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark-notificationPrefs{border-radius:26px 26px 8px 26px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark-profile{background:var(--signal-soft);transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow{gap:14px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-profile .account-flow{gap:10px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow>.soft{padding:18px;border-radius:20px;background:var(--signal-soft);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .signal-profile-pass{position:relative;padding:16px!important;background:var(--signal-surface)!important;border:1px solid var(--signal-line)!important;border-radius:20px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-customer-monogram{display:grid;place-items:center;width:44px;height:44px;margin:0 0 8px;border-radius:50%;background:var(--signal-lime);color:var(--signal-ink);font-size:1.5rem;line-height:1;font-weight:800;letter-spacing:-.04em;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-profile .signal-profile-pass .summary-line{border-color:var(--signal-line);padding:8px 0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-profile-pass .summary-line>span{color:var(--signal-muted);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-profile-pass .summary-line>strong{font-size:.9375rem;font-weight:850;color:var(--signal-ink);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .summary-line{gap:12px;padding:12px 0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .summary-line>span{font-size:.8125rem;line-height:1.5;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .summary-line>strong{font-size:.875rem;line-height:1.45;font-weight:750!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.account-flow,.account-details-page)>.list{display:grid;gap:9px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow>.list>.row,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-details-page>.list>.row,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-notifications>.row,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-link>.row,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-privacy,.screen-notificationPrefs) .account-flow>.row{padding:14px 15px!important;min-height:68px;border:0!important;background:var(--signal-soft)!important;border-radius:16px!important;gap:12px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-profile .account-flow>.list>.row{min-height:60px;padding:10px 15px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .row-icon{width:40px;height:40px;border-radius:12px;background:transparent!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .row-icon>svg{width:24px;height:24px;stroke-width:2;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .row-copy strong{font-size:.9375rem!important;line-height:1.3;font-weight:850!important;letter-spacing:-.035em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .row-copy small{font-size:.8125rem!important;line-height:1.45;color:var(--signal-muted);margin-top:4px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .row-end{font-size:.75rem;font-weight:800;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow>.card{border:1px solid var(--signal-line);background:var(--signal-surface);border-radius:20px;padding:18px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow>.card .topline>strong{font-size:1rem;font-weight:850;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow>.soft h3{font-size:1.15rem!important;line-height:1.25;font-weight:850!important;letter-spacing:-.04em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow>.soft h2{font-size:1.5rem!important;font-weight:800!important;letter-spacing:-.045em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-link{margin-top:18px;display:grid;gap:10px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-page .daily-check{display:flex;align-items:flex-start;gap:12px;min-height:72px;padding:16px;margin:0 0 9px;background:var(--signal-soft);border-radius:16px;border:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-page .daily-check strong{font-size:1rem;font-weight:850;letter-spacing:-.03em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-page .daily-check small{font-size:.75rem;line-height:1.45;color:var(--signal-muted);margin-top:6px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-page .daily-check input{flex:none;accent-color:var(--signal-ink);margin-top:3px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .daily-preferences-page [id$="-options"]{background:var(--signal-surface);border:1px solid var(--signal-line);border-radius:16px;padding:16px;margin:0 0 14px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-security .account-flow>.soft{background:var(--signal-guide,#f0f5e6)!important;color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-security .account-flow>.soft :is(h3,p){color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-security .account-flow>.soft p{color:var(--signal-muted)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-detail-card{padding:20px!important;border:1px solid var(--signal-line)!important;border-radius:20px!important;background:var(--signal-surface)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-detail-card h3{font-size:1.125rem!important;font-weight:800!important;letter-spacing:-.035em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-detail-card+.account-detail-card{background:var(--signal-guide,#f0f5e6)!important;color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-detail-card+.account-detail-card :is(h3,dt,dd,.summary-line,.summary-line strong,.muted){color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-detail-card :is(dt,dd){overflow-wrap:anywhere;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-help{position:relative;gap:14px;padding:16px!important;min-height:96px;background:var(--signal-guide,#f0f5e6);border-radius:20px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-help>.mono-brand-avatar{width:64px;height:64px;align-self:center;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-help>p{font-size:1.125rem!important;line-height:1.25;font-weight:800;letter-spacing:-.035em;color:var(--signal-ink);max-width:19ch;min-width:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-privacyNotice,.screen-accountTerms,.screen-dataExport,.screen-supportCase,.screen-caseDetail,.screen-feedback,.screen-statements) .page-heading h1{font-size:1.75rem!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.045em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-privacyNotice,.screen-accountTerms) details{background:var(--signal-soft);border:0;border-radius:20px;padding:13px 17px;margin-bottom:9px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-privacyNotice,.screen-accountTerms) details>summary{font-size:.875rem;font-weight:850;line-height:1.4;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-dailyAccountNotice,.screen-actionConfirm,.screen-sampleConfirm,.screen-resetConfirm,.screen-ambassadorReset,.screen-ambassadorSample,.screen-ambassadorGuide,.screen-testing) .page-heading h1{font-size:1.75rem!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.045em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-dailyAccountNotice>section>p:not(.small){padding:18px;background:var(--signal-soft);border-radius:20px;font-size:.9375rem;line-height:1.6;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .ambassador-boundary{padding:18px;border:0;border-radius:20px;background:var(--signal-soft);margin:18px 0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .ambassador-boundary>strong{font-size:1rem;font-weight:850;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .ambassador-boundary>p{font-size:.875rem;line-height:1.55;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-ambassador-character{position:relative;isolation:isolate;display:flex;justify-content:flex-end;align-items:flex-end;min-height:160px;padding:12px 16px;background:radial-gradient(ellipse at 76% 94%,#b7ef3c30,transparent 53%),var(--signal-ink);border-radius:20px;overflow:hidden;margin-bottom:20px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-ambassador-character>img{display:block;position:relative;z-index:1;width:142px;height:142px;max-width:65%;object-fit:contain;transform:none;margin:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-ambassador-character>span{position:absolute;left:20px;top:20px;color:var(--signal-lime);font-size:2.25rem;line-height:1;font-weight:800;letter-spacing:-.06em;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .ambassador-entry>h1{font-size:1.75rem!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.045em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-ambassadorGuide,.screen-testing) .test-list{counter-reset:signal-test;display:grid;gap:10px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-ambassadorGuide,.screen-testing) .test-step{counter-increment:signal-test;display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;padding:16px;border:0;background:var(--signal-soft);border-radius:16px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-ambassadorGuide,.screen-testing) .test-step::before{content:counter(signal-test);display:grid;place-items:center;align-self:start;width:32px;height:32px;border-radius:50%;background:var(--signal-lime);color:var(--signal-ink);font-size:.875rem;font-weight:800;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-ambassadorGuide,.screen-testing) .test-step strong{font-size:.9375rem;font-weight:850;letter-spacing:-.025em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-ambassadorGuide,.screen-testing) .test-step p{font-size:.8125rem;line-height:1.55;color:var(--signal-muted);}
+
+/* Menu is the same app: compact navigation rows, native queues/disclosures. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu{padding-bottom:18px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu>.hibiscus-root-header{margin-bottom:18px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu>.hibiscus-root-header h1{font-size:1.75rem!important;font-weight:800!important;letter-spacing:-.045em!important;margin-top:8px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-lockup-menu{position:relative;padding:0;background:transparent;border-radius:0;gap:9px;margin:0 0 10px!important;min-height:44px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-lockup-menu>.mono-brand-avatar{width:40px!important;height:40px!important;margin:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-lockup-menu .mono-brand-wordmark{width:96px!important;max-width:50%;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-owner{font-size:.9375rem!important;font-weight:750;letter-spacing:-.025em;color:var(--signal-ink);margin:0 0 18px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-group{margin:0 0 20px!important;border:0!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-group>h2{font-size:.8125rem!important;line-height:1.4!important;letter-spacing:-.01em!important;font-weight:650!important;text-transform:none;color:var(--signal-muted);padding:0 2px;margin-bottom:9px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-group>div{display:grid;gap:9px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item{min-height:68px;padding:12px 14px!important;border:0!important;border-radius:16px!important;background:var(--signal-soft)!important;gap:11px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-icon{width:40px!important;height:40px!important;display:grid;place-items:center;border:0!important;background:transparent!important;border-radius:12px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-icon>svg{width:23px!important;height:23px!important;stroke-width:2;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item strong{font-size:.9375rem!important;font-weight:750!important;line-height:1.3;letter-spacing:-.025em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item small{font-size:.8125rem!important;line-height:1.4!important;margin-top:4px;color:var(--signal-muted);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item[data-menu-route=pay]{background:var(--signal-ink)!important;color:var(--signal-paper)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item[data-menu-route=pay] :is(strong,small){color:var(--signal-paper)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-disclosure{padding:0!important;background:transparent!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-disclosure>summary{min-height:68px;padding:14px!important;background:var(--signal-soft);border:0;border-radius:16px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-disclosure>summary strong{font-size:1rem;font-weight:850;letter-spacing:-.025em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-disclosure>summary small{font-size:.8125rem;line-height:1.5;margin-top:5px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-disclosure[open]>div{margin-top:9px;}
+
+@media(max-height:720px){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-welcome{padding:16px 18px 18px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-picture{min-height:140px;flex-basis:140px;max-height:164px;margin:16px 0;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-picture .mono-brand-avatar-hero{width:132px!important;height:132px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome h1{font-size:2rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-copy{margin-bottom:16px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-actions :is(.primary,.secondary){min-height:52px!important;}
+}
+@media(prefers-reduced-motion:no-preference){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.mono-menu-item,.hibiscus-chat-starters>button,.account-flow .row){transition:transform .16s ease,background .16s ease;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.mono-menu-item,.hibiscus-chat-starters>button,.account-flow .row):active{transform:scale(.98);}
+}
+@supports (container-type:inline-size){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.mono-welcome,.onboarding-page,.account-flow,.hibiscus-chat-feed){container-type:inline-size;}
+ @container (max-width:19em){
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-welcome-hello{display:none;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-heading{grid-template-columns:minmax(0,1fr);}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-mark{grid-column:1;grid-row:auto;width:40px;height:40px;margin-bottom:12px;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-heading>h1{grid-column:1;grid-row:auto;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-account-heading>p{grid-column:1;grid-row:auto;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .summary-line{grid-template-columns:minmax(0,1fr);gap:4px;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .account-flow .summary-line>strong{text-align:left;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting{grid-template-columns:minmax(0,1fr);}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting>.mono-brand-avatar{grid-column:1;grid-row:auto;width:64px!important;height:64px!important;justify-self:start;z-index:0;margin:0 0 10px;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .hibiscus-chat-feed-greeting h2{max-width:none;}
+ }
+}
+/* Icons have a fixed column; long labels and enlarged type may wrap. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item{grid-template-columns:40px minmax(0,1fr) 14px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item>span:first-child{width:40px;height:40px;}
+
+/* A small lime light grounds Welcome's existing white-faced Lux. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-welcome-picture::after{content:"";position:absolute;z-index:0;pointer-events:none;right:13px;bottom:13px;width:160px;height:13px;border-radius:50%;background:radial-gradient(ellipse,#d7ff3f70,transparent 70%);filter:blur(4px);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-menu-item[data-menu-route=pay] .mono-menu-icon{background:var(--signal-lime)!important;color:var(--signal-ink)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .chat-entry button>svg{color:var(--signal-paper)!important;}

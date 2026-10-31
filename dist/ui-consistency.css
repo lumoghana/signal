@@ -1,0 +1,325 @@
+/* Shared finishing rules. Home owns its financial hierarchy; sheets and long
+   conversations retain their own layout and scrolling behavior. */
+:root{
+ --ui-title:2rem;
+ --ui-sheet-title:1.5rem;
+ --ui-support:.9375rem;
+ --ui-label:.875rem;
+ --ui-action:1rem;
+ --ui-action-compact:.875rem;
+ --ui-control-curve:16px;
+ --ui-panel-curve:24px;
+ --ui-section-gap:20px;
+ --ui-related-gap:12px;
+}
+
+/* A main destination title, a compact task title, then supporting copy. */
+#app .screen :is(.destination-heading,.focus-pay-heading,.focus-story-heading,.plan-hub-heading)>h1,
+#app .screen:not(.screen-home):not(.screen-pause) .page-heading>h1,
+#app .screen .onboarding-page .page-heading>h1{
+ font-size:var(--ui-title);line-height:1.18;font-weight:700;
+ letter-spacing:-.035em;text-align:left;
+}
+#app .screen :is(.destination-heading,.focus-pay-heading,.focus-story-heading,.plan-hub-heading)>p,
+#app .screen:not(.screen-home):not(.screen-pause) .page-heading>p{
+ font-size:var(--ui-support);line-height:1.5;font-weight:400;
+ color:var(--muted);letter-spacing:0;margin-top:8px;
+}
+#app .task-sheet-layer .screen .page-heading>h1,
+#app .task-sheet-layer .screen[data-density] .page-heading>h1,
+#app .simple-plan-setup .page-heading>h1{
+ font-size:var(--ui-sheet-title);line-height:1.22;font-weight:700;
+ letter-spacing:-.025em;text-align:left;
+}
+#app[data-route=chat] .chat-workspace>.page-heading h1{
+ font-size:var(--ui-title);line-height:1.18;font-weight:700;letter-spacing:-.035em;
+}
+#app[data-route=chat] .screen .chat-has-conversation>.page-heading h1{
+ font-size:var(--ui-sheet-title);line-height:1.22;
+}
+
+/* Task actions share one shape. Card actions have a compact, still readable
+   role rather than inheriting the 12px labels of an older composition. */
+#app .screen:not(.screen-home):not(.screen-pause) :is(.primary,.secondary,.danger),
+#app .task-sheet-layer .screen:not(.screen-pause) :is(.primary,.secondary,.danger){
+ min-height:52px;border-radius:var(--ui-control-curve);padding:12px 16px;
+ font-size:var(--ui-action);line-height:1.4;font-weight:700;letter-spacing:-.015em;
+}
+#app .screen:not(.screen-home):not(.screen-pause) .plan-hub-actions>button{
+ min-height:48px;border-radius:var(--ui-control-curve);padding:10px 8px;
+ font-size:var(--ui-action-compact);line-height:1.4;font-weight:700;
+}
+#app .screen:not(.screen-pause) .actions>.text-btn,
+#app .screen .destination-footer>.text-btn,
+#app .screen .plan-hub-detail-actions>.text-btn{
+ min-height:44px;font-size:var(--ui-label);line-height:1.45;font-weight:600;
+}
+#app .screen .icon-btn{
+ min-width:44px;min-height:44px;border-radius:var(--ui-control-curve);
+}
+#app .screen .icon-btn svg{width:21px;height:21px;stroke-width:1.9}
+
+/* A label always reads as a label, including after a form enters a sheet. */
+#app .screen .field>span,
+#app .task-sheet-layer .screen .field>span{
+ font-size:var(--ui-label);line-height:1.45;font-weight:600;
+ color:var(--ink);letter-spacing:0;margin-bottom:7px;text-align:left;
+}
+#app .screen input.input:not(.amount-input):not(.code-input):not([type=password]),
+#app .screen select.input,
+#app .screen textarea.input{
+ min-height:52px;border-radius:var(--ui-control-curve);
+ font-size:1rem;line-height:1.5;border-color:var(--control-line);
+}
+#app .screen:not(.screen-pause) .field{margin-bottom:16px}
+#app .task-sheet-layer .screen:not(.screen-pause) .field{margin-bottom:12px}
+#app .screen :is(.focus-details,.screen-explainer,.optional-fields,.plan-hub-details)>summary{
+ min-height:44px;font-size:var(--ui-label);line-height:1.45;font-weight:600;
+ color:var(--green-ink);padding-top:11px;padding-bottom:11px;
+}
+
+/* Cards, record rows and explanations repeat the same construction. */
+#app .screen:not(.screen-home) :is(.card,.receipt,.account-detail-card){
+ border-radius:var(--ui-panel-curve);border-color:var(--line);
+}
+#app .screen:not(.screen-home) :is(.notice,.soft,.warning){
+ border-radius:var(--ui-control-curve);
+}
+#app .screen .goal-summary.card{
+ display:block;width:100%;text-align:left;padding:16px;margin:10px 0;
+}
+#app .screen .goal-summary.card h3{font-size:1rem;line-height:1.4;font-weight:700;margin:0}
+#app .screen .goal-summary.card p{font-size:var(--ui-label);line-height:1.5;margin:6px 0 0}
+#app .screen .goal-summary.card .progress{margin-top:12px}
+#app .screen .receipt .summary-line,
+#app .screen .account-detail-card dl>div{
+ font-size:var(--ui-label);line-height:1.5;gap:var(--ui-related-gap);
+}
+#app .screen .receipt .summary-line>span,
+#app .screen .account-detail-card dt{color:var(--muted)}
+#app .screen .receipt .summary-line>strong,
+#app .screen .account-detail-card dd{
+ font-weight:600;color:var(--ink);font-variant-numeric:lining-nums tabular-nums;
+}
+#app .screen .receipt .summary-line>strong{max-width:65%;overflow-wrap:anywhere}
+#app .screen .account-detail-card dd{margin:0}
+#app .screen .account-details-page>h2{font-size:1.25rem;line-height:1.3;font-weight:600}
+
+/* One outcome symbol. State colours and truthful status copy remain owned by
+   the existing result views. No motion or authorisation gate changes here. */
+#app .screen-paymentResult .success-mark{
+ width:56px;height:56px;min-width:56px;margin:0 auto 14px;
+}
+#app .screen-paymentResult .success-mark svg{width:28px;height:28px}
+#app .task-sheet-layer .screen-paymentResult:has(>.hero h1)>.page-heading{
+ display:none!important; /* The sheet title already says Transfer result. */
+}
+#app .screen-paymentResult>.hero>h1{
+ font-size:var(--ui-sheet-title);line-height:1.22;letter-spacing:-.025em;
+ font-weight:700;text-align:center;
+}
+#app .screen-paymentResult>.hero>p{font-size:1rem;line-height:1.5;text-align:center}
+#app .screen :is(.bank-funding-result,.funding-budget-prompt) .notice>.avatar{
+ width:40px;height:40px;min-width:40px;border-radius:50%;margin:0 0 10px;
+}
+#app .screen :is(.bank-funding-result,.funding-budget-prompt) .notice>.avatar svg{
+ width:24px;height:24px;
+}
+
+@media(max-height:700px){
+ :root{--ui-title:1.75rem}
+ #app .screen :is(.destination-heading,.focus-pay-heading,.focus-story-heading,.plan-hub-heading){margin-bottom:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ #app .screen button,#app .screen input,#app .screen select,#app .screen textarea{transition:none}
+}
+
+/* Budget sources and optional Money Box protection reuse the task system.
+   Safety explanations stay visible; technical demo controls are expandable. */
+#app .screen .payment-plan-link{margin:8px 0 10px;padding:0;border:0}
+#app .screen .payment-plan-link .field{margin-bottom:4px}
+#app .screen #payment-essential{width:100%;min-width:0;max-width:100%;text-overflow:ellipsis}
+#app .screen #payment-plan-hint{font-size:.8125rem;line-height:1.45;margin:4px 0 0}
+#app .screen .box-protection-fields{border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+#app .screen .box-protection-fields label:has(input[type=checkbox]),
+#app .screen .protection-support label:has(input[type=checkbox]){display:flex;align-items:flex-start;gap:10px;min-height:44px;cursor:pointer;font-size:.9375rem;font-weight:600;line-height:1.5}
+#app .screen :is(.box-protection-fields,.protection-support) input[type=checkbox]{width:22px;height:22px;min-width:22px;margin:1px 0 0;accent-color:var(--green-ink)}
+#app .screen .box-protection-fields>p{font-size:.875rem;line-height:1.5;margin:4px 0 12px;color:var(--muted)}
+#app .screen .box-protection-status{background:var(--green-soft);border:1px solid var(--line);border-radius:var(--ui-control-curve);padding:12px 14px;margin:12px 0;font-size:.875rem;line-height:1.5}
+#app .screen .box-protection-status p{font-size:inherit;line-height:inherit;margin:4px 0 0}
+#app .screen .box-protection-status strong{font-weight:700}
+#app .screen .partner-code-panel{border-top:1px solid var(--line);padding-top:12px;margin:12px 0 0}
+#app .screen .partner-code-panel h2{font-size:1rem;line-height:1.4;margin:0 0 6px}
+#app .screen .partner-code-panel p{font-size:.875rem;line-height:1.5;margin:6px 0 10px}
+#app .screen :is(.partner-code-panel,.protection-scope) .actions{gap:8px;margin-top:10px}
+#app .screen :is(#partner-verification-code,#protection-verification-code,#invitation-verification-code){font-variant-numeric:tabular-nums;letter-spacing:.12em;width:100%;font-size:1.125rem}
+#app .screen .protection-simulation{border:1px dashed var(--control-line);border-radius:var(--ui-control-curve);padding:0 12px;margin:10px 0;font-size:.8125rem;line-height:1.5;background:var(--paper)}
+#app .screen .protection-simulation>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:.875rem;line-height:1.4;font-weight:600;color:var(--green-ink)}
+#app .screen .protection-simulation>summary::after{content:'+';margin-left:auto;font-size:1.25rem}
+#app .screen .protection-simulation[open]>summary::after{content:'−'}
+#app .screen .protection-simulation :is(p,small){font-size:.8125rem;line-height:1.5;overflow-wrap:anywhere}
+#app .screen .protection-simulation code{font:700 1.125rem/1.5 var(--font-ui);font-variant-numeric:tabular-nums;letter-spacing:.1em;color:var(--ink)}
+#app .screen .protection-scope{border-block:1px solid var(--line);padding:10px 0;margin:12px 0;font-size:.875rem;line-height:1.5}
+#app .screen :is(.box-protection-fields,.partner-code-panel,.protection-support) :is(input,select,button,summary):focus-visible{outline:3px solid var(--green-ink);outline-offset:3px}
+@media(max-height:700px){
+ #app .screen .partner-code-panel{padding-top:10px;margin-top:10px}
+ #app .screen .box-protection-status{margin-block:10px;padding:10px 12px}
+}
+#app .screen .box-protection-fields .protection-toggle>span{display:block}
+#app .screen .box-protection-fields .protection-toggle small,
+#app .screen .box-protection-status small{display:block;font-size:.8125rem;font-weight:400;line-height:1.5;color:var(--muted);margin-top:3px}
+#app .screen .protection-sample-message{border:1px dashed var(--control-line);border-radius:var(--ui-control-curve);padding:0 12px;margin:10px 0;background:var(--paper)}
+#app .screen .protection-sample-message>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:.875rem;line-height:1.4;font-weight:600;color:var(--green-ink)}
+#app .screen .protection-sample-message>summary::after{content:'+';margin-left:auto;font-size:1.25rem}
+#app .screen .protection-sample-message[open]>summary::after{content:'−'}
+#app .screen .protection-sample-message pre{font:400 .875rem/1.6 var(--font-ui);white-space:pre-wrap;overflow-wrap:anywhere;background:var(--white);padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0 12px;color:var(--ink)}
+#app .screen .protection-scope{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#app .screen .protection-scope>span{margin-left:auto;color:var(--muted)}
+/* A protected review adds one decision input, not another screen of balances. */
+#app .task-sheet-layer .box-transfer-review>.page-heading{display:none!important}
+#app .screen .box-transfer-total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:8px 0 12px}
+#app .screen .box-transfer-total>span{font-size:.875rem;line-height:1.4;color:var(--muted)}
+#app .screen .box-transfer-total .balance-main{font-size:2rem;line-height:1.2;white-space:nowrap}
+#app .screen .box-transfer-summary{padding:10px 14px;margin:8px 0 12px}
+#app .screen .box-transfer-summary .summary-line{padding:5px 0;margin:0}
+#app .screen .box-transfer-projection>summary{min-height:44px;display:flex;align-items:center;font-size:.875rem;font-weight:600;color:var(--green-ink);cursor:pointer}
+#app .screen .box-transfer-projection>summary::after{content:'+';margin-left:auto}
+#app .screen .box-transfer-projection[open]>summary::after{content:'−'}
+#app .screen .box-transfer-review .protection-scope{padding:0;margin:0 0 6px;border:0;min-height:24px}
+#app .screen .box-transfer-review .partner-code-panel{padding-top:10px;margin-top:6px}
+#app .screen .box-transfer-review .partner-code-panel .inline{display:flex;flex-wrap:wrap;gap:0 16px}
+#app .screen .box-transfer-review .partner-code-panel .inline>.text-btn{min-height:44px;padding:4px 0;font-size:.8125rem}
+#app .screen .box-transfer-review .actions{margin-top:12px}
+#app .screen .box-transfer-review .actions>.secondary{min-height:48px}
+
+/* v17: content owns its height; flexible text tracks own their width.
+   Fix intrinsic sizing instead of hiding overflow or reducing readable type. */
+#app .screen,
+#app .screen :is(section,article,form,fieldset,label,details,dl,dt,dd){min-width:0;max-width:100%}
+#app .screen fieldset{min-inline-size:0}
+#app .screen :is(.inline,.split,.summary-line,.row,.card,.soft,.notice,.warning,.hero,.grid2,.grid3,.stack,.actions,.chips,.receipt){min-width:0}
+#app .screen :is(.grid2,.grid3)>*{min-width:0;max-width:100%}
+#app .screen :is(h1,h2,h3,p,summary,dt,dd){overflow-wrap:anywhere;word-break:normal}
+#app .screen :is(input,select,textarea){min-width:0;max-width:100%;min-inline-size:0}
+#app .screen :is(.primary,.secondary,.danger,.text-btn,.chip){max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+#app .screen .inline{flex-wrap:wrap}
+#app .screen .inline>:is(input,select,textarea,.field,form){flex:1 1 9rem;min-width:0}
+#app .screen .inline>.icon-btn{flex:none}
+#app .screen .split{flex-wrap:wrap;gap:6px 12px}
+#app .screen .split>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .screen .row{flex-wrap:wrap;gap:8px 12px}
+#app .screen .row-copy{flex:1 1 7rem;min-width:0;max-width:100%}
+#app .screen .row-copy :is(strong,small){overflow-wrap:anywhere;word-break:normal}
+#app .screen .row-end{flex:0 1 auto;min-width:0;max-width:calc(100% - 56px);margin-left:auto;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+#app .screen .row-end svg{flex:none}
+#app .screen .summary-line{flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+#app .screen .summary-line>span:first-child{flex:1 1 8rem;min-width:0;overflow-wrap:anywhere}
+#app .screen .summary-line>strong{flex:0 1 auto;min-width:0;max-width:100%;margin-left:auto;overflow-wrap:anywhere}
+#app .screen :is(.balance-calculation,.chat-calculation-body dl,.first-plan-math,.plan-benefit-comparison,.home-story-breakdown)>div{flex-wrap:wrap;gap:6px 12px;min-width:0}
+#app .screen :is(.balance-calculation,.chat-calculation-body dl,.first-plan-math,.plan-benefit-comparison,.home-story-breakdown) :is(dt,dd){min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .screen :is(.balance-calculation,.chat-calculation-body dl,.first-plan-math,.plan-benefit-comparison,.home-story-breakdown) dd{margin-left:auto}
+#app .screen :is(.balance-main,.balance-number,.plan-hub-amount,.focus-story-total>strong,.first-plan-conclusion>strong){max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+#app .screen .whole{overflow-wrap:anywhere;word-break:normal}
+#app .screen :is(.currency,.payment-currency,.money-currency){display:inline-block;white-space:nowrap;word-break:normal;overflow-wrap:normal}
+#app .home-refined .account-room>strong,
+#app .plan-hub .plan-budget-section .plan-hub-amount{display:block;width:fit-content;max-width:100%}
+#app .home-refined .account-card-heading{flex-wrap:wrap;gap:4px 8px}
+#app .home-refined .account-card-heading>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .home-refined .account-available-secondary{flex-wrap:wrap;gap:6px 10px}
+#app .home-refined .account-available-secondary>strong{max-width:100%;margin-left:auto;overflow-wrap:anywhere}
+#app .home-refined .account-savings>button>span{min-width:0;max-width:100%}
+#app .home-refined .account-savings strong{overflow-wrap:anywhere;white-space:normal}
+#app .home-refined .home-funding-actions,
+#app .plan-hub .plan-hub-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+#app .plan-hub :is(.plan-section-heading>div,.plan-hub-shortfall){min-width:0;overflow-wrap:anywhere}
+#app .screen :is(.scene-art,.option-art){max-width:100%;min-width:0}
+#app .screen :is(.scene-art,.option-art)>svg{display:block;max-width:100%}
+#app .screen pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal}
+#app #toast{overflow-wrap:anywhere;white-space:normal}
+#app[data-route=chat] :is(.chat-workspace,.chat-thread,.chat-turn,.chat-bubble,.chat-reply,.chat-entry,.chat-tools){min-width:0;max-width:100%}
+#app[data-route=chat] .chat-reply-actions>*{min-width:0;max-width:100%}
+#app[data-route=chat] .chat-tools .chat-prompts .chips>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app[data-route=chat] .chat-calculation dd{white-space:normal;overflow-wrap:anywhere;max-width:100%;min-width:0}
+#app .task-sheet-layer .task-sheet-chrome{min-width:0;max-width:100%}
+#app .task-sheet-layer .task-sheet-chrome #task-sheet-title{min-width:0;overflow-wrap:anywhere}
+@media(max-width:359px){
+ #app .home-refined .home-greeting{flex-wrap:wrap;gap:8px}
+ #app .home-refined .home-header-actions{margin-left:auto}
+ #app .home-refined .account-intelligence{gap:6px}
+}
+/* Setup and account records share flexible text tracks. These content views
+   may scroll vertically; long saved details must not widen the viewport. */
+#app .screen :is(.onboarding-page,.account-flow){min-width:0;max-width:100%}
+#app .screen :is(.onboarding-page,.account-flow) :is(.card,.soft,.notice,.receipt,.stack,.form,.field,details){min-width:0;max-width:100%}
+#app .screen :is(.onboarding-page,.account-flow) :is(p,h2,h3,summary){overflow-wrap:anywhere}
+#app .screen :is(.onboarding-page,.account-flow) .summary-line{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);align-items:baseline;gap:8px 12px}
+#app .screen :is(.onboarding-page,.account-flow) .summary-line>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .screen :is(.onboarding-page,.account-flow) .summary-line>strong{text-align:right;max-width:none}
+#app .screen .onboarding-page .verified-phone-row>.text-btn{grid-column:1/-1;justify-self:start;text-align:left;padding-inline:0;min-height:44px}
+#app .screen .onboarding-page .code-input{letter-spacing:.16em}
+#app .screen :is(.onboarding-page,.account-flow) .input{min-width:0;max-width:100%}
+#app .screen .account-flow :is(input[type=date],select,textarea){min-inline-size:0;max-inline-size:100%}
+#app .screen .account-flow .topline{flex-wrap:wrap;gap:8px 12px}
+#app .screen .account-flow .topline>strong{min-width:0;overflow-wrap:anywhere;flex:1 1 10rem}
+#app .screen .account-flow .topline>.pill{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+#app .screen .account-flow .check-row{min-width:0;align-items:flex-start}
+#app .screen .account-flow .check-row>input{flex:none}
+#app .screen .account-flow .check-row>span{min-width:0;overflow-wrap:anywhere}
+#app .screen .account-flow .row-copy :is(strong,small){overflow-wrap:anywhere}
+/* Payment and savings details must be allowed to grow at enlarged text sizes. */
+#app .screen :is([data-payment-entry],.payment-plan-link,.transaction-account-fields,.automatic-mobile-details,.partner-code-panel,.box-protection-fields,.protection-support,.box-transfer-review){min-width:0;max-width:100%}
+#app .screen [data-payment-entry] :is(.field,select.input){min-width:0;max-width:100%}
+#app .screen .box-transfer-total{flex-wrap:wrap;align-items:baseline}
+#app .screen .box-transfer-total>.balance-main{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+#app .screen .box-transfer-total .currency{display:inline-block;white-space:nowrap;word-break:normal;overflow-wrap:normal}
+#app .screen .decision-payment-summary>span{min-width:0;max-width:100%}
+#app .screen .decision-payment-summary strong{white-space:normal;overflow-wrap:anywhere;word-break:normal}
+#app .screen .pause-hero-toolbar{flex-wrap:wrap}
+#app .screen .pause-comparison-values>div{min-width:0;max-width:100%}
+#app .screen .pause-comparison-values :is(strong,small,.comparison-label){min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .screen :is(.protection-sample-message,.protection-simulation){min-width:0;max-width:100%}
+#app .screen .protection-sample-message pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal}
+#app .screen .goal-summary .split{align-items:flex-start}
+#app .screen .goal-summary .split>h3{min-width:0;overflow-wrap:anywhere}
+#app .screen .goal-summary .split>svg{flex:0 0 auto}
+#app .screen .box-protection-status{max-width:100%;min-width:0;overflow-wrap:anywhere}
+#app .screen .goal-summary>.box-protection-status{display:inline-flex;align-items:flex-start;gap:6px}
+#app .screen .protection-toggle>span{min-width:0;overflow-wrap:anywhere}
+#app .screen .protection-scope>strong{min-width:0;overflow-wrap:anywhere}
+#app .screen .protection-scope>span{max-width:100%;overflow-wrap:anywhere}
+#app .screen .payment-result-compact :is(.result-reference,.result-context,.result-explanation){min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .screen .payment-result-compact .result-reference{flex-wrap:wrap}
+#app .screen .payment-result-compact .result-reference>strong{min-width:0;max-width:100%;margin-left:auto}
+#app .screen .transaction-stage{flex-wrap:wrap}
+#app .screen .transaction-stage>span:first-child{min-width:0;overflow-wrap:anywhere}
+#app .screen .ambassador-boundary :is(p,strong),#app .screen .test-step>div{min-width:0;overflow-wrap:anywhere}
+/* Wider balances get the full track before the illustration takes another row. */
+#app .home-refined .account-intelligence{flex-wrap:wrap}
+#app .home-refined :is(.account-room,.account-balance-primary){flex:1 1 max-content;width:auto;min-width:0;max-width:100%}
+#app .home-refined .accounts-home-art{margin-left:auto}
+#app .home-refined .account-room>small{max-width:18ch}
+#app .screen .topline{margin-inline:0;min-width:0;max-width:100%}
+#app .task-sheet-layer .screen [data-payment-entry] .payment-amount-row .amount-input{line-height:1.2}
+#app .screen-pay .pay-hero.focus-pay-art .scene-art{height:96px!important;min-height:0!important;margin:4px 0 12px!important}
+@media(max-height:700px){
+ #app .screen-pay .pay-hero.focus-pay-art .scene-art{height:64px!important;margin:2px 0 10px!important}
+ #app .screen-pay .focus-pay-heading{margin-bottom:10px}
+}
+/* The comparison stays the hero; repeated zero-fee arithmetic stays compact. */
+#app .screen .decision-payment-summary.is-zero-fee>span{flex-direction:row;align-items:baseline;gap:6px}
+#app .screen .decision-payment-summary.is-zero-fee{padding-block:7px;gap:6px 12px}
+@media(max-height:720px){
+ #app .screen-pause .pause-payment-context small{display:inline;margin:0;font-size:inherit}
+ #app .screen-pause .pause-payment-context small::before{content:' · '}
+ #app .screen .pause-hero-toolbar{min-height:44px}
+ #app .screen .pause-hero-intro{padding:4px 0}
+ #app .screen .pause-money-stage{height:48px;margin:0 0 2px}
+ #app .screen-pause .pause-suggested-amount{gap:4px 8px}
+}
+@media(max-height:720px){
+ #app .task-sheet-layer .screen-pause>.transaction-stage{margin-bottom:4px}
+ #app .task-sheet-layer .screen-pause .payment-balance{padding:0 0 5px;margin-bottom:5px}
+ #app .task-sheet-layer .screen-pause .pause-decision-heading{margin-bottom:6px}
+ #app .task-sheet-layer .screen-pause .pause-payment-context{margin-bottom:4px}
+ #app .task-sheet-layer .screen-pause .pause-decisions .pause-equal-choice{min-height:52px}
+}

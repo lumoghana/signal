@@ -1,0 +1,206 @@
+/* Shared money tasks. All colours and curves follow the current edition.
+   The group balance is a separate record; these styles do not touch Home. */
+body #app #view .gm-page{
+ display:flex;flex-direction:column;min-width:0;min-height:0;gap:0;
+ color:var(--ink);font-family:var(--font-ui,inherit);font-size:14px;line-height:1.45;
+}
+body #app .task-sheet-body#view .gm-page{
+ flex:1 1 0;max-height:100%;width:100%;
+}
+/* Use the sheet's actual remaining height, including its edition-specific
+   chrome and padding. Only the task body scrolls; actions stay in view. */
+body #app .task-sheet-layer .task-sheet:has(.gm-page){height:calc(100% - max(12px,env(safe-area-inset-top)))}
+body #app .task-sheet-body#view:has(>.screen>.gm-page){display:flex;flex:1 1 0;flex-direction:column;overflow:hidden}
+body #app .task-sheet-body#view>.screen:has(>.gm-page){display:flex;flex:1 1 0;flex-direction:column;min-height:0;overflow:hidden}
+body #app #view .gm-page :is(h1,h2,h3,p,dl){margin:0;min-width:0}
+body #app #view .gm-page :is(h1,h2,h3,strong){color:var(--ink)}
+body #app #view .gm-page>.page-heading,
+body #app #view .gm-page>.gm-heading{flex:none;margin:0 0 16px}
+body #app #view .gm-page>.page-heading h1,
+body #app #view .gm-page .gm-heading h1{font-size:26px;line-height:1.15;letter-spacing:-.035em;font-weight:650;margin:0}
+body #app #view .gm-page>.page-heading p,
+body #app #view .gm-page .gm-heading p{font-size:13px;line-height:1.45;color:var(--muted);margin:7px 0 0}
+body #app #view .gm-page .gm-body{flex:1 1 auto;min-width:0;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scroll-padding-block:8px}
+body #app #view .gm-page .gm-form{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;margin:0}
+body #app #view .gm-page .gm-actions{display:flex;flex-direction:column;gap:8px;flex:none;margin:16px 0 0;padding:0;min-width:0;background:inherit}
+body #app #view .gm-page .gm-actions :is(.primary,.secondary,.danger){width:100%;min-height:48px;padding:11px 14px;font-size:14px;line-height:1.4;border-radius:var(--curve-control,16px)}
+body #app #view .gm-page .gm-actions .text-btn{min-height:44px;padding:9px 6px;font-size:13px;line-height:1.4}
+body #app #view .gm-page button{font-family:inherit}
+body #app #view .gm-page button:focus-visible,
+body #app #view .gm-page input:focus-visible,
+body #app #view .gm-page select:focus-visible{outline:2px solid var(--ink);outline-offset:2px;box-shadow:none}
+body #app #view .gm-page :is(.gm-choice,.gm-choices){display:flex;flex-direction:column;gap:10px;margin:0}
+body #app #view .gm-page .gm-choice-row{display:flex;align-items:center;gap:13px;width:100%;min-height:76px;padding:15px 13px;text-align:left;border:1px solid var(--line);border-radius:var(--curve-panel,18px);background:var(--white);color:var(--ink)}
+body #app #view .gm-page .gm-choice-row>svg:last-child{width:18px;height:18px;margin-left:auto;flex:none}
+body #app #view .gm-page .gm-choice-icon{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:var(--curve-control,13px);background:var(--green-soft,var(--soft));color:var(--green-ink,var(--ink))}
+body #app #view .gm-page .gm-choice-icon svg{width:22px;height:22px}
+body #app #view .gm-page .gm-choice-copy{display:block;flex:1;min-width:0}
+body #app #view .gm-page .gm-choice-copy strong{display:block;font-size:15px;line-height:1.35;font-weight:650;letter-spacing:-.015em}
+body #app #view .gm-page .gm-choice-copy small{display:block;font-size:12px;line-height:1.4;color:var(--muted);margin-top:4px}
+body #app #view .gm-page .gm-hero{flex:none;padding:16px 0 18px;border-bottom:1px solid var(--line);margin:0 0 12px}
+body #app #view .gm-page .gm-overline{display:block;color:var(--muted);font-size:12px;line-height:1.4;margin:0 0 5px}
+body #app #view .gm-page .gm-amount{display:block;font-size:38px;line-height:1.15;font-weight:600;letter-spacing:-.045em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-caption{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:7px}
+body #app #view .gm-page .gm-progress{height:7px;background:var(--soft);border-radius:8px;overflow:hidden;margin-top:15px}
+body #app #view .gm-page .gm-progress>span{display:block;height:100%;max-width:100%;min-width:0;background:var(--ink);border-radius:inherit}
+body #app #view .gm-page .gm-tabs{display:flex;flex:none;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+body #app #view .gm-page .gm-tabs :is(.chip,button){min-height:44px;padding:9px 13px;border:1px solid var(--line);border-radius:var(--curve-control,100px);background:transparent;color:var(--ink);font-size:12px;line-height:1.4}
+body #app #view .gm-page .gm-tabs :is(.gm-selected,.chip.selected){background:var(--ink);color:var(--white);border-color:var(--ink)}
+body #app #view .gm-page .field{display:block;min-width:0;margin:0 0 13px}
+body #app #view .gm-page .field>span{display:block;font-size:12px;line-height:1.4;font-weight:500;margin-bottom:6px;color:var(--ink)}
+body #app #view .gm-page .field :is(input,select,textarea){width:100%;min-width:0;min-height:48px;border:1px solid var(--control-line,var(--line));border-radius:var(--curve-panel,13px);padding:11px 12px;background:var(--white);color:var(--ink);font-size:16px;line-height:1.4;box-shadow:none}
+body #app #view .gm-page .field textarea{min-height:76px;resize:vertical}
+body #app #view .gm-page .field input[readonly]{color:var(--muted);background:var(--soft)}
+body #app #view .gm-page .field input[aria-invalid=true]{border-color:var(--red)}
+body #app #view .gm-page .gm-inline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
+body #app #view .gm-page .gm-inline>*{min-width:0}
+body #app #view .gm-page .gm-people{display:flex;flex-direction:column;gap:0;margin:0;min-width:0}
+body #app #view .gm-page .gm-person{display:flex;align-items:center;gap:10px;min-width:0;min-height:62px;padding:9px 0;border-bottom:1px solid var(--line)}
+body #app #view .gm-page .gm-avatar{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--ink);font-size:12px;font-weight:600}
+body #app #view .gm-page .gm-person-copy{flex:1;min-width:0}
+body #app #view .gm-page .gm-person-copy strong{display:block;font-size:14px;line-height:1.35;overflow-wrap:anywhere;font-weight:600}
+body #app #view .gm-page .gm-person-copy small{display:block;margin-top:3px;font-size:11px;line-height:1.4;color:var(--muted)}
+body #app #view .gm-page .gm-person-copy .field{margin:0}
+body #app #view .gm-page .gm-person-copy input{min-height:44px;padding:9px 10px}
+body #app #view .gm-page .gm-person-amount{flex:none;max-width:42%;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;text-align:right;line-height:1.4;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-person-amount .field{margin:0;width:100px;max-width:100%}
+body #app #view .gm-page label.gm-person-amount{display:block;width:96px;min-width:0;margin:0}
+body #app #view .gm-page .gm-person-amount input{width:100%;min-width:0;min-height:44px;padding:9px 8px;text-align:right;font-size:16px}
+body #app #view .gm-page .gm-remove{display:grid;place-items:center;flex:none;width:44px;min-width:44px;height:44px;min-height:44px;padding:10px;border:0;background:transparent;color:var(--muted);border-radius:50%}
+body #app #view .gm-page .gm-remove svg{width:18px;height:18px}
+body #app #view .gm-page .gm-summary{margin:0}
+body #app #view .gm-page .gm-summary>div,
+body #app #view .gm-page .gm-summary dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.45}
+body #app #view .gm-page .gm-summary dt{color:var(--muted);min-width:0;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-summary dd{margin:0;max-width:60%;text-align:right;font-weight:550;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-status{display:inline-flex;align-items:center;gap:5px;width:fit-content;padding:5px 9px;border-radius:var(--curve-control,100px);background:var(--soft);color:var(--ink);font-size:11px;line-height:1.4;font-weight:600}
+body #app #view .gm-page .gm-empty{padding:28px 10px;text-align:center;color:var(--muted)}
+body #app #view .gm-page .gm-empty>svg{width:28px;height:28px;margin-bottom:12px;color:var(--ink)}
+body #app #view .gm-page .gm-empty h2{font-size:18px;line-height:1.3;font-weight:600;letter-spacing:-.025em;margin-bottom:6px}
+body #app #view .gm-page .gm-empty p{font-size:13px;line-height:1.45;max-width:260px;margin:auto}
+body #app #view .gm-page .gm-item{display:flex;align-items:center;gap:11px;width:100%;min-height:70px;margin:0;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left}
+body #app #view .gm-page .gm-item>svg{width:20px;height:20px;flex:none}
+body #app #view .gm-page .gm-item>.gm-choice-copy{display:block;flex:1;min-width:0}
+body #app #view .gm-page .gm-item>.gm-choice-icon{flex:none}
+body #app #view .gm-page .gm-item>.gm-trailing{flex:none;max-width:40%;min-width:0;margin-left:auto}
+body #app #view .gm-page .gm-item strong{display:block;font-size:14px;line-height:1.35;font-weight:600;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-item small{display:block;font-size:12px;line-height:1.4;color:var(--muted);margin-top:4px}
+body #app #view .gm-page .gm-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;margin:9px 0 0}
+body #app #view .gm-page .gm-section-head h2{font-size:15px;line-height:1.35;letter-spacing:-.02em;font-weight:650}
+body #app #view .gm-page .gm-section-head .text-btn{min-height:44px;padding:8px 0;font-size:12px}
+body #app #view .gm-page .gm-trailing{flex:none;margin-left:auto;text-align:right;font-variant-numeric:tabular-nums;font-size:12px;line-height:1.4}
+body #app #view .gm-page .gm-boundary{flex:none;display:block;color:var(--muted);font-size:10px;line-height:1.45;margin:12px 0 0;text-align:center}
+body #app #view .gm-page .gm-step{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin:0 0 8px}
+body #app #view .gm-page :is(.gm-error,#error){flex:none;color:var(--red);font-size:13px;line-height:1.45;margin:10px 0 0;overflow-wrap:anywhere}
+body #app #view .gm-page :is(.gm-error,#error):empty{display:none}
+body #app #view .gm-page details{margin:8px 0 0;border-top:1px solid var(--line)}
+body #app #view .gm-page details>summary{min-height:44px;padding:12px 0;font-size:12px;line-height:1.4;color:var(--muted)}
+body #app #view .gm-page details>p{font-size:12px;line-height:1.45;color:var(--muted);margin-bottom:10px}
+body #app #view .gm-page details .secondary{min-height:44px;margin:8px 0;padding:10px 12px;font-size:13px}
+body #app #view .gm-page .gm-note{font-size:12px;line-height:1.45;color:var(--muted);padding:11px 12px;background:var(--soft);border-radius:var(--curve-panel,14px);margin:10px 0}
+body #app #view .gm-page .gm-people-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+body #app #view .gm-page .gm-people-tools .secondary{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:9px 12px;font-size:12px;border-radius:var(--curve-control,14px)}
+body #app #view .gm-page .gm-people-tools-small{justify-content:space-between;gap:0;margin:3px 0}
+body #app #view .gm-page .gm-people-tools-small .text-btn{min-height:44px;padding:7px 3px;font-size:11px}
+body #app #view .gm-page .gm-contact{display:flex;align-items:center;gap:10px;width:100%;min-width:0;min-height:64px;padding:10px 2px;text-align:left;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink)}
+body #app #view .gm-page .gm-contact.selected{background:var(--soft)}
+body #app #view .gm-page .gm-contact:disabled{opacity:.6}
+body #app #view .gm-page .gm-contact-check{display:grid;place-items:center;flex:none;width:28px;height:28px;border:1px solid var(--line);border-radius:50%}
+body #app #view .gm-page .gm-contact.selected .gm-contact-check{background:var(--ink);color:var(--white)}
+body #app #view .gm-page .gm-saved-group{display:flex;align-items:center;gap:6px}
+body #app #view .gm-page .gm-saved-group .gm-contact{flex:1;min-width:0}
+body #app #view .gm-page .gm-phone-picker{width:100%;min-height:44px;margin:2px 0 8px;font-size:13px}
+body #app #view .gm-page .gm-mandate-choice{padding:12px 0;border-block:1px solid var(--line);margin:0 0 10px}
+body #app #view .gm-page .gm-mandate-choice h2{font-size:14px;line-height:1.4;margin:0 0 8px;font-weight:600}
+body #app #view .gm-page .gm-mandate-choice .gm-tabs{margin:0 0 7px}
+body #app #view .gm-page .gm-mandate-choice p{font-size:12px;line-height:1.45;color:var(--muted)}
+body #app #view .gm-page .gm-mandate-preview{padding:13px 14px;border:1px solid var(--line);border-radius:var(--curve-panel,16px);margin:12px 0;background:var(--soft)}
+body #app #view .gm-page .gm-mandate-preview h2{font-size:15px;line-height:1.4;margin:0 0 7px}
+body #app #view .gm-page .gm-mandate-preview p{font-size:12px;line-height:1.5;color:var(--muted);margin:4px 0}
+body #app #view .gm-page .gm-mandate-preview .text-btn{display:block;min-height:44px;padding:8px 0;font-size:12px;margin-top:3px}
+body #app #view .gm-page .gm-mandate-summary{padding:4px 0 14px;border-bottom:1px solid var(--line);margin:0 0 12px}
+body #app #view .gm-page .gm-mandate-summary h2{font-size:20px;line-height:1.25;letter-spacing:-.025em;margin:10px 0 6px;font-weight:600}
+body #app #view .gm-page .gm-mandate-summary p{font-size:12px;line-height:1.45;color:var(--muted)}
+body #app #view .gm-page .gm-mandate-rules{list-style:decimal;display:block;margin:0;padding:0 0 0 23px}
+body #app #view .gm-page .gm-mandate-rules li{font-size:13px;line-height:1.5;margin:0;padding:8px 0 8px 3px;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-mandate-rules li::marker{color:var(--muted);font-variant-numeric:tabular-nums}
+body #app #view .gm-page .gm-mandate-card{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:64px;padding:10px 12px;margin:12px 0 7px;text-align:left;border:1px solid var(--line);border-radius:var(--curve-panel,16px);background:var(--soft);color:var(--ink)}
+body #app #view .gm-page .gm-mandate-card>span{display:block;min-width:0}
+body #app #view .gm-page .gm-mandate-card strong{display:block;font-size:14px;line-height:1.4}
+body #app #view .gm-page .gm-mandate-card small{display:block;font-size:12px;line-height:1.45;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-mandate-card>svg{flex:none;width:18px;height:18px}
+body #app #view .gm-page .gm-hub-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 4px}
+body #app #view .gm-page .gm-hub-tools .secondary{min-width:0;min-height:44px;padding:9px 8px;font-size:12px;line-height:1.4;border-radius:var(--curve-control,14px)}
+body #app #view .gm-page .gm-approver-list{margin:2px 0 12px}
+body #app #view .gm-page .gm-role-summary{padding:12px 0;border-bottom:1px solid var(--line);margin:0 0 10px}
+body #app #view .gm-page .gm-role-summary h2{font-size:19px;line-height:1.3;font-weight:600;letter-spacing:-.025em;margin:9px 0 6px}
+body #app #view .gm-page .gm-role-summary>strong{display:block;font-size:14px;line-height:1.4;margin-bottom:4px}
+body #app #view .gm-page .gm-role-summary>p{font-size:12px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
+body #app #view .gm-page .gm-invitation-role{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:0 0 10px}
+body #app #view .gm-page .gm-invitation-role>strong{font-size:15px;line-height:1.4;margin-top:3px}
+body #app #view .gm-page .gm-invitation-role>p{font-size:12px;line-height:1.45;color:var(--muted)}
+body #app #view .gm-page .gm-invitation-mandate{padding:10px 0 0;border-block:1px solid var(--line);margin:0 0 8px}
+body #app #view .gm-page .gm-invitation-mandate>h2{font-size:15px;line-height:1.4;font-weight:600;margin:0 0 4px}
+body #app #view .gm-page .gm-invitation-mandate>p{font-size:12px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+body #app #view .gm-page .gm-invitation-mandate>.text-btn{display:block;min-height:44px;padding:8px 0;font-size:13px;line-height:1.4}
+@media(max-height:700px){
+ body #app #view .gm-page>.page-heading,body #app #view .gm-page>.gm-heading{margin-bottom:12px}
+ body #app #view .gm-page>.page-heading h1,body #app #view .gm-page .gm-heading h1{font-size:24px}
+ body #app #view .gm-page .gm-choice-row{min-height:68px;padding:12px 11px;gap:11px}
+ body #app #view .gm-page .gm-choice-icon{width:36px;height:36px}
+ body #app #view .gm-page .gm-actions{margin-top:12px;gap:7px}
+ body #app #view .gm-page .gm-hero{padding:8px 0 13px;margin-bottom:8px}
+ body #app #view .gm-page .gm-amount{font-size:34px}
+ body #app #view .gm-page .gm-boundary{margin-top:9px}
+ body #app #view .gm-page .gm-empty{padding:20px 8px}
+}
+@media(max-width:350px){
+ body #app #view .gm-page .gm-choice-copy strong{font-size:14px}
+ body #app #view .gm-page .gm-choice-copy small{font-size:11px}
+ body #app #view .gm-page .gm-person{gap:7px}
+ body #app #view .gm-page .gm-avatar{width:30px;height:30px}
+ body #app #view .gm-page .gm-person-amount{max-width:38%;font-size:13px}
+ body #app #view .gm-page label.gm-person-amount{width:86px}
+ body #app #view .gm-page .gm-inline{gap:8px}
+ body #app #view .gm-page .gm-summary dd{max-width:57%}
+}
+@media(prefers-reduced-motion:reduce){body #app #view .gm-page *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+/* Collection payouts retain one task body and one clear primary decision. */
+body #app #view .gm-page .gm-payout-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;list-style:none;margin:0 0 16px;padding:0}
+body #app #view .gm-page .gm-payout-steps li{display:flex;align-items:center;gap:6px;min-width:0;color:var(--muted);font-size:12px;line-height:1.4}
+body #app #view .gm-page .gm-payout-steps li>span{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid var(--line);border-radius:50%;font-size:11px;font-variant-numeric:tabular-nums}
+body #app #view .gm-page .gm-payout-steps li>strong{font:inherit;color:inherit;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-payout-steps li[aria-current=step]{color:var(--ink);font-weight:600}
+body #app #view .gm-page .gm-payout-steps li:is([aria-current=step],.is-complete)>span{background:var(--ink);border-color:var(--ink);color:var(--white)}
+body #app #view .gm-page .gm-quiet{font-size:12px;line-height:1.45;color:var(--muted);margin:8px 0 14px;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-payout-section{display:block;margin:10px 0 12px;min-width:0}
+body #app #view .gm-page .gm-payout-section>.gm-section-head{margin-top:0}
+body #app #view .gm-page .gm-payout-row .gm-trailing{display:flex;align-items:center;justify-content:flex-end;gap:7px;max-width:45%;font-weight:600;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-payout-row .gm-trailing>svg{flex:none;width:16px;height:16px}
+body #app #view .gm-page .gm-activity-list{display:block;min-width:0}
+body #app #view .gm-page .gm-activity-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;width:100%;min-height:62px;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;color:var(--ink)}
+body #app #view .gm-page .gm-activity-row>span{display:block;flex:1;min-width:0}
+body #app #view .gm-page .gm-activity-row strong{display:block;font-size:13px;line-height:1.4;font-weight:600;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-activity-row small{display:block;font-size:11px;line-height:1.45;color:var(--muted);margin-top:3px}
+body #app #view .gm-page .gm-activity-row>strong{flex:none;max-width:42%;font-variant-numeric:tabular-nums;text-align:right}
+body #app #view .gm-page .gm-activity-row>svg{flex:none;width:16px;height:16px}
+body #app #view .gm-page .gm-contributions{margin-top:10px}
+body #app #view .gm-page .gm-supporting-proof{margin:8px 0 16px}
+body #app #view .gm-page .gm-supporting-proof>summary{font-size:13px;color:var(--ink)}
+body #app #view .gm-page .gm-supporting-proof input[type=file]{font-size:13px;line-height:1.4;min-height:48px;padding:10px;overflow:hidden}
+body #app #view .gm-page .gm-proof-selected{font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+body #app #view .gm-page .gm-proof-selected>strong{font-weight:600}
+body #app #view .gm-page .gm-payout-evidence{display:block;margin:12px 0;padding:12px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+body #app #view .gm-page .gm-payout-evidence>span{display:block;font-size:12px;line-height:1.4;color:var(--muted)}
+body #app #view .gm-page .gm-payout-evidence>strong{display:block;font-size:13px;line-height:1.45;font-weight:550;margin-top:5px}
+body #app #view .gm-page .gm-payout-evidence small{font-size:11px;color:var(--muted);font-weight:400}
+body #app #view .gm-page .gm-payout-evidence>.text-btn{display:block;min-height:44px;font-size:12px;padding:9px 0}
+body #app #view .gm-page .gm-payout-receipt{display:block;min-width:0}
+@media(max-width:350px){
+ body #app #view .gm-page .gm-payout-steps{gap:5px}
+ body #app #view .gm-page .gm-payout-steps li{font-size:11px;gap:4px}
+ body #app #view .gm-page .gm-payout-steps li>span{width:22px;height:22px}
+}
+
+body #app #view .gm-page .gm-history-row{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;text-align:left;color:var(--ink)}
+body #app #view .gm-page .gm-payout-steps .is-stopped>span{border-style:dashed}

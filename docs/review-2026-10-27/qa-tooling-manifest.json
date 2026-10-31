@@ -1,0 +1,460 @@
+{
+  "status": "Review complete; all checks passed",
+  "scope": "Retained source QA and final evidence. Domain app source was approved separately; this manifest is not a publication receipt.",
+  "files": {
+    "tests/manual-layout/OVERFLOW-AUDIT.md": {
+      "sha256": "e6603be48d4fb48abfd96e41722ba7dc42fd17ded60d27bbb4f0f8e70d17d0d4",
+      "bytes": 13275
+    },
+    "tests/manual-layout/REVIEW-CHECKS.md": {
+      "sha256": "ed179ff67d1a6fe1761f539eb8f0d11a3350987bfac40242acbd3565b25ab6c1",
+      "bytes": 2063
+    },
+    "tests/manual-layout/overflow-audit.html": {
+      "sha256": "88cff9a3b1110bd48a89ba396fda0009243ca09afa0b978bbb5bb36dbc4ce2b8",
+      "bytes": 2461
+    },
+    "tests/manual-layout/overflow-audit.js": {
+      "sha256": "be3f053442682dbbd2c25e87f0e64b5ad33da4edc2475a6a1478f1f938bde368",
+      "bytes": 33308
+    },
+    "tests/manual-layout/overflow-seed.js": {
+      "sha256": "24ef1dcf9b18b6460ebaef6f702d1696d5911dca3c3e8a5ab66416e44c5b145b",
+      "bytes": 26373
+    },
+    "tests/manual-layout/prepare-overflow-audit.cjs": {
+      "sha256": "8a6861a4e3b690cebad99420bcf91a04a6aa151eff0cf13145f5f0ed755ace20",
+      "bytes": 3439
+    },
+    "tests/manual-layout/deep-gallery.html": {
+      "sha256": "d545397551181d57367cead93b297aee358343f0938a7b867b4445c5d67f7c60",
+      "bytes": 4235
+    },
+    "tests/manual-layout/deep-gallery.js": {
+      "sha256": "178c00211eefa98bd80768ca4818dee024055eee4af4eeaf0844ab3b31ab871e",
+      "bytes": 14120
+    },
+    "tests/manual-layout/deep-onboarding-fixtures.js": {
+      "sha256": "f03dd803363fb1c5c6ce220d27cf9fca37e33d540d68cdf68075bbddba087782",
+      "bytes": 1066
+    },
+    "tests/manual-layout/deep-payments-fixtures.js": {
+      "sha256": "3a38fa89eb91e2eefd2bafa04a0fc9e3a759b0231b551200838719d1bbd656af",
+      "bytes": 3098
+    },
+    "tests/manual-layout/deep-planning-fixtures.js": {
+      "sha256": "303bab0fd1b575dca4f70f14edba7bce8d59f396b233fe5d76d5412cbe6599da",
+      "bytes": 4423
+    },
+    "tests/manual-layout/planning-native-history.html": {
+      "sha256": "cd7e793037365dc6b2183bf3a6b2a3a04421bb2c12c33612c588dc1c5803e3a8",
+      "bytes": 2187
+    },
+    "tests/manual-layout/planning-native-history.js": {
+      "sha256": "21ae563d74761d8434942b315a7d8a1168341e9b9c328851ccf6b2b8e65ad6e1",
+      "bytes": 4848
+    },
+    "tests/manual-layout/build-review-inventory.cjs": {
+      "sha256": "cc208c1b88e6b12662cce36094a9c985746d7e4a2a6f41b9f47e7a650e208411",
+      "bytes": 19794
+    },
+    "tests/manual-layout/capture-review-pins.cjs": {
+      "sha256": "7d42b6b708f8133ba2d467eae9b4a5b247dd517ae34a5ff81f0bff1b0675f61b",
+      "bytes": 3762
+    },
+    "tests/manual-layout/run-review-check.cjs": {
+      "sha256": "29f24912dc9db7636b241a986c7b6d88ced4d6f863599c7c2147e72c4c291959",
+      "bytes": 3988
+    },
+    "tests/manual-layout/refresh-review-contracts.cjs": {
+      "sha256": "f888ffca1dc4ae136bb434f616cbdd309863599030584ef55332608127dfa5b4",
+      "bytes": 3337
+    },
+    "tests/manual-layout/check-guidance-fixtures.cjs": {
+      "sha256": "690eebca95135cb2df46ff961df72ecc89c32ee1add69c1f71c1d23d11e90dfe",
+      "bytes": 4435
+    },
+    "tests/manual-layout/check-savings-fixtures.cjs": {
+      "sha256": "695d0a10ff39831048f35da5dae6491edc7b3800898c3e66f4d18d9897a639fa",
+      "bytes": 3579
+    },
+    "docs/review-2026-10-27/payments.md": {
+      "sha256": "cd4549cfef23abe69d086b6235ab6fdd7c7e6a83f9fb16d0bb458345d8f82cfe",
+      "bytes": 44611
+    },
+    "docs/review-2026-10-27/inventory-minna.json": {
+      "sha256": "699b1f5f9685cce952c3fc40482ae7e2f6b527f050f78bb10a4e500faee3f9dd",
+      "bytes": 1403523
+    },
+    "docs/review-2026-10-27/release-source-pins.json": {
+      "sha256": "f234c2f001593c09f78233619539a96200b85225b2b086cd4a62abc0829d26a2",
+      "bytes": 89555
+    },
+    "docs/review-2026-10-27/RELEASE-REVIEW.md": {
+      "sha256": "278779d15caf1abddfc7da6780031657ea3ff709b2568afc1ff9eafc8c360589",
+      "bytes": 5681
+    },
+    "docs/review-2026-10-27/system.md": {
+      "sha256": "3cbc3f5305a1933a04d0a636647803cc621746a8975f9f7ed1baf8af7a9b0b81",
+      "bytes": 30180
+    },
+    "docs/review-2026-10-27/onboarding.md": {
+      "sha256": "fbe2c85db805766095b412a7b4d3b2056f51e1b1c6a95434e1476a92ba3bd878",
+      "bytes": 49134
+    },
+    "docs/review-2026-10-27/final-layout-evidence.json": {
+      "sha256": "026505a717508e42788fd678fe5ce3de25e290832db860491836dc7ddbc1ef26",
+      "bytes": 561261
+    },
+    "docs/review-2026-10-27/peer-integration.json": {
+      "sha256": "62671eec5e5ebfe42983cae0646642e347c22dcf7674128f9c1e690de5996a74",
+      "bytes": 5434
+    },
+    "docs/review-2026-10-27/DECISIONS.md": {
+      "sha256": "263853190b66bb6d556f44d6b91724a6340715558cecce6364fb39e969b8f3bb",
+      "bytes": 5520
+    },
+    "docs/review-2026-10-27/gate-summary.json": {
+      "sha256": "436103139578f189c734b252b7903e7032d19d1b1ed38dbaf2c231cedf78d4f9",
+      "bytes": 5915
+    },
+    "docs/review-2026-10-27/layout-evidence-before-privacy-fix.json": {
+      "sha256": "d131da7e0ba95fd6b419841693fc4601b731f8ec00514ee83100c77095d0058a",
+      "bytes": 674960
+    },
+    "docs/review-2026-10-27/planning.md": {
+      "sha256": "4ab6e55dc43f2b7b43c6cb98b39855c99cda2a5795a6b040f64d63104f860141",
+      "bytes": 46613
+    },
+    "docs/review-2026-10-27/source-pins-integrated.json": {
+      "sha256": "bb3385d6c7edb106ddf4e1574f6d80a01da72b4b9596be94573e8c97a1b20ed4",
+      "bytes": 89555
+    },
+    "docs/review-2026-10-27/primary.md": {
+      "sha256": "befa4e57475ca37321536ff6ec58ea0dd7d709b425eb8afc26a04da3430f4984",
+      "bytes": 35552
+    },
+    "docs/review-2026-10-27/inventory-everyday.json": {
+      "sha256": "ddf4815258a3f22b565a361a8124f9e0dd4bc50fda1d88e0a06e45ccefc892eb",
+      "bytes": 1403055
+    },
+    "docs/review-2026-10-27/cleanup-verification.json": {
+      "sha256": "536b910fb153f56d11f460ca3adbc7b5631f86f8ed32c6ac814c2ad9c2fa20f3",
+      "bytes": 450
+    },
+    "docs/review-2026-10-27/inventory-hibiscus.json": {
+      "sha256": "a33115f78a388569c35d8ab53da74081a3e5cce70114349a40cf4af34721a76b",
+      "bytes": 1408186
+    },
+    "docs/review-2026-10-27/inventory.json": {
+      "sha256": "1dd4f971720a82ccdeaf36f7cac4c5ac1abd5bf6cb2ec3452b294027c161a81a",
+      "bytes": 362959
+    },
+    "docs/review-2026-10-27/inventory.md": {
+      "sha256": "3c1a40c2bff2b57474d2c1aa35cf0cf4733519b24848e368381973eb987e1e91",
+      "bytes": 29682
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-25-16-978Z-all-edition-final-welcome.json": {
+      "sha256": "d90fa492037aee74bb6f6ca4e25f945d3d448a451068abcab1529f4456580407",
+      "bytes": 192120
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-18-675Z-planning-finish-draft.log": {
+      "sha256": "4bc52b8b3727d026163256b79e984f82beba52bde93f9b179a0bd108700fd7b0",
+      "bytes": 1119
+    },
+    "docs/review-2026-10-27/test-runs/index.json": {
+      "sha256": "414db2efea009e457b62024dfeed40542d030420d1518c35ea772d283baff589",
+      "bytes": 8890
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-18-18-250Z-primary-finish-cards.json": {
+      "sha256": "640f9bbd12989eeb97f9c137862848ae0f4025915a95f15b02e6772a10917907",
+      "bytes": 188624
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-07-45-250Z-minna-final-gate-canonical.json": {
+      "sha256": "740758bd9e8216273b845acf4e46ace780723c03693023d435ebc8644c0c0af0",
+      "bytes": 221905
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-17-23-352Z-hibiscus-current-ui-links.log": {
+      "sha256": "0ff58b4df012ae180432869c9146c4a19ce5b3684b09582fbbd54ba521f4fe96",
+      "bytes": 2431
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-41-841Z-payments-finish.json": {
+      "sha256": "cc74fd134554ff724a651ddf1fbb4800048f1a376c59c2f42b9e574ee2369991",
+      "bytes": 188490
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-20-42-818Z-primary-category-current.json": {
+      "sha256": "c485b416bddfcae5856bb074c8c0ad4748faa8f89ef8b2c5338bdf182610b2e6",
+      "bytes": 189881
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-18-37-915Z-primary-category-diagnosis.log": {
+      "sha256": "c3180c0973925dbddf419d72e6f806575a0975b8d353f77bfc828405fd1590ef",
+      "bytes": 436
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-25-09-108Z-final-valid-context-inventory.json": {
+      "sha256": "9f240624b581dade6f35f2c3cade1b624fe378620bd1389f7c5b47f8e3fa667f",
+      "bytes": 189923
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-14-38-991Z-payments-finish-chooser.json": {
+      "sha256": "174f47dc0eb9c8b96570b3e6e86e589168ab72549d81e01b2d341fc1ec4b173f",
+      "bytes": 188632
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-35-52-018Z-everyday-full-regression.json": {
+      "sha256": "567bf9e0f123b7d9beb8571d7c5bdddb4fb1ab444970dfe83bc059b9d7e5e3b7",
+      "bytes": 219387
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-12-51-084Z-planning-history-recovery.json": {
+      "sha256": "de96ddea723c3776b2a560f5bf7d7d8bcad274b3fedb6b1621da7e5901e0bd50",
+      "bytes": 188677
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-14-42-774Z-payments-campus-context.log": {
+      "sha256": "45b9c8f3d3a0236afae6b5ef4b6f78743870c3a2c9e6e80fbcbad4ecadc6d8a8",
+      "bytes": 1864
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-19-18-324Z-hibiscus-final-gate-current-ui.json": {
+      "sha256": "9192d5d5ebab29575fb243874047d6874af775d30d3850ed9912491dedebf98a",
+      "bytes": 222891
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-57-59-995Z-budget-history-native-recovery.json": {
+      "sha256": "6932c4868b9f2358159e61fdcd393e9d0dc9ee75b0250d73952189588bfd2e9a",
+      "bytes": 189917
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-04-00-290Z-everyday-final-regression.json": {
+      "sha256": "06113c2109e0a93612558e8a4ad4d88575c2c9249d55c079c68c217681760ade",
+      "bytes": 218686
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-20-42-818Z-primary-category-current.log": {
+      "sha256": "f7793b67c3080edcac1d85941b7d9dfac9a47edee675cb2fbc602f7797fb78b4",
+      "bytes": 1069
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-17-23-352Z-hibiscus-current-ui-links.json": {
+      "sha256": "35736b162f4060e110ffb179d667776658cab5f850808d2bc1c9679da96b86ec",
+      "bytes": 190550
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-06-59-856Z-minna-final-gate.json": {
+      "sha256": "f8c0cee6e8b0a0f16e2a736b65082a1c463a9111bce68af38efc7a726e2d4944",
+      "bytes": 221885
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-09-16-122Z-planning-retained.log": {
+      "sha256": "e7404871ee8646542836a158a6db8d2ca1837c1a3ba4df29ac9c61d13888ca8b",
+      "bytes": 16239
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-22-48-315Z-hibiscus-onboarding-branches.json": {
+      "sha256": "4cc9318b150207ccf2a73c67ff5b9aeccbf4bee8225e1eeb2f226b1bf94d43da",
+      "bytes": 190510
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-08-57-221Z-planning-finish.json": {
+      "sha256": "ebc088d807befc4ee3237a3caf4f99ca20adaa7354294b6c598077f4dc45d772",
+      "bytes": 188492
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-13-40-246Z-onboarding-finish-context.log": {
+      "sha256": "e1d42671d8578e0a40a4ef0fc86489926c66d59a5720f21c0eb9386fc3c37e2d",
+      "bytes": 1176
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-19-18-324Z-hibiscus-final-gate-current-ui.log": {
+      "sha256": "53a9a34e056e8a758ab25f9d0e0900e6fca9349c3d163d6982b46d8c7a1f7070",
+      "bytes": 122481
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-15-03-603Z-final-route-inventory.json": {
+      "sha256": "bff9e8fea6fd523982fdcd27d97528cb3f7980cee305e28243567a6e22581ced",
+      "bytes": 189907
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-01-932Z-onboarding-finish-forms.json": {
+      "sha256": "ccda35dc56e0bcd68881f140eb90bd8bf36bebd94c67f86d0f192456d6b7c08c",
+      "bytes": 188558
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-08-57-221Z-planning-finish.log": {
+      "sha256": "152f70369e07bb0cd87a8d9629b89204b789aa9496d89be653bd3acd7e2fdb05",
+      "bytes": 1921
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-40-03-722Z-product-finish-privacy.log": {
+      "sha256": "e1bcd781402d072f9b511c8c7a35fdbe5b69b4189a5735774418acad7048d886",
+      "bytes": 655
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-10-25-937Z-hibiscus-final-gate.json": {
+      "sha256": "9914693d61d09420ec5bea1c114195d0ee50bb5418ed0b1b3542218ca71eff9f",
+      "bytes": 222869
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-12-11-529Z-product-finish.json": {
+      "sha256": "f8c47d07b493b2785d4d2564b04c82badfdcf74222d54ee3ae35ef2b8b3b3ce2",
+      "bytes": 188651
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-18-37-915Z-primary-category-diagnosis.json": {
+      "sha256": "e18ec4c2e31080ab2ca83cb7e319ad4e5cb9ed93ff4ea48f1df4a85f8408feb1",
+      "bytes": 188667
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-14-38-991Z-payments-finish-chooser.log": {
+      "sha256": "5a9330af775ca8cac32c459e286649979a9d0e102c33337caa153367a6b22817",
+      "bytes": 638
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-12-11-529Z-product-finish.log": {
+      "sha256": "d38d10d94cf338fe89824df726d79b2835bc86f2041fa2cf1e8f461b8e7687e2",
+      "bytes": 550
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-18-675Z-planning-finish-draft.json": {
+      "sha256": "394452e2571153366342b976275d398fa61837dfec84ea70e66fec2bfa52f5d4",
+      "bytes": 188504
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-25-16-978Z-all-edition-final-welcome.log": {
+      "sha256": "e85463b90de51d1d601b52396ea2b47254b3811951d1871a4f75ee2084c25313",
+      "bytes": 5386
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-13-40-246Z-onboarding-finish-context.json": {
+      "sha256": "14759fcafe10c1870dcdb30960360ee137688ba8d9a6277d027c44280d59ba1c",
+      "bytes": 188688
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-15-21-504Z-primary-retained.json": {
+      "sha256": "376b8bea998e9be56c8cf9c0c83684404095321ec60223c80d7316d7bf2b7f85",
+      "bytes": 191115
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-12-46-281Z-planning-finish-recovery.json": {
+      "sha256": "e25df64786e7cdca81a8997de7d4628503fefae5d0ec2097f83c01b71888f217",
+      "bytes": 188636
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-06-59-856Z-minna-final-gate.log": {
+      "sha256": "987ac161b3eeeadca68a57ab24b362c06e8477ddeb89fdbf4b2e09ff2076f3ee",
+      "bytes": 948
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-35-52-018Z-everyday-full-regression.log": {
+      "sha256": "beac29eaf0c5a59a7df2e5978095b3f217c87764464af4f2690e02976a251f45",
+      "bytes": 122022
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-13-16-130Z-payments-finish-stage.json": {
+      "sha256": "4045b22ee1203041426bb04a30999ecf267c576c6aaef71e9b67f408658e45f6",
+      "bytes": 188628
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-08-28-145Z-onboarding-finish.json": {
+      "sha256": "ef0dfd8be1f9d562252ab8a54e66e5c03633e482238dc8d8e4bba8316186e3b1",
+      "bytes": 189247
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-58-610Z-payments-retained.json": {
+      "sha256": "3a6c161d07c15201f2178d1ae5b0270d3fd29f3338195334e17d10bb7c149003",
+      "bytes": 189893
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-22-48-315Z-hibiscus-onboarding-branches.log": {
+      "sha256": "81990720d1b2bd2d748ad61a7e9faa2f6af86f0f068139b7d1599c111cc71732",
+      "bytes": 1901
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-57-38-480Z-planning-finish-native-history.log": {
+      "sha256": "6f2d9fdcbcfb2bc1dcce2fb3a86f32478d4c659dda793d10a0ff8f1d165c491b",
+      "bytes": 977
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-13-16-130Z-payments-finish-stage.log": {
+      "sha256": "4c50f169f0ac8eb500410e442f2a830e36b3c60990ab637538db207f11f5efee",
+      "bytes": 1465
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-25-09-108Z-final-valid-context-inventory.log": {
+      "sha256": "688cdfb51ca30acacfdaef3fa02a7757dcee5a70834b30ed350e5b5e670c8615",
+      "bytes": 1145
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-15-00-597Z-primary-finish.json": {
+      "sha256": "b0505b4539bccdb9d0b68f3aba20f8bc6d1ce4c2f84bf84c32d44ac8242585e7",
+      "bytes": 188612
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-15-00-597Z-primary-finish.log": {
+      "sha256": "199dd77b76f42617c03089ef648fadebaa308f3859a87e5c53b9a271a4ec7daf",
+      "bytes": 2545
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-08-28-145Z-onboarding-finish.log": {
+      "sha256": "4a1bbe5a43092db7c818a8220c49ff915065eb7ba6edbee9623672ee0bfbdc39",
+      "bytes": 2647
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-14-42-774Z-payments-campus-context.json": {
+      "sha256": "3c3affbb2c65cb3a5992d6b6935514c18fd6fd9f177c319b254234ce45734739",
+      "bytes": 188676
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-57-59-995Z-budget-history-native-recovery.log": {
+      "sha256": "dedc75846fe37ebaf35a757bab6e61b25f27b480b03cd2e1f6bb44a6b211ead2",
+      "bytes": 1764
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-07-45-250Z-minna-final-gate-canonical.log": {
+      "sha256": "9cb86feeec9d3758546501d98f0a25235cd047a12c6146dab4b47b1b33107681",
+      "bytes": 121529
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-41-841Z-payments-finish.log": {
+      "sha256": "1fac05b1cf3e473ad691ca536307b0bc67471390d77185d48e84a8fdd39486aa",
+      "bytes": 1157
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-09-16-122Z-planning-retained.json": {
+      "sha256": "0a0a99c723648747f706de6de6c7361591bda4ea8925efd2332947fd6a294309",
+      "bytes": 191323
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-12-46-281Z-planning-finish-recovery.log": {
+      "sha256": "118f2949709b8c7d9ff2767d842a27fb50f7553920db2e17dc3009db241904a8",
+      "bytes": 879
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-10-25-937Z-hibiscus-final-gate.log": {
+      "sha256": "7a6ed8885490bce9614dc5492afcaabd2f87468a4b94329c036056cdaac5b7a0",
+      "bytes": 124672
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-04-00-290Z-everyday-final-regression.log": {
+      "sha256": "2e283ec20079daabbebe1fbae202a839f232acda411f9b7d0c5a3c7226615667",
+      "bytes": 120866
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-58-610Z-payments-retained.log": {
+      "sha256": "e1d33d6af78eedd2d843f118157ba571c5f40ec0929e8af7624253f0968be5f3",
+      "bytes": 10105
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-18-18-250Z-primary-finish-cards.log": {
+      "sha256": "3d28831f205de1d8aee70d545bca840e9abd7f6a06d1e1e0c208c231a579e4fb",
+      "bytes": 1720
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T02-15-03-603Z-final-route-inventory.log": {
+      "sha256": "110ac075e7f07660917ae80b7708d3cfd551e6d6826d9acd9bb62adfc7bbacfc",
+      "bytes": 1145
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-15-21-504Z-primary-retained.log": {
+      "sha256": "87c3af3a1754d07bec17c7b2a56f43e5dc79729fd066292be1658e144d12fb82",
+      "bytes": 14950
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-40-28-845Z-onboarding-retained-submit.json": {
+      "sha256": "08f9d60e1234c7d9bbb5fc048e845a3c0c5c8c7ae8e6a3717ce9171cfe23923d",
+      "bytes": 190590
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-40-28-845Z-onboarding-retained-submit.log": {
+      "sha256": "2e33c3bf462cc0ff0fd0c1cb676a810c40fe42d8e51fd28c080cc8ee1ccfb4b4",
+      "bytes": 2246
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-40-03-722Z-product-finish-privacy.json": {
+      "sha256": "909977da0d8f5aa8642f27036b91a1ec79859454b65bc2d89091e803cf9a64a8",
+      "bytes": 189897
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-12-51-084Z-planning-history-recovery.log": {
+      "sha256": "4b93a29642162ad51d0e3b4ccab8b27b419bc5e713944d83b74dd369f1c6aaaf",
+      "bytes": 1764
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-10-01-932Z-onboarding-finish-forms.log": {
+      "sha256": "76e3fc95246458a8aae5fe43641717335899ee14911e27c4aa31a90b74fd001f",
+      "bytes": 1178
+    },
+    "docs/review-2026-10-27/test-runs/2026-10-27T01-57-38-480Z-planning-finish-native-history.json": {
+      "sha256": "bd12d7b7bd838e1f0e3d77b4f66d4c9c302614563add28ec8d0cc07496001d3a",
+      "bytes": 189878
+    }
+  },
+  "temporaryFiles": [
+    "__overflow-audit.html",
+    "__overflow-audit.js",
+    "__overflow-seed.js",
+    "__deep-gallery.html",
+    "__deep-gallery.js",
+    "__deep-onboarding-fixtures.js",
+    "__deep-payments-fixtures.js",
+    "__deep-planning-fixtures.js",
+    "__planning-native-history.html",
+    "__planning-native-history.js"
+  ],
+  "temporaryMirrors": [
+    "__audit-minna",
+    "__audit-hibiscus"
+  ],
+  "cleanupCommand": "node tests/manual-layout/prepare-overflow-audit.cjs --clean",
+  "cleanupVerified": true,
+  "finalFunctionalFiles": 253,
+  "finalLayoutChecks": 8466,
+  "preparedRouteFixtures": 1128,
+  "fixtureErrors": 0,
+  "populatedContextGaps": 0,
+  "intentionalMissingContextObservations": 6,
+  "nativeRecoveryProofs": 6,
+  "lastPopulatedContextOpticalProofs": 6
+}

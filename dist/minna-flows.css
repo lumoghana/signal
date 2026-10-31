@@ -1,0 +1,298 @@
+/* Minna Edition: setup, personal tools and saving use the same ink-and-paper
+   system as the wallet. Controllers, field names and decisions are untouched. */
+
+body.minna-edition #app :is(.onboarding-page,.account-flow,.simple-plan-setup){
+ color:#111;min-width:0;max-width:100%;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) :is(.card,.soft,.notice,.receipt){
+ background:#fff;color:#111;box-shadow:none;border-radius:0;
+ border:0;border-block:1px solid #d7d7d7;padding:14px 0;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) :is(p,small,.small){
+ line-height:1.5;letter-spacing:0;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) .muted{
+ color:#626262;
+}
+
+/* An introduction is left aligned and editorial. Artwork supplies warmth;
+   it never sits behind a field or competes with the form's next action. */
+body.minna-edition #app .screen .onboarding-page .page-heading{
+ margin:6px 0 20px;max-width:none;text-align:left;
+}
+body.minna-edition #app .screen .onboarding-page .page-heading>h1{
+ font-size:clamp(1.875rem,8vw,2.5rem);line-height:1.12;
+ font-weight:600;letter-spacing:-.045em;max-width:17ch;text-wrap:balance;
+}
+body.minna-edition #app .screen .onboarding-page .page-heading>p{
+ margin:10px 0 0;font-size:.9375rem;line-height:1.5;
+ color:#626262;max-width:34ch;
+}
+body.minna-edition #app .screen .onboarding-page>.topline{
+ min-height:44px;margin:0 0 16px;padding:0;align-items:center;
+}
+body.minna-edition #app .screen .onboarding-page .topline .eyebrow{
+ color:#111;font-size:.6875rem;letter-spacing:.1em;
+}
+body.minna-edition #app .screen .onboarding-page :is(.progress,.onboarding-progress){
+ height:2px;min-height:2px;border-radius:0;background:#e3e3e3;
+}
+body.minna-edition #app .screen .onboarding-page :is(.progress-bar,.progress>div){
+ background:#111;border-radius:0;
+}
+body.minna-edition #app .screen .onboarding-page .scene-art{
+ width:min(100%,250px);margin:0 0 14px auto!important;
+ height:clamp(96px,17dvh,144px)!important;filter:grayscale(1);
+}
+body.minna-edition #app :is(.screen-phone,.screen-otp,.screen-campus,.screen-pin,.screen-confirmPin,.screen-signin) .onboarding-page .scene-art{
+ height:72px!important;margin-bottom:10px!important;
+}
+body.minna-edition #app .screen.screen-welcome .welcome-screen{
+ text-align:left;min-width:0;
+}
+body.minna-edition #app .screen.screen-welcome .welcome-screen>h1{
+ font-size:clamp(2.125rem,9vw,3rem);line-height:1.06;letter-spacing:-.05em;
+ font-weight:600;max-width:13ch;margin:0 0 14px;
+}
+body.minna-edition #app .screen.screen-welcome .welcome-art-stage{
+ height:clamp(140px,23dvh,214px);margin:8px 0 18px;
+ background:#fff;border-radius:0;
+}
+body.minna-edition #app .screen.screen-welcome .welcome-art-stage>.scene-art{
+ filter:grayscale(1);background:#fff;
+}
+body.minna-edition #app .screen.screen-welcome .welcome-screen>.muted{
+ font-size:1rem;line-height:1.5;color:#626262;max-width:30ch;
+}
+body.minna-edition #app .screen.screen-welcome .welcome-utilities{
+ border-top:1px solid #d7d7d7;margin-top:14px;
+}
+body.minna-edition #app .screen .onboarding-page .notice{
+ background:#f5f5f5;border:0;padding:12px 14px;font-size:.875rem;line-height:1.5;
+}
+body.minna-edition #app .screen .onboarding-page .notice :is(strong,p){color:#111}
+body.minna-edition #app .screen .onboarding-page .notice p{margin-top:5px}
+
+/* A form has one typography ladder, flat fields and a clear black action. */
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) .field{
+ margin-bottom:16px;min-width:0;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) .field>span{
+ font-size:.875rem;font-weight:500;color:#111;margin-bottom:7px;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) :is(input.input,select.input,textarea.input){
+ border:1px solid #777;border-radius:2px;background:#fff;color:#111;
+ min-height:52px;font-size:1rem;box-shadow:none;
+}
+body.minna-edition #app .screen .onboarding-page .phone-field{
+ gap:12px;align-items:center;
+}
+body.minna-edition #app .screen .onboarding-page .phone-field>span{
+ font-size:1.125rem;font-weight:500;color:#111;
+}
+body.minna-edition #app .screen .onboarding-page .code-input{
+ border:0;border-bottom:2px solid #111;border-radius:0;
+ letter-spacing:.18em;font-variant-numeric:tabular-nums;
+ padding-inline:8px;background:#fff;color:#111;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) :is(.check-row,.protection-toggle){
+ font-size:.9375rem;line-height:1.5;gap:12px;color:#111;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) :is(input[type=checkbox],input[type=radio]){
+ width:22px;height:22px;min-width:22px;accent-color:#111;flex:0 0 auto;
+}
+body.minna-edition #app .screen .onboarding-page .verified-phone-row{
+ border-bottom:1px solid #d7d7d7;padding-bottom:12px;
+}
+body.minna-edition #app .screen .onboarding-page .verified-phone-row>.text-btn{
+ text-decoration:underline;text-decoration-style:dotted;text-underline-offset:5px;
+}
+
+/* Personal and merchant information is organised by dividers, not nested
+   rounded panels. The same receipt/reference text remains available. */
+body.minna-edition #app .screen .account-flow{gap:16px}
+body.minna-edition #app .screen .account-flow .summary-line{
+ padding:10px 0;border-bottom:1px solid #e2e2e2;
+ gap:10px 16px;font-size:.875rem;line-height:1.5;
+}
+body.minna-edition #app .screen .account-flow .summary-line>span{color:#626262}
+body.minna-edition #app .screen .account-flow .summary-line>strong{
+ color:#111;font-weight:500;overflow-wrap:anywhere;
+}
+body.minna-edition #app .screen .account-flow .summary-line:last-child{border-bottom:0}
+body.minna-edition #app .screen .account-flow .hero{
+ background:transparent;border:0;border-radius:0;padding:6px 0 12px;
+ text-align:left;align-items:flex-start;
+}
+body.minna-edition #app .screen .account-flow .hero :is(h1,h2){
+ text-align:left;font-weight:600;line-height:1.15;letter-spacing:-.035em;
+}
+body.minna-edition #app .screen .account-flow .hero .money{
+ text-align:left;font-variant-numeric:tabular-nums;line-height:1.15;
+}
+body.minna-edition #app .screen .account-flow :is(.row-icon,.success-mark){
+ color:#111;background:#fff;border:1px solid #111;border-radius:0;
+}
+body.minna-edition #app .screen .account-flow .pill{
+ border:1px solid #111;background:#fff;color:#111;border-radius:0;
+ font-size:.75rem;font-weight:500;padding:4px 8px;
+}
+body.minna-edition #app .screen .account-flow :is(.grid2,.grid3)>.soft{
+ border:1px solid #d7d7d7;padding:14px;background:#fff;
+}
+body.minna-edition #app .screen .account-flow details{
+ border-radius:0;max-width:100%;
+}
+body.minna-edition #app .screen .account-flow details>summary{
+ color:#111;min-height:44px;font-weight:500;
+ text-decoration:underline;text-decoration-style:dotted;text-underline-offset:5px;
+}
+body.minna-edition #app .screen :is(.account-details-page,.account-breakdown) :is(.account-detail-card,.receipt){
+ border:0;border-radius:0;border-block:1px solid #d7d7d7;
+ padding:16px 0;background:#fff;box-shadow:none;
+}
+body.minna-edition #app .screen :is(.account-details-page,.account-breakdown)>h2{
+ font-weight:600;font-size:1.125rem;line-height:1.3;letter-spacing:-.02em;
+}
+body.minna-edition #app :is(.screen-profile,.screen-profileEdit,.screen-profilePhone,.screen-security,.screen-changePin,.screen-devices,.screen-privacy,.screen-dataExport,.screen-notificationPrefs,.screen-notifications,.screen-help,.screen-supportCase,.screen-caseDetail,.screen-feedback,.screen-more) .scene-art{
+ height:76px!important;max-width:230px;margin:0 0 12px auto!important;filter:grayscale(1);
+}
+body.minna-edition #app :is(.screen-merchant,.screen-merchantApply,.screen-merchantDestination,.screen-merchantCollect,.screen-merchantCollection,.screen-merchantPayer,.screen-merchantSales,.screen-settlements,.screen-settlementDetail) .scene-art{
+ height:72px!important;max-width:230px;margin:0 0 12px auto!important;filter:grayscale(1);
+}
+body.minna-edition #app .screen-merchantCollection .lumo-payment-qr{
+ margin:0 auto;max-width:100%;background:#fff;border:0;border-radius:0;
+}
+
+/* Budget setup and Money Boxes keep separate jobs, with matching flat tools. */
+body.minna-edition #app .simple-plan-setup .simple-plan-art{
+ height:68px;margin:0 0 12px;
+}
+body.minna-edition #app .simple-plan-setup .simple-plan-art>.scene-art{
+ height:68px!important;width:min(100%,230px);margin:0 0 0 auto!important;filter:grayscale(1);
+}
+body.minna-edition #app .simple-plan-setup .plan-setup-progress{
+ margin:0 0 18px;display:grid;gap:8px;
+}
+body.minna-edition #app .simple-plan-setup .plan-setup-progress .progress{
+ height:2px;background:#dedede;border-radius:0;
+}
+body.minna-edition #app .simple-plan-setup .plan-setup-progress .progress-bar{
+ background:#111;border-radius:0;
+}
+body.minna-edition #app .simple-plan-setup .page-heading h1{
+ font-weight:600;letter-spacing:-.04em;
+}
+body.minna-edition #app .simple-plan-setup .first-cost-suggestions .chip{
+ border-radius:2px;background:#fff;color:#111;border:1px solid #949494;
+}
+body.minna-edition #app .simple-plan-setup .first-cost-preview{
+ border:0;border-top:1px solid #111;border-radius:0;
+ background:#fff;color:#111;padding:10px 0;
+}
+body.minna-edition #app .simple-plan-setup .first-plan-conclusion{
+ background:#fff;color:#111;border:0;border-block:1px solid #111;
+ border-radius:0;padding:16px 0;margin:14px 0;
+}
+body.minna-edition #app .simple-plan-setup .first-plan-conclusion>strong{
+ display:block;background:none;color:#111;font-size:2.5rem;font-weight:500;
+ line-height:1.15;letter-spacing:-.045em;margin:6px 0;font-variant-numeric:tabular-nums;
+}
+body.minna-edition #app .simple-plan-setup .first-plan-conclusion .plan-scope-cue{
+ color:#626262;background:none;
+}
+body.minna-edition #app .screen :is(.goal-summary.card,.goal-detail,.goal-amount-card){
+ border-radius:0;box-shadow:none;background:#fff;color:#111;
+ border:0;border-bottom:1px solid #d7d7d7;padding:16px 0;margin:0;
+}
+body.minna-edition #app .screen .goal-summary.card :is(h3,strong){color:#111}
+body.minna-edition #app .screen :is(.goal-summary,.goal-detail,.goal-amount-card) .progress{
+ height:3px;border-radius:0;background:#e1e1e1;
+}
+body.minna-edition #app .screen :is(.goal-summary,.goal-detail,.goal-amount-card) .progress-bar{
+ background:#111;border-radius:0;
+}
+body.minna-edition #app :is(.screen-goal,.screen-goals,.screen-goalEdit,.screen-essentialEdit,.screen-essentials,.screen-firstEssentials,.screen-firstPlanReview,.screen-planSetup) .scene-art{
+ height:68px!important;max-width:230px;margin:0 0 12px auto!important;filter:grayscale(1);
+}
+body.minna-edition #app :is(.screen-goals,.screen-goal)>.hero{
+ text-align:left;align-items:flex-start;background:none;border:0;
+ border-radius:0;padding:6px 0 16px;
+}
+body.minna-edition #app :is(.screen-goals,.screen-goal)>.hero .balance-main{
+ text-align:left;font-weight:500;letter-spacing:-.045em;
+}
+body.minna-edition #app :is(.screen-goals,.screen-goal)>.hero .progress{
+ height:3px;border-radius:0;background:#e1e1e1;
+}
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow,.simple-plan-setup) .warning{
+ background:#fff;color:#111;border:0;border-left:3px solid #111;
+ border-radius:0;padding:10px 14px;
+}
+
+/* Protection stays explicit. State words and lock symbols carry meaning even
+   in monochrome, and full sample messages remain naturally expandable. */
+body.minna-edition #app .screen :is(.box-protection-fields,.partner-code-panel){
+ border:0;border-top:1px solid #111;border-radius:0;background:#fff;
+ margin-top:16px;padding:14px 0 0;color:#111;
+}
+body.minna-edition #app .screen .protection-toggle{
+ display:flex;align-items:flex-start;gap:12px;min-height:44px;
+ font-size:.9375rem;line-height:1.5;color:#111;
+}
+body.minna-edition #app .screen .protection-toggle input{
+ accent-color:#111;width:22px;height:22px;min-width:22px;
+}
+body.minna-edition #app .screen .protection-toggle small{
+ color:#626262;line-height:1.5;font-size:.8125rem;font-weight:400;
+}
+body.minna-edition #app .screen .box-protection-status{
+ border:1px solid #111;border-radius:0;background:#fff;color:#111;
+ padding:10px 12px;line-height:1.5;
+}
+body.minna-edition #app .screen .protection-scope{
+ border-color:#d7d7d7;border-radius:0;color:#111;
+}
+body.minna-edition #app .screen :is(.protection-simulation,.protection-sample-message){
+ border:0;border-block:1px dotted #777;border-radius:0;background:#fff;
+ padding:0;margin:12px 0;color:#111;
+}
+body.minna-edition #app .screen :is(.protection-simulation,.protection-sample-message)>summary{
+ color:#111;min-height:44px;font-weight:500;
+}
+body.minna-edition #app .screen .protection-sample-message pre{
+ background:#f5f5f5;color:#111;border:0;border-radius:0;
+ padding:12px;line-height:1.6;max-width:100%;overflow-wrap:anywhere;white-space:pre-wrap;
+}
+body.minna-edition #app .screen .protection-support.notice{
+ background:#f5f5f5;color:#111;border:0;border-left:3px solid #111;
+ border-radius:0;padding:12px 14px;
+}
+body.minna-edition #app .screen :is(#partner-verification-code,#protection-verification-code,#invitation-verification-code){
+ border-radius:2px;letter-spacing:.12em;color:#111;background:#fff;
+}
+
+/* Quiet empty and completed states share a single ink symbol. */
+body.minna-edition #app .screen :is(.onboarding-page,.account-flow) :is(.empty,.hero.center){
+ background:transparent;border:0;border-radius:0;text-align:left;padding-inline:0;
+}
+body.minna-edition #app :is(.screen-accountReady,.screen-identityResult,.screen-campusStatus,.screen-applicationStatus,.screen-recoveryStatus,.screen-campusInterestSaved,.screen-boxProtectionInvite,.screen-boxProtectionSupport) .success-mark{
+ border:1px solid #111;background:#fff;color:#111;border-radius:0;
+ width:52px;height:52px;margin:0 0 14px;
+}
+body.minna-edition #app :is(.screen-accountReady,.screen-identityResult,.screen-campusStatus,.screen-applicationStatus,.screen-recoveryStatus) :is(.pill,.status-pill){
+ border:1px solid #111;background:#fff;color:#111;border-radius:0;
+}
+
+@media(max-height:700px){
+ body.minna-edition #app .screen .onboarding-page .page-heading{margin-bottom:16px}
+ body.minna-edition #app .screen .onboarding-page .scene-art{height:88px!important;margin-bottom:10px!important}
+ body.minna-edition #app :is(.screen-phone,.screen-otp,.screen-campus,.screen-pin,.screen-confirmPin,.screen-signin) .onboarding-page .scene-art{height:56px!important}
+ body.minna-edition #app .screen.screen-welcome .welcome-art-stage{height:140px;margin-bottom:14px}
+ body.minna-edition #app .screen .onboarding-page .actions{margin-top:14px;gap:8px}
+ body.minna-edition #app .simple-plan-setup .simple-plan-art,
+ body.minna-edition #app .simple-plan-setup .simple-plan-art>.scene-art{height:48px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ body.minna-edition #app :is(.onboarding-page,.account-flow,.simple-plan-setup) :is(.scene-art,.success-mark){animation:none!important;transition:none!important}
+}

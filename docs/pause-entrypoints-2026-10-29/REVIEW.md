@@ -1,0 +1,9 @@
+# Consistent Pause entry points
+
+The previous release updated real-payment Pause but omitted the default first-time path. Welcome Get started, See a sample Pause and ambassador entry all opened samplePause with the older shoes/laptop illustration. Tester pauseDemo also retained an older diagram. All thirteen shipped actual-payment Pause fixtures already rendered the new avatar correctly.
+
+The Monochrome final presentation adapter now applies the exact same avatar, raised palm, dark surface, one consequence and compact payment context to all three Pause renderers. Public sample assumptions sit in closed See why. Default first-time signup, skip, returning-user back, ambassador back and replay keep their original handlers. The sample never creates a payment draft, starts a PIN/biometric approval or changes money. It remains a fixed example, not a forecast from the customer's savings.
+
+The isolated calculation is unchanged:320 shoes redirect two planned future160 contributions; laptop target1600, saved640, remaining960; six weeks becomes eight, while saved640 remains unchanged. Tester rule chips and exact isolated scoring remain available in See why, and the route remains excluded from ordinary use. Live Pause timing, financial calculations, PIN/biometric authorisation and the prior fractional clock correction are unchanged. Everyday and Hibiscus are untouched.
+
+Validation includes seven new actual-entrypoint tests and the ten existing intro isolation/model/action checks. The full required edition contract/regression gate passed321/321, exit0. The browser entrypoint matrix passed56/56 with zero findings and no setup errors. Browser coverage: signup, optional sample, ambassador sample, returning user, expanded assumptions, and three tester scenarios at seven viewport/type settings (56 layouts). Temporary dist QA files are removed before publication.

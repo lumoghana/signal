@@ -1,0 +1,162 @@
+/* Signal Home: one coherent scale for money, character and navigation. */
+body.signal-edition.minna-edition #app{background:#f7f6f0!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-home{padding:16px 17px 12px!important;background:#f7f6f0!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home{display:flex!important;flex-direction:column;gap:12px;min-width:0;max-width:100%;padding:0!important;color:#151711;container-type:inline-size;container-name:signal-home;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home>*{flex-shrink:0;min-width:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home>.scene-art{display:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header{display:flex!important;align-items:center;justify-content:space-between;padding:0!important;margin:0!important;min-height:44px;gap:12px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header .signal-brand-wordmark{display:block!important;min-width:0;flex:0 1 124px;line-height:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-wordmark{display:block;width:124px!important;max-width:100%!important;height:auto!important;filter:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header .home-header-actions{display:flex!important;align-items:center;gap:9px;flex-shrink:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header .signal-profile{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;background:#d7ff3f!important;color:#151711!important;border:0!important;border-radius:50%!important;font-weight:850;font-size:1.125rem;order:2;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header #lumo-scan-qr{order:1;width:44px!important;height:44px!important;min-height:44px!important;min-width:44px!important;padding:8px!important;border:0!important;border-radius:0!important;background:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header #lumo-scan-qr svg{width:28px!important;height:28px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting{position:static!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;clip-path:none!important;white-space:normal!important;margin:3px 0 2px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting p{font-size:2rem!important;font-weight:850!important;letter-spacing:-.065em;line-height:1.1;margin:0!important;overflow-wrap:anywhere;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-campus-note{font-size:.8125rem;line-height:1.45;margin:0;color:#62645a;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-money-card{position:relative;background:radial-gradient(ellipse at 85% 23%,#dfff65 0,transparent 48%),#d7ff3f!important;color:#151711!important;border:0!important;border-radius:26px!important;padding:15px 17px 0!important;margin:0!important;overflow:visible;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-heading{display:flex!important;align-items:center!important;justify-content:space-between;gap:8px;margin:0!important;padding:0!important;min-height:28px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-label{color:#151711!important;font-size:1.0625rem!important;line-height:1.15!important;font-weight:850!important;letter-spacing:-.045em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .balance-eye{display:grid!important;place-items:center;min-width:38px!important;width:38px!important;min-height:44px!important;height:38px!important;padding:9px!important;background:#1517110b!important;color:#151711!important;border:0!important;border-radius:50%!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .balance-eye>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{display:grid;grid-template-columns:minmax(0,1fr) 38%;align-items:center;min-height:120px;gap:8px;margin:0 0 4px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money{display:block!important;width:100%!important;padding:0!important;margin:0!important;background:transparent!important;text-align:left;border:0!important;color:#151711!important;min-width:0;position:relative;z-index:1;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money>strong{font-size:4.25rem!important;font-weight:800!important;line-height:1.03!important;letter-spacing:-.065em!important;color:#151711!important;margin:0!important;padding:0!important;background:none!important;max-width:100%;white-space:normal!important;font-variant-numeric:lining-nums tabular-nums;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money .whole{font-family:'Signal Display',Manrope,sans-serif!important;font-size:1em!important;font-weight:800!important;letter-spacing:-.035em!important;-webkit-text-stroke:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money :is(.currency,.money-currency){font-family:Manrope,sans-serif!important;font-size:.43em!important;font-weight:850!important;letter-spacing:-.04em!important;color:#151711!important;margin-right:2px!important;vertical-align:baseline;top:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money .cents{font-family:Manrope,sans-serif!important;font-size:.32em!important;font-weight:800!important;color:#151711!important;letter-spacing:-.04em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-wide-amount .everyday-primary-money>strong{font-size:3.45rem!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-huge-amount .everyday-primary-money>strong{font-size:2.5rem!important;overflow-wrap:anywhere;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-lux{display:block;object-fit:contain;height:auto;pointer-events:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-lux{width:100%;max-width:none;height:120px;margin:0;object-position:right bottom;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-breakdown{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid #15171132;padding:8px 0;gap:14px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell{display:flex;flex-direction:column;gap:3px;min-width:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell+.signal-balance-cell{border-left:1px solid #15171132;padding-left:17px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell>span{font-size:.8125rem;color:#4d571e;font-weight:700;line-height:1.3;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell>strong{font-size:1.25rem!important;line-height:1.22!important;font-weight:850!important;letter-spacing:-.045em;color:#151711!important;overflow-wrap:anywhere;min-height:1.3em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell>strong>span:not([data-private-value]):not(.money-mask){font-size:.8125rem;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-plan-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #15171122;min-height:44px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-budget-link{border:0!important;padding:7px 0!important;margin:0!important;width:auto!important;min-height:44px!important;display:flex!important;justify-content:flex-start!important;align-items:center;gap:5px;font-size:.8125rem!important;font-weight:800!important;color:#151711!important;background:transparent!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-budget-link>svg{background:transparent!important;color:#151711!important;width:16px;height:16px;padding:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-budget-basis{display:flex!important;align-items:center;justify-content:flex-end;flex-wrap:wrap;column-gap:7px;margin:0!important;color:#414a19!important;font-size:.6875rem!important;text-align:right;line-height:1.3!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-budget-date-action{background:none!important;color:#151711!important;border:0;padding:9px 0!important;min-height:44px;font-size:.75rem!important;font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;margin:0!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-height:96px!important;padding:12px 5px!important;border:0!important;border-radius:23px!important;background:#eeede5!important;color:#151711!important;font-weight:850!important;font-size:1rem!important;line-height:1.25;letter-spacing:-.045em;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action .mono-action-icon{display:grid;place-items:center;width:36px!important;height:36px!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action:first-child .mono-action-icon{border:2.5px solid currentColor!important;border-radius:50%!important;width:34px!important;height:34px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action:first-child svg{width:25px!important;height:25px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action svg{width:34px!important;height:34px!important;stroke-width:2.1;filter:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action-pay{background:#151711!important;color:#fffef9!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action-pay svg{width:39px!important;height:39px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy{margin:0!important;padding:0!important;background:#eeede5!important;border:0!important;border-radius:25px!important;min-height:112px!important;overflow:visible!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open{position:relative;display:grid!important;grid-template-columns:96px minmax(0,1fr);gap:0;width:100%;min-height:112px!important;padding:8px 12px 8px 0!important;color:#151711!important;border:0!important;border-radius:25px!important;background:transparent!important;text-align:left;overflow:visible!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open::before,body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open::after{display:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art{display:flex;align-items:center;align-self:center;min-width:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:96px;height:96px;max-width:none;margin:0;transform:rotate(-5deg);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy{position:relative!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start;gap:6px;max-width:none!important;min-width:0;width:auto!important;min-height:96px!important;padding:10px 14px!important;border-radius:23px;background:#fffef9!important;color:#151711!important;text-shadow:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy::before{content:'';position:absolute;left:-10px;top:39%;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:12px solid #fffef9;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-eyebrow{display:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-insight{display:block!important;min-height:0!important;font-size:1rem!important;line-height:1.25!important;font-weight:850!important;letter-spacing:-.045em;color:#151711!important;max-width:none;overflow-wrap:anywhere;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-insight-detail{display:block;font-size:.8125rem!important;line-height:1.4!important;font-weight:650!important;margin:4px 0 0;color:inherit!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-question{display:flex;align-items:center;gap:5px;font-size:.75rem!important;font-weight:650;line-height:1.3!important;color:#62645a!important;margin:0!important;text-decoration:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home-destinations{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-boxes-card,body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-story-card{padding:0!important;margin:0!important;border:0!important;border-radius:21px!important;background:#eeede5!important;min-width:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-boxes-card{background:#d7ff3f!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-boxes-open,body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-story-card>button{display:grid!important;grid-template-columns:28px minmax(0,1fr) 12px!important;grid-template-rows:auto!important;align-items:center!important;gap:7px!important;min-height:76px!important;padding:12px 11px!important;width:100%;background:transparent!important;color:#151711!important;border:0!important;text-align:left;border-radius:21px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-box-symbol,body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-story-symbol{display:block!important;width:28px!important;height:30px!important;background:none!important;padding:0!important;border-radius:0!important;grid-area:auto!important;color:#151711!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-box-symbol svg,body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-story-symbol svg{width:28px;height:30px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-box-copy{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:4px!important;grid-area:auto!important;min-width:0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home :is(.mono-box-title,.signal-story-card strong){display:block!important;font-size:.875rem!important;font-weight:850!important;line-height:1.2!important;letter-spacing:-.04em!important;color:#151711!important;white-space:normal!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-savings-amount{display:grid!important;grid-template-areas:'savings';font-size:.875rem!important;font-weight:800!important;letter-spacing:-.04em!important;line-height:1.3!important;margin:0!important;padding:0!important;grid-area:auto!important;min-height:1.3em;color:#151711!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-savings-reserve{display:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-boxes-open>svg{grid-area:auto!important;width:13px!important;margin:0!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-story-card>button>svg{width:13px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home :is(.mono-box-empty-note,.signal-story-card small){display:block;font-size:.75rem!important;line-height:1.3!important;color:#62645a!important;margin-top:4px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-home-alert{margin:0!important;min-height:44px!important;font-size:.8125rem!important;background:#eeede5;border-radius:16px;padding:10px 13px!important;border:0!important;}
+body.signal-edition.minna-edition #app #nav.mono-primary-nav{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));background:#f7f6f0!important;border-top:1px solid #deded3!important;padding:7px 12px max(8px,env(safe-area-inset-bottom))!important;min-height:72px;}
+body.signal-edition.minna-edition #app #nav.mono-primary-nav[hidden]{display:none!important;}
+body.signal-edition.minna-edition #app #nav .nav-item{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;padding:4px!important;background:transparent!important;border:0!important;color:#85867e!important;font-size:.8125rem!important;font-weight:550!important;line-height:1.2;}
+body.signal-edition.minna-edition #app #nav .nav-item svg{width:28px!important;height:28px!important;padding:0!important;background:none!important;border-radius:0!important;}
+body.signal-edition.minna-edition #app #nav .nav-item.active{color:#151711!important;font-weight:800!important;}
+body.signal-edition.minna-edition #app #nav .nav-item.active::after{position:absolute;bottom:-2px;display:block;width:6px;height:6px;background:#d7ff3f;border-radius:50%;content:'';}
+body.signal-edition.minna-edition #app .prototype-boundary{min-height:18px;padding:3px 8px!important;font-size:.625rem!important;color:#797b72!important;background:#f7f6f0!important;}
+body.signal-edition .desktop-note .mono-brand-avatar{display:none!important;}
+body.signal-edition .desktop-note .actual-wordmark{width:160px!important;height:auto!important;filter:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .mono-brand-wordmark{width:104px;height:auto;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.screen-pause,.screen-samplePause,.screen-pauseDemo) .mono-brand-wordmark{filter:invert(1)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-pause-character .mono-pause-face{left:0!important;top:0!important;width:100%!important;height:100%!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-pause-character img{border-radius:0!important;mix-blend-mode:normal!important;object-fit:contain;}
+@media(min-width:900px){body.signal-edition.minna-edition #app{width:440px!important;max-width:440px!important;}body.signal-edition.minna-edition{gap:72px;background:#eeede5!important;}}
+@media(max-width:899px){body.signal-edition.minna-edition{background:#f7f6f0!important;}body.signal-edition.minna-edition #app{width:100%;max-width:480px;}}
+/* Keep the privacy control in its own heading band. Lux has a real row. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-heading{justify-content:flex-start!important;gap:7px;padding-right:0!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .balance-eye{position:relative;right:auto;top:auto;align-self:center;margin:-8px 0;z-index:2;min-width:44px!important;min-height:44px!important;width:44px!important;height:44px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money .money-mask{font-size:.43em!important;letter-spacing:.03em!important;line-height:1!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy{gap:4px!important;}
+/* On short phones the composition tightens as a whole, rather than enlarging
+   the same parts until the lower destinations are pushed out of view. */
+@media(max-height:720px) and (min-width:360px){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-home{padding:10px 14px 6px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home{gap:6px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header .signal-brand-wordmark{flex-basis:116px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-wordmark{width:116px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting{margin:1px 0!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting p{font-size:1.75rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-money-card{padding:11px 14px 0!important;border-radius:23px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-heading{min-height:24px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-label{font-size:1rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{min-height:92px;grid-template-columns:minmax(0,1fr) 36%;margin-bottom:3px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-lux{height:92px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money>strong{font-size:3.5rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-wide-amount .everyday-primary-money>strong{font-size:2.9rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-huge-amount .everyday-primary-money>strong{font-size:2.05rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-breakdown{padding:6px 0;gap:12px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell>span{font-size:.75rem;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell>strong{font-size:1.125rem!important;line-height:1.2!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action{min-height:74px!important;padding:8px 4px!important;gap:5px!important;font-size:.875rem!important;border-radius:19px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action .mono-action-icon{width:30px!important;height:30px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action:first-child .mono-action-icon{width:30px!important;height:30px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action svg{width:30px!important;height:30px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action:first-child svg{width:23px!important;height:23px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action-pay svg{width:34px!important;height:34px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy{min-height:88px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open{grid-template-columns:78px minmax(0,1fr);min-height:88px!important;padding:4px 10px 4px 0!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:80px;height:80px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy{min-height:80px!important;padding:8px 12px!important;gap:3px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-insight{font-size:.9375rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-insight-detail{font-size:.75rem!important;margin-top:2px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-question{font-size:.6875rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-boxes-open,body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-story-card>button{min-height:64px!important;padding:9px 10px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home :is(.mono-box-title,.signal-story-card strong){font-size:.8125rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-savings-amount{font-size:.8125rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home :is(.mono-box-empty-note,.signal-story-card small){font-size:.6875rem!important;}
+ body.signal-edition.minna-edition #app:has(#view>.screen-home) #nav.mono-primary-nav{min-height:60px;padding-top:3px!important;padding-bottom:4px!important;}
+ body.signal-edition.minna-edition #app:has(#view>.screen-home) #nav .nav-item{min-height:48px;gap:3px;}
+ body.signal-edition.minna-edition #app:has(#view>.screen-home) #nav .nav-item svg{width:25px!important;height:25px!important;}
+}
+@container signal-home (max-width:20em){body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-breakdown{grid-template-columns:minmax(0,1fr);gap:8px;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell+.signal-balance-cell{border-left:0;padding-left:0;border-top:1px solid #15171122;padding-top:8px;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home-destinations{grid-template-columns:minmax(0,1fr);}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-plan-footer{flex-direction:column;align-items:stretch;gap:0;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-budget-basis{justify-content:space-between;text-align:left;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .mono-budget-link{width:100%!important;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{grid-template-columns:minmax(0,1fr) 37%;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money>strong{font-size:3.5rem!important;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open{grid-template-columns:80px minmax(0,1fr);}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:84px;height:100px;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home-actions{gap:7px!important;}body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action{font-size:.875rem!important;}}
+@media(prefers-reduced-motion:no-preference){body.signal-edition .signal-action{transition:transform .15s ease,background .15s ease;}body.signal-edition .signal-action:active{transform:scale(.96);}}
+
+/* A wide neutral privacy reserve may wrap. Centre the actual value inside its
+   reserved grid area, so the visible money and Lux keep the same centre line. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money>strong>[data-private-value]{align-self:center!important;}
+/* Separate painted bounds for Lux and his quote; neither can overlap or escape
+   the rounded card. The whole native button remains the existing Chat target. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy{overflow:hidden!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy:focus-within{outline:3px solid #151711;outline-offset:3px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:8px 12px 8px 10px!important;align-items:center;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art{display:grid;place-items:center;width:96px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:92px;height:92px;max-width:100%;margin:0;transform:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy{min-height:88px!important;padding:10px!important;border-radius:20px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy::before{left:-6px;top:50%;transform:translateY(-50%);border-top-width:7px;border-bottom-width:7px;border-right-width:7px;}
+@media(max-height:720px) and (min-width:360px){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open{grid-template-columns:80px minmax(0,1fr);gap:10px;padding:6px 8px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art{width:80px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:76px;height:76px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-copy{min-height:72px!important;padding:8px 10px!important;}
+}
+@container signal-home (max-width:20em){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-buddy .mono-conversation-open{grid-template-columns:72px minmax(0,1fr);gap:10px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art{width:72px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:68px;height:68px;}
+}

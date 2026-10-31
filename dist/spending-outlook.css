@@ -1,0 +1,16 @@
+/* A daily guide is a detail of the existing after-Budget amount. */
+.home-spending-outlook-caption{font-size:.875rem;line-height:1.35}
+.home-spending-outlook-caption .outlook-daily-value{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+#app .spending-outlook .outlook-conclusion{padding:0 0 16px;margin:0 0 14px;border-bottom:1px solid var(--line,#d9ddd5)}
+#app .spending-outlook .outlook-conclusion>span{display:block;font-size:1rem;font-weight:500}
+#app .spending-outlook .outlook-conclusion>h1{margin:8px 0;font-size:2.75rem;line-height:1.12;font-weight:600;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+#app .spending-outlook .outlook-conclusion>p{margin:0;font-size:.9375rem;line-height:1.45}
+#app .spending-outlook .outlook-period{margin:0 0 10px;color:var(--muted,#596153);font-size:.875rem;line-height:1.45}
+#app .spending-outlook>p:not(.outlook-period){margin:0 0 10px;font-size:.9375rem;line-height:1.5}
+#app .spending-outlook .outlook-actions{margin-top:12px}
+.spending-outlook .outlook-calculation{margin:12px 0}
+.spending-outlook .outlook-calculation>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line,#d9ddd5);font-size:.875rem;line-height:1.45}
+.spending-outlook .outlook-calculation dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.home-spending-outlook-caption,.spending-outlook{animation:none!important;transition:none!important}}
+#app .account-room .home-spending-outlook-caption svg{display:inline-block;vertical-align:-.125em;width:14px;height:14px;margin:0 0 0 2px}
+body #app .home-refined .account-room>small.home-spending-outlook-caption{font-size:.875rem;line-height:1.35}

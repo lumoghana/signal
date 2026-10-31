@@ -1,0 +1,51 @@
+LUMO SIGNAL - UPLOAD AND DEPLOY
+
+This package contains Signal version 15 with the original 2D Lumo avatar,
+the complete application source, build scripts, tests and live website assets.
+
+1. EXTRACT THIS ZIP
+   Open the extracted lumo-signal folder. README.md, vercel.json, config/,
+   scripts/ and dist/ belong directly in your GitHub repository root.
+   Keep all folder names and paths intact.
+
+2. UPLOAD TO GITHUB
+   Recommended: use GitHub Desktop, especially for this many files.
+   - Sign in to GitHub Desktop.
+   - Clone https://github.com/lumoghana/signal to your computer.
+   - Copy the CONTENTS of the extracted lumo-signal folder into that clone.
+     If asked about an existing README, use the README from this package.
+   - Commit the changes, then click Push origin.
+
+   Browser alternative: open your repository, choose Add file > Upload files,
+   and upload the extracted files/folders in batches of up to 100 files.
+   Preserve subfolders. Commit each batch and upload all batches before Deploy.
+   Individual files in this package are below GitHub's browser file-size limit.
+
+3. DEPLOY ON VERCEL
+   - Sign in to Vercel.
+   - Choose Add New > Project and import your GitHub repository.
+   - Keep Root Directory at the repository root.
+   - vercel.json already selects these settings:
+       Framework: Other
+       Build command: node scripts/build-release.cjs
+       Install command: empty (no dependencies required)
+       Output directory: dist
+   - Click Deploy.
+
+   If Vercel asks for the settings manually, use the values above.
+   No environment variables are required for this prototype.
+
+4. QUICK CHECK AFTER DEPLOYING
+   - Open Home, Pay, Money Boxes, Money Story and Ask Lumo.
+   - Check the original 2D avatar and balance privacy toggle.
+   - Walk through signup and the sample Pause; no live money moves.
+
+NOTES
+   This is the interactive prototype, using browser-local sample records.
+   Existing browser records on the ChatGPT Site do not automatically move to
+   a Vercel domain. No credentials or saved personal browser records are included.
+   Historical review screenshots are omitted; application assets are included.
+
+REFERENCE
+   https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository
+   https://vercel.com/docs/builds/configure-a-build

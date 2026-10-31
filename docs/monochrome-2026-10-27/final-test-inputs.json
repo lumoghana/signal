@@ -1,0 +1,13 @@
+{
+  "command": "node scripts/check-edition-parity.cjs --regression --sequential",
+  "files": {
+    "dist/index.html": "800d9af753e2f419ba37a2bc5a97a46275823d74423ffd691db01e3ad3329740",
+    "dist/mono-design.js": "9357b4d112da527f82304c45c40fb6a9f950dd3e76e9c174b586888cca6a51f9",
+    "dist/mono-design.css": "ce50bf2efcebcde9f61947a8c4a6ef969a604f43ce66e4f514bbdd3fc0217843",
+    "dist/mono-planning.css": "83dcd1c5bc43220ad9a5dba342239b91c1c0d25c75851d79226f02e14c0ec01b",
+    "dist/mono-payments.css": "346123abcad379955eb00eae8a487bd3b7b1c95e8289b2b6c5f90d6eb4d749d7",
+    "dist/mono-life.css": "057bb66d0add5f5da022c259a44b102ff580a4a47db7538a69cb9eb01d7c6a5f",
+    "config/editions.json": "1b7e6596fa30a343f21c1f7976db52256b9e759714dda0002b6fd3e589a05769",
+    "tests/monochrome-design.test.cjs": "5922e6e9e5095eec64be7be14ab30809696b3f894e65db79085be3275ac45892"
+  }
+}

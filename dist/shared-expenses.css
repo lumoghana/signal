@@ -1,0 +1,35 @@
+/* Shared costs use existing identity tokens and content-sized native sheets. */
+body #app :is(.shared-expenses-page,.shared-split-page,.shared-split-review,.shared-group-page,.shared-receive-page,.shared-request-page){min-width:0;color:var(--ink)}
+body #app .shared-total{font-size:2rem;font-weight:600;letter-spacing:-.04em;line-height:1.2;margin:12px 0 20px;font-variant-numeric:tabular-nums}
+body #app .shared-total small{display:block;font-size:.8125rem;font-weight:400;line-height:1.5;letter-spacing:0;color:var(--muted);margin-top:6px}
+body #app .shared-section-title{font-size:1rem;margin:22px 0 8px}
+body #app .shared-modes{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+body #app .shared-modes .chip{min-height:44px;font-size:.8125rem}
+body #app .shared-owner-row{max-width:55%}
+body #app .shared-friend-row{display:flex;align-items:flex-start;gap:6px;padding:12px 0;border-top:1px solid var(--line)}
+body #app .shared-friend-row>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(88px,.7fr);gap:10px;flex:1;min-width:0}
+body #app .shared-friend-row .field{margin:0}
+body #app .shared-friend-row input{min-width:0;padding:12px 10px;min-height:48px}
+body #app .shared-friend-row .icon-btn{width:44px;min-width:44px;height:44px;margin-top:24px;padding:10px;background:transparent}
+body #app .shared-calculation{margin:18px 0}
+body #app .shared-calculation>div{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:.9375rem;line-height:1.45}
+body #app .shared-calculation dt{color:var(--muted);min-width:0;overflow-wrap:anywhere}
+body #app .shared-calculation dd{margin:0;text-align:right;max-width:60%;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;font-weight:500}
+body #app .shared-money{white-space:nowrap;overflow-wrap:normal}
+body #app .shared-calculation>div:last-child{font-weight:600}
+body #app .shared-status{margin:14px 0 20px}
+body #app .shared-status>span{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid var(--line);border-radius:var(--curve-control);margin-bottom:12px}
+body #app .shared-status strong{font-size:1.5rem;line-height:1.25;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+body #app .shared-status p{font-size:.8125rem;color:var(--muted);margin-top:8px;line-height:1.5}
+body #app .shared-share{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+body #app .shared-share>div{flex:1;min-width:0}
+body #app .shared-share strong{display:block;font-size:.9375rem;overflow-wrap:anywhere}
+body #app .shared-share span{display:block;font-size:.8125rem;color:var(--muted);line-height:1.5;margin-top:3px}
+body #app .shared-share .text-btn{min-height:44px;padding:8px 0;font-size:.8125rem}
+body #app .shared-boundary{font-size:.6875rem;line-height:1.5;color:var(--muted);margin:18px 0 0}
+body #app .shared-simulation{border-top:1px solid var(--line);padding-top:6px;margin-top:20px}
+body #app .shared-simulation summary{min-height:44px;font-size:.8125rem}
+body #app .shared-simulation p{font-size:.8125rem;line-height:1.5;color:var(--muted);margin-bottom:10px}
+body #app .shared-simulation .secondary{margin:8px 0;min-height:48px}
+body #app :is(.shared-receipt-entry,.shared-requests-entry){margin-top:12px}
+@media(max-width:359px){body #app .shared-friend-row>div{grid-template-columns:minmax(0,1fr)}body #app .shared-owner-row{max-width:none}body #app .shared-friend-row .icon-btn{margin-top:24px}}

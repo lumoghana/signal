@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "editions": {
+    "everyday": {
+      "qaRuntimePaths": 0,
+      "indexHasQaReference": false
+    },
+    "minna": {
+      "qaRuntimePaths": 0,
+      "indexHasQaReference": false
+    },
+    "hibiscus": {
+      "qaRuntimePaths": 0,
+      "indexHasQaReference": false
+    }
+  },
+  "removedTemporaryFileCount": 10,
+  "removedMirrorDirectoryCount": 2,
+  "command": "node tests/manual-layout/prepare-overflow-audit.cjs --clean"
+}

@@ -1,0 +1,37 @@
+/* One existing Home shelf changes its observation; no extra balance competes. */
+body #app .home-daily-insight .home-story-insight{font-size:.9375rem;line-height:1.45;font-weight:600}
+body #app .home-header-actions button[aria-label="Updates"]{position:relative}
+body #app .daily-unread-badge{position:absolute;inset:3px 1px auto auto;min-width:17px;min-height:17px;padding:1px 4px;border-radius:50%;background:var(--ink);color:var(--white);border:2px solid var(--paper);font-size:.5625rem;line-height:1.2;font-weight:700;text-align:center}
+body #app .daily-updates-toolbar{display:flex;justify-content:flex-end;margin:0 0 4px}
+body #app .daily-update-row{width:100%;display:flex;align-items:flex-start;gap:12px;background:transparent;color:var(--ink);border:0;border-bottom:1px solid var(--line);border-radius:0;padding:15px 0;min-height:64px;text-align:left}
+body #app .daily-update-row>span:nth-child(2){flex:1;min-width:0}
+body #app .daily-update-row :is(strong,small,time){overflow-wrap:anywhere}
+body #app .daily-update-row strong{display:block;font-size:.9375rem;line-height:1.4;font-weight:500}
+body #app .daily-update-row.is-unread strong{font-weight:700}
+body #app .daily-update-row small{display:block;font-size:.8125rem;line-height:1.45;color:var(--muted);margin-top:5px}
+body #app .daily-update-row time{display:block;font-size:.6875rem;line-height:1.4;color:var(--muted);margin-top:7px}
+body #app .daily-update-symbol{padding-top:1px}
+body #app .daily-update-row>svg{margin-top:4px}
+body #app .daily-delivery-note,body #app .daily-quiet-note{margin-top:16px}
+body #app .daily-preferences-link{margin-top:18px;border-top:1px solid var(--line);padding-top:8px}
+body #app .daily-check{display:flex;align-items:flex-start;gap:12px;padding:14px 0;min-height:52px}
+body #app .daily-check input{width:21px;height:21px;flex:0 0 auto;margin:3px 0;accent-color:var(--ink)}
+body #app .daily-check strong{font-size:.9375rem;line-height:1.4;font-weight:600}
+body #app .daily-check small{display:block;color:var(--muted);font-size:.8125rem;line-height:1.45;margin-top:4px}
+body #app .daily-time-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+body #app .daily-money-story .daily-story-conclusion{padding:18px 0;border-bottom:1px solid var(--line);margin-bottom:16px}
+body #app .daily-story-conclusion>span{font-size:.8125rem;line-height:1.4;color:var(--muted)}
+body #app .daily-story-conclusion>strong{display:block;font-size:2.375rem;line-height:1.2;font-weight:600;letter-spacing:-.045em;font-variant-numeric:tabular-nums;margin:8px 0}
+body #app .daily-story-conclusion>p{font-size:.9375rem;line-height:1.5}
+body #app .daily-story-actions{margin:12px 0}
+body #app .daily-story-details{margin:12px 0}
+body #app .daily-story-details summary{min-height:44px;font-size:.875rem;line-height:1.5}
+body #app .daily-story-details dl{margin:0 0 16px}
+body #app .daily-story-details dl>div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.875rem;line-height:1.4}
+body #app .daily-story-details dd{margin:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+body #app .daily-story-payment{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;padding:12px 0;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink)}
+body #app .daily-story-payment>span{min-width:0;overflow-wrap:anywhere}
+body #app .daily-story-payment strong{font-size:.875rem;line-height:1.4;font-weight:600}
+body #app .daily-story-payment small{display:block;color:var(--muted);font-size:.75rem;line-height:1.4;margin-top:3px}
+body #app .daily-story-payment>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:340px){body #app .daily-time-pair{grid-template-columns:1fr}}

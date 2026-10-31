@@ -1,0 +1,32 @@
+Manrope interface typography — Lumo Minna Edition
+
+Font package: @fontsource-variable/manrope 5.3.0
+Retrieved with npm pack --ignore-scripts on 23 October 2026.
+Package: https://www.npmjs.com/package/@fontsource-variable/manrope
+Upstream source: https://github.com/sharanda/manrope
+Fontsource metadata source: https://github.com/google/fonts
+License: SIL Open Font License 1.1; original copyright and full license retained in dist/fonts/Manrope-OFL.txt.
+
+Local file: /fonts/Manrope-Variable.woff2
+SHA-256: a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972
+Latin variable face, upright, wght axis 200 through 800.
+Required real weights 400, 500, 600 and 700 were instantiated successfully with fontTools.
+OpenType features found: calt, dnom, frac, kern, liga, locl, numr, pnum, tnum.
+
+Glyph verification with fontTools cmap:
+Manrope contains G, H, all decimal digits, decimal/comma punctuation and U+2212 minus.
+The distributed Manrope fonts do NOT contain U+20B5 Ghana cedi. This must not be represented as native Manrope coverage.
+The existing bundled Lumo Sans Regular/Medium/Semibold/Bold faces DO contain U+20B5 and are the deliberate currency-only supplement.
+
+Suggested CSS (root owns final CSS integration):
+@font-face {
+ font-family: 'Manrope UI'; src: url('/fonts/Manrope-Variable.woff2') format('woff2');
+ font-weight: 200 800; font-style: normal; font-display: swap;
+}
+/* Declare these after the variable face. Only the cedi glyph uses Lumo Sans. */
+@font-face { font-family: 'Manrope UI'; src: url('/fonts/LumoSans-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+20B5; }
+@font-face { font-family: 'Manrope UI'; src: url('/fonts/LumoSans-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; unicode-range: U+20B5; }
+@font-face { font-family: 'Manrope UI'; src: url('/fonts/LumoSans-Semibold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; unicode-range: U+20B5; }
+@font-face { font-family: 'Manrope UI'; src: url('/fonts/LumoSans-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; unicode-range: U+20B5; }
+
+This is Lumo's own local type treatment inspired by Minna's disciplined neutral typography. It is not Minna's proprietary Avenir Next font. No runtime CDN is required.

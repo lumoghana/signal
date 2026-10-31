@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-30",
+  "identity": "Original Signal and Lux explicitly selected in conversation",
+  "sourceReference": "Original Signal homepage, exec-b570643a-85d9-489a-b618-ea58a68df9db.png",
+  "method": "Built-in image generation with exact character/wordmark reference; genuine alpha; lossless optimized web assets",
+  "assets": [
+    "dist/assets/signal/lux-welcome.webp",
+    "dist/assets/signal/lux-pause.webp",
+    "dist/assets/signal/signal-wordmark.webp"
+  ]
+}

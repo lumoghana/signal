@@ -1,0 +1,33 @@
+/* Supporting money facts remain readable without changing primary amounts,
+   privacy geometry, the two-card hierarchy or the edition's type and palette. */
+body #app .screen-home .everyday-account-home .everyday-account-heading>div>p,
+body #app .screen-home .everyday-account-home .everyday-primary-label,
+body #app .screen-home .everyday-account-home .everyday-available-context,
+body #app .screen-home .everyday-account-home .everyday-boxes-copy>small{
+ font-size:12px;line-height:1.4;
+ color:var(--muted);
+ color:color-mix(in srgb,var(--ink) 76%,var(--white));
+}
+body #app .screen-home .everyday-account-home .experience-budget-basis{min-height:1.4em;white-space:nowrap}
+/* Hibiscus uses an inverted plum money card; its supporting facts stay light. */
+body.hibiscus-edition #app .screen-home .hibiscus-account-hierarchy .everyday-money-card :is(.experience-budget-basis,.everyday-primary-label,.everyday-available-context){
+ color:var(--onInk,#fff);
+ color:color-mix(in srgb,var(--onInk,#fff) 90%,transparent);
+}
+body #app .screen-plan .plan-section-heading>div>span,
+body #app .screen-plan .plan-hub-facts,
+body #app .screen-plan .budget-line-figures,
+body #app .screen-plan .budget-line-notes,
+body #app .screen-plan .budget-overview-total-label,
+body #app .screen-plan .budget-period-kicker{
+ font-size:12px;line-height:1.4;
+ color:var(--muted);
+ color:color-mix(in srgb,var(--ink) 76%,var(--white));
+}
+body #app .screen-plan .budget-overview-actions[data-budget-primary]{grid-template-columns:minmax(0,1fr)}
+body #app .screen-plan .budget-overview-actions[data-budget-primary]>.primary{width:100%}
+body #app .screen :is(.payment-plan-link,.focus-review,.authorize-form) :is(.small.muted,.tiny.muted),
+body #app .screen #payment-plan-hint{font-size:12px;line-height:1.45;color:var(--muted);color:color-mix(in srgb,var(--ink) 76%,var(--white))}
+body #app .screen .experience-budget-assistance{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px}
+body #app .screen .experience-budget-assistance svg{flex:none;width:18px;height:18px}
+body #app .screen .experience-budget-help{min-height:44px}

@@ -1,0 +1,22 @@
+PASS Home has a discoverable Chat control and Chat opens as a full-screen destination
+PASS full-screen Chat keeps a working Home return and restores the normal navigation
+PASS a deliberate left swipe from Home opens Chat and a right swipe returns Home
+PASS vertical scrolling, short drags, mouse drags and cancelled touches never change destination
+PASS swiping over inputs, buttons or an open task never hijacks a task
+PASS Chat actions use one contextual sheet and preserve the exact conversation and composer
+PASS a payment launched from Chat still needs review and authorisation, then returns to the conversation
+PASS confirmed funding and deferring optional Budget setup return to the same full-screen Chat
+PASS leaving and reopening Chat keeps unsent text, history and reading position
+PASS an unfinished affordability clarification survives a visit to Home
+PASS browser back returns Home without authorising or losing the unsent draft
+PASS reduced motion preserves Chat navigation, calculation and safe task dismissal
+12 full-screen Chat banking checks passed; 0 failed.
+✔ tests/chat-banking.test.cjs (614.072593ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 623.475218

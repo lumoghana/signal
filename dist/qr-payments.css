@@ -1,0 +1,148 @@
+/* The scan is a short selection task, within the existing Lumo sheet. */
+#app .qr-campus{min-width:0;max-width:100%}
+#app .qr-campus .page-heading{margin-bottom:16px}
+#app .qr-campus .page-heading>.scene-art{display:none!important}
+#app .qr-campus .page-heading h1{font-size:28px;line-height:1.12}
+#app .qr-campus .page-heading p{margin-top:7px}
+#app .qr-start{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;width:100%;margin:0 0 18px}
+#app .qr-start>span{flex:1;text-align:left}
+#app .qr-code-form{margin-bottom:15px}
+#app .qr-code-form .inline{flex-wrap:nowrap;gap:8px}
+#app .qr-code-form .input{min-width:0;flex:1 1 0;width:0;text-transform:uppercase}
+#app .qr-code-form button{flex:0 0 auto;width:auto;padding-inline:18px;min-height:48px}
+#app .qr-merchants .row{padding-block:10px}
+#app .qr-merchants .row-icon{width:36px;height:36px;flex-basis:36px}
+#app .qr-campus>.text-btn{display:block;margin:10px auto 0;min-height:44px}
+#app .qr-preview-note{font-size:12px;line-height:1.45;color:var(--muted,#64705f);margin:10px 0 0;text-align:center;overflow-wrap:anywhere}
+#app .qr-camera{position:relative;isolation:isolate;width:min(100%,280px);aspect-ratio:1.25;min-height:0;margin:4px auto 10px;border-radius:24px;background:#182119;color:#fff;overflow:hidden;border:1px solid #263526}
+#app .qr-camera video{display:block;width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
+#app .qr-viewfinder{position:absolute;inset:20px;display:grid;place-items:center;border:2px solid var(--accent,#b5e96a);border-radius:18px;pointer-events:none}
+#app .qr-camera.is-active .qr-viewfinder>svg{opacity:0}
+#app .qr-camera-label{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);background:#182119d9;padding:2px 9px;border-radius:9px;font-size:11px;white-space:nowrap}
+#app .qr-status{min-height:2.8em;margin:0 0 10px;line-height:1.4}
+#app .qr-scan-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#app .qr-scan-actions .primary,#app .qr-scan-actions .secondary{min-height:52px;white-space:normal;padding:10px;line-height:1.25}
+#app .qr-photo-choice{display:flex;position:relative;align-items:center;justify-content:center;gap:7px;text-align:center;cursor:pointer;margin:0;font-weight:600}
+#app .qr-photo-choice input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+#app .qr-photo-choice:focus-within{outline:3px solid var(--accent,#b5e96a);outline-offset:3px}
+#app .qr-photo-choice svg{flex:0 0 auto}
+#app .qr-sample-figure{display:flex;flex-direction:column;align-items:center;gap:9px;margin:8px auto 16px}
+#app .lumo-payment-qr{display:block;max-width:100%;height:auto;flex:0 0 auto;border-radius:0}
+#app .qr-sample-figure figcaption{display:flex;flex-direction:column;gap:3px;text-align:center}
+#app .qr-sample-figure figcaption span{font-size:13px;color:var(--muted,#64705f)}
+@media(max-height:700px){
+ #app .qr-camera{width:min(100%,236px);margin-block:2px 8px}
+ #app .qr-campus .page-heading{margin-bottom:12px}
+ #app .qr-campus .page-heading h1{font-size:26px}
+ #app .qr-start{margin-bottom:13px}
+ #app .qr-merchants .row{padding-block:8px}
+ #app .qr-campus .section-head{margin-top:12px;margin-bottom:4px}
+}
+@media(prefers-reduced-motion:reduce){#app .qr-camera,#app .qr-viewfinder{animation:none;transition:none}}
+
+/* Scan and My code share one full-height task. The camera is the background,
+   with controls above it and a clear viewfinder, as in a native scanner. */
+body.lumo-qr-hub-open #app .task-sheet-layer{align-items:stretch;top:var(--qr-hub-top,var(--task-viewport-top,0px));height:var(--qr-hub-height,var(--task-viewport-height,100dvh))}
+body.lumo-qr-hub-open #app .task-sheet{display:flex!important;flex-direction:column!important;align-items:stretch!important;height:100%!important;max-height:100%!important;margin:0!important;border:0;border-radius:0!important;transform:none!important;opacity:1!important;background:#142019}
+body.lumo-qr-hub-open #app .task-sheet-chrome{display:none!important}
+body.lumo-qr-hub-open #app .task-sheet-body#view{display:flex!important;flex:1 1 auto!important;align-items:stretch!important;height:100%!important;max-height:none!important;min-height:0!important;padding:0!important;margin:0!important;overflow-x:hidden;overflow-y:auto;scroll-padding:0;background:#142019}
+body.lumo-qr-hub-open #app .screen.screen-campusPay,
+body.lumo-qr-hub-open #app .screen.screen-myQr{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;padding:0!important;width:100%!important;height:100%!important;min-height:100%!important;max-height:none!important;margin:0!important;background:transparent;animation:none!important}
+body.lumo-qr-hub-open #app .qr-hub .payment-balance,
+body.lumo-qr-hub-open #app .screen-campusPay>[data-payment-balance]{display:none!important}
+body.lumo-qr-hub-open #app .screen-campusPay>.qr-hub{margin:0}
+body.lumo-qr-hub-open #toast{z-index:110}
+#app .qr-hub{--qr-camera-bg:#142019;position:relative;isolation:isolate;display:flex;flex-direction:column;gap:18px;width:100%;height:100dvh;min-height:560px;margin:0;padding:calc(12px + env(safe-area-inset-top)) 24px calc(14px + env(safe-area-inset-bottom));background:var(--qr-camera-bg);color:#fff;overflow:hidden}
+#app .qr-hub .scene-art,
+#app .qr-hub figure:not(.personal-qr-card){display:none!important}
+body.lumo-qr-hub-open #app .task-sheet-body .qr-hub{flex:1 0 auto!important;width:100%!important;height:var(--qr-hub-height,100dvh)!important;max-height:none!important}
+#app .qr-hub::before{content:'';position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,#0009 0%,#0005 25%,#0000 48%,#0006 72%,#000a 100%);pointer-events:none}
+#app .qr-hub-video{position:absolute;z-index:-2;display:block;width:100%;height:100%;inset:0;object-fit:cover;background:var(--qr-camera-bg)}
+#app .qr-hub-toolbar{display:flex;justify-content:space-between;align-items:center;flex:0 0 auto;height:44px;margin:0 -7px}
+#app .qr-hub-toolbar button{display:inline-flex;justify-content:center;align-items:center;width:44px;height:44px;min-height:44px;padding:6px;margin:0;border:0;border-radius:50%;background:transparent;color:inherit;box-shadow:none;transform:none}
+#app .qr-hub-toolbar button:focus-visible{outline:2px solid currentColor;outline-offset:1px}
+#app .qr-hub-toolbar svg{width:26px;height:26px}
+#app .qr-hub-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:0 0 auto;gap:2px;width:100%;height:46px;padding:3px;border-radius:999px;background:#e6e6e6;color:#111}
+#app .qr-hub-tabs button{display:flex;justify-content:center;align-items:center;min-height:0;margin:0;border:0;border-radius:999px;background:transparent;color:inherit;box-shadow:none;font:inherit;font-size:16px;font-weight:650;line-height:1.2;padding:7px 10px;transform:none}
+#app .qr-hub-tabs button[aria-selected=true]{background:#fff;box-shadow:0 1px 3px #0001}
+#app .qr-hub-tabs button:focus-visible{outline:2px solid #111;outline-offset:-3px}
+#app .qr-scan-panel{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;gap:14px}
+#app .qr-hub h1{font-family:inherit;font-size:clamp(25px,7.5vw,32px)!important;font-weight:600;letter-spacing:-.9px;line-height:1.15;margin:10px 0 0;color:inherit;text-align:left}
+#app .qr-scan-stage{display:flex;flex:1 1 auto;min-height:0;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding-top:6px}
+#app .qr-hub-viewfinder{position:relative;display:grid;place-items:center;flex:0 1 auto;width:min(100%,38dvh,340px);aspect-ratio:1;min-width:150px;max-height:100%;border:2px solid #fffa;border-radius:26px;box-shadow:0 0 0 999px #0001;color:#fff}
+#app .qr-hub-viewfinder>span{opacity:.55;display:flex}
+#app .qr-hub-viewfinder i{position:absolute;width:26px;height:26px;border:3px solid #fff;pointer-events:none}
+#app .qr-hub-viewfinder i:nth-child(1){top:-2px;left:-2px;border-right:0;border-bottom:0;border-top-left-radius:26px}
+#app .qr-hub-viewfinder i:nth-child(2){top:-2px;right:-2px;border-left:0;border-bottom:0;border-top-right-radius:26px}
+#app .qr-hub-viewfinder i:nth-child(3){bottom:-2px;right:-2px;border-top:0;border-left:0;border-bottom-right-radius:26px}
+#app .qr-hub-viewfinder i:nth-child(4){bottom:-2px;left:-2px;border-top:0;border-right:0;border-bottom-left-radius:26px}
+#app .qr-frame-hint{font-size:13px;line-height:1.4;text-align:center;color:#fff;max-width:100%;margin:0}
+#app .qr-hub-feedback{display:flex;flex:0 0 auto;flex-direction:column;align-items:center;gap:6px;min-width:0}
+#app .qr-hub .qr-status{min-height:0;margin:0;font-size:12px;line-height:1.4;text-align:center;color:#ffffffe0}
+#app .qr-hub #error{margin:0;color:#fff;font-size:12px;line-height:1.4;text-align:center;background:#6d2929e6;border-radius:10px;padding:8px 10px;width:100%;overflow-wrap:anywhere}
+#app .qr-hub #error:empty{display:none}
+#app .qr-camera-retry{min-height:38px;border:1px solid #fff5;border-radius:999px;background:#1117;color:#fff;font-size:13px;font-weight:600;padding:7px 18px;width:auto;line-height:1.3}
+#app .qr-hub-actions{display:flex;flex:0 0 auto;flex-direction:column;align-items:center;gap:3px;margin-top:0}
+#app .qr-hub-upload{position:relative;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:52px;padding:12px 16px;margin:0;border:0;border-radius:999px;background:#fff;color:#111;font-size:15px;font-weight:650;line-height:1.3;text-align:center;cursor:pointer}
+#app .qr-hub-upload input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:100%;margin:0;cursor:pointer;padding:0}
+#app .qr-hub-upload:focus-within{outline:2px solid #fff;outline-offset:4px}
+#app .qr-manual-code{min-height:36px;padding:7px 12px;border:0;background:transparent;color:#fff;font-size:12px;line-height:1.3;text-decoration:underline;text-underline-offset:3px}
+#app .qr-hub-boundary{font-size:10px;line-height:1.4;color:#ffffffc9;text-align:center;margin:0}
+#app .qr-hub.is-code{background:var(--paper,#f8f9f4);color:var(--ink,#20261e)}
+#app .qr-hub.is-code::before{display:none}
+#app .qr-code-panel{display:flex;flex:1 1 auto;flex-direction:column;gap:10px;min-height:0;text-align:center}
+#app .qr-code-panel h1{text-align:center;margin-top:8px}
+#app .qr-hub-subtitle{font-size:13px;line-height:1.45;margin:0;color:var(--muted,#646b5f);text-align:center}
+#app .qr-code-panel .personal-qr-page{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;width:100%;padding:0}
+#app .qr-code-panel .personal-qr-card{flex:0 1 auto;margin:auto auto 20px;width:min(100%,306px);max-width:306px;padding:14px;border-radius:22px}
+#app .qr-code-panel .lumo-personal-qr{width:min(240px,36dvh);max-width:100%;flex:0 1 auto;min-height:0}
+#app .qr-code-panel .personal-qr-actions{flex:0 0 auto;margin-top:0}
+#app .qr-code-panel .personal-qr-note{margin-top:14px;margin-bottom:2px}
+#app .qr-code-panel #error{background:#f9e5e0;color:#862c25;margin-bottom:10px}
+body.minna-edition #app .qr-hub{--qr-camera-bg:#151515}
+body.hibiscus-edition #app .qr-hub{--qr-camera-bg:#3c1941}
+@media(max-height:700px){
+ #app .qr-hub{gap:11px;min-height:500px;padding:calc(7px + env(safe-area-inset-top)) 20px calc(9px + env(safe-area-inset-bottom))}
+ #app .qr-hub-tabs{height:42px}
+ #app .qr-scan-panel{gap:9px}
+ #app .qr-hub h1{font-size:26px!important;margin-top:5px}
+ #app .qr-scan-stage{gap:10px;padding-top:0}
+ #app .qr-hub-viewfinder{width:min(100%,32dvh,260px);border-radius:22px}
+ #app .qr-hub-upload{min-height:46px;padding:10px}
+ #app .qr-code-panel .personal-qr-card{margin:auto auto 12px;padding:8px;gap:7px}
+ #app .qr-code-panel .lumo-personal-qr{width:min(204px,34dvh)}
+ #app .qr-code-panel .personal-qr-note{margin-top:10px}
+}
+@media(max-height:570px){
+ #app .qr-hub{gap:7px;padding:4px 18px 7px}
+ #app .qr-hub-toolbar{height:38px}
+ #app .qr-hub-tabs{height:39px}
+ #app .qr-hub h1{font-size:24px!important;margin-top:3px}
+ #app .qr-scan-panel{gap:7px}
+ #app .qr-hub-viewfinder{width:min(100%,29dvh,200px)}
+ #app .qr-frame-hint{font-size:12px}
+ #app .qr-hub .qr-status{font-size:11px}
+ #app .qr-hub-upload{min-height:44px}
+ #app .qr-manual-code{min-height:30px;padding:6px}
+ #app .qr-code-panel{gap:7px}
+ #app .qr-code-panel .personal-qr-card{margin-bottom:8px}
+ #app .qr-code-panel .lumo-personal-qr{width:172px}
+}
+
+/* Scanner surfaces stay dark across editions. My code keeps its light surface. */
+body.lumo-qr-hub-open #app .qr-hub.is-scan h1{color:#fff}
+body.lumo-qr-hub-open #app .qr-hub.is-scan .qr-status{color:#ffffffe0}
+/* Payment facts may move currency above the number, never split its digits. */
+body #app .screen .payment-fact-amount{display:flex;flex-wrap:wrap;align-items:baseline;gap:.15em;min-width:0}
+body #app .screen .payment-fact-amount .payment-fact-currency{font-size:.48em;white-space:nowrap;letter-spacing:0}
+body #app .screen .payment-fact-amount .payment-fact-number{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+/* Let a growing amount use another row before the recipient becomes a sliver. */
+body #app :is(.screen-requests,.screen-activity) .row{flex-wrap:wrap}
+body #app :is(.screen-requests,.screen-activity) .row-copy{flex:1 1 10rem}
+body #app :is(.screen-requests,.screen-activity) .row-end{max-width:100%;margin-inline-start:auto;white-space:nowrap}
+@media(max-width:360px){
+ body #app .screen-pause .pause-hero .pause-comparison-values{grid-template-columns:minmax(0,1fr)}
+ body #app .screen-pause .pause-hero .pause-comparison-arrow{justify-self:start;transform:rotate(90deg)}
+ body #app .screen-pause .pause-hero .pause-comparison-values strong{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+ body #app .screen-pause .pause-hero .pause-comparison-values strong .currency{display:block}
+}

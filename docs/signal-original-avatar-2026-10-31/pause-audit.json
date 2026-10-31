@@ -1,0 +1,130 @@
+{
+  "edition": "signal",
+  "name": "pause · standard",
+  "variant": "standard",
+  "size": [
+    390,
+    844,
+    1
+  ],
+  "setup": {
+    "requested": "pause",
+    "variant": "standard",
+    "errors": [],
+    "initialActual": "pause",
+    "seededMoney": {
+      "operational": 400,
+      "savings": 100,
+      "room": 50,
+      "essentials": 350
+    },
+    "renderedViews": [
+      "pause"
+    ],
+    "renderedView": "pause",
+    "actual": "pause",
+    "sheet": true,
+    "fallback": false,
+    "renderFallback": false
+  },
+  "palette": {
+    "count": 0,
+    "findings": [],
+    "unfilteredImages": [],
+    "note": "Strict neutral-RGB palette rule is not applicable to Signal ivory, ink and pale green. Contrast is checked separately."
+  },
+  "width": 390,
+  "height": 844,
+  "app": {
+    "left": 0,
+    "right": 390,
+    "top": 0,
+    "bottom": 844,
+    "width": 390,
+    "height": 844
+  },
+  "documentWidth": 390,
+  "appScrollWidth": 390,
+  "viewScroll": {
+    "client": 709,
+    "scroll": 709
+  },
+  "route": "pause",
+  "actualRoute": "home",
+  "horizontal": [],
+  "unreachable": [],
+  "fixedClipped": [],
+  "textClipping": [],
+  "contentClipping": [],
+  "homeArtworkOverlap": [],
+  "planBoxesOverlap": [],
+  "savingsHackPlacement": [],
+  "savingsHackGeometry": null,
+  "pageGuidance": {
+    "mode": "",
+    "route": "pause",
+    "guideCount": 0,
+    "expanded": 0,
+    "outsideCopy": "2 of 3 Your choice Pause Moment Pause. A moment. Food and transport would be GH₵230.00 short. Food and transport would be GH₵230.00 short. GH₵280.00 to Akua’s Kitchen Continue to PIN or biometrics. Change amount Continue Nothing sent yet. PIN or biometrics comes next. Other ways forward Use GH₵50.00 Plan stays covered Add GH₵230.00 first Budget covered after it arrives This covers a budget item Decide later Cancel payment See why Payment to Akua’s Kitchen Campus Pay · AK01 Fee GH₵0.00 Total GH₵280.00 Now GH₵ 350 .00 of GH₵350.00 planned → After · projected GH₵ 120 .00 of GH₵350.00 planned Compare choices · projected Use GH₵50.00 Budget covered · GH₵0.00 outside it Add GH₵230.00, then pay GH₵280.00 Budget covered · GH₵0.00 outside it Only after the extra money is confirmed received. Continue with GH₵280.00 GH₵230.00 of Budget uncovered These compare saved Budget costs. Other costs may be missing. Adding money and paying are separate actions. Available now GH₵400.00 Payment amount −GH₵280.00 Projected Everyday balance GH₵120.00 Remaining budget GH₵350.00 Budget shortfall GH₵230.00 Total budget shortfall GH₵230.00 Your Budget applies to Everyday money. Money Boxes are held separately in savings and are not deducted again. These figures are a preview. Nothing has been sent. Help me understand this",
+    "critical": false,
+    "essentialHelpOutside": null,
+    "essentialAmountOutside": null,
+    "pinOutside": null,
+    "controlIds": [],
+    "actionLabels": [
+      "Go back",
+      "Get help",
+      "Change amount",
+      "Continue",
+      "Use GH₵50.00Plan stays covered",
+      "Add GH₵230.00 firstBudget covered after it arrives",
+      "This covers a budget item",
+      "Decide later",
+      "Cancel payment",
+      "Help me understand this"
+    ]
+  },
+  "guidanceStateIssues": [],
+  "endOcclusion": [],
+  "endUnreachable": [],
+  "scrollers": [],
+  "collapsedScrollers": [],
+  "verifiedReachable": [],
+  "homeGeometry": {
+    ".account-operational": {
+      "left": 16,
+      "right": 374,
+      "top": 148.640625,
+      "bottom": 378.453125,
+      "width": 358,
+      "height": 229.8125
+    },
+    ".account-savings": {
+      "left": 16,
+      "right": 190.5,
+      "top": 628.453125,
+      "bottom": 716.453125,
+      "width": 174.5,
+      "height": 88
+    },
+    ".everyday-home-actions": {
+      "left": 16,
+      "right": 374,
+      "top": 388.453125,
+      "bottom": 492.453125,
+      "width": 358,
+      "height": 104
+    },
+    ".everyday-budget-link": {
+      "left": 164.140625,
+      "right": 164.140625,
+      "top": 202.53125,
+      "bottom": 398.40625,
+      "width": 0,
+      "height": 195.875
+    }
+  },
+  "homeMoney": {
+    "masks": 0
+  }
+}

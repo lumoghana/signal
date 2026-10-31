@@ -1,0 +1,44 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
+const {captureEntry,buildPlatformAssets,localPath}=require('../scripts/build-platform-assets.cjs');
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+function fixture(){
+ const root=fs.mkdtempSync(path.join(os.tmpdir(),'lumo-platform-'));fs.mkdirSync(path.join(root,'dist/fonts'),{recursive:true});fs.mkdirSync(path.join(root,'config'),{recursive:true});
+ for(const [name,body] of Object.entries({'a.js':'(()=>{window.order=["a"]})();','b.js':'(()=>{window.order.push("b")})();','a.css':'.money{color:black;background:url(assets/a.png)}','b.css':'.money{color:white}','fonts/Manrope-Variable.woff2':'font','manifest.webmanifest':'{"name":"Lumo","start_url":"/"}','sw.js':'/* shell worker version1 */','index.html':'<!doctype html><head><link rel="stylesheet" href="/a.css?v=1"><link href="/b.css" rel="stylesheet"></head><body><script src="/a.js?v=1"></script><script src="/b.js"></script></body>'}))fs.writeFileSync(path.join(root,'dist',name),body);
+ fs.writeFileSync(path.join(root,'config/editions.json'),JSON.stringify({currentEdition:'mono',editions:{mono:{storageKey:'lumo-mono-test'}}}));
+ return root;
+}
+test('captures reviewed order, bundles exactly once and preserves execution/cascade',()=>{
+ const root=fixture();try{const before=fs.readFileSync(path.join(root,'dist/index.html'));const result=buildPlatformAssets({root,capture:true});const registry=JSON.parse(fs.readFileSync(path.join(root,'dist/platform-assets.json')));assert.deepEqual(registry.entry.scripts,['/a.js?v=1','/b.js']);assert.deepEqual(registry.entry.styles,['/a.css?v=1','/b.css']);const context={};context.window=context;vm.runInNewContext(fs.readFileSync(path.join(root,'dist',result.script.slice(1)),'utf8'),context);assert.equal(context.order.join(','),'a,b');const css=fs.readFileSync(path.join(root,'dist',result.stylesheet.slice(1)),'utf8');assert(css.indexOf('color:black')<css.indexOf('color:white'));assert(css.includes('url(/assets/a.png)'));assert(fs.readFileSync(path.join(root,'dist/index.html')).equals(before));assert(fs.existsSync(path.join(root,'dist/a.js')));assert.equal(registry.bundles.script.sources[0].sha256,sha(fs.readFileSync(path.join(root,'dist/a.js'))));assert.equal(buildPlatformAssets({root,check:true}).checked,true);}finally{fs.rmSync(root,{recursive:true,force:true});}
+});
+test('changed source fails a stale build check and deterministic rebuild retires only old owned bundles',()=>{
+ const root=fixture();try{const first=buildPlatformAssets({root,capture:true});fs.writeFileSync(path.join(root,'dist/a.js'),'(()=>{window.order=["changed"]})();');fs.writeFileSync(path.join(root,'dist/keep-user-file.js'),'/* keep */');assert.throws(()=>buildPlatformAssets({root,check:true}),/stale/);const second=buildPlatformAssets({root});assert.notEqual(second.script,first.script);assert(!fs.existsSync(path.join(root,'dist',first.script.slice(1))));assert(fs.existsSync(path.join(root,'dist/keep-user-file.js')));assert.equal(buildPlatformAssets({root,check:true}).version,second.version);}finally{fs.rmSync(root,{recursive:true,force:true});}
+});
+test('shell has only explicit public essentials, edition namespace and content hashes',()=>{
+ const root=fixture();try{fs.writeFileSync(path.join(root,'dist/old-unused-art.png'),'large unused asset');const result=buildPlatformAssets({root,capture:true});const context={self:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'dist/platform-precache.js'),'utf8'),context);const shell=context.self.LUMO_PRECACHE;assert.equal(shell.namespace,'lumo-mono-test');assert(shell.assets.some(x=>x.url==='/index.html'));assert(shell.assets.some(x=>x.url===result.script));assert(!shell.assets.some(x=>x.url==='/old-unused-art.png'));assert(!shell.assets.some(x=>x.url==='/a.js'));assert(shell.assets.every(x=>/^[a-f0-9]{64}$/.test(x.sha256)));const index=shell.assets.find(x=>x.url==='/index.html');assert.equal(index.sha256,sha(fs.readFileSync(path.join(root,'dist/index.html'))));}finally{fs.rmSync(root,{recursive:true,force:true});}
+});
+for(const reference of ['CSS','font preload'])test('shell caches the actual '+reference+' TTF under assets/fonts without caching unrelated fonts',()=>{
+ const root=fixture();try{
+  const fontPath='assets/fonts/InterTight-Variable.ttf',font=Buffer.from('Hibiscus primary font bytes');fs.mkdirSync(path.join(root,'dist/assets/fonts'),{recursive:true});fs.writeFileSync(path.join(root,'dist',fontPath),font);fs.writeFileSync(path.join(root,'dist/assets/fonts/Unused-Variable.ttf'),'not used');
+  if(reference==='CSS')fs.appendFileSync(path.join(root,'dist/a.css'),'\n@font-face{font-family:"Inter Tight";src:url("assets/fonts/InterTight-Variable.ttf?v=hibiscus") format("truetype")}\n@font-face{font-family:Remote;src:url(https://third.example/assets/fonts/Remote.ttf)}');
+  else{const index=path.join(root,'dist/index.html');fs.writeFileSync(index,fs.readFileSync(index,'utf8').replace('</head>','<link type="font/ttf" href="/assets/fonts/InterTight-Variable.ttf?v=hibiscus" crossorigin="anonymous" rel="preload" as="font"><link rel="preload" as="font" href="https://third.example/assets/fonts/Remote.ttf"></head>'));}
+  buildPlatformAssets({root,capture:true});const context={self:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'dist/platform-precache.js'),'utf8'),context);const assets=context.self.LUMO_PRECACHE.assets,fonts=assets.filter(item=>item.url==='/'+fontPath);assert.equal(fonts.length,1);assert.equal(fonts[0].sha256,sha(font));assert.equal(fonts[0].sizeBytes,font.length);assert(!assets.some(item=>item.url.includes('Unused-Variable')||item.url.includes('third.example')||item.url.includes('Remote.ttf')));assert.equal(buildPlatformAssets({root,check:true}).checked,true);
+ }finally{fs.rmSync(root,{recursive:true,force:true});}
+});
+test('final bundled HTML can be repinned without losing the canonical original order',()=>{
+ const root=fixture();try{const first=buildPlatformAssets({root,capture:true});fs.writeFileSync(path.join(root,'dist/index.html'),'<html><head><link rel="stylesheet" href="'+first.stylesheet+'"></head><body><script src="'+first.script+'"></script></body></html>');const second=buildPlatformAssets({root});assert.equal(second.script,first.script);assert.notEqual(second.version,first.version);const registry=JSON.parse(fs.readFileSync(path.join(root,'dist/platform-assets.json')));assert.deepEqual(registry.entry.scripts,['/a.js?v=1','/b.js']);assert.equal(buildPlatformAssets({root,check:true}).checked,true);}finally{fs.rmSync(root,{recursive:true,force:true});}
+});
+test('rejects external, traversal, duplicate and already-bundled entry sources',()=>{
+ for(const url of ['https://third.example/a.js','//third.example/a.js','/../a.js','/%2e%2e/a.js','/x\\a.js'])assert.throws(()=>localPath(url));assert.throws(()=>captureEntry('<link rel="stylesheet" href="/a.css"><script src="/a.js"></script><script src="/a.js?v=2"></script>'),/Duplicate/);assert.throws(()=>captureEntry('<link rel="stylesheet" href="/a.css"><script src="/lumo-runtime.0123456789ab.js"></script>'),/original/);
+});
+test('original 2D avatar and Signal wordmark are integrity-pinned public shell essentials',()=>{
+ const root=fixture();try{
+  fs.mkdirSync(path.join(root,'dist/assets/signal'),{recursive:true});fs.mkdirSync(path.join(root,'dist/brand'),{recursive:true});
+  const files=['brand/lumo-avatar-icon-180.png','brand/lumo-avatar-icon-192.png','brand/lumo-avatar-icon-512.png','brand/lumo-avatar-icon.svg','assets/signal/signal-wordmark.webp'];
+  for(const file of files)fs.writeFileSync(path.join(root,'dist',file),'public Lumo identity '+file);
+  for(const file of ['lux-welcome.webp','lux-pause.webp','lux-welcome-bold.webp','lux-pause-bold.webp','lux-warm-welcome.webp','lux-warm-pause.webp','lux-ring-welcome.webp','lux-ring-pause.webp','lux-ring-hero.webp','lux-ring-icon.webp','unused-exploration.webp'])fs.writeFileSync(path.join(root,'dist/assets/signal',file),'inactive source-history asset');
+  buildPlatformAssets({root,capture:true});const context={self:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'dist/platform-precache.js'),'utf8'),context);
+  for(const file of files){const entry=context.self.LUMO_PRECACHE.assets.find(a=>a.url==='/'+file);assert(entry,file+' remains available offline');assert.equal(entry.sha256,sha(fs.readFileSync(path.join(root,'dist',file))));}
+  assert(!context.self.LUMO_PRECACHE.assets.some(a=>a.url.includes('/assets/signal/lux-')||a.url.endsWith('unused-exploration.webp')),'Inactive 3D explorations are not offline shell essentials');assert(buildPlatformAssets({root,check:true}).checked);
+ }finally{fs.rmSync(root,{recursive:true,force:true});}
+});

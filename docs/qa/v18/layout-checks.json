@@ -1,0 +1,56 @@
+[
+  {
+    "screen": "biometric prompt",
+    "size": "320 × 640 at 150%",
+    "contentHeight": 778,
+    "height": 545,
+    "horizontal": false,
+    "spills": [],
+    "width": 303
+  },
+  {
+    "screen": "biometric prompt",
+    "size": "390 × 844",
+    "contentHeight": 628,
+    "height": 628,
+    "horizontal": false,
+    "spills": [],
+    "width": 388
+  },
+  {
+    "screen": "QR scanner",
+    "size": "390 × 844",
+    "contentHeight": 602,
+    "height": 602,
+    "horizontal": false,
+    "spills": [],
+    "width": 388
+  },
+  {
+    "screen": "QR scanner",
+    "size": "412 × 915",
+    "contentHeight": 602,
+    "height": 602,
+    "horizontal": false,
+    "spills": [],
+    "width": 410
+  },
+  {
+    "screen": "QR scanner",
+    "size": "320 × 640",
+    "contentHeight": 559,
+    "height": 559,
+    "horizontal": false,
+    "spills": [],
+    "width": 318
+  },
+  {
+    "screen": "QR scanner",
+    "size": "320 × 640 at 150%",
+    "contentHeight": 763,
+    "height": 566,
+    "horizontal": false,
+    "spills": [],
+    "width": 303
+  }
+]

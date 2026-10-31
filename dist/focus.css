@@ -1,0 +1,206 @@
+/* Five distinct compositions, one Lumo. */
+.screen-home,.screen-pay,.screen-paymentReview,.screen-pause,.screen-story{--focus-ink:#20261e;padding:8px 24px 18px;letter-spacing:-.2px}
+.focus-top .eyebrow{font-size:10px;letter-spacing:1.7px}
+.focus-art{width:100%;position:relative;isolation:isolate}
+.screen .focus-art .scene-art{height:148px!important;margin:0!important;width:100%;mix-blend-mode:multiply}
+.screen .focus-art .scene-art svg{height:100%;width:100%;animation:focus-rise .65s cubic-bezier(.18,.72,.28,1) both}
+.focus-amount,.focus-payment-title h1,.focus-story-total>strong{font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:-3px;line-height:1.1;overflow-wrap:anywhere}
+.focus-amount .currency,.focus-payment-title .currency,.focus-story-total .currency{font-size:.27em;letter-spacing:0;margin-right:7px;vertical-align:baseline}
+.focus-amount .cents,.focus-payment-title .cents,.focus-story-total .cents{font-size:.55em;letter-spacing:-1px;color:#68705e}
+.focus-home .home-greeting{padding:4px 0 12px}.focus-home .avatar{border:1px solid var(--line);width:38px;height:38px}
+.focus-hello{font-size:13px;color:#66705e;margin-bottom:9px}
+.focus-money h1{font-size:14px;line-height:1.4;font-weight:500;letter-spacing:0}
+.focus-money h1 button{display:flex;gap:4px;align-items:center;padding:0;background:none;border:0;font-size:inherit}
+.focus-amount{font-size:clamp(48px,13.5vw,64px);margin-top:5px;color:#354c25}
+.home-stage:before{content:'';position:absolute;width:65%;height:85%;border-radius:50%;background:radial-gradient(ellipse,#e1efcf 0%,#eff4e6 55%,transparent 73%);left:17%;top:12%;z-index:-1}
+.screen .home-stage .scene-art{height:145px!important}.home-stage{margin:0 0 10px}
+.focus-main-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.screen .focus-main-actions button{min-height:53px;border-radius:16px;font-size:14px;padding:12px 8px}
+.focus-main-actions .secondary{background:transparent;border:1.5px solid #283321;color:var(--ink)}
+.focus-small-actions{display:flex;align-items:center;justify-content:center;gap:26px;margin:5px 0 8px}.screen .focus-small-actions button{display:flex;align-items:center;gap:5px;font-size:12px;min-height:40px}
+.focus-plan{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:#edf0e7;border:0;border-radius:17px;padding:13px 15px}
+.focus-plan small{display:block;font-size:8px;letter-spacing:1.25px;color:#5e6854;line-height:1.4}.focus-plan strong{display:block;font-size:21px;letter-spacing:-.7px;margin-top:3px}.focus-plan strong span{font-size:12px;font-weight:400;letter-spacing:0}.focus-plan em{font-size:11px;color:#825233;font-style:normal;display:block;margin-top:3px}
+.screen .focus-story-link{padding:14px 0 13px;border-bottom:1px solid var(--line);border-radius:0;margin:0;min-height:69px}.focus-story-link .home-story-copy small{font-size:8px;letter-spacing:1.3px;margin:0 0 3px}.focus-story-link .home-story-copy strong{font-size:22px;letter-spacing:-.8px}
+.focus-latest{display:flex;align-items:center;padding-top:9px;gap:5px}.focus-latest>button:first-child{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:1;text-align:left;background:none;border:0;padding:0;min-width:0}.focus-latest small,.focus-latest span strong{display:block}.focus-latest small{font-size:10px;color:var(--muted)}.focus-latest strong{font-size:12px}.focus-latest span{min-width:0}.focus-latest span strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}.focus-latest .icon-btn{height:40px;width:32px}.focus-resume{display:flex;width:100%;justify-content:space-between;align-items:center;border:0;background:none;font-size:12px;min-height:44px;padding:8px 0}
+/* Pay: decisive heading, artwork with breathing room, then one short task list. */
+.focus-pay-heading{margin:8px 0 0}.focus-pay-heading h1{font-size:36px;line-height:1.04;letter-spacing:-1.7px;max-width:9em}.focus-pay-heading p{font-size:13px;color:#66705e;margin-top:9px}
+.screen-pay .focus-pay-art .scene-art{height:154px!important;margin:0!important}.screen-pay .focus-pay-art{margin:2px 0 13px}
+.screen-pay .pay-tabs{padding:4px;border-radius:14px;background:#e9ede2;gap:3px;border:0;margin:0 0 8px;display:grid;grid-template-columns:1fr 1fr 1fr}.screen-pay .pay-tabs button{min-height:43px;border:0;border-radius:10px;font-size:11px;padding:8px 3px;letter-spacing:-.1px;color:#616a57;background:none}.screen-pay .pay-tabs [aria-selected=true]{background:#20261e;color:#fff;box-shadow:0 2px 4px #20261e10}
+.screen-pay .pay-option-list .row{min-height:65px;padding:10px 0;border-bottom:1px solid #e4e8dd}.screen-pay .row-icon{background:transparent;border:1px solid #dce2d3;border-radius:50%;width:40px;height:40px}.screen-pay .row-copy strong{font-size:16px;font-weight:500;letter-spacing:-.4px}.screen-pay .pay-utilities{margin-top:12px;justify-content:flex-start;gap:22px}.screen-pay .pay-utilities button{font-size:12px;min-height:44px}
+.screen-pay .pay-tab-panel{animation:focus-rise .28s ease both}.screen-pay .pay-tab-panel[hidden]{display:none!important}.screen-pay #pay-panel-bills .row{min-height:49px;padding:6px 0}.screen-pay #pay-panel-bills .row-icon{width:31px;height:31px;border:0}.screen-pay #pay-panel-bills .row-copy strong{font-size:14px}.screen-pay .campus-code{margin:6px 0 4px}.screen-pay .campus-code label{font-size:11px}
+/* Review is a precise payment summary, with the actual approval still ahead. */
+.screen .review-stage .scene-art{height:132px!important}.focus-payment-title{text-align:center;margin:4px 0 18px}.focus-payment-title .eyebrow{color:#66705e;font-size:9px;letter-spacing:1.5px}.focus-payment-title h1{font-size:52px;margin:8px 0}.focus-payment-title p{font-size:16px}.focus-payment-title small{display:block;font-size:11px;color:#66705e;margin-top:4px;overflow-wrap:anywhere}.focus-receipt{border-top:1px solid #dce2d3;border-bottom:1px solid #dce2d3;padding:8px 0}.focus-receipt>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;font-size:13px}.focus-receipt>div>span{color:#64705a}.focus-receipt .focus-total{font-size:16px;padding-top:10px}.focus-receipt .focus-total span{color:var(--ink);font-weight:600}.focus-receipt .focus-after{font-size:12px;margin-top:7px;padding:10px 12px;background:#edf0e7;border-radius:9px}.focus-details{font-size:12px;margin-top:9px}.focus-details summary{cursor:pointer;min-height:35px;display:flex;align-items:center;gap:6px;color:#58644e}.focus-details summary:after{content:'+';margin-left:auto}.focus-details[open] summary:after{content:'−'}.focus-details p{padding:4px 0;color:#58644e}.focus-footnote{font-size:10px;color:#59654e;text-align:center;margin-top:9px}.screen-paymentReview .actions{gap:8px;margin-top:16px}.screen-paymentReview .actions .primary,.screen-paymentReview .actions .secondary{min-height:49px}.screen-paymentReview .actions .text-btn{min-height:40px}
+/* Pause owns the green canvas. Its one insight remains the engine's selected message. */
+.screen.screen-pause{background:var(--green);min-height:100%;padding-top:8px;animation:focus-pause-reveal .45s cubic-bezier(.2,.75,.3,1) both}.focus-pause{color:#202b19}.focus-pause .focus-top{margin-bottom:3px}.focus-pause-label{display:flex;justify-content:center;align-items:center;gap:7px;font-size:8px;font-weight:600;letter-spacing:1.8px;margin:8px 0 2px}.focus-pause-label>span{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:1px solid #202b1940;border-radius:50%;font-size:13px;letter-spacing:0}.screen .pause-stage .scene-art{height:172px!important}.focus-pause-insight h1{font-size:clamp(27px,7.3vw,34px);line-height:1.09;letter-spacing:-1.2px;text-align:center;text-wrap:balance;margin:4px auto 18px;max-width:21ch}.focus-consequence{padding:13px 0 0;border-top:1px solid #202b1930}.focus-consequence>div:not(.focus-balance-track){display:flex;align-items:center;justify-content:space-between;padding:4px 0;gap:10px;font-size:12px}.focus-consequence>div:nth-child(2){font-size:15px}.focus-consequence>div:nth-child(2) strong{font-size:21px;letter-spacing:-.7px}.focus-balance-track{height:7px;background:#202b191c;border-radius:5px;margin:10px 0;overflow:hidden}.focus-balance-track>span{display:block;height:100%;width:var(--remaining);background:#26381d;border-radius:5px;animation:focus-money-impact 1.4s .3s cubic-bezier(.3,0,.25,1) both}.focus-consequence>p{font-size:11px;opacity:.78;overflow-wrap:anywhere}.focus-choice{text-align:center;font-size:12px;font-weight:500;margin:17px 0 0}.focus-pause .actions{margin-top:12px}.screen-pause .focus-pause .secondary{background:transparent;border:1px solid #202b1970}.focus-pause-exits{display:grid;grid-template-columns:1fr 1fr;gap:8px}.screen-pause .focus-pause-exits .text-btn{min-height:44px;font-size:12px}.focus-pause .focus-footnote{margin-top:2px}
+/* Money Story: the answer is visible before opening more detail. */
+.focus-story-heading h1{font-size:35px;line-height:1.03;letter-spacing:-1.6px}.focus-story-heading p{font-size:12px;color:#64705a;margin-top:9px}.screen .story-stage .scene-art{height:127px!important}.focus-story-period{display:flex;gap:5px;margin:7px 0 15px}.focus-period{background:none;border:1px solid #dfe4d7;border-radius:22px;min-height:40px;flex:1;font-size:12px}.focus-period.is-active{background:#20261e;color:white;border-color:#20261e}.focus-story-total>span{display:block;font-size:8px;letter-spacing:1.1px;color:#64705a}.focus-story-total>strong{display:block;font-size:45px;margin-top:6px}.focus-categories{margin-top:14px}.focus-category{display:block;width:100%;text-align:left;padding:9px 0;border:0;background:none;min-height:54px}.focus-category>div{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px}.focus-category>div>span{display:flex;align-items:center;gap:7px}.focus-category i{height:7px;width:7px;border-radius:50%;display:inline-block}.focus-category small{font-size:10px;font-weight:400;color:#66705e;margin-left:4px}.focus-category-track{display:block;height:4px;background:#e8ecdf;border-radius:5px;margin-top:9px;overflow:hidden}.focus-category-track>span{display:block;height:100%;border-radius:5px;animation:focus-bar .6s ease both}.focus-story .actions{margin-top:14px}.focus-story .text-btn{display:flex;align-items:center;justify-content:center;gap:8px}.focus-empty{font-size:13px;color:#64705a;margin:18px 0}
+/* Preserve reading and scrolling on short screens and with large accessibility text. */
+@media(max-height:760px){.screen .home-stage .scene-art{height:112px!important}.screen .focus-pay-art .scene-art{height:120px!important}.screen .pause-stage .scene-art{height:138px!important}.screen .review-stage .scene-art{height:105px!important}.screen .story-stage .scene-art{height:97px!important}.focus-pause-insight h1{font-size:28px}.focus-money .focus-amount{font-size:52px}.focus-hello{margin-bottom:5px}.focus-main-actions{gap:8px}.screen .focus-main-actions button{min-height:49px}.focus-small-actions{margin:2px 0 5px}.focus-plan{padding:11px 13px}.focus-home .home-greeting{padding-bottom:7px}.focus-story-heading h1,.focus-pay-heading h1{font-size:32px}}
+@media(max-width:359px){.screen-home,.screen-pay,.screen-paymentReview,.screen-pause,.screen-story{padding-left:18px;padding-right:18px}.focus-amount{font-size:49px}.screen .focus-main-actions button{font-size:12px}.focus-payment-title h1{font-size:45px}.focus-story-total>strong{font-size:40px}.screen-pay .pay-tabs button{font-size:10px}.focus-pause-insight h1{font-size:27px}}
+@media(hover:hover){.focus-main-actions .primary:hover{background:#394831}.focus-category:hover,.focus-story-link:hover{opacity:.75}}
+@keyframes focus-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes focus-pause-reveal{from{opacity:.3;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes focus-money-impact{from{width:100%}to{width:var(--remaining)}}
+@keyframes focus-bar{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@media(prefers-reduced-motion:reduce){.screen.screen-pause,.screen .focus-art .scene-art svg,.screen-pay .pay-tab-panel,.focus-balance-track>span,.focus-category-track>span{animation:none!important}}
+
+/* Customer design system: consistent scale, clear actions and a private overview. */
+:root{--muted:#626c59;--line:#e0e5d9;--radius:20px}
+.screen{--art-size:clamp(145px,22dvh,190px);padding:10px 24px 22px}
+.screen .topline{margin:0 -5px 13px;min-height:46px}
+.screen .topline .eyebrow{font-size:12px;letter-spacing:1.1px}
+.screen .page-heading{margin-bottom:19px}
+.screen .page-heading h1,.screen .hero h1{font-size:clamp(2rem,8.8vw,2.4rem);line-height:1.07;letter-spacing:-1.4px;font-weight:600}
+.screen .page-heading p,.screen .hero p{font-size:14px;line-height:1.45;margin-top:10px;color:var(--muted)}
+.screen p{line-height:1.45}
+.screen .eyebrow{font-size:12px;letter-spacing:1px}
+.screen .small,.screen small,.screen .tiny,.screen .mini-label{font-size:12px;line-height:1.45}
+.screen .primary,.screen .secondary,.screen .danger{min-height:52px;border-radius:16px;font-size:15px;line-height:1.3;padding:14px 16px}
+.screen .primary{font-weight:600;letter-spacing:-.2px}
+.screen .secondary{background:#edf0e7}
+.screen .text-btn{font-size:14px;min-height:44px;padding:10px 4px}
+.screen .icon-btn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0}
+.screen .actions{gap:10px;margin-top:20px}
+.screen .field{margin-bottom:17px}
+.screen .field>span,.screen .field{font-size:14px}
+.screen .field>span{margin-bottom:7px}
+.screen input:not([type=checkbox]):not([type=radio]),.screen select{min-height:54px;border-radius:14px;padding:14px;font-size:16px;background:#fff}
+.screen .amount-input{font-size:clamp(2.5rem,10vw,3.2rem)!important;min-height:72px!important}
+.screen .row{min-height:65px;padding:12px 0;gap:13px}
+.screen .row-copy strong{font-size:16px;font-weight:500;letter-spacing:-.25px;line-height:1.3}
+.screen .row-copy small{font-size:12px;line-height:1.45;margin-top:3px}
+.screen .row-end{font-size:13px;min-width:18px;max-width:47%;overflow-wrap:anywhere}
+.screen .row-icon{width:40px;height:40px;border-radius:13px;background:#edf0e7}
+.screen .summary-line{font-size:14px;padding:10px 0}
+.screen .notice,.screen .warning{font-size:14px;line-height:1.45;padding:15px;border-radius:16px}
+.screen .card,.screen .receipt,.screen .soft{padding:19px;border-radius:20px}
+.screen .chip{min-height:44px;font-size:12px;padding:10px 13px}
+.screen summary{min-height:44px;align-content:center;cursor:pointer;font-size:13px}
+.screen .preview-boundary,.screen .focus-footnote,.screen .pause-unsent{font-size:12px;line-height:1.4}
+.screen .scene-art{height:var(--art-size)!important;margin-bottom:15px}
+.screen .page-heading>.scene-art,.screen .hero>.scene-art{height:var(--art-size)!important;margin-bottom:18px}
+#nav:not([hidden]){min-height:78px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid #e3e7dd;gap:0}
+.nav-item{isolation:isolate;min-height:56px;padding:8px 0 4px;gap:5px;font-size:11px;line-height:1.25;color:#687360;border-radius:14px;position:relative}
+.nav-item.active{color:#26351d;background:#edf2e5}.nav-item.active:before{display:none}.nav-item svg{width:23px;height:23px}.nav-item.active svg{stroke-width:2}
+.screen [hidden]{display:none!important}
+/* Home: the balance is a private, stable-sized object, never a blurred value. */
+.focus-home .home-greeting{min-height:48px;padding:0 0 13px}.focus-home .home-greeting .wordmark{font-size:33px}.focus-home .avatar{width:40px;height:40px;border:1px solid #dce3d1;background:none}
+.home-intro{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin:2px 0 10px}.home-intro p{font-size:15px;font-weight:500}.home-intro>span{font-size:12px;color:#65705a;text-align:right;max-width:50%}
+.focus-money{position:relative;text-align:center;padding:0 0 4px}
+.balance-caption{display:flex;justify-content:center;align-items:center;gap:10px;min-height:44px;font-size:13px;color:#546049}
+.balance-eye{display:inline-flex;align-items:center;justify-content:center;border:0;background:#edf0e7;border-radius:50%;min-width:44px;min-height:44px;color:#35472a}
+.focus-money .focus-amount{font-size:clamp(2.9rem,13vw,3.7rem);min-height:67px;display:flex;align-items:center;justify-content:center;margin-top:5px;letter-spacing:-2.5px;color:#283b1e}
+.focus-money .focus-amount .money-mask{font-size:48px;letter-spacing:6px;line-height:1}
+.money-mask{display:inline-block;white-space:nowrap;letter-spacing:3px;line-height:1.1}
+.privacy-hint{font-size:12px;color:#637156;margin-top:4px;min-height:18px}
+.balance-details-link{position:absolute;right:0;top:49px;display:flex;align-items:center;justify-content:center;gap:2px;border:0;background:none;font-size:0;min-height:44px;min-width:25px;opacity:.7}.balance-details-link svg{width:18px;height:18px}
+.screen .home-stage .scene-art{height:clamp(125px,17dvh,164px)!important}.home-stage{margin:0 0 10px}.home-stage:before{width:77%;height:93%;left:12%;top:5%;background:radial-gradient(ellipse,#e2efcf,transparent 70%)}
+.screen .focus-main-actions button{min-height:54px;font-size:14px;border-radius:16px}.focus-main-actions .secondary{background:transparent;border:1.5px solid #29371f}
+.focus-small-actions{margin:4px 0 9px;gap:28px}.screen .focus-small-actions button{min-height:44px;font-size:13px}
+.focus-plan{padding:14px 15px;border-radius:16px;background:#edf0e7}.focus-plan small{font-size:11px;letter-spacing:.6px}.focus-plan strong{font-size:22px;margin-top:4px;line-height:1.2}.focus-plan strong>span:not([data-private-value]){font-size:12px;font-weight:400;letter-spacing:0}.focus-plan em{font-size:12px}.focus-plan .money-mask{font-size:20px}
+.screen .focus-story-link{min-height:74px;padding:13px 0}.focus-story-link .home-story-copy strong{font-size:23px;letter-spacing:-.8px}.focus-story-link .home-story-copy small{font-size:12px;letter-spacing:0;text-transform:none;margin:4px 0 0}.focus-latest{padding-top:10px;min-height:55px}.focus-latest small,.focus-latest strong{font-size:12px}.focus-latest .money-mask{font-size:15px}.focus-resume{font-size:13px;min-height:48px}
+/* Primary destinations have individual compositions within the same system. */
+.destination-heading h1,.focus-pay-heading h1,.focus-story-heading h1{font-size:clamp(2rem,8.7vw,2.4rem);line-height:1.05;letter-spacing:-1.6px}.destination-heading p,.focus-pay-heading p,.focus-story-heading p{font-size:14px;line-height:1.45;color:#616d55;margin-top:10px}
+.screen .destination-stage .scene-art{height:clamp(125px,18dvh,165px)!important}.destination-stage{margin-top:5px}
+.plan-room{padding:4px 0 16px}.plan-room>span{font-size:13px;color:#616d55}.plan-room>strong{display:block;font-size:clamp(2.5rem,10.4vw,3rem);letter-spacing:-2px;line-height:1.15;margin:5px 0 7px}.plan-room .currency{font-size:.37em;letter-spacing:0;margin-right:5px}.plan-room .cents{font-size:.6em;letter-spacing:-1px;color:#67725c}.plan-room p{font-size:12px;color:#616d55}.plan-room .text-btn{display:flex;align-items:center;gap:8px;text-align:left}
+.destination-list .row{border-top:1px solid #e0e5d8}.destination-list .row-icon{background:none;border:1px solid #e0e5d8;border-radius:50%}.destination-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}.destination-footer .text-btn{display:flex;align-items:center;gap:7px;font-size:13px}.destination-footer>span{font-size:12px;color:#65715a}
+.you-campus{display:flex;align-items:center;justify-content:center;gap:6px;color:#637156;font-size:12px;margin:4px 0 15px}.you-options{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.you-options button{min-height:90px;display:grid;grid-template-columns:35px 1fr;grid-template-rows:1fr 1fr;column-gap:10px;align-items:center;border:0;border-top:1px solid #e0e5d8;background:none;text-align:left;padding:15px 0}.you-options button>span{grid-row:1/-1;display:flex;align-items:center;justify-content:center}.you-options strong{font-size:15px;align-self:end;font-weight:500}.you-options small{color:#65715a;font-size:12px;align-self:start;margin-top:2px}
+.screen-pay .focus-pay-art .scene-art{height:clamp(128px,19dvh,164px)!important}.screen-pay .pay-tabs{margin:0 0 10px}.screen-pay .pay-tabs button{min-height:48px;font-size:12px}.screen-pay .pay-option-list .row{min-height:64px}.screen-pay .pay-option-list .row-copy strong{font-size:16px}.screen-pay #pay-panel-bills .row{min-height:51px}.screen-pay #pay-panel-bills .row-copy strong{font-size:15px}.screen-pay .pay-utilities .text-btn{font-size:13px}.screen-pay .campus-code label{font-size:13px}.screen-pay .compact-draft{font-size:12px;min-height:44px}
+/* Financial decisions: enough space to read, one unambiguous approval path. */
+.screen .review-stage .scene-art{height:clamp(112px,17dvh,148px)!important}.focus-payment-title h1{font-size:clamp(2.6rem,12vw,3.3rem)}.focus-payment-title .eyebrow{font-size:12px}.focus-payment-title small{font-size:12px;line-height:1.45}.focus-payment-title{margin:8px 0 20px}.focus-receipt>div{font-size:14px;padding:9px 0}.focus-receipt .focus-after{font-size:13px}.screen-paymentReview .actions .primary,.screen-paymentReview .actions .secondary{min-height:52px}.focus-details{font-size:13px}.focus-details summary{min-height:44px}
+.screen.screen-pause{padding:10px 24px 24px}.focus-pause-label{font-size:11px;letter-spacing:1px;margin:8px 0}.screen .pause-stage .scene-art{height:clamp(135px,21dvh,185px)!important}.focus-pause-insight h1{font-size:clamp(1.8rem,7.9vw,2.2rem);max-width:22ch;line-height:1.1;letter-spacing:-1.1px;margin:6px auto 22px}.focus-consequence>div:not(.focus-balance-track){font-size:14px}.focus-consequence>div:nth-child(2){font-size:16px}.focus-consequence>div:nth-child(2) strong{font-size:25px}.focus-consequence>p{font-size:12px;line-height:1.45}.focus-choice{font-size:14px;margin:18px 0 0}.screen .focus-pause .pause-actions{display:flex;flex-direction:column;gap:9px;margin-top:14px}.focus-pause-exits{grid-column:1/-1;width:100%;gap:10px}.screen-pause .focus-pause-exits .text-btn{min-height:46px;font-size:13px}.screen .focus-pause .secondary{background:transparent}
+.screen .story-stage .scene-art{height:clamp(108px,16dvh,138px)!important}.focus-story-period{margin:6px 0 18px}.focus-period{min-height:44px;font-size:13px}.focus-story-total>span{font-size:11px;letter-spacing:.5px;line-height:1.4}.focus-story-total>strong{font-size:clamp(2.4rem,10vw,3rem)}.focus-category{min-height:60px;padding:12px 0}.focus-category>div{font-size:14px}.focus-category small{font-size:12px}.focus-story .actions{margin-top:17px}
+/* Chat keeps a readable conversation and a reachable composer. */
+.screen-chat .page-heading h1{font-size:35px}.screen-chat .chat-bubble{font-size:15px;line-height:1.5;border-radius:19px;padding:15px}.screen-chat .chat-prompts summary{font-size:13px}.screen-chat .chat-entry{min-height:54px;border-radius:17px}.screen-chat .chat-entry button{width:44px;height:44px;min-width:44px}.screen-chat .chat-entry input{background:none;border:0;min-height:50px;padding:10px;font-size:16px}
+/* Density changes adjust artwork and spacing, never shrink readable copy. */
+.screen[data-density=snug]{--art-size:155px}.screen[data-density=compact]{--art-size:132px}
+.screen[data-density=compact] .focus-art .scene-art,.screen[data-density=compact] .focus-pay-art .scene-art{height:120px!important}
+.screen-pause[data-density=compact] .focus-art .scene-art{height:135px!important}
+.screen[data-density=compact] .topline{margin-bottom:8px}.screen[data-density=compact] .page-heading{margin-bottom:13px}
+@media(max-height:760px){.screen{padding-top:6px}.home-intro{margin-bottom:2px}.home-intro>span{display:none}.screen .home-stage .scene-art{height:108px!important}.focus-money .focus-amount{min-height:58px;font-size:50px}.focus-money .focus-amount .money-mask{font-size:42px}.screen .focus-main-actions button{min-height:50px}.focus-plan{padding:11px 14px}.screen .focus-story-link{min-height:66px}.focus-latest{padding-top:5px}.screen .destination-stage .scene-art{height:112px!important}.you-options button{min-height:76px;padding:10px 0}.screen-pause .pause-stage .scene-art{height:130px!important}.screen .review-stage .scene-art{height:110px!important}.screen .story-stage .scene-art{height:98px!important}}
+@media(max-width:359px){.screen{padding-left:19px;padding-right:19px}.home-intro>span{display:none}.screen .focus-main-actions button{font-size:13px;gap:5px}.you-options{gap:0 10px}.you-options button{grid-template-columns:27px 1fr;column-gap:6px}.you-options strong{font-size:14px}.screen-pay .pay-tabs button{font-size:11px}.focus-pause-insight h1{font-size:28px}}
+
+.focus-plan strong>[data-private-value]{font:inherit;letter-spacing:inherit}.balance-details-link{min-width:44px}.focus-plan small{font-size:12px}.focus-story-total>span,.focus-pause-label{font-size:12px}
+
+/* First funding and clear money language. The eye controls only the two summary amounts. */
+.balance-details-link{position:static;font-size:12px;min-height:36px;min-width:44px;width:max-content;margin:1px auto 0;opacity:1;color:#536448}
+.plan-explanation{display:block;font-size:12px;color:#626f57;line-height:1.4;margin-top:5px;max-width:29ch}
+.home-first-funding>p{font-size:13px;color:#58694d;text-align:center;margin-bottom:11px}
+.home-first-funding .primary{min-height:54px}
+.home-plan-invite{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;min-height:78px;padding:14px 0;text-align:left;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:none}
+.home-plan-invite strong{display:block;font-size:20px;letter-spacing:-.6px}.home-plan-invite small{display:block;font-size:12px;color:#637156;margin-top:4px;max-width:29ch}
+.plan-start-copy{font-size:14px;color:#637156;margin:6px 0 17px}
+.focus-plan-shortfall{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 0 15px;margin-bottom:10px;border-bottom:1px solid #202b1930}.focus-plan-shortfall>span{font-size:13px;max-width:18ch}.focus-plan-shortfall>strong{font-size:29px;letter-spacing:-1px;line-height:1.1;text-align:right}
+.pause-plan-basis{font-size:12px;color:#3b502b;margin:11px 0 0;line-height:1.45}
+.screen .chat-scope{font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;margin-bottom:10px;border-bottom:1px solid var(--line);color:#637156}
+.screen .chat-scope button{font-size:12px;min-height:44px}
+@media(max-height:760px){.screen .home-stage .scene-art{height:96px!important}.balance-details-link{min-height:32px}.home-first-funding>p{margin-bottom:8px}}
+
+.focus-consequence>.pause-available-before{font-size:14px!important}.focus-consequence>.pause-available-before strong{font-size:14px!important;letter-spacing:0!important}.focus-consequence>.pause-available-after{font-size:16px!important}.focus-consequence>.pause-available-after strong{font-size:25px!important;letter-spacing:-.7px!important}.focus-consequence>.focus-plan-shortfall{font-size:13px;min-height:60px}.focus-consequence>.focus-plan-shortfall strong{font-size:29px;letter-spacing:-1px}
+
+.story-category-scope{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px}.story-category-scope .text-btn{min-height:44px}
+.screen-chat .chat-context{padding:2px 0 7px}.screen-chat .chat-context .chips{margin:7px 0 0}.screen-chat .chat-prompts{gap:6px;margin:8px 0 3px}.screen-chat .chat-prompts .chip{font-size:12px;padding:9px 12px}
+.screen-chat[data-density=compact] .page-heading{--art-size:106px}.screen-chat[data-density=snug] .page-heading{--art-size:128px}
+
+/* Clearer actions throughout Lumo. Preserve the existing sizes and static placement. */
+.screen .primary,.screen .secondary,.screen .danger{font-size:16px;font-weight:700;letter-spacing:-.2px;border:1.5px solid transparent}
+.screen .primary{background:#20261e;color:#fff;border-color:#20261e;box-shadow:0 2px 0 #20261e1c}
+.screen .secondary{background:#f5f7ef;color:#20261e;border-color:#536148;box-shadow:none}
+.screen .danger{background:#fae7e3;border-color:#bd7769;color:#8b2d20}
+.screen .focus-main-actions button{font-size:15px;font-weight:700}
+.screen-paymentReview .actions .primary,.screen-paymentReview .actions .secondary{font-size:16px;font-weight:700}
+.screen .focus-pause .secondary{background:#ffffff26;border:1.5px solid #29371f;font-weight:700}
+.screen .text-btn{font-weight:600;color:#26331f;text-decoration:underline;text-decoration-color:#89977d;text-underline-offset:4px;text-decoration-thickness:1px}
+.screen .focus-small-actions .text-btn,.screen .pay-utilities .text-btn,.screen .welcome-utilities .text-btn{font-weight:600}
+.screen .pause-actions .text-btn,.screen-pause .focus-pause-exits .text-btn{font-weight:600;text-decoration-color:#516a3b}
+.screen .row-copy strong,.screen-pay .row-copy strong,.screen .menu-choice strong,.screen .you-options strong{font-weight:600}
+.screen .row-end svg{stroke-width:2;color:#4b5a40}
+.screen .menu-icon{background:#e6ebdd;color:#28391f}
+.screen .funding-choices{gap:12px}
+.screen .funding-choices .menu-choice{border:1.5px solid #647256;background:#f4f6ee;border-radius:19px;padding:17px 9px;min-height:140px;gap:10px}
+.screen .funding-choices .menu-choice strong{font-size:16px;font-weight:700}
+.screen .funding-choices .menu-choice small{font-size:12px;color:#56644c}
+.screen .funding-choices .menu-icon{background:#20261e;color:#fff;width:47px;height:47px}
+.screen .icon-btn,.screen .balance-eye{background:#edf1e6;border:1px solid #d7decd;color:#2c3b23}
+.screen .icon-btn svg,.screen .balance-eye svg,.screen .primary svg,.screen .secondary svg{stroke-width:2}
+.screen .focus-pause .icon-btn{background:#ffffff35;border-color:#64814480}
+.screen .chip,.screen .focus-period{font-weight:600;border-color:#a0ad94;color:#33432a}
+.screen .chip.selected,.screen .focus-period.is-active{border-color:#20261e;background:#20261e;color:#fff}
+.screen-pay .pay-tabs button{font-weight:700;color:#405036;border:1px solid transparent}
+.screen-pay .pay-tabs button[aria-selected=true]{border-color:#20261e;background:#20261e;color:#fff}
+.screen .chat-context .text-btn,.screen .chat-scope button{font-weight:600}
+.screen .chat-entry button{font-weight:700;background:#20261e;color:#fff;border:1.5px solid #20261e}
+.nav-item{font-weight:600}.nav-item.active{font-weight:700}
+.screen button:disabled{background:#e3e7dc;color:#8b9481;border-color:#d4dacb;box-shadow:none;opacity:.75}
+.screen button:focus-visible{outline:3px solid #5d7a3c;outline-offset:3px}
+.screen-pause button:focus-visible{outline-color:#26391b}
+@media(hover:hover){.screen .primary:not(:disabled):hover{background:#33432a;border-color:#33432a}.screen .secondary:not(:disabled):hover{background:#e8eedf}.screen .funding-choices .menu-choice:hover{background:#eaf0e0;border-color:#2e4121}.screen .icon-btn:hover,.screen .balance-eye:hover{background:#e1e9d6}}
+@media(max-width:359px){.screen .focus-main-actions button{font-size:14px}.screen .funding-choices .menu-choice{padding:15px 7px}.screen .funding-choices .menu-choice strong{font-size:15px}}
+.screen .focus-plan,.screen .home-plan-invite,.screen .focus-resume,.screen .compact-draft,.screen .home-money-story,.screen .focus-category{font-weight:600}
+.screen .balance-details-link{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+/* Review corrections: visible planning choices and readable fields. */
+.screen input:not([type=checkbox]):not([type=radio]),.screen select,.screen textarea{border:1.5px solid #7b8a70;background:#fff}
+.screen input:focus,.screen select:focus,.screen textarea:focus{border-color:#3f5a2b;box-shadow:0 0 0 3px #b5e96a65}
+.screen [aria-invalid=true]{border-color:#a64333!important;box-shadow:0 0 0 3px #a6433318}
+.screen .payment-plan-link{padding:13px 14px;margin:8px 0 14px;border-radius:15px;background:#edf2e5}
+.screen .payment-plan-link label,.screen .payment-plan-link .field{font-size:13px}
+.screen .payment-plan-link select{margin-top:7px}
+.screen .payment-plan-link p{font-size:12px;color:#56694b;margin-top:7px}
+.plan-period-line .text-btn{font-size:12px;min-height:44px;padding-left:0;justify-content:flex-start}
+.screen .plan-period-fields{margin:10px 0 16px}
+.screen .plan-period-fields label{font-size:13px}
+.ambassador-intro{font-size:15px;color:#637156;margin:12px 0 18px}
+.ambassador-boundary{padding:15px;background:#edf2e5;border-radius:16px;margin:15px 0;font-size:14px}
+.ambassador-boundary p{margin-top:7px;font-size:13px;line-height:1.5}
+.ambassador-entry>.small{margin-top:17px}
+.ambassador-tools{margin-top:15px}
+.screen-chat:has(#chatText:focus) .page-heading{--art-size:72px;margin-bottom:5px}
+.screen-chat:has(#chatText:focus) .page-heading h1{font-size:27px}
+.screen-chat:has(#chatText:focus) .page-heading>p{display:none}
+.screen-chat:has(#chatText:focus) .chat-prompts,.screen-chat:has(#chatText:focus) .chat-context .chips{display:none}
+.screen-chat:has(#chatText:focus) .chat-thread{min-height:72px}
+.screen-chat:has(#chatText:focus) .chat-context{padding-bottom:2px}
+
+/* Open campus linework stays behind the crisp foreground illustration. */
+.screen .focus-art .scene-art.scene-legon{mix-blend-mode:normal}
+.scene-legon .legon-backdrop{pointer-events:none}

@@ -1,0 +1,37 @@
+/* Both identities inherit their own type, ink, paper and accent tokens. */
+.everyday-shortcuts{display:flex;gap:8px;margin:10px 0 12px}
+.everyday-shortcuts>button{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;min-width:0;min-height:44px;border:1px solid var(--line,#dededb);border-radius:12px;background:var(--paper,#fff);color:var(--ink,#111);font:inherit;font-size:14px;font-weight:600}
+.everyday-shortcuts>button>span{font-size:20px;line-height:1}
+.everyday-payments h1,.everyday-recovery h1,.everyday-payment-choice h1{font-size:clamp(25px,7vw,31px);line-height:1.12;margin:5px 0 10px;letter-spacing:-.04em}
+.everyday-intro,.everyday-recovery>p,.everyday-payment-choice>p{font-size:15px;line-height:1.45;margin:0 0 14px;color:var(--muted,#666)}
+.everyday-filter{display:flex;gap:4px;padding:4px;border:1px solid var(--line,#dededb);border-radius:14px;margin-bottom:10px}
+.everyday-filter button{flex:1;min-height:44px;border:0;border-radius:10px;background:transparent;color:var(--ink,#111);font:inherit;font-size:14px;font-weight:600}
+.everyday-filter button[aria-pressed=true]{background:var(--ink,#111);color:var(--paper,#fff)}
+.everyday-payment-list{border-top:1px solid var(--line,#dededb)}
+.everyday-payment-row{width:100%;display:flex;align-items:center;gap:10px;min-height:66px;padding:12px 0;border:0;border-bottom:1px solid var(--line,#dededb);background:transparent;text-align:left;color:var(--ink,#111);font:inherit}
+.everyday-payment-row>span:not(.everyday-row-icon){flex:1;min-width:0}
+.everyday-payment-row strong{display:block;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.everyday-payment-row small{display:block;font-size:12px;line-height:1.4;margin-top:4px;color:var(--muted,#666);overflow-wrap:anywhere}
+.everyday-row-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid var(--line,#dededb);border-radius:50%}
+.everyday-merchant-row{display:flex;align-items:center;border-bottom:1px solid var(--line,#dededb)}
+.everyday-merchant-row .everyday-payment-row{min-width:0;flex:1;border:0}
+.everyday-star{display:grid;place-items:center;flex:0 0 44px;min-width:44px;min-height:44px;border:0;background:transparent;color:var(--ink,#111);font-size:28px;line-height:1}
+.everyday-star[aria-pressed=true]{border-radius:50%;background:var(--green,#cfef59);color:var(--ink,#111)}
+.everyday-empty{padding:18px 0}
+.everyday-empty h2,.everyday-pending-preview h2{font-size:18px;line-height:1.2;margin:0 0 7px}
+.everyday-empty p{font-size:14px;line-height:1.45;color:var(--muted,#666);margin:0;max-width:32em}
+.everyday-pending-preview{margin-top:18px}
+.everyday-more,.everyday-simulation{margin:14px 0;font-size:14px;line-height:1.4}
+.everyday-more summary,.everyday-simulation summary{min-height:44px;display:flex;align-items:center;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.everyday-receipt-shortcuts{display:grid;gap:8px;margin:16px 0 8px}
+.everyday-save-favourite{min-height:44px;justify-content:center;gap:7px}
+.everyday-repeat-hint{padding:10px 12px;margin:0 0 10px;border-left:3px solid var(--green,#cfef59);background:var(--paper,#fff);font-size:13px;line-height:1.4;color:var(--ink,#111)}
+.everyday-status-symbol{display:grid;place-items:center;width:48px;height:48px;border:2px solid var(--ink,#111);border-radius:50%;margin:4px 0 16px}
+.everyday-recovery-context{margin:16px 0;border-top:1px solid var(--line,#dededb);border-bottom:1px solid var(--line,#dededb)}
+.everyday-summary-line{display:flex;justify-content:space-between;gap:14px;padding:10px 0;font-size:13px;line-height:1.4}
+.everyday-summary-line>span{color:var(--muted,#666)}
+.everyday-summary-line>strong{text-align:right;min-width:0;overflow-wrap:anywhere;max-width:70%}
+.everyday-payment-choice .actions,.everyday-recovery .actions{gap:8px}
+.everyday-payments .preview-boundary,.everyday-recovery .preview-boundary{font-size:11px;line-height:1.4;margin:16px 0 0}
+.everyday-shortcuts button:focus-visible,.everyday-payments button:focus-visible,.everyday-receipt-shortcuts button:focus-visible,.everyday-recovery button:focus-visible{outline:3px solid var(--ink,#111);outline-offset:3px}
+@media(max-width:370px){.everyday-payment-row{gap:8px}.everyday-row-icon{flex-basis:30px;width:30px;height:30px}.everyday-payment-row small{font-size:12px}}

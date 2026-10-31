@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumo isolated student rehearsal</title><style>
+body{margin:0;background:#eee;color:#161616;font:14px/1.5 system-ui}header{display:flex;align-items:center;gap:10px;padding:12px;background:white}button,select{padding:10px;font:inherit}main{display:flex;gap:24px;padding:20px;align-items:flex-start}iframe{width:375px;height:667px;border:1px solid #ccc;background:#fff;flex:none}pre{white-space:pre-wrap;max-width:650px;overflow-wrap:anywhere;font:12px/1.5 monospace}.note{padding:0 20px}#status{font-weight:600}
+</style><header><strong>Isolated student rehearsal</strong><button id="fresh">Start fresh</button><button id="reload">Reload saved rehearsal</button><button id="back">Browser Back</button><select id="size" aria-label="Phone size"><option value="375,667">375 × 667</option><option value="390,844">390 × 844</option><option value="320,568">320 × 568</option></select><span id="status">Loading</span></header><p class="note">Only sample data in this page’s memory. Uses the shipped app. No customer profile, camera, identity service or live payment provider is connected.</p><main><iframe id="rehearsal" title="Student Lumo rehearsal"></iframe><pre id="report"></pre></main><script>
+'use strict';
+const frame=document.querySelector('iframe'),report=document.querySelector('#report'),status=document.querySelector('#status');
+let records=[],source='';
+async function boot(clear=false){
+ if(clear)records=[];
+ let html=await fetch('/').then(r=>r.text());source=html;
+ const bootstrap=`<script>(()=>{const map=new Map(${JSON.stringify(records)});const store={getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k),clear:()=>map.clear(),key:i=>[...map.keys()][i]||null,get length(){return map.size}};Object.defineProperty(window,'localStorage',{value:store});Object.defineProperty(window,'sessionStorage',{value:store});window.__rehearsalRecords=()=>[...map];try{Object.defineProperty(navigator,'mediaDevices',{value:{getUserMedia:()=>Promise.reject(new Error('Camera unavailable in isolated rehearsal'))}})}catch{}window.addEventListener('error',e=>parent.postMessage({type:'rehearsal-error',message:e.message},location.origin));})();<\/script>`;
+ html=html.replace('<head>','<head><base href="/">').replace(/<script\b/,bootstrap+'<script');
+ await new Promise(resolve=>{frame.onload=resolve;frame.srcdoc=html;});status.textContent='Ready';snapshot();
+}
+function snapshot(){const d=frame.contentDocument,w=frame.contentWindow;if(!w.L)return;records=w.__rehearsalRecords();const app=d.querySelector('#app'),view=d.querySelector('#view');report.textContent=JSON.stringify({route:w.L.route,onboarded:w.L.state.onboarded,locked:w.L.state.locked,task:w.L.taskSheet?.active||false,historyRoute:w.history.state?.route,focus:d.activeElement?.getAttribute('aria-label')||d.activeElement?.textContent?.trim().slice(0,80),view:view?{client:view.clientHeight,scroll:view.scrollHeight}:null,appWidth:app?.clientWidth,scrollWidth:app?.scrollWidth,errors:errors},null,2)}
+const errors=[];window.addEventListener('message',event=>{if(event.source===frame.contentWindow&&event.data?.type==='rehearsal-error')errors.push(event.data.message)});
+document.querySelector('#fresh').onclick=()=>boot(true);document.querySelector('#reload').onclick=()=>{records=frame.contentWindow.__rehearsalRecords();boot()};document.querySelector('#back').onclick=()=>frame.contentWindow.history.back();document.querySelector('#size').onchange=e=>{const [w,h]=e.target.value.split(',');frame.style.width=w+'px';frame.style.height=h+'px'};
+setInterval(snapshot,250);boot(true);
+</script></html>

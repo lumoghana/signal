@@ -1,0 +1,34 @@
+/* Shared Money Box savings controls inherit each edition's type and accents. */
+.savings-hack-fields,.savings-hack-status{min-width:0;margin:20px 0;padding:18px 0;border-top:1px solid var(--line,rgba(127,127,127,.22));border-bottom:1px solid var(--line,rgba(127,127,127,.22));overflow-wrap:anywhere}
+.sh-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0;margin-bottom:12px}.sh-heading h2{font-size:1rem;line-height:1.35;margin:0;min-width:0}.sh-heading>span{font-size:.75rem;flex-shrink:0;color:var(--muted)}
+.savings-hack-fields .field{min-width:0;margin-bottom:12px}.savings-hack-fields .input{width:100%;max-width:100%;min-width:0;box-sizing:border-box;font:inherit}.savings-hack-fields select{white-space:normal;text-overflow:ellipsis;padding-right:25px}
+.sh-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px}.sh-input-unit{display:flex;align-items:center;min-width:0;gap:8px}.sh-input-unit>input{flex:1;min-width:0}.sh-input-unit>span{font-size:.875rem;color:var(--muted)}
+.sh-help,.sh-example,.sh-description,.sh-cancel-confirm p{font-size:.8125rem;line-height:1.55;margin:8px 0 12px;overflow-wrap:anywhere}.sh-help,.sh-sample-note{color:var(--muted)}.sh-example{padding:10px 12px;border-radius:10px;background:var(--soft,rgba(127,127,127,.09))}.sh-sample-note{font-size:.6875rem;line-height:1.5;margin:9px 0 0}
+.sh-limits,.sh-history{min-width:0;font-size:.8125rem}.sh-limits summary,.sh-history summary{cursor:pointer;line-height:1.5;padding:8px 0;overflow-wrap:anywhere}.sh-limits[open] summary{margin-bottom:8px}.sh-limits .field>span{font-size:.8125rem}
+.sh-consent{display:flex;gap:10px;align-items:flex-start;font-size:.75rem;line-height:1.55;margin-top:10px;cursor:pointer;min-width:0}.sh-consent input{flex:0 0 18px;width:18px;height:18px;margin:2px 0 0;accent-color:var(--ink)}.sh-consent span{min-width:0;overflow-wrap:anywhere}
+.sh-actions{display:flex;gap:6px 14px;align-items:center;flex-wrap:wrap;min-width:0}.sh-actions>button{width:auto;max-width:100%;white-space:normal;overflow-wrap:anywhere;min-width:0;font-size:.8125rem}.sh-actions .text-btn{padding:8px 0;margin:0;min-height:40px}.sh-cancel-confirm{padding:12px;margin-top:10px;border-radius:10px;background:var(--soft,rgba(127,127,127,.09))}.sh-cancel-confirm p{margin-top:0}
+.sh-history{margin-top:8px}.sh-history ul{list-style:none;margin:4px 0 0;padding:0}.sh-history li{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:9px 0;border-top:1px solid var(--line,rgba(127,127,127,.16))}.sh-history li>div{display:flex;flex-direction:column;gap:3px;min-width:0}.sh-history strong{font-size:.75rem;font-weight:600;overflow-wrap:anywhere}.sh-history span,.sh-history time{font-size:.6875rem;color:var(--muted);line-height:1.5;overflow-wrap:anywhere}.sh-history time{flex-shrink:0}
+@media(max-width:350px){.sh-grid{grid-template-columns:minmax(0,1fr)}.savings-hack-fields,.savings-hack-status{padding:14px 0}.sh-consent{gap:8px}.sh-actions{gap:4px 12px}}
+@media(prefers-reduced-motion:reduce){.savings-hack-fields *,.savings-hack-status *{scroll-behavior:auto}}
+
+/* Keep the control with money actions; supporting detail stays below them. */
+.sh-priority-control.savings-hack-status{margin:0;padding:0;border:0}
+.sh-priority-control .sh-heading{margin:0 0 2px}
+.sh-priority-control:has(.sh-heading){padding:10px 14px;border-radius:12px;background:var(--soft)}
+.sh-priority-control .sh-actions{justify-content:space-between;gap:4px 12px}
+.sh-priority-control .sh-cancel-confirm{margin:6px 0 0;padding:10px 0 0;border-top:1px solid var(--line);border-radius:0}
+.savings-hack-details{min-width:0;margin:18px 0 0;padding-top:12px;border-top:1px solid var(--line);overflow-wrap:anywhere}
+.sh-info{font-size:.8125rem;min-width:0}.sh-info summary{cursor:pointer;line-height:1.5;padding:8px 0;overflow-wrap:anywhere}
+.money-box-goal-guide,.payment-auto-saving,.savings-hack-overview,.sh-overview-rule{min-width:0;overflow-wrap:anywhere}
+.money-box-goal-guide{padding:12px 0;margin:10px 0 16px;border-bottom:1px solid var(--line)}
+.money-box-goal-guide>p{font-size:.9375rem;line-height:1.5;font-weight:600;margin:0 0 6px}
+.money-box-goal-guide details,.payment-auto-saving details{font-size:.8125rem;line-height:1.55;color:var(--muted)}
+.money-box-goal-guide summary,.payment-auto-saving summary,.savings-hack-overview summary{min-height:44px;padding:10px 0;cursor:pointer}
+.sh-overview-entry{width:100%;margin:12px 0;white-space:normal}
+.sh-overview-rule{padding:16px 0;border-bottom:1px solid var(--line)}
+.sh-overview-rule>p{margin:7px 0;line-height:1.5}
+.sh-overview-rule>button{margin-top:8px;white-space:normal;min-height:44px}
+.payment-auto-saving{padding-top:10px;margin-top:10px;border-top:1px solid var(--line)}
+.payment-auto-saving p{margin:5px 0;line-height:1.5}
+.budget-cycle-obligation-date{grid-column:1/-1;min-width:0}
+.budget-cycle-obligation-date input{width:100%;min-width:0;box-sizing:border-box}

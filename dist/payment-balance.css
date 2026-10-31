@@ -1,0 +1,18 @@
+/* A fact row, not another card or an additional primary amount. */
+#app .screen .payment-balance{
+ display:flex;align-items:baseline;justify-content:space-between;gap:8px 12px;
+ min-width:0;flex-wrap:wrap;margin:0 0 10px;padding:5px 0 9px;
+ border-bottom:1px solid var(--line);color:var(--ink);font-size:.875rem;line-height:1.4;
+}
+#app .screen .payment-balance>span{color:var(--muted);font-weight:500}
+#app .screen .payment-balance>strong{
+ min-width:0;color:var(--ink);font-size:1rem;line-height:1.4;font-weight:700;
+ font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.02em;
+ white-space:normal;overflow-wrap:anywhere;word-break:normal;
+}
+#app .screen .payment-balance-currency{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+#app .screen .payment-balance-number{overflow-wrap:anywhere}
+#app .screen .payment-result-compact>.payment-balance{text-align:left;margin-bottom:18px}
+@media(max-height:720px){
+ #app .screen .payment-balance{margin-bottom:8px;padding:3px 0 7px}
+}

@@ -1,0 +1,343 @@
+/* Lumo Mono · money in motion.
+   Presentation only. Payment authority, timed Pause, QR decoding, approval,
+   virtual-card ledger and all recovery destinations remain in their owners. */
+
+/* A quiet progress line keeps the customer oriented without repeating titles. */
+body.minna-edition #app .screen .transaction-stage{
+ margin:0 0 18px;padding:0 0 12px;border:0;border-bottom:1px solid var(--mono-line,#e2e2e2);
+ border-radius:0;background:transparent;color:var(--mono-muted,#6c6c6c);font-size:13px;line-height:1.4;letter-spacing:.02em;
+}
+body.minna-edition #app .screen .transaction-stage strong{font-weight:600;color:var(--mono-ink,#161616);margin-left:5px}
+body.minna-edition #app .transaction-stage-dots{gap:4px}
+body.minna-edition #app .transaction-stage-dots i{width:16px;height:3px;border-radius:2px;background:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .transaction-stage-dots :is(i.active,i.is-complete){background:var(--mono-ink,#161616)}
+body.minna-edition #app .screen .payment-balance{
+ margin:0 0 16px;padding:0 0 12px;background:transparent;border:0;border-bottom:1px solid var(--mono-line,#e2e2e2);
+ font-size:12px;line-height:1.5;gap:8px;box-shadow:none;
+}
+body.minna-edition #app .screen .payment-balance>span{color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen .payment-balance>strong{color:var(--mono-ink,#161616);font-size:14px;font-weight:650;letter-spacing:-.02em}
+
+/* Payments overview: compact segmented navigation and generous destination rows. */
+body.minna-edition #app .screen-pay .focus-pay-heading{margin:5px 0 22px}
+body.minna-edition #app .screen-pay .focus-pay-heading h1{font-size:34px;line-height:1.12;letter-spacing:-.045em;font-weight:650}
+body.minna-edition #app .screen-pay .focus-pay-heading p{font-size:14px;line-height:1.5;max-width:32ch;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen-pay .pay-hero.focus-pay-art{width:100%;margin:0}
+body.minna-edition #app .screen-pay .pay-hero.focus-pay-art .scene-art{height:72px!important;margin:0 0 18px!important;filter:grayscale(1)!important;opacity:.85}
+body.minna-edition #app .screen-pay .pay-tabs{display:flex;gap:4px;padding:4px;margin:0 0 18px;border:0;border-radius:14px;background:var(--mono-soft,#f0f0f0)}
+body.minna-edition #app .screen-pay .pay-tabs button{flex:1;min-height:44px;padding:10px 6px;border:0;border-radius:10px;background:transparent;color:var(--mono-muted,#6c6c6c);font-size:13px;font-weight:600;line-height:1.35;box-shadow:none}
+body.minna-edition #app .screen-pay .pay-tabs button[aria-selected=true]{background:var(--mono-surface,#fff);color:var(--mono-ink,#161616);box-shadow:0 1px 4px #00000008}
+body.minna-edition #app .screen-pay .pay-option-list{border:0;border-radius:0;background:transparent}
+body.minna-edition #app .screen-pay .pay-option-list .row{min-height:76px;padding:15px 0;border:0;border-bottom:1px solid var(--mono-line,#e2e2e2);border-radius:0;background:transparent;gap:13px}
+body.minna-edition #app .screen-pay .pay-option-list .row :is(.avatar,.row-icon){display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;border:0;border-radius:14px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen-pay .pay-option-list .row-copy strong{font-size:15px;font-weight:650;letter-spacing:-.02em}
+body.minna-edition #app .screen-pay .pay-option-list .row-copy :is(small,.muted){font-size:12px;line-height:1.45;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen-pay .compact-draft{margin:0 0 18px;padding:14px 16px;min-height:56px;border:1px solid var(--mono-line,#e2e2e2);border-radius:14px;background:var(--mono-surface,#fff);color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen-pay .pay-utilities{gap:8px;margin-top:14px}
+body.minna-edition #app .screen-pay .vc-pay-entry{margin-top:16px;border-color:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .screen-pay .row-icon{border-color:var(--mono-line,#e2e2e2)!important}
+body.minna-edition #app .compact-draft{border-color:var(--mono-line,#e2e2e2)!important;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+
+/* Amount entry: the number gets the space, with the consequence beneath it. */
+body.minna-edition #app .screen [data-payment-entry] .hero{padding:0;margin:4px 0 22px;gap:6px!important;text-align:left}
+body.minna-edition #app .screen [data-payment-entry] .hero>h1{font-size:29px;line-height:1.18;font-weight:650;letter-spacing:-.04em;color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen [data-payment-entry] .hero p{font-size:14px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen :is([data-payment-entry],.virtual-card-funding,.vc-funded-create) .payment-amount-row{
+ display:flex;align-items:baseline;gap:10px;min-width:0;min-height:92px;margin:6px 0 2px;padding:15px 16px;
+ border:1px solid var(--mono-line,#e2e2e2);border-radius:16px;background:var(--mono-soft,#f0f0f0);box-shadow:none;
+}
+body.minna-edition #app .screen :is([data-payment-entry],.virtual-card-funding,.vc-funded-create) .payment-amount-row:focus-within{border-color:var(--mono-ink,#161616);box-shadow:0 0 0 1px var(--mono-ink,#161616)}
+body.minna-edition #app :is(.screen-momoAdd,.screen-requestCreate) .payment-amount-row{display:flex;align-items:baseline;gap:10px;min-width:0;min-height:86px;padding:15px 16px;border:1px solid var(--mono-line,#e2e2e2);border-radius:16px;background:var(--mono-soft,#f0f0f0);box-shadow:none}
+body.minna-edition #app :is(.screen-momoAdd,.screen-requestCreate) .payment-amount-row:focus-within{border-color:var(--mono-ink,#161616);box-shadow:0 0 0 1px var(--mono-ink,#161616)}
+body.minna-edition #app :is(.screen-momoAdd,.screen-requestCreate) .payment-currency{flex:none;font-size:19px;font-weight:500;color:var(--mono-ink,#161616);line-height:1.2}
+body.minna-edition #app :is(.screen-momoAdd,.screen-requestCreate) .payment-amount-row .amount-input{min-width:0;min-height:0!important;width:100%;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--mono-ink,#161616)!important;font-size:42px!important;line-height:1.2!important;font-weight:550;letter-spacing:-.055em;text-align:left!important;box-shadow:none!important;outline:none!important}
+body.minna-edition #app .screen :is([data-payment-entry],.virtual-card-funding,.vc-funded-create) .payment-currency{flex:none;font-size:19px;font-weight:500;color:var(--mono-ink,#161616);letter-spacing:-.02em;line-height:1.2}
+body.minna-edition #app .task-sheet-layer .screen [data-payment-entry] .amount-input,
+body.minna-edition #app .screen :is([data-payment-entry],.virtual-card-funding,.vc-funded-create) .payment-amount-row .amount-input{
+ min-width:0;min-height:0!important;width:100%;padding:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;color:var(--mono-ink,#161616)!important;font-size:42px!important;line-height:1.2!important;
+ font-weight:550;letter-spacing:-.055em;box-shadow:none!important;outline:none!important;
+}
+body.minna-edition #app .screen [data-payment-entry] .payment-projection{margin:14px 0 18px}
+body.minna-edition #app .screen .payment-projection{box-shadow:none!important}
+body.minna-edition #app .screen [data-payment-entry] .entry-consequence,
+body.minna-edition #app .screen [data-payment-entry] .entry-consequence.lumo-lens-small{
+ padding:13px 14px;border:0;border-left:3px solid var(--mono-acid,#d7ff3f);border-radius:0 12px 12px 0;
+ background:var(--mono-soft,#f0f0f0);box-shadow:none;gap:10px;
+}
+body.minna-edition #app .screen [data-payment-entry] .entry-consequence-copy,
+body.minna-edition #app .screen [data-payment-entry] .entry-consequence-copy.lumo-lens-value{
+ margin:3px 0 0;padding:0;color:var(--mono-ink,#161616)!important;background:transparent!important;
+ font-size:14px;line-height:1.5;font-weight:600;letter-spacing:-.015em;box-shadow:none;
+}
+body.minna-edition #app .screen [data-payment-entry] .entry-consequence-label{color:var(--mono-muted,#6c6c6c);font-size:13px;line-height:1.5;font-weight:500}
+body.minna-edition #app .screen [data-payment-entry] .projection-placeholder{font-size:12px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen [data-payment-entry] .entry-category{margin:10px 0 14px;color:var(--mono-muted,#6c6c6c);font-size:12px}
+body.minna-edition #app .screen [data-payment-entry] .category-chip{border:1px solid var(--mono-line,#e2e2e2);border-radius:999px;min-height:38px;padding:8px 13px;background:var(--mono-surface,#fff);color:var(--mono-ink,#161616);font-size:12px}
+body.minna-edition #app .screen [data-payment-entry] .payment-plan-link{margin:16px 0 0;padding:0;border:0;background:transparent}
+body.minna-edition #app .screen [data-payment-entry] .payment-plan-link select{min-height:50px;border:1px solid var(--mono-line,#e2e2e2);border-radius:12px;background:var(--mono-surface,#fff);color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen :is(.payment-plan-choice,.recipient-search){border:0;border-top:1px solid var(--mono-line,#e2e2e2);border-radius:0;background:transparent}
+body.minna-edition #app .screen :is(.payment-plan-choice,.recipient-search)>summary{min-height:48px;font-size:13px;font-weight:550}
+
+/* Review and receipts are clear records, with a single amount above the facts. */
+body.minna-edition #app .screen-paymentReview .focus-payment-title{margin:8px 0 24px;padding:0;border:0;background:transparent;border-radius:0;text-align:left}
+body.minna-edition #app .screen-paymentReview .focus-payment-title :is(.eyebrow,small){color:var(--mono-muted,#6c6c6c);font-size:12px;line-height:1.5}
+body.minna-edition #app .task-sheet-layer .screen-paymentReview .focus-payment-title h1,
+body.minna-edition #app .screen-paymentReview .focus-payment-title h1{font-size:46px!important;line-height:1.15;font-weight:550;letter-spacing:-.055em;color:var(--mono-ink,#161616);margin:8px 0 12px}
+body.minna-edition #app .screen-paymentReview .focus-payment-title p{font-size:15px;line-height:1.5;margin:0 0 5px;color:var(--mono-ink,#161616)}
+body.minna-edition #app :is(.screen-paymentReview,.screen-txDetail,.screen-requestCreate,.screen-requestDetail,.screen-requestConfirm,.screen-momoAdd,.screen-bankAdd,.virtual-card-review) :is(.receipt,.focus-receipt){
+ padding:5px 16px;border:1px solid var(--mono-line,#e2e2e2);border-radius:18px;background:var(--mono-surface,#fff);box-shadow:none;
+}
+body.minna-edition #app .screen-paymentReview .focus-receipt>div,
+body.minna-edition #app .screen .receipt .summary-line{padding:13px 0;border-color:var(--mono-line,#e2e2e2);gap:10px;font-size:13px;line-height:1.5}
+body.minna-edition #app .screen-paymentReview .focus-receipt>div>span,
+body.minna-edition #app .screen .receipt .summary-line>span{color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen-paymentReview .focus-receipt>div>strong,
+body.minna-edition #app .screen .receipt .summary-line>strong{font-weight:600;color:var(--mono-ink,#161616);overflow-wrap:anywhere}
+body.minna-edition #app .screen-paymentReview .focus-receipt .focus-total{border-color:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .screen-paymentReview .focus-receipt .focus-total strong{font-size:17px;letter-spacing:-.025em}
+body.minna-edition #app .screen :is(.receipt-more,.focus-details){border-color:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .screen :is(.receipt-more,.focus-details)>summary{min-height:48px;color:var(--mono-ink,#161616);font-size:13px;font-weight:550}
+body.minna-edition #app .screen-paymentReview .focus-details :is(p,small){color:var(--mono-muted,#6c6c6c)!important}
+body.minna-edition #app #view .payment-consequence{
+ padding:13px 14px;margin:16px 0;border:0;border-left:3px solid var(--mono-acid,#d7ff3f);border-radius:0 12px 12px 0;
+ background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);
+}
+body.minna-edition #app #view .payment-consequence>span,
+body.minna-edition #app #view .payment-consequence>small{color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app #view .payment-consequence>strong{color:var(--mono-ink,#161616)!important}
+body.minna-edition #app #view .payment-consequence:is([data-consequence-tone=shortfall],[data-consequence-tone=funding]){border-color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen-authorize .hero{margin:5px 0 18px;padding:0;background:transparent;text-align:left;align-items:flex-start}
+body.minna-edition #app .screen-authorize .hero h1{font-size:34px!important;letter-spacing:-.04em;line-height:1.15}
+body.minna-edition #app .screen-authorize #payment-pin{min-height:60px;padding:14px 16px;font-size:20px;letter-spacing:.3em;border-radius:12px;text-align:center}
+body.minna-edition #app .screen-authorize :is(.biometric-choice,.biometric-status){border-color:var(--mono-line,#e2e2e2);background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);border-radius:14px}
+body.minna-edition #app .screen-authorize .biometric-entry{border:1px solid var(--mono-line,#e2e2e2);background:var(--mono-surface,#fff);border-radius:12px;color:var(--mono-ink,#161616);min-height:52px}
+
+/* A result communicates its actual status through words and a distinct symbol. */
+body.minna-edition #app .screen .payment-result-compact{padding:18px 0 0;text-align:left}
+body.minna-edition #app .screen .payment-result-compact .result-mark{display:grid;place-items:center;width:68px;height:68px;margin:0 0 25px;border:0;border-radius:50%;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen .payment-result-compact[data-payment-state=confirmed] .result-mark{background:var(--mono-acid,#d7ff3f);color:var(--mono-ink,#161616)}
+body.minna-edition #app .screen .payment-result-compact>h1{font-size:34px;line-height:1.12;letter-spacing:-.045em;font-weight:650;color:var(--mono-ink,#161616);margin:0 0 15px}
+body.minna-edition #app .screen .payment-result-compact .result-context{font-size:16px;line-height:1.5;color:var(--mono-ink,#161616);margin:0 0 12px}
+body.minna-edition #app .screen .payment-result-compact .result-context strong{font-weight:650}
+body.minna-edition #app .screen .payment-result-compact .result-explanation{font-size:14px;line-height:1.55;color:var(--mono-muted,#6c6c6c);margin:0 0 20px}
+body.minna-edition #app .screen .payment-result-compact .result-reference{padding:16px 0;margin:22px 0;border-color:var(--mono-line,#e2e2e2);font-size:12px;line-height:1.5;gap:12px}
+body.minna-edition #app .screen .payment-result-compact .result-reference>span{color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .screen .payment-result-compact .result-reference>strong{font-weight:550;color:var(--mono-ink,#161616);overflow-wrap:anywhere}
+body.minna-edition #app .screen .payment-result-compact :is(.preview-boundary,.result-details){font-size:13px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app :is(.screen-txDetail,.screen-requestDetail,.screen-requestConfirm) .hero{gap:10px!important;padding:4px 0 18px;text-align:left;align-items:flex-start!important}
+body.minna-edition #app :is(.screen-txDetail,.screen-requestDetail,.screen-requestConfirm) .hero .avatar{display:grid;place-items:center;width:52px;height:52px;border:0;border-radius:16px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);margin-bottom:4px}
+body.minna-edition #app :is(.screen-txDetail,.screen-requestDetail,.screen-requestConfirm) .hero h1{font-size:42px;letter-spacing:-.05em;line-height:1.15}
+body.minna-edition #app :is(.screen-txDetail,.screen-requestDetail,.screen-requestConfirm) .hero .pill{border:0;border-radius:999px;padding:6px 10px;background:var(--mono-soft,#f0f0f0);font-size:13px;color:var(--mono-ink,#161616)}
+body.minna-edition #app :is(.screen-activity,.screen-pending,.screen-requests) .row{padding-block:16px;border-color:var(--mono-line,#e2e2e2);gap:12px;min-height:72px}
+body.minna-edition #app :is(.screen-activity,.screen-pending,.screen-requests) .row :is(.row-icon,.avatar){width:40px;height:40px;flex:0 0 40px;border-radius:50%;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);border:0}
+body.minna-edition #app :is(.screen-activity,.screen-pending,.screen-requests) .row-copy strong{font-size:14px;font-weight:600;line-height:1.4}
+body.minna-edition #app :is(.screen-activity,.screen-pending,.screen-requests) .row-copy :is(small,.muted){font-size:13px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app :is(.screen-activity,.screen-pending,.screen-requests) .row-end{font-size:14px;font-weight:600;letter-spacing:-.02em;color:var(--mono-ink,#161616)}
+
+/* Pause is the intentional contrast in the journey. Lime identifies the
+   projected consequence; both decisions retain equal visual authority. */
+body.minna-edition #app .task-sheet:is([data-sheet-treatment=pause],[data-step=pause]){background:var(--mono-ink,#161616)!important;color:#fff;border:0;border-top:3px solid var(--mono-acid,#d7ff3f)}
+body.minna-edition #app .task-sheet:is([data-sheet-treatment=pause],[data-step=pause]) :is(.task-sheet-chrome,.task-sheet-body){background:var(--mono-ink,#161616)!important;color:#fff;border-color:#ffffff26}
+body.minna-edition #app .task-sheet:is([data-sheet-treatment=pause],[data-step=pause]) :is(#task-sheet-title,.icon-btn){color:#fff!important}
+body.minna-edition #app .task-sheet:is([data-sheet-treatment=pause],[data-step=pause]) .icon-btn{background:#ffffff0a!important;border:0!important;border-radius:50%!important}
+body.minna-edition #app .screen.screen-pause,
+body.minna-edition #app .task-sheet-layer .screen.screen-pause,
+body.minna-edition #app .task-sheet-layer .screen.screen-pause[data-density]{
+ --muted:#b7b7b7;--line:#ffffff26;--control-line:#ffffff70;
+ background:var(--mono-ink,#161616)!important;color:#fff;
+}
+body.minna-edition #app .screen-pause :is(.transaction-stage,.transaction-stage strong,.payment-balance>strong,.pause-payment-context,.pause-payment-context strong,.focus-pause-label,.pause-goal-impact,.pause-total-impact,.pause-decision-consequence p){color:#fff!important}
+body.minna-edition #app .screen-pause :is(.focus-pause,.pause-arrival-intro,.focus-choice){color:#fff!important}
+body.minna-edition #app .screen-pause .pause-arrival-intro{font-size:29px;line-height:1.18;font-weight:600;letter-spacing:-.04em}
+body.minna-edition #app .screen-pause #error:not(:empty){padding:12px 14px;border:1px solid #ffffff4d;border-radius:12px;background:#ffffff0d;color:#fff!important;font-size:13px;line-height:1.5}
+body.minna-edition #app .screen-pause :is(.payment-balance,.transaction-stage,.decision-payment-summary){border-color:#ffffff26}
+body.minna-edition #app .screen-pause :is(.payment-balance>span,.decision-payment-summary>span,.projection-tag,.focus-footnote,.pause-comparison-note,.pause-timing-status,.pause-payment-context small){color:#b7b7b7!important}
+body.minna-edition #app .screen-pause .decision-payment-summary strong{color:#fff!important;font-weight:600}
+body.minna-edition #app .screen-pause .transaction-stage-dots i{background:#ffffff26}
+body.minna-edition #app .screen-pause .transaction-stage-dots :is(i.active,i.is-complete){background:var(--mono-acid,#d7ff3f)}
+body.minna-edition #app .task-sheet-layer .screen-pause .pause-decision-heading .focus-pause-insight h1,
+body.minna-edition #app .task-sheet-layer .screen-pause:has([data-pause-hero]) .pause-decision-heading .focus-pause-insight h1,
+body.minna-edition #app .task-sheet-layer .screen-pause .focus-pause-insight[data-decision-state=shortfall] h1{color:#fff!important;background:transparent!important;font-size:29px;line-height:1.18;font-weight:600;letter-spacing:-.04em;max-width:20ch;margin:8px 0 20px}
+body.minna-edition #app .task-sheet-layer .screen-pause .pause-comparison,
+body.minna-edition #app .screen .pause-comparison.pause-hero,
+body.minna-edition #app .task-sheet-layer .screen-pause .pause-comparison.pause-hero{
+ padding:0 16px 17px;margin:18px 0;background:#ffffff06;color:#fff;border:1px solid #ffffff26;border-radius:20px;box-shadow:none;
+}
+body.minna-edition #app .screen-pause .pause-hero-toolbar{min-height:52px;gap:10px}
+body.minna-edition #app .screen-pause .pause-hero-intro{padding:12px 0 6px}
+body.minna-edition #app .screen-pause .pause-hero .pause-hero-intro h2{color:#fff!important;font-size:13px;line-height:1.4;font-weight:600}
+body.minna-edition #app .screen-pause :is(.pause-hero-boundary,.pause-comparison-values .comparison-label,.pause-comparison-values small,.pause-comparison-arrow){color:#b7b7b7!important;font-size:13px;line-height:1.5}
+body.minna-edition #app .screen-pause .pause-hero-replay{border:0;border-radius:999px;background:transparent;color:#fff!important;font-size:13px;min-height:44px;padding:8px 0 8px 8px}
+body.minna-edition #app .screen-pause .pause-money-stage{height:64px;margin:0 0 8px;color:#fff}
+body.minna-edition #app .screen-pause .pause-money-ring{color:var(--mono-acid,#d7ff3f)!important}
+body.minna-edition #app .screen-pause .pause-money-slip{fill:#fff;stroke:var(--mono-ink,#161616)}
+body.minna-edition #app .screen-pause .pause-lens-symbol{color:#fff}
+body.minna-edition #app .task-sheet-layer .screen-pause .pause-comparison-values strong,
+body.minna-edition #app .task-sheet-layer .screen-pause:has([data-pause-hero]) .pause-hero .pause-comparison-after.lumo-lens strong,
+body.minna-edition #app .task-sheet-layer .screen-pause:has(.focus-pause-insight[data-decision-state=shortfall]) .pause-comparison-after.lumo-lens strong{padding:0;background:transparent!important;color:var(--mono-acid,#d7ff3f)!important;font-size:30px;line-height:1.2;letter-spacing:-.045em;font-weight:550}
+body.minna-edition #app .screen-pause .pause-hero .pause-comparison-before strong{color:#fff!important;font-weight:450}
+body.minna-edition #app .screen-pause .pause-hero .pause-comparison-after{border-color:var(--mono-acid,#d7ff3f)!important}
+body.minna-edition #app .screen-pause .pause-comparison-values{padding:10px 0 0;gap:10px}
+/* Large text or a large balance may use another line. Keep every currency,
+   whole-number and cents token available instead of clipping a nowrap run. */
+body.minna-edition #app #view .pause-comparison .pause-comparison-values :is(strong,.balance-number){display:flex;flex-wrap:wrap;align-items:baseline;gap:0;min-width:0;max-width:100%;width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:normal}
+body.minna-edition #app #view .pause-comparison .pause-comparison-values :is(.currency,.whole,.cents){min-width:0;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:normal}
+body.minna-edition #app #view .pause-comparison .pause-comparison-values .whole{flex:0 1 auto}
+body.minna-edition #app #view .pause-comparison .pause-comparison-values :is(.currency,.cents){flex:0 0 auto}
+body.minna-edition #app .screen-pause .pause-suggested-amount{color:#fff!important;text-decoration:underline;text-decoration-color:#ffffff70;text-underline-offset:4px;font-size:13px;line-height:1.45}
+body.minna-edition #app .screen-pause .pause-suggested-amount small{color:#b7b7b7!important;text-decoration:none}
+body.minna-edition #app .screen-pause .pause-recovery-options{gap:8px;margin:12px 0 2px}
+body.minna-edition #app .screen-pause .pause-recovery-options .pause-recovery-choice{min-height:46px;padding:10px 8px;border:1px solid #ffffff4d;border-radius:12px!important;background:transparent;color:#fff!important;font-size:12px;font-weight:550;line-height:1.4}
+body.minna-edition #app .task-sheet-layer .screen-pause .pause-decisions .pause-equal-choice,
+body.minna-edition #app .screen-pause:has([data-pause-hero]) .pause-equal-choice:first-child,
+body.minna-edition #app .screen-pause:has([data-pause-hero]) .pause-equal-choice:last-child{min-height:54px;padding:14px 12px;border:1px solid #fff;border-radius:12px!important;background:#fff!important;color:var(--mono-ink,#161616)!important;font-size:14px;font-weight:650;box-shadow:none!important}
+body.minna-edition #app .screen-pause [data-pause-hold]::after{background:var(--mono-acid,#d7ff3f)!important}
+body.minna-edition #app .screen-pause [data-pause-hold][aria-disabled=true]{border-color:#ffffff66!important;border-style:dashed;background:transparent!important;color:#b7b7b7!important}
+body.minna-edition #app .screen-pause :is(.pause-link-cost,.focus-pause-exits .text-btn,.pause-calculation>summary){color:#fff!important;background:transparent!important;border-radius:0;font-size:12px}
+body.minna-edition #app .screen-pause :is(.pause-calculation,.focus-details,.pause-calculation dl,.pause-calculation dt,.pause-calculation dd){color:#fff!important;border-color:#ffffff26;background:transparent!important}
+body.minna-edition #app .screen-pause :is(button,summary,a):focus-visible,
+body.minna-edition #app .task-sheet:is([data-sheet-treatment=pause],[data-step=pause]) .icon-btn:focus-visible{outline:2px solid var(--mono-acid,#d7ff3f)!important;outline-offset:3px}
+
+/* The first-use story shares the same limited palette. Its illustrated
+   consequence, timings and reduced-motion version remain intact. */
+body.minna-edition #app .pause-intro{--intro-ring:var(--mono-acid,#d7ff3f);--intro-halo:var(--mono-soft,#f0f0f0);--intro-ink:var(--mono-ink,#161616);--intro-accent:var(--mono-acid,#d7ff3f)}
+body.minna-edition #app .pause-intro-badge{border:0;border-radius:999px;padding:7px 12px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);font-size:12px;letter-spacing:.08em}
+body.minna-edition #app .pause-intro>h1{font-size:34px!important;font-weight:600;line-height:1.12;letter-spacing:-.04em;max-width:15ch;margin:8px auto 0}
+body.minna-edition #app .pause-intro-result h2{font-size:23px!important;line-height:1.25;font-weight:500;letter-spacing:-.035em}
+body.minna-edition #app .pause-intro-result h2 strong{font-weight:650}
+body.minna-edition #app .pause-intro-result p{font-size:12px;line-height:1.5}
+
+/* Scanner and personal code use a true ink surface and pure QR symbol. */
+body.minna-edition.lumo-qr-hub-open #app .task-sheet,
+body.minna-edition.lumo-qr-hub-open #app .task-sheet-body#view{background:var(--mono-ink,#161616)!important}
+body.minna-edition #app .qr-hub{--qr-camera-bg:var(--mono-ink,#161616);gap:20px;background:var(--mono-ink,#161616);color:#fff;padding-inline:24px}
+body.minna-edition #app .qr-hub.is-code{background:var(--mono-paper,#fafafa);color:var(--mono-ink,#161616)}
+body.minna-edition #app .qr-hub-tabs{height:50px;padding:4px;gap:4px;border:1px solid #ffffff26;border-radius:16px;background:#ffffff0d;color:#fff}
+body.minna-edition #app .qr-hub-tabs button{min-height:40px;border-radius:11px;font-size:14px;font-weight:600;color:inherit;background:transparent;box-shadow:none}
+body.minna-edition #app .qr-hub-tabs button[aria-selected=true]{background:var(--mono-acid,#d7ff3f)!important;color:var(--mono-ink,#161616)!important;box-shadow:none}
+body.minna-edition #app .qr-hub.is-code .qr-hub-tabs{border-color:var(--mono-line,#e2e2e2);background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+body.minna-edition #app .qr-hub.is-code .qr-hub-tabs button[aria-selected=true]{background:var(--mono-surface,#fff)!important;color:var(--mono-ink,#161616)!important}
+body.minna-edition #app .qr-hub-toolbar button{background:#ffffff0a!important;color:#fff!important;border-radius:50%!important}
+body.minna-edition #app .qr-hub.is-code .qr-hub-toolbar button{background:var(--mono-soft,#f0f0f0)!important;color:var(--mono-ink,#161616)!important}
+body.minna-edition #app .qr-hub :is(.qr-hub-toolbar svg,.qr-hub-upload svg){flex:none}
+body.minna-edition #app .qr-hub h1{font-size:32px!important;line-height:1.16;letter-spacing:-.04em;font-weight:600}
+body.minna-edition #app .qr-hub-viewfinder{border:1px solid #ffffff4d;border-radius:26px;color:#fff;box-shadow:none}
+body.minna-edition #app .qr-hub-viewfinder i{border-color:var(--mono-acid,#d7ff3f)}
+body.minna-edition #app .qr-hub :is(.qr-frame-hint,.qr-status){font-size:12px;line-height:1.5;color:#e3e3e3}
+body.minna-edition #app .qr-hub .qr-camera-retry{min-height:44px;border-radius:12px;border:1px solid #ffffff4d;background:#ffffff0a;color:#fff;font-size:12px}
+body.minna-edition #app .qr-hub-upload{min-height:54px;border-radius:12px;background:#fff;color:var(--mono-ink,#161616);font-size:14px;font-weight:650}
+body.minna-edition #app .qr-hub .qr-manual-code{min-height:44px;font-size:12px;color:#fff;text-underline-offset:4px}
+body.minna-edition #app .qr-hub #error{background:#ffffff12;color:#fff;border:1px solid #ffffff4d;border-radius:12px;padding:12px;font-size:12px;line-height:1.5}
+body.minna-edition #app .qr-hub.is-code #error{background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);border-color:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .qr-hub .personal-qr-card{padding:20px;border:1px solid var(--mono-line,#e2e2e2);border-radius:24px;background:#fff;color:#111;box-shadow:none;gap:15px}
+body.minna-edition #app .qr-hub .personal-qr-card figcaption strong{font-size:18px;font-weight:600;letter-spacing:-.025em;color:#111}
+body.minna-edition #app .qr-hub .personal-qr-card figcaption span{font-size:12px;color:#6c6c6c}
+body.minna-edition #app .qr-hub .personal-qr-note{font-size:13px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app :is(.qr-hub-subtitle,.personal-qr-recipient-note){font-size:12px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .qr-hub-video,
+body.minna-edition #app .qr-camera video{filter:grayscale(1)}
+body.minna-edition #app :is(.qr-camera,.qr-camera-label){background:var(--mono-ink,#161616);border-color:#ffffff26}
+body.minna-edition #app .qr-viewfinder{border-color:var(--mono-acid,#d7ff3f)}
+body.minna-edition #app :is(.lumo-payment-qr,.lumo-personal-qr){filter:none!important;border-radius:0!important;background:#fff!important}
+
+/* Cards feel like a considered object. The details and safety controls remain
+   ordinary, readable controls below the face. */
+body.minna-edition #app .virtual-card-page .vc-face{
+ position:relative;isolation:isolate;overflow:hidden;min-height:176px;padding:22px 23px 20px;border:0;border-radius:22px;
+ background:var(--mono-ink,#161616);color:#fff;box-shadow:none;
+}
+body.minna-edition #app .virtual-card-page .vc-face::after{content:'';position:absolute;z-index:-1;right:-38px;top:35px;width:170px;height:170px;border:1px solid #ffffff24;border-radius:50%;box-shadow:0 0 0 28px #ffffff08,0 0 0 55px #ffffff04;pointer-events:none}
+body.minna-edition #app .virtual-card-page .vc-face-top{margin-bottom:24px;gap:14px}
+body.minna-edition #app .virtual-card-page .vc-face-top>span{font-size:12px;line-height:1.4;letter-spacing:.03em;color:#d7d7d7}
+body.minna-edition #app .virtual-card-page .vc-wordmark{width:65px;filter:none!important}
+body.minna-edition #app .virtual-card-page .vc-masked-number{font-size:19px;font-weight:450;letter-spacing:.13em;line-height:1.4;color:#fff}
+body.minna-edition #app .virtual-card-page .vc-face-status{font-size:13px;line-height:1.4;color:#e3e3e3;margin-top:10px}
+body.minna-edition #app .virtual-card-page .vc-face-status svg{color:var(--mono-acid,#d7ff3f)}
+body.minna-edition #app .virtual-card-page .vc-money{margin:23px 0;gap:7px}
+body.minna-edition #app .virtual-card-page .vc-money>span{font-size:12px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-page .vc-money>strong{font-size:36px!important;font-weight:550;letter-spacing:-.045em;line-height:1.2;color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page .vc-money small{font-size:13px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-page .vc-list{border:0;border-radius:0;background:transparent;overflow:visible}
+body.minna-edition #app .virtual-card-page .vc-card-row{gap:13px;padding:18px 0;min-height:86px;border:0;border-bottom:1px solid var(--mono-line,#e2e2e2);color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page .vc-row-symbol{width:44px;height:44px;border-radius:14px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page .vc-row-copy strong{font-size:15px;line-height:1.4;font-weight:600;letter-spacing:-.02em}
+body.minna-edition #app .virtual-card-page .vc-row-copy small{font-size:13px;line-height:1.5;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-page .vc-row-end{font-size:14px;letter-spacing:-.02em}
+body.minna-edition #app .virtual-card-page .vc-empty{padding:16px 0 20px}
+body.minna-edition #app .virtual-card-page .vc-empty-icon{width:72px;height:72px;margin:0 0 26px;border-radius:22px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page .vc-empty h2{font-size:27px!important;line-height:1.2;letter-spacing:-.035em;font-weight:600;margin-bottom:12px!important}
+body.minna-edition #app .virtual-card-page .vc-empty p{font-size:14px;line-height:1.6;max-width:32ch;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-page :is(.vc-create-summary,.vc-demo-warning){padding:15px 16px;border:0;border-radius:14px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page .vc-main-actions{gap:9px}
+body.minna-edition #app .virtual-card-page .vc-detail-tools{gap:9px;margin-top:8px}
+body.minna-edition #app .virtual-card-page .vc-manage{font-size:13px;line-height:1.4;font-weight:550;color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page :is(.vc-history,.vc-details,.vc-demo-controls){border-color:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .virtual-card-page .vc-history{margin-top:16px}
+body.minna-edition #app .virtual-card-page .vc-history>summary{font-size:13px;min-height:52px;font-weight:600}
+body.minna-edition #app .virtual-card-page .vc-details>div{padding:17px 0;border-color:var(--mono-line,#e2e2e2)}
+body.minna-edition #app .virtual-card-page .vc-details dt{font-size:12px;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-page .vc-details dd{font-size:14px;font-weight:600;color:var(--mono-ink,#161616)}
+body.minna-edition #app .virtual-card-page :is(.vc-status-icon,.vc-auth-symbol){width:64px;height:64px;border-radius:20px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616);margin-bottom:24px}
+body.minna-edition #app .virtual-card-page .vc-status h1{font-size:32px;line-height:1.18;letter-spacing:-.04em;font-weight:600}
+body.minna-edition #app .virtual-card-page :is(.vc-note,.vc-status p){font-size:13px;line-height:1.55;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-page .vc-disclosure{font-size:13px;line-height:1.5;margin-top:22px;color:var(--mono-muted,#6c6c6c)}
+body.minna-edition #app .virtual-card-flow .vc-funding-recipient>span{width:44px;height:44px;border-radius:14px;background:var(--mono-soft,#f0f0f0);color:var(--mono-ink,#161616)}
+
+/* Short or enlarged layouts keep the content flow, never shrink the choices. */
+@media(max-height:720px){
+ body.minna-edition #app .screen .transaction-stage{margin-bottom:12px;padding-bottom:9px}
+ body.minna-edition #app .screen .payment-balance{margin-bottom:12px;padding-bottom:9px}
+ body.minna-edition #app .screen-pay .focus-pay-heading{margin-bottom:16px}
+ body.minna-edition #app .screen-pay .pay-hero.focus-pay-art .scene-art{height:48px!important;margin-bottom:12px!important}
+ body.minna-edition #app .screen-pay .pay-option-list .row{min-height:68px;padding-block:12px}
+ body.minna-edition #app .screen [data-payment-entry] .hero{margin-bottom:16px}
+ body.minna-edition #app .screen :is([data-payment-entry],.virtual-card-funding,.vc-funded-create) .payment-amount-row{min-height:80px;padding-block:12px}
+ body.minna-edition #app .screen-paymentReview .focus-payment-title{margin:4px 0 18px}
+ body.minna-edition #app .screen-paymentReview .focus-receipt>div,
+ body.minna-edition #app .screen .receipt .summary-line{padding-block:10px}
+ body.minna-edition #app .screen .payment-result-compact{padding-top:8px}
+ body.minna-edition #app .screen .payment-result-compact .result-mark{width:58px;height:58px;margin-bottom:18px}
+ body.minna-edition #app .screen .payment-result-compact .result-reference{margin-block:16px}
+ body.minna-edition #app .task-sheet-layer .screen-pause:has([data-pause-hero]) .pause-decision-heading .focus-pause-insight h1{font-size:25px;margin:5px 0 14px}
+ body.minna-edition #app .task-sheet-layer .screen-pause .pause-comparison.pause-hero{padding:0 14px 13px;margin:12px 0}
+ body.minna-edition #app .screen-pause .pause-hero-toolbar{min-height:46px}
+ body.minna-edition #app .screen-pause .pause-money-stage{height:44px;margin:0 0 5px}
+ body.minna-edition #app .screen-pause .pause-comparison-values{padding-top:7px}
+ body.minna-edition #app .screen-pause .pause-recovery-options{margin-top:8px}
+ body.minna-edition #app .screen-pause .pause-actions{margin-top:10px;gap:6px}
+ body.minna-edition #app .qr-hub{gap:12px;padding-inline:20px}
+ body.minna-edition #app .qr-hub-tabs{height:46px}
+ body.minna-edition #app .qr-hub-tabs button{min-height:36px}
+ body.minna-edition #app .qr-hub h1{font-size:28px!important}
+ body.minna-edition #app .qr-hub .personal-qr-card{padding:14px;gap:10px}
+ body.minna-edition #app .virtual-card-page .vc-face{min-height:148px;padding:18px 20px}
+ body.minna-edition #app .virtual-card-page .vc-face-top{margin-bottom:16px}
+ body.minna-edition #app .virtual-card-page .vc-money{margin-block:17px}
+ body.minna-edition #app .virtual-card-page .vc-disclosure{margin-top:16px}
+}
+@media(max-width:360px){
+ body.minna-edition #app .virtual-card-page .vc-card-row{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:13px;row-gap:10px;align-items:start}
+ body.minna-edition #app .virtual-card-page .vc-row-symbol{grid-column:1;grid-row:1 / span 2;align-self:start}
+ body.minna-edition #app .virtual-card-page .vc-row-copy{grid-column:2;grid-row:1;min-width:0;max-width:100%}
+ body.minna-edition #app .virtual-card-page .vc-row-end{grid-column:2;grid-row:2;display:flex;justify-content:space-between;margin-left:0;max-width:none;width:100%}
+ body.minna-edition #app :is(.screen-momoAdd,.screen-requestCreate) .payment-amount-row .amount-input{font-size:36px!important}
+ body.minna-edition #app .screen [data-payment-entry] .payment-amount-row .amount-input{font-size:36px!important}
+ body.minna-edition #app .screen-paymentReview .focus-payment-title h1{font-size:40px!important}
+ body.minna-edition #app .screen-pause .pause-hero .pause-comparison-values{grid-template-columns:minmax(0,1fr)}
+ body.minna-edition #app .screen-pause .pause-hero .pause-comparison-arrow{padding-top:0;transform:rotate(90deg);justify-self:start}
+ body.minna-edition #app .screen-pause .pause-hero .pause-comparison-values strong .currency{display:inline}
+ body.minna-edition #app .qr-hub{padding-inline:18px}
+ body.minna-edition #app .qr-hub .personal-qr-card{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.minna-edition #app :is(.pay-tabs button,.qr-viewfinder,.qr-hub-viewfinder,.vc-face){transition:none;animation:none}
+}
+
+/* Separate working surface for return/closure choices. Monetary facts wrap
+   under text enlargement and never become horizontally scrollable controls. */
+.vc-lifecycle{margin-top:24px;padding-top:20px;border-top:1px solid var(--line,#ddd)}
+.vc-lifecycle h2{font-size:18px;margin:0 0 16px}
+.vc-lifecycle .actions{display:flex;flex-direction:column;gap:10px}
+.vc-lifecycle input{max-width:100%;min-width:0}
+.virtual-card-page .receipt,.virtual-card-page .vc-line{min-width:0;overflow-wrap:anywhere}

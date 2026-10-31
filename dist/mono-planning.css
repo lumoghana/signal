@@ -1,0 +1,266 @@
+/* Lumo / monochrome planning.
+   Presentation only. All figures, mandates, rules and actions come from the
+   existing product controllers. Loaded after the shared feature styles. */
+
+/* Plan is a pair of clear account surfaces, with the Budget itself in view. */
+body.minna-edition #app #view .plan-hub{display:block;min-width:0}
+body.minna-edition #app #view .plan-hub .plan-hub-heading{margin:10px 0 25px}
+body.minna-edition #app #view .plan-hub .plan-hub-heading h1{font-size:32px;font-weight:600;letter-spacing:-.045em;line-height:1.12}
+body.minna-edition #app #view .plan-hub :is(.plan-budget-section,.plan-boxes-section){margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+body.minna-edition #app #view .plan-hub .plan-section-heading{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+body.minna-edition #app #view .plan-hub .plan-section-heading h2{font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.025em}
+body.minna-edition #app #view .plan-hub .plan-section-heading>div>span{display:block;margin-top:3px;font-size:12px;color:var(--mono-muted)}
+body.minna-edition #app #view .plan-hub .plan-section-icon{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid var(--mono-line);border-radius:13px;background:var(--mono-surface);color:var(--mono-ink)}
+body.minna-edition #app #view .plan-hub .plan-section-icon svg{width:21px;height:21px}
+body.minna-edition #app #view .plan-hub .budget-overview-summary{display:block;padding:19px 20px 16px;border:0;border-radius:20px;background:var(--mono-soft);margin:0}
+body.minna-edition #app #view .plan-hub .budget-overview-total-label{gap:6px 12px;align-items:center}
+body.minna-edition #app #view .plan-hub .budget-overview-total-label>span{font-size:13px;color:var(--mono-muted);font-weight:500}
+body.minna-edition #app #view .plan-hub .budget-overview-period{color:var(--mono-ink);font-size:12px;min-height:44px;padding:5px 0}
+body.minna-edition #app #view .plan-hub .budget-overview-summary>.plan-hub-amount{display:block;font-size:40px;font-weight:550;letter-spacing:-.055em;line-height:1.16;margin:1px 0 15px;overflow-wrap:anywhere}
+body.minna-edition #app #view .plan-hub .plan-hub-amount .balance-number{font-size:inherit;line-height:inherit}
+body.minna-edition #app #view .plan-hub .budget-overview-context{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding-top:13px;border-top:1px solid #dcdcdc;gap:16px}
+body.minna-edition #app #view .plan-hub .budget-overview-context-single{grid-template-columns:1fr}
+body.minna-edition #app #view .plan-hub .budget-overview-context>span{font-size:12px;line-height:1.5;color:var(--mono-muted)}
+body.minna-edition #app #view .plan-hub .budget-overview-context strong{font-size:17px;font-weight:600;line-height:1.4;margin-top:4px;color:var(--mono-ink);overflow-wrap:anywhere;white-space:normal}
+body.minna-edition #app #view .plan-hub .plan-hub-shortfall{display:flex;gap:7px;align-items:flex-start;padding:10px 0 0;margin:8px 0 0;font-size:13px;color:var(--mono-ink);border-top:1px solid #dcdcdc}
+body.minna-edition #app #view .plan-hub .plan-hub-shortfall svg{flex:none;margin-top:2px}
+body.minna-edition #app #view .plan-hub .plan-hub-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0 0}
+body.minna-edition #app #view .plan-hub .plan-hub-actions>button{min-height:48px;padding:11px 10px;font-size:13px;line-height:1.4;min-width:0}
+body.minna-edition #app #view .plan-hub .budget-overview-items{margin:17px 0 0;border-top:0}
+body.minna-edition #app #view .plan-hub .budget-overview-item{min-height:58px;padding:13px 2px;border-color:var(--mono-line)}
+body.minna-edition #app #view .plan-hub .budget-overview-item>span>strong{font-size:14px;line-height:1.4;font-weight:550;letter-spacing:-.01em}
+body.minna-edition #app #view .budget-overview-item small{font-size:12px;color:var(--mono-muted);margin-top:4px}
+body.minna-edition #app #view .budget-overview-item-amount{font-size:14px;font-weight:600;gap:8px;max-width:56%;white-space:normal;text-align:right;overflow-wrap:anywhere}
+body.minna-edition #app #view .budget-overview-item-amount>svg{flex:none;width:16px;height:16px;color:var(--mono-muted)}
+body.minna-edition #app #view .plan-hub .plan-hub-details{margin:10px 0 0;border:0;background:transparent;border-radius:0}
+body.minna-edition #app #view .plan-hub .plan-hub-details>summary{min-height:48px;font-size:13px;font-weight:500;padding:12px 1px;color:var(--mono-muted);border:0}
+body.minna-edition #app #view .plan-hub .plan-hub-details[open]{padding-bottom:8px}
+body.minna-edition #app #view .plan-hub .plan-hub-detail-actions{padding:0;border-top:1px solid var(--mono-line)}
+body.minna-edition #app #view .plan-hub .plan-hub-detail-actions>.row{padding:14px 0}
+body.minna-edition #app #view .plan-hub .plan-boxes-section{margin-top:24px;padding:20px;border:1px solid var(--mono-line);border-radius:20px;background:var(--mono-surface)}
+body.minna-edition #app #view .plan-hub .plan-boxes-section .plan-section-heading{margin-bottom:16px;padding-right:0}
+body.minna-edition #app #view .plan-hub .plan-boxes-section .plan-section-icon{border:0;background:var(--mono-soft)}
+body.minna-edition #app #view .plan-hub .plan-boxes-section .plan-hub-amount{display:block;position:static;inset:auto;font-size:30px;font-weight:550;line-height:1.2;letter-spacing:-.04em;margin:0}
+body.minna-edition #app #view .plan-hub .plan-hub-facts{font-size:12px;color:var(--mono-muted);line-height:1.5;margin:5px 0 0}
+body.minna-edition #app #view .plan-hub .plan-hub-empty{font-size:14px;line-height:1.5;margin:6px 0 0;color:var(--mono-muted)}
+body.minna-edition #app #view .plan-hub .plan-boxes-section .plan-hub-actions{margin-top:17px}
+body.minna-edition #app #view .plan-hub .budget-items-disclosure{display:block;width:100%;margin:12px 0 0}
+body.minna-edition #app #view .plan-hub .budget-items-disclosure>summary{display:flex;align-items:center;gap:8px;min-height:46px;padding:10px 0;border:0;border-radius:0;background:transparent;color:var(--mono-ink);font-size:13px;font-weight:550}
+body.minna-edition #app #view .plan-hub .budget-items-disclosure>summary>svg{margin-left:auto}
+body.minna-edition #app #view .budget-items-count{background:var(--mono-soft);color:var(--mono-ink)}
+body.minna-edition #app #view .plan-hub .budget-overview-tools{display:block;width:100%;margin-top:0}
+body.minna-edition #app #view .plan-hub button.budget-readability-item{padding:14px 0!important;min-height:63px!important;gap:7px!important}
+body.minna-edition #app #view .budget-line-top>strong{font-size:14px!important;line-height:1.4;font-weight:550!important;letter-spacing:-.01em}
+body.minna-edition #app #view .budget-line-top>.budget-overview-item-amount{font-size:14px!important;max-width:57%;white-space:normal;flex-wrap:wrap;gap:3px 6px}
+body.minna-edition #app #view :is(.budget-line-figures,.budget-line-notes){font-size:12px;line-height:1.5;color:var(--mono-muted)}
+body.minna-edition #app #view .budget-line-notes>[data-budget-over]{color:var(--mono-ink)}
+body.minna-edition #app #view .budget-readable-period{padding:13px 0;margin:0 0 12px;font-size:13px;border-color:var(--mono-line)}
+body.minna-edition #app #view .budget-readable-period>strong{font-size:14px;font-weight:550}
+body.minna-edition #app #view .plan-hub .budget-start-copy{padding:18px 19px;margin:0;border:0;border-radius:18px;background:var(--mono-soft)}
+body.minna-edition #app #view .budget-start-copy h3{font-size:22px;font-weight:550;line-height:1.25;letter-spacing:-.03em;margin:0 0 9px}
+body.minna-edition #app #view .budget-start-copy p{font-size:14px;line-height:1.55;color:var(--mono-muted)}
+body.minna-edition #app #view .budget-start-copy .budget-start-note{font-size:12px;line-height:1.55;margin:10px 0 0}
+body.minna-edition #app #view .budget-clarity-example{padding:18px;border-radius:18px;background:var(--mono-soft);border:0}
+body.minna-edition #app #view .budget-clarity-example p{font-size:13px;line-height:1.55}
+
+/* Budget editors and suggestions share an open ledger rhythm. */
+body.minna-edition #app #view :is(.budget-overview-edit-total,.budget-conclusion,.outlook-conclusion,.budget-estimate-result){padding:18px 20px;border:0;border-radius:18px;background:var(--mono-soft);margin:18px 0}
+body.minna-edition #app #view .budget-overview-edit-total>span{font-size:13px;color:var(--mono-muted)}
+body.minna-edition #app #view .budget-overview-edit-total>strong{font-size:34px;font-weight:550;letter-spacing:-.045em;line-height:1.2}
+body.minna-edition #app #view .budget-category-original{padding:17px 0;border-color:var(--mono-line)}
+body.minna-edition #app #view .budget-category-original>div:first-child{font-size:15px;line-height:1.5;gap:12px}
+body.minna-edition #app #view .budget-category-original>div:first-child strong{max-width:55%;white-space:normal;overflow-wrap:anywhere;text-align:right}
+body.minna-edition #app #view .budget-category-original-actions{gap:10px;margin-top:14px}
+body.minna-edition #app #view .budget-category-original-actions>button{flex:1;min-height:44px;font-size:13px}
+body.minna-edition #app #view :is(.budget-delete-action,.budget-delete-confirm){color:var(--mono-ink)}
+body.minna-edition #app #view .budget-history-column-labels{font-size:12px;padding:8px 0 10px;border-bottom:1px solid var(--mono-line);color:var(--mono-muted)}
+body.minna-edition #app #view .budget-history-items{gap:0}
+body.minna-edition #app #view .budget-history-item{padding:11px 0;border-bottom:1px solid var(--mono-line);gap:12px}
+body.minna-edition #app #view .budget-history-include{font-size:14px;line-height:1.45;gap:10px}
+body.minna-edition #app #view .budget-history-projection{margin-top:15px;padding:15px 0;font-size:14px;font-weight:550;border-color:var(--mono-line)}
+body.minna-edition #app #view :is(.budget-history-actions,.budget-overview-edit .actions,.budget-category-detail .actions){margin-top:18px;gap:9px}
+body.minna-edition #app #view .budget-cycle-items{border-top:0;margin-top:9px}
+body.minna-edition #app #view .budget-cycle-item{padding:13px 0;gap:12px;border-color:var(--mono-line)}
+body.minna-edition #app #view .budget-cycle-choose{font-size:14px;font-weight:550;line-height:1.45}
+body.minna-edition #app #view .budget-cycle-dates{gap:12px}
+body.minna-edition #app #view .budget-guide-start .plan-benefit-example{padding:18px;border-radius:18px;background:var(--mono-soft);border:0}
+body.minna-edition #app #view .budget-guide-review-items .summary-line{padding:12px 0;font-size:14px;border-color:var(--mono-line)}
+body.minna-edition #app #view .budget-guide-review-calculation{padding-top:10px}
+body.minna-edition #app #view :is(.first-cost-list,.budget-review-breakdown){border-color:var(--mono-line)}
+body.minna-edition #app #view :is(.first-plan-conclusion,.budget-review-insight){background:var(--mono-soft);color:var(--mono-ink);border:0;border-radius:18px;padding:18px}
+body.minna-edition #app #view .first-plan-conclusion :is(strong,span,p){color:var(--mono-ink)}
+body.minna-edition #app #view .first-plan-conclusion .consequence-headline{font-size:32px;font-weight:550;letter-spacing:-.045em;line-height:1.18}
+body.minna-edition #app #view .first-plan-math{padding:13px 0;border-color:var(--mono-line)}
+body.minna-edition #app #view .plan-setup-progress{color:var(--mono-muted)}
+body.minna-edition #app #view .simple-plan-art{filter:grayscale(1)}
+body.minna-edition #app #view .outlook-daily-value{font-size:35px;line-height:1.18;letter-spacing:-.045em;font-weight:550;color:var(--mono-ink)}
+body.minna-edition #app #view .outlook-period{font-size:13px;color:var(--mono-muted);line-height:1.5}
+body.minna-edition #app #view .budget-review-totals{background:var(--mono-soft);border:0;border-radius:18px;padding:18px}
+body.minna-edition #app #view .budget-review-category{padding:14px 0;border-color:var(--mono-line)}
+
+/* Money Boxes: one savings account, then distinct purposes. */
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero{padding:23px 22px;margin:16px 0 20px;border:0;border-radius:22px;background:var(--mono-ink);color:#fff;text-align:left;box-shadow:none}
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero :is(p,span,strong,.balance-main){color:#fff}
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero p.small{font-size:12px;line-height:1.5;color:#c4c4c4;margin:0 0 8px}
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero .balance-main{font-size:41px;font-weight:550;letter-spacing:-.05em;line-height:1.18;margin:0}
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero .balance-number{font-size:inherit;line-height:inherit}
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero .progress{height:5px;background:#454545!important;border:0;border-radius:10px!important;margin:18px 0 2px}
+body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero .progress-bar{background:var(--mono-acid)!important;border-radius:10px!important}
+body.minna-edition #app #view .screen-goals .goal-summary.card{display:block;text-align:left;width:100%;padding:19px 18px;margin:0 0 11px;border:1px solid var(--mono-line);border-radius:18px;background:var(--mono-surface);color:var(--mono-ink);box-shadow:none}
+body.minna-edition #app #view .screen-goals .goal-summary.card h3{font-size:17px;font-weight:600;letter-spacing:-.02em;line-height:1.4;margin:0}
+body.minna-edition #app #view .screen-goals .goal-summary.card p.small{font-size:12px;line-height:1.5;margin:7px 0 0;color:var(--mono-muted)}
+body.minna-edition #app #view .screen-goals .goal-summary.card .progress{height:5px;border-radius:10px;background:var(--mono-soft);margin:16px 0 0}
+body.minna-edition #app #view .screen-goals .goal-summary.card .progress-bar{background:var(--mono-ink);border-radius:10px}
+body.minna-edition #app #view .screen-goals>.actions{margin-top:20px}
+body.minna-edition #app #view .screen-goal>.actions{gap:9px;margin-top:18px}
+body.minna-edition #app #view .screen-goal>.actions>.text-btn{min-height:44px;font-size:13px}
+body.minna-edition #app #view .screen-goal>.small.muted{font-size:13px;line-height:1.6;color:var(--mono-muted);margin:17px 0}
+body.minna-edition #app #view .box-protection-fields{padding:18px 0;border-color:var(--mono-line)}
+body.minna-edition #app #view .box-protection-status{border-color:var(--mono-line);color:var(--mono-ink)}
+body.minna-edition #app #view :is(.partner-code-panel,.protection-sample-message){background:var(--mono-soft);color:var(--mono-ink);border-color:var(--mono-line);border-radius:16px}
+body.minna-edition #app #view .protection-toggle{font-size:14px;line-height:1.5}
+body.minna-edition #app #view :is(#partner-verification-code,#protection-verification-code,#invitation-verification-code){border-radius:12px;letter-spacing:.08em;background:var(--mono-surface);color:var(--mono-ink)}
+body.minna-edition #app #view details.protection-simulation{padding:0;border:0;border-block:1px solid var(--mono-line);border-radius:0;background:transparent;color:var(--mono-ink)}
+body.minna-edition #app #view p.protection-simulation{padding:0;border:0;background:transparent;color:var(--mono-muted);font-size:13px;line-height:1.5}
+body.minna-edition #app #view .protection-support.notice{padding:16px;border:0;border-radius:16px;background:var(--mono-soft);color:var(--mono-ink)}
+
+/* Savings hacks stay with the fund/return actions; detail remains optional. */
+body.minna-edition #app #view .savings-hack-fields{margin:23px 0;padding:20px 0;border-color:var(--mono-line)}
+body.minna-edition #app #view .sh-heading{margin-bottom:14px;gap:10px;flex-wrap:wrap}
+body.minna-edition #app #view .sh-heading h2{font-size:17px;font-weight:600;letter-spacing:-.02em}
+body.minna-edition #app #view .sh-heading>span{font-size:12px;color:var(--mono-muted)}
+body.minna-edition #app #view :is(.sh-help,.sh-description,.sh-example){font-size:13px;line-height:1.55}
+body.minna-edition #app #view .sh-example{padding:13px 14px;margin:12px 0;background:var(--mono-soft);border:0;border-radius:12px;color:var(--mono-ink)}
+body.minna-edition #app #view .sh-grid{gap:13px}
+body.minna-edition #app #view .sh-consent{font-size:13px;line-height:1.6;gap:11px;margin-top:15px}
+body.minna-edition #app #view .sh-consent input{width:20px;height:20px;flex:0 0 20px;margin-top:2px;accent-color:var(--mono-ink)}
+body.minna-edition #app #view :is(.sh-limits,.sh-history,.sh-info){font-size:13px;line-height:1.55}
+body.minna-edition #app #view :is(.sh-limits,.sh-history,.sh-info)>summary{min-height:44px;padding:12px 0;line-height:1.5;color:var(--mono-muted)}
+body.minna-edition #app #view .sh-priority-control:has(.sh-heading){margin:2px 0 0;padding:15px 16px;border:1px solid var(--mono-line);border-radius:14px;background:var(--mono-soft)}
+body.minna-edition #app #view .sh-priority-control .sh-heading{margin:0 0 5px;align-items:center}
+body.minna-edition #app #view .sh-priority-control .sh-heading h2{font-size:14px}
+body.minna-edition #app #view .sh-actions{gap:5px 12px}
+body.minna-edition #app #view .sh-actions>.text-btn{font-size:13px;min-height:44px;padding:8px 0;color:var(--mono-ink)}
+body.minna-edition #app #view .savings-hack-details{margin-top:20px;padding-top:4px;border-color:var(--mono-line)}
+body.minna-edition #app #view .sh-cancel-confirm{background:var(--mono-soft);border-radius:12px;padding:14px}
+body.minna-edition #app #view .sh-history li{padding:12px 0;border-color:var(--mono-line);gap:12px}
+body.minna-edition #app #view .sh-history strong{font-size:13px;line-height:1.45}
+body.minna-edition #app #view .sh-history :is(span,time){font-size:13px;color:var(--mono-muted)}
+body.minna-edition #app #view .saving-milestone-amount{padding:19px 20px;margin:18px 0;border:0;border-radius:18px;background:var(--mono-soft)}
+body.minna-edition #app #view .saving-milestone-amount>span{font-size:13px;color:var(--mono-muted)}
+body.minna-edition #app #view .saving-milestone-amount>strong{display:block;font-size:36px;font-weight:550;letter-spacing:-.045em;line-height:1.2;margin:8px 0}
+body.minna-edition #app #view .saving-milestone-amount .balance-number{font-size:inherit!important;white-space:normal;overflow-wrap:anywhere}
+body.minna-edition #app #view .saving-milestone-amount>p{font-size:13px;line-height:1.5;color:var(--mono-muted)}
+body.minna-edition #app #view .saving-milestone-amount .progress{margin-top:15px}
+body.minna-edition #app #view .saving-milestones li{padding:16px 0;border-color:var(--mono-line)}
+body.minna-edition #app #view .saving-milestones li>span:first-child{background:var(--mono-acid);color:var(--mono-ink)}
+body.minna-edition #app #view .saving-milestones small{font-size:12px;line-height:1.55;color:var(--mono-muted)}
+
+/* Shared costs and collections use the same quiet, explicit account language. */
+body.minna-edition #app #view .gm-page{font-size:14px;line-height:1.5;background:transparent}
+body.minna-edition #app #view .gm-page :is(.gm-heading h1,.page-heading h1){font-size:30px;line-height:1.15;font-weight:600;letter-spacing:-.04em}
+body.minna-edition #app #view .gm-page :is(.gm-heading p,.page-heading p){font-size:14px;line-height:1.55;margin-top:9px;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-choice-row{min-height:84px;padding:17px 15px;gap:13px;border:1px solid var(--mono-line);border-radius:18px;background:var(--mono-surface);color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-choice-icon{width:42px;height:42px;border-radius:13px;background:var(--mono-soft);color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-choice-copy strong{font-size:15px;font-weight:600;line-height:1.4;letter-spacing:-.015em}
+body.minna-edition #app #view .gm-page .gm-choice-copy small{font-size:12px;line-height:1.5;margin-top:5px;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-hub-tools{gap:9px;margin:15px 0 7px}
+body.minna-edition #app #view .gm-page .gm-hub-tools .secondary{min-height:46px;font-size:12px}
+body.minna-edition #app #view .gm-page .gm-hero{margin:0 0 17px;padding:20px;border:0;border-radius:20px;background:var(--mono-soft)}
+body.minna-edition #app #view .gm-page .gm-overline{font-size:12px;line-height:1.5;color:var(--mono-muted);margin:0 0 7px}
+body.minna-edition #app #view .gm-page .gm-amount{font-size:40px;font-weight:550;letter-spacing:-.05em;line-height:1.18;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-caption{font-size:12px;line-height:1.55;color:var(--mono-muted);margin-top:8px}
+body.minna-edition #app #view .gm-page .gm-progress{height:5px;background:#d9d9d9;border-radius:8px;margin-top:17px}
+body.minna-edition #app #view .gm-page .gm-progress>span{background:var(--mono-ink);border-radius:8px}
+body.minna-edition #app #view .gm-page .gm-tabs{gap:7px;margin:0 0 15px}
+body.minna-edition #app #view .gm-page .gm-tabs .chip{min-height:44px;padding:9px 12px;font-size:12px;line-height:1.4;border-radius:10px;background:var(--mono-soft);border-color:transparent;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-tabs .chip.selected{background:var(--mono-ink)!important;color:#fff!important;border-color:var(--mono-ink)!important}
+body.minna-edition #app #view .gm-page .field{margin-bottom:17px}
+body.minna-edition #app #view .gm-page .field>span{font-size:13px;font-weight:550;line-height:1.45;margin-bottom:8px;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .field :is(input,select,textarea){min-height:50px;padding:12px 13px;border-radius:12px;background:var(--mono-surface);border-color:#c9c9c9;font-size:16px;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-note{padding:13px 14px;margin:13px 0;background:var(--mono-soft);border:0;border-radius:12px;font-size:13px;line-height:1.55;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-person{min-height:72px;padding:13px 0;gap:11px;border-color:var(--mono-line)}
+body.minna-edition #app #view .gm-page .gm-avatar{width:36px;height:36px;border-radius:50%;background:var(--mono-soft);color:var(--mono-ink);font-size:13px}
+body.minna-edition #app #view .gm-page .gm-person-copy strong{font-size:14px;line-height:1.4;font-weight:550}
+body.minna-edition #app #view .gm-page .gm-person-copy small{font-size:12px;line-height:1.45;color:var(--mono-muted);margin-top:4px}
+body.minna-edition #app #view .gm-page .gm-person-amount{font-size:14px;font-weight:600}
+body.minna-edition #app #view .gm-page .gm-summary>div,body.minna-edition #app #view .gm-page .gm-summary dl>div{font-size:13px;line-height:1.5;padding:13px 0;border-color:var(--mono-line)}
+body.minna-edition #app #view .gm-page .gm-summary dt{color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-summary dd{font-weight:550;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-status{padding:5px 9px;border-radius:7px;background:var(--mono-soft);color:var(--mono-ink);font-size:13px;font-weight:600}
+body.minna-edition #app #view .gm-page .gm-item{min-height:79px;padding:15px 0;gap:12px;border-color:var(--mono-line)}
+body.minna-edition #app #view .gm-page .gm-item strong{font-size:14px;font-weight:550;line-height:1.4}
+body.minna-edition #app #view .gm-page .gm-item small{font-size:12px;line-height:1.5;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-section-head{min-height:48px;margin:12px 0 1px}
+body.minna-edition #app #view .gm-page .gm-section-head h2{font-size:16px;font-weight:600;letter-spacing:-.02em;line-height:1.4}
+body.minna-edition #app #view .gm-page .gm-empty{padding:35px 12px;text-align:left}
+body.minna-edition #app #view .gm-page .gm-empty>svg{display:block;margin-bottom:17px}
+body.minna-edition #app #view .gm-page .gm-empty h2{font-size:22px;font-weight:600;letter-spacing:-.035em;line-height:1.25;margin-bottom:9px}
+body.minna-edition #app #view .gm-page .gm-empty p{font-size:14px;line-height:1.6;max-width:32ch;margin:0;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-contact{min-height:70px;padding:13px 10px;gap:11px;border-radius:12px;border-bottom:0;margin-bottom:4px;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-contact.selected{background:var(--mono-soft)!important;color:var(--mono-ink)!important;border-color:var(--mono-line)!important}
+body.minna-edition #app #view .gm-page .gm-contact.selected :is(strong,small){color:var(--mono-ink)!important}
+body.minna-edition #app #view .gm-page .gm-contact.selected .gm-contact-check{background:var(--mono-acid);border-color:var(--mono-acid);color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-contact-check{width:29px;height:29px;border:1px solid #c9c9c9;color:var(--mono-ink)}
+body.minna-edition #app #view .gm-page .gm-mandate-choice{padding:17px 0;border-color:var(--mono-line);margin-bottom:14px}
+body.minna-edition #app #view .gm-page .gm-mandate-choice h2{font-size:15px;font-weight:600;margin-bottom:12px}
+body.minna-edition #app #view .gm-page .gm-mandate-choice p{font-size:13px;line-height:1.55;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page :is(.gm-mandate-card,.gm-mandate-preview){padding:17px;border:1px solid var(--mono-line);border-radius:16px;background:var(--mono-surface);margin:16px 0}
+body.minna-edition #app #view .gm-page .gm-mandate-card{min-height:78px}
+body.minna-edition #app #view .gm-page :is(.gm-mandate-card strong,.gm-mandate-preview h2){font-size:15px;font-weight:600;line-height:1.4}
+body.minna-edition #app #view .gm-page :is(.gm-mandate-card small,.gm-mandate-preview p){font-size:12px;line-height:1.55;color:var(--mono-muted);margin-top:5px}
+body.minna-edition #app #view .gm-page .gm-mandate-summary{padding:4px 0 18px;margin-bottom:12px;border-color:var(--mono-line)}
+body.minna-edition #app #view .gm-page .gm-mandate-summary h2{font-size:25px;font-weight:550;letter-spacing:-.035em;line-height:1.2;margin:15px 0 9px}
+body.minna-edition #app #view .gm-page .gm-mandate-summary p{font-size:13px;line-height:1.6;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-mandate-rules li{font-size:14px;line-height:1.6;padding:10px 0 10px 4px}
+body.minna-edition #app #view .gm-page .gm-role-summary{padding:10px 0 18px;border-color:var(--mono-line);margin-bottom:15px}
+body.minna-edition #app #view .gm-page .gm-role-summary h2{font-size:23px;font-weight:550;letter-spacing:-.03em;line-height:1.25;margin:13px 0 10px}
+body.minna-edition #app #view .gm-page .gm-role-summary>p{font-size:13px;line-height:1.6;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page :is(.gm-invitation-role>p,.gm-invitation-mandate>p){font-size:13px;line-height:1.6;color:var(--mono-muted)}
+body.minna-edition #app #view .gm-page .gm-actions{margin-top:18px;gap:8px;background:transparent}
+body.minna-edition #app #view .gm-page .gm-actions :is(.primary,.secondary,.danger){min-height:49px;padding:12px 14px;font-size:14px;line-height:1.4;border-radius:12px!important}
+body.minna-edition #app #view .gm-page .gm-actions .text-btn{font-size:13px;min-height:44px}
+body.minna-edition #app #view .gm-page .gm-boundary{font-size:12px;color:var(--mono-muted);margin-top:13px;line-height:1.5}
+body.minna-edition #app #view .gm-page :is(.gm-error,#error){color:var(--mono-ink);font-size:13px;font-weight:550;line-height:1.5}
+body.minna-edition #app #view .gm-page details{border-color:var(--mono-line)}
+body.minna-edition #app #view .gm-page details>summary{font-size:13px;min-height:46px;color:var(--mono-muted)}
+
+/* A single scrolling task surface also accommodates enlarged text on tall
+   phones. Pinning both the heading and actions can leave a zero-height
+   nested body, so the complete collection page participates in normal flow. */
+body.minna-edition #app .task-sheet-body#view:has(>.screen>.gm-page){display:block;flex:1 1 0;min-height:0;overflow-x:hidden;overflow-y:auto}
+body.minna-edition #app .task-sheet-body#view>.screen:has(>.gm-page){display:block;flex:none;height:auto;min-height:0;max-height:none;overflow:visible}
+body.minna-edition #app .task-sheet-body#view .gm-page{display:block;flex:none;height:auto;min-height:0;max-height:none;overflow:visible}
+body.minna-edition #app .task-sheet-body#view .gm-page .gm-body{flex:none;height:auto;min-height:0;max-height:none;overflow:visible}
+body.minna-edition #app .task-sheet-body#view .gm-page .gm-form{display:block;flex:none;height:auto;min-height:0;max-height:none;overflow:visible}
+body.minna-edition #app .task-sheet-body#view .gm-page .gm-actions{position:static;flex:none}
+
+/* Preserve readable money and usable actions on smaller devices. */
+@media(max-width:359px){
+ body.minna-edition #app #view .plan-hub .budget-overview-summary{padding:17px 16px}
+ body.minna-edition #app #view .plan-hub .budget-overview-summary>.plan-hub-amount{font-size:35px}
+ body.minna-edition #app #view .plan-hub .plan-boxes-section{padding:17px 16px}
+ body.minna-edition #app #view .plan-hub .budget-overview-actions{grid-template-columns:1fr}
+ body.minna-edition #app #view .plan-hub .budget-overview-context{gap:10px}
+ body.minna-edition #app #view .plan-hub .budget-overview-context strong{font-size:15px}
+ body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero{padding:21px 18px}
+ body.minna-edition #app #view :is(.screen-goals,.screen-goal)>.hero .balance-main{font-size:35px}
+ body.minna-edition #app #view .gm-page .gm-choice-row{padding:15px 12px;gap:10px}
+ body.minna-edition #app #view .gm-page .gm-choice-icon{width:36px;height:36px}
+ body.minna-edition #app #view .gm-page .gm-person{gap:8px}
+ body.minna-edition #app #view .gm-page .gm-avatar{width:32px;height:32px}
+ body.minna-edition #app #view .gm-page .gm-hero{padding:17px}
+ body.minna-edition #app #view .gm-page .gm-amount{font-size:35px}
+ body.minna-edition #app #view .sh-grid{grid-template-columns:1fr}
+}
+@media(max-height:700px){
+ body.minna-edition #app #view .plan-hub .plan-hub-heading{margin:7px 0 19px}
+ body.minna-edition #app #view .plan-hub .plan-boxes-section{margin-top:20px}
+ body.minna-edition #app #view .plan-hub .plan-hub-actions>button{font-size:13px!important;min-height:46px!important;padding:11px 9px!important}
+ body.minna-edition #app #view .gm-page .gm-choice-row{min-height:76px;padding-block:13px}
+ body.minna-edition #app #view .gm-page .gm-actions{margin-top:13px}
+ body.minna-edition #app #view .gm-page .gm-empty{padding-block:25px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.minna-edition #app #view :is(.plan-hub,.gm-page,.savings-hack-fields,.savings-hack-status,.screen-goals,.screen-goal) *{scroll-behavior:auto;transition:none;animation:none}
+}

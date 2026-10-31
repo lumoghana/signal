@@ -1,0 +1,91 @@
+/* Pair account money with the part left after the saved plan. */
+.screen-home .has-saved-plan{text-align:left;padding-top:1px}
+.screen-home .has-saved-plan .home-account-line{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:46px}
+.screen-home .has-saved-plan .balance-caption{justify-content:flex-start;font-size:13px;gap:8px;min-height:44px}
+.screen-home .has-saved-plan .focus-amount{font-size:29px;line-height:1.15;min-height:0;margin:0;letter-spacing:-1px;color:#526049;text-align:right;justify-content:flex-end}
+.screen-home .has-saved-plan .focus-amount .money-mask{font-size:25px;letter-spacing:3px}
+.screen-home .home-plan-summary{display:flex;position:relative;width:100%;text-align:left;align-items:center;justify-content:space-between;padding:13px 0 3px;border-radius:0;border:0;border-top:1px solid #d7dfce;background:none;gap:12px;box-shadow:none}
+.screen-home .home-plan-summary>span{min-width:0}
+.screen-home .home-plan-summary small{display:block;font-size:14px;font-weight:600;letter-spacing:0;line-height:1.4;color:#35482a}
+.screen-home .home-plan-summary strong{display:block;font-size:clamp(42px,12vw,51px);font-weight:700;letter-spacing:-1.9px;line-height:1.08;margin:5px 0 8px;color:#283e1c;font-variant-numeric:tabular-nums}
+.screen-home .home-plan-summary strong>[data-private-value]{font:inherit;letter-spacing:inherit}
+.screen-home .home-plan-summary .currency{font-size:.35em;letter-spacing:0;margin-right:5px}
+.screen-home .home-plan-summary .cents{font-size:.55em;letter-spacing:-.6px}
+.screen-home .home-plan-summary .money-mask{font-size:40px;letter-spacing:6px}
+.screen-home .home-plan-summary>.icon{flex:none}
+.screen-home .home-plan-math{display:block;font-size:13px;color:#4f6042;line-height:1.4;max-width:34ch}
+.screen-home .home-plan-math b{font-weight:600}
+.screen-home .home-plan-summary .plan-explanation{font-size:11px;line-height:1.4;margin-top:5px;max-width:none;color:#68745e}
+.screen-home .has-saved-plan .privacy-hint{text-align:left;font-size:11px;margin:7px 0 0;line-height:1.35;min-height:0}
+.screen-home .has-saved-plan .balance-details-link{position:static;margin:0 0 0 auto;font-size:12px;min-height:44px;opacity:1;justify-content:flex-end}
+.screen-home:has(.has-saved-plan) .home-stage .scene-art{height:clamp(90px,13dvh,126px)!important;margin:0!important}
+.screen-home:has(.has-saved-plan) .home-stage{margin:0 0 7px}
+/* Keep the consequence and the two equally weighted decisions together. */
+.screen.screen-pause{padding:7px 22px 17px}
+.screen-pause .focus-pause-compact .topline{margin-bottom:2px;min-height:44px}
+.screen-pause .focus-pause-compact .focus-pause-label{justify-content:flex-start;font-size:10px;letter-spacing:1px;margin:4px 0 8px}
+.screen-pause .focus-pause-compact .focus-pause-label>span{width:19px;height:19px;font-size:11px}
+.screen-pause .pause-decision-heading{display:grid;grid-template-columns:82px minmax(0,1fr);gap:11px;align-items:center;margin:0 0 8px}
+.screen-pause .pause-decision-heading .pause-stage{margin:0}
+.screen-pause .pause-decision-heading .pause-stage .scene-art{height:86px!important;margin:0!important;width:100%}
+.screen-pause .pause-decision-heading .focus-pause-insight h1{font-size:24px;line-height:1.12;letter-spacing:-.75px;text-align:left;max-width:none;margin:0;text-wrap:balance}
+.screen-pause .pause-payment-context{font-size:12px;margin:4px 0 11px;color:#36472b;line-height:1.35;overflow-wrap:anywhere}
+.screen-pause .pause-decision-consequence{padding:11px 0;border-top:1px solid #2d421f40;border-bottom:1px solid #2d421f40}
+.screen-pause .pause-decision-consequence p{font-size:14px;line-height:1.4;margin:0}
+.screen-pause .pause-decision-consequence .pause-goal-impact{margin-top:8px;font-weight:600}
+.screen-pause .pause-decision-consequence .pause-total-impact,.screen-pause .pause-decision-consequence .pause-existing-gap{font-size:12px;margin-top:7px;line-height:1.35;color:#3c502e}
+.screen-pause .pause-simple-figures{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px}
+.screen-pause .pause-simple-figures strong{font-size:23px;letter-spacing:-.6px}
+.screen-pause .focus-pause-compact .focus-choice{font-size:13px;margin:11px 0 0;font-weight:500}
+.screen-pause .focus-pause-compact .pause-actions{display:flex;flex-direction:column;gap:4px;margin-top:11px}
+.screen-pause .pause-decisions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px;width:100%}
+.screen-pause .pause-decisions .pause-equal-choice{min-height:53px;border:1.8px solid #25351b;background:#f8fcef;color:#233119;font-size:14px;font-weight:700;line-height:1.25;padding:12px 8px;border-radius:14px;box-shadow:none;margin:0}
+.screen-pause .pause-decisions .pause-equal-choice:hover{background:#fff}
+.screen-pause .pause-actions .pause-link-cost{font-size:13px;min-height:44px;padding:8px 0}
+.screen-pause .focus-pause-compact .focus-pause-exits{gap:12px}
+.screen-pause .focus-pause-compact .focus-pause-exits .text-btn{min-height:44px;font-size:13px;padding:7px 2px}
+.screen-pause .focus-pause-compact .focus-footnote{font-size:11px;line-height:1.35;margin-top:6px;text-align:center}
+.screen-pause .focus-pause-compact #error:empty{display:none}
+/* A brief sample before the optional four-step plan, without an extra sign-up step. */
+.screen-planBenefit .topline{gap:8px;margin-bottom:10px}
+.screen-planBenefit .topline .eyebrow{font-size:10px;letter-spacing:.5px}
+.screen-planBenefit .topline .pill{font-size:10px;padding:5px 7px;white-space:nowrap}
+.screen-planBenefit h1{font-size:31px;line-height:1.07;letter-spacing:-1.1px;margin:5px 0 9px}
+.screen-planBenefit .plan-benefit-intro{font-size:14px;color:#536348;line-height:1.4;margin:0 0 14px}
+.plan-benefit-before{padding:0 0 13px;border-bottom:1px solid #dbe3d1;margin-bottom:14px}
+.plan-benefit-before>span{display:block;font-size:10px;font-weight:600;letter-spacing:.6px;color:#5c6c4f}
+.plan-benefit-before>div{display:flex;align-items:baseline;gap:9px;margin:6px 0}
+.plan-benefit-before strong{font-size:34px;letter-spacing:-1px;color:#2d451e;line-height:1.1}
+.plan-benefit-before>div>span{font-size:13px}
+.plan-benefit-before>p{font-size:12px;color:#5c6c4e;line-height:1.4}
+.plan-benefit-pause{background:#b5e96a;border-radius:18px;padding:14px 15px 12px;display:grid;grid-template-columns:78px minmax(0,1fr);column-gap:11px;align-items:center}
+.plan-benefit-pause-label{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.8px;margin-bottom:8px}
+.screen-planBenefit .plan-benefit-art{grid-row:2/4;grid-column:1;margin:0}
+.screen-planBenefit .plan-benefit-art .scene-art{height:87px!important;width:100%;margin:0!important}
+.plan-benefit-pause h2{font-size:20px;line-height:1.15;letter-spacing:-.5px;margin:0}
+.plan-benefit-pause>p{font-size:12px;line-height:1.4;margin:4px 0 0}
+.plan-benefit-impact{grid-column:1/-1;margin:9px 0 0;border-top:1px solid #30461e45;padding-top:7px}
+.plan-benefit-impact>div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 0;font-size:13px}
+.plan-benefit-impact strong{font-size:17px;white-space:nowrap}
+.plan-benefit-pause .plan-benefit-choice{grid-column:1/-1;font-size:12px;font-weight:500;margin:8px 0 0}
+.plan-benefit-footnote{font-size:12px;color:#5d6b51;line-height:1.4;margin:12px 0 0}
+.screen-planBenefit .actions{margin-top:14px;gap:4px}
+@media(max-height:700px){
+ .screen-pause .pause-decision-heading{grid-template-columns:64px minmax(0,1fr);gap:8px;margin-bottom:5px}
+ .screen-pause .pause-decision-heading .pause-stage .scene-art{height:66px!important}
+ .screen-pause .pause-decision-heading .focus-pause-insight h1{font-size:23px}
+ .screen-pause .pause-payment-context{margin-bottom:8px}
+ .screen-pause .pause-decision-consequence{padding:9px 0}
+ .screen-pause .focus-pause-compact .focus-choice{margin-top:8px}
+ .screen-pause .focus-pause-compact .pause-actions{margin-top:8px}
+ .screen-home .has-saved-plan .balance-details-link{min-height:44px}
+ .screen-home:has(.has-saved-plan) .home-stage .scene-art{height:86px!important}
+ .screen-planBenefit h1{font-size:28px}.screen-planBenefit .plan-benefit-intro{margin-bottom:10px}.plan-benefit-before{margin-bottom:10px;padding-bottom:10px}
+}
+@media(max-width:359px){
+ .screen.screen-pause{padding-left:16px;padding-right:16px}
+ .screen-pause .pause-decisions{gap:7px}.screen-pause .pause-decisions .pause-equal-choice{font-size:13px}
+ .screen-home .has-saved-plan .focus-amount{font-size:26px}
+ .screen-home .home-plan-summary strong{font-size:42px}
+ .screen-home .home-plan-math{font-size:12px}
+}

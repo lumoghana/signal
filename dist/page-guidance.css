@@ -1,0 +1,8 @@
+/* Supporting education yields the first view to the task and its current data. */
+.page-guidance{min-width:0;max-width:100%;margin:18px 0 4px;border-top:1px solid var(--line);font-size:.8125rem;line-height:1.5;overflow-wrap:anywhere}
+.page-guidance>summary{cursor:pointer;color:var(--muted);font-size:.75rem;line-height:1.5;padding:12px 0;min-height:40px;overflow-wrap:anywhere}
+.page-guidance[open]>summary{color:var(--ink)}
+.page-guidance-body{min-width:0;max-width:100%;padding:0 0 4px}
+.page-guidance-body>p{font-size:.8125rem;line-height:1.55;color:var(--muted);margin:0 0 10px;overflow-wrap:anywhere}
+.page-guidance .page-guidance-dismiss{display:inline-flex;align-items:center;min-height:40px;width:auto;max-width:100%;padding:8px 0;font-size:.75rem;white-space:normal;overflow-wrap:anywhere;color:var(--ink)}
+.page-guidance>summary:focus-visible,.page-guidance-dismiss:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:3px}

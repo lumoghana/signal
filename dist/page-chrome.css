@@ -1,0 +1,22 @@
+/* Quiet page chrome: navigation names each destination; headings stay accessible. */
+body #app .screen :is(.hibiscus-root-header>h1,.hibiscus-tab-title>h1),
+body #app .screen-plan .plan-hub-heading>h1,
+body #app .screen-pay .focus-pay-heading>h1,
+body #app .screen-more .destination-heading>h1{
+ position:absolute!important;width:1px!important;height:1px!important;min-width:0!important;min-height:0!important;
+ padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;
+ white-space:nowrap!important;border:0!important;
+}
+body #app .screen .hibiscus-root-header{justify-content:flex-end;min-height:44px;padding:0;margin:0 0 10px!important}
+body #app .screen-plan .plan-hub-heading{height:0;min-height:0;margin:0!important;padding:0!important}
+/* Keep the existing assistant symbol and accessible name at every width. */
+body #app .screen :is(.hibiscus-root-chat,.hibiscus-home-chat-entry){display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 40px!important;width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;padding:9px!important;gap:0!important}
+body #app .screen :is(.hibiscus-root-chat,.hibiscus-home-chat-entry)>span{
+ display:block!important;position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
+ overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important;
+}
+body #app .screen :is(.hibiscus-root-chat,.hibiscus-home-chat-entry)>svg{display:block!important;width:21px!important;height:21px!important;flex:none!important}
+/* Chat keeps its name for assistive technology and uses the existing bubble glyph. */
+body #app .screen .hibiscus-chat-header-title{display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;min-width:24px;width:24px;height:24px;font-size:0!important;line-height:1}
+body #app .screen .hibiscus-chat-header-title::before{content:"";display:block;width:22px;height:22px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 11.5a8.5 8.5 0 0 1-9 8.5H4l-2 2V11.5a9.5 9.5 0 0 1 19 0Z'/%3E%3Cpath d='M7 10h10M7 14h6'/%3E%3C/svg%3E") center/contain no-repeat}
+body #app .screen .hibiscus-chat-header.has-context-return .hibiscus-chat-header-title{display:none}

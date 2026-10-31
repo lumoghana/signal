@@ -1,0 +1,53 @@
+/* Getting started alone adopts Hibiscus's nested architecture and composition.
+   Typography, green/monochrome identity and all later app pages stay edition-owned. */
+body #app .screen.screen-welcome:has(.getting-started){display:flex;flex-direction:column;min-height:100%;padding:12px 12px 16px}
+body #app .screen .welcome-screen.getting-started{
+ --start-top:color-mix(in srgb,var(--green-ink) 90%,var(--green));
+ --start-middle:color-mix(in srgb,var(--green-ink) 75%,var(--ink));
+ --start-deep:var(--ink);--start-glow:var(--green);--start-foreground:var(--white);
+ position:relative;isolation:isolate;display:flex;flex:1 0 auto;flex-direction:column;justify-content:flex-end;
+ min-height:calc(100dvh - 56px);padding:104px 24px 20px!important;overflow:hidden;
+ border-radius:var(--curve-panel,24px);background:var(--start-deep);color:var(--start-foreground);
+}
+body #app .screen .getting-started :is(.welcome-art-stage,.welcome-illustration,.scene-art){display:none!important}
+body #app .screen .getting-started>.topline{position:absolute;top:24px;left:24px;right:24px;z-index:2;margin:0!important;min-height:44px}
+body #app .screen .getting-started .actual-wordmark{filter:brightness(0) invert(1);width:90px!important;min-width:0;max-width:100%;height:auto}
+body #app .screen .getting-started>.topline .pill{background:rgb(255 255 255 / .12);color:var(--start-foreground);border-color:rgb(255 255 255 / .3)}
+body #app .screen .getting-started>h1{position:relative;z-index:1;font-size:2.375rem!important;line-height:1.06!important;font-weight:700;letter-spacing:-.055em!important;color:var(--start-foreground)!important;max-width:12ch;margin:0 0 12px!important;text-align:left}
+body #app .screen .getting-started>p.muted{position:relative;z-index:1;font-size:.96875rem!important;line-height:1.45!important;color:var(--start-foreground)!important;max-width:31ch;opacity:.92;margin:0 0 24px!important}
+body #app .screen .getting-started>.actions{position:relative;z-index:1;gap:8px;margin:0!important}
+body #app .screen .getting-started>.actions>.primary{background:var(--green)!important;border-color:var(--green)!important;color:var(--ink)!important}
+body #app .screen .getting-started>.actions>.secondary{background:transparent!important;color:var(--start-foreground)!important;border:1px solid rgb(255 255 255 / .6)!important}
+body #app .screen .getting-started :is(.text-btn,.preview-boundary){position:relative;z-index:1;color:var(--start-foreground)!important}
+body #app .screen .getting-started .welcome-utilities{position:relative;z-index:1;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:8px 0 0!important}
+body #app .screen .getting-started .welcome-utilities>.text-btn{min-height:44px;padding:8px 4px!important;font-size:.75rem!important;line-height:1.4}
+body #app .screen .getting-started>.getting-started-sample,body #app .screen .getting-started>.welcome-explore{display:flex;align-items:center;justify-content:center;min-height:44px!important;font-size:.875rem!important;line-height:1.4;margin:4px 0 0!important;padding:8px 0!important}
+body #app .screen .getting-started>.preview-boundary{font-size:.6875rem!important;line-height:1.4!important;opacity:.8;margin:6px 0 0!important;padding:0!important}
+body #app .screen .getting-started .primary,body #app .screen .getting-started .secondary{min-height:48px;padding:11px 14px!important;font-size:.9375rem;line-height:1.4}
+body #app .screen .getting-started>.actions>.text-btn{min-height:44px;padding:8px 4px!important;font-size:.8125rem!important;line-height:1.4}
+body #app .screen .getting-started button:focus-visible{outline:3px solid var(--start-foreground);outline-offset:3px}
+body #app .screen .getting-started-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;background:linear-gradient(180deg,var(--start-top),var(--start-middle) 42%,var(--start-deep) 88%)}
+body #app .screen .getting-started-scene:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 15%,color-mix(in srgb,var(--start-deep) 35%,transparent) 44%,var(--start-deep) 83%)}
+body #app .screen .getting-started-arch{position:absolute;left:calc(22px + var(--arch)*23px);right:calc(22px + var(--arch)*23px);top:calc(100px + var(--arch)*28px);bottom:180px;border:calc(9px - var(--arch)*1px) solid rgb(255 255 255 / .2);border-bottom:0;border-radius:160px 160px 0 0;opacity:calc(1 - var(--arch)*.1)}
+body #app .screen .getting-started-glow{position:absolute;width:220px;height:220px;top:90px;left:50%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--start-glow) 60%,transparent),transparent 70%);opacity:.5}
+body.minna-edition #app .screen .welcome-screen.getting-started{--start-top:#555;--start-middle:#292929;--start-deep:#111;--start-glow:#ddd;border-radius:0}
+body.minna-edition #app .screen .getting-started>h1{font-weight:500}
+body.minna-edition #app .screen .getting-started>.actions>.primary{background:#fff!important;border-color:#fff!important;color:#111!important}
+body.minna-edition #app .screen .getting-started :is(.primary,.secondary){border-radius:2px}
+@media(min-width:900px){body #app .screen .welcome-screen.getting-started{min-height:calc(100dvh - 120px)}}
+@media(max-height:700px){
+ body #app .screen .welcome-screen.getting-started{padding:84px 20px 16px!important}
+ body #app .screen .getting-started>.topline{top:18px;left:20px;right:20px}
+ body #app .screen .getting-started>h1{font-size:2.125rem!important;margin-bottom:10px!important}
+ body #app .screen .getting-started>p.muted{font-size:.875rem!important;line-height:1.4!important;margin-bottom:14px!important;max-width:none}
+ body #app .screen .getting-started>.actions{gap:6px}
+ body #app .screen .getting-started :is(.primary,.secondary){min-height:44px;padding:9px 12px!important}
+ body #app .screen .getting-started .welcome-utilities{margin-top:4px!important}
+ body #app .screen .getting-started>.preview-boundary{margin-top:2px!important}
+ body #app .screen .getting-started-arch{top:calc(80px + var(--arch)*24px);bottom:140px}
+}
+@media(max-width:359px){
+ body #app .screen .getting-started>h1{font-size:2rem!important}
+ body #app .screen .getting-started-arch{left:calc(16px + var(--arch)*19px);right:calc(16px + var(--arch)*19px)}
+}
+@media(prefers-reduced-motion:reduce){body #app .screen .getting-started *{animation:none!important;transition:none!important;scroll-behavior:auto}}

@@ -1,0 +1,25 @@
+/* A compact editor, using the edition's own type, controls and colours. */
+.screen .budget-history-entry{min-height:44px;display:inline-flex;align-items:center;text-align:left}
+#app .screen .budget-history-period{margin:0 0 6px;font-weight:600;line-height:1.4}
+#app .screen .budget-history-intro{margin:0 0 12px;line-height:1.45}
+.screen .budget-history-column-labels{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;font-size:.875rem;color:var(--muted);padding-bottom:4px}
+.screen .budget-history-column-labels span:last-child{text-align:right}
+#app .screen .budget-history-items{display:grid;gap:8px;margin:0 0 4px}
+.screen .budget-history-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:center}
+.screen .budget-history-include{display:flex;gap:9px;align-items:center;min-height:44px;overflow-wrap:anywhere;line-height:1.35}
+.screen .budget-history-include input{width:20px;height:20px;flex:none;margin:0}
+#app .screen .budget-history-item .field{margin:0;min-width:0}
+#app .screen .budget-history-item .inline{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+#app .screen .budget-history-item .inline .input{flex:1;min-width:0;width:0;text-align:right}
+#app .screen .budget-history-item .payment-currency{font-size:.875rem;line-height:1.4;white-space:nowrap;flex:none}
+#app .screen .budget-history-projection{padding:10px 0;margin:4px 0 0;border-top:1px solid var(--line);font-weight:600;line-height:1.4}
+#app .screen .budget-history-draft-note{margin:0;line-height:1.4}
+#app .screen .budget-history-actions{margin-top:12px;gap:4px}
+#app .screen .budget-history-details{margin-top:8px}
+.screen .budget-history-details dd{font-variant-numeric:tabular-nums;margin:0;text-align:right}
+.screen .budget-history-transactions .summary-line{gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.screen .budget-history-transactions small{display:block;color:var(--muted);margin-top:3px}
+.screen .budget-history-details .summary-line{align-items:start;gap:12px}
+.screen .budget-history-missing-actions{display:flex;flex-wrap:wrap;gap:4px 12px}
+#history-missing-costs:empty{display:none}
+@media(max-width:340px){.screen .budget-history-item{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.screen .budget-history-include{gap:6px}}

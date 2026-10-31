@@ -1,0 +1,1164 @@
+{
+  "baseline_commit": "a991acfd47c5ee85eb2cc34fcb40cd3e9b868ded",
+  "registered_screens": 111,
+  "method": "Production-index route registration and v5 purpose inventory carried forward, with all three v6 additions. State execution is evidenced separately by tests, not implied for every variant.",
+  "screens": [
+    {
+      "route": "accountInfo",
+      "purpose": "Read account details and access records/closure.",
+      "treatment": "account",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "accountReady",
+      "purpose": "Confirm the sample account is ready and enter Lumo.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "accountReview",
+      "purpose": "Review completed signup checks and accept account terms.",
+      "treatment": "dedicated",
+      "states": [
+        "incomplete_checks",
+        "terms_missing",
+        "ready_to_submit"
+      ]
+    },
+    {
+      "route": "accountTerms",
+      "purpose": "Read preview account terms.",
+      "treatment": "account",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "actionConfirm",
+      "purpose": "Accept/cancel a branded consequential choice with current preconditions.",
+      "treatment": "support",
+      "states": [
+        "pending_choice",
+        "cancelled",
+        "accepted",
+        "preconditions_changed",
+        "stale_or_account_replaced"
+      ]
+    },
+    {
+      "route": "activity",
+      "purpose": "Browse and filter all transaction statuses.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "all_statuses",
+        "pending_filter",
+        "direction_filter",
+        "search",
+        "period_category_scope",
+        "pagination"
+      ]
+    },
+    {
+      "route": "addMoney",
+      "purpose": "Choose an incoming-funding method.",
+      "treatment": "funding",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "allocate",
+      "purpose": "Enter an allocation amount.",
+      "treatment": "plan",
+      "states": [
+        "valid",
+        "invalid_amount",
+        "missing_goal"
+      ]
+    },
+    {
+      "route": "allocationReview",
+      "purpose": "Confirm a single-use allocation change.",
+      "treatment": "plan",
+      "states": [
+        "valid_review",
+        "consumed_operation",
+        "missing_goal"
+      ]
+    },
+    {
+      "route": "allowance",
+      "purpose": "Save an expected amount/date; keep it distinct from received money.",
+      "treatment": "plan",
+      "states": [
+        "unspecified",
+        "expected_amount_date",
+        "invalid_fields",
+        "saved"
+      ]
+    },
+    {
+      "route": "ambassadorGuide",
+      "purpose": "Read sample credentials and connected tasks to try.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "ambassadorReset",
+      "purpose": "Confirm fresh signup after preserving feedback.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "ambassadorSample",
+      "purpose": "Confirm loading the bundled sample account.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "ambassadorWelcome",
+      "purpose": "Choose signup/sample exploration with simulation boundaries.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "applicationCorrection",
+      "purpose": "Correct the application student ID while retaining other checks.",
+      "treatment": "dedicated",
+      "states": [
+        "initial",
+        "invalid_id",
+        "saved"
+      ]
+    },
+    {
+      "route": "applicationStatus",
+      "purpose": "Follow an in-review, correction-needed or refused application.",
+      "treatment": "dedicated",
+      "states": [
+        "pending",
+        "more_information",
+        "refused",
+        "ready_redirect"
+      ]
+    },
+    {
+      "route": "authorize",
+      "purpose": "Enter the PIN and authorise the reviewed payment.",
+      "treatment": "payment",
+      "states": [
+        "valid_review",
+        "invalid_pin",
+        "five_wrong_pins_lock",
+        "changed_plan_requires_review",
+        "insufficient_funds",
+        "duplicate_submission"
+      ]
+    },
+    {
+      "route": "balances",
+      "purpose": "Inspect account balance, pending holds and planning commitments.",
+      "treatment": "records",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "bankAdd",
+      "purpose": "Read sample receiving details or inspect a confirmed test credit.",
+      "treatment": "funding",
+      "states": [
+        "receiving_details",
+        "no_credit",
+        "confirmed_test_credit",
+        "validation_error"
+      ]
+    },
+    {
+      "route": "bill",
+      "purpose": "Select a service, verify its destination and enter/choose its amount.",
+      "treatment": "payment",
+      "states": [
+        "service_destination",
+        "service_package",
+        "amount_entry",
+        "linked_essential",
+        "invalid_account",
+        "invalid_amount",
+        "submitted_result"
+      ]
+    },
+    {
+      "route": "campus",
+      "purpose": "Enter the student ID and check pilot eligibility.",
+      "treatment": "dedicated",
+      "states": [
+        "initial",
+        "invalid_student_id",
+        "unsupported_campus"
+      ]
+    },
+    {
+      "route": "campusInterest",
+      "purpose": "Save interest for another campus.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "campusInterestSaved",
+      "purpose": "Confirm that campus interest was saved locally.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "campusPay",
+      "purpose": "Find and select a campus merchant.",
+      "treatment": "payment",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "campusStatus",
+      "purpose": "Follow eligibility review or correct an unmatched student ID.",
+      "treatment": "dedicated",
+      "states": [
+        "pending",
+        "attention",
+        "approved_redirect"
+      ]
+    },
+    {
+      "route": "caseDetail",
+      "purpose": "Read/update/close/reopen a locally saved report.",
+      "treatment": "support",
+      "states": [
+        "existing",
+        "missing_record",
+        "saved_local",
+        "updates",
+        "closed",
+        "reopened"
+      ]
+    },
+    {
+      "route": "changePin",
+      "purpose": "Validate current PIN and set a different matching new PIN.",
+      "treatment": "account",
+      "states": [
+        "initial",
+        "wrong_current_pin",
+        "invalid_new_pin",
+        "same_pin",
+        "mismatched_confirmation",
+        "saved"
+      ]
+    },
+    {
+      "route": "chat",
+      "purpose": "Ask money questions, inspect calculations and open relevant working actions.",
+      "treatment": "primary",
+      "states": [
+        "intro",
+        "active_history",
+        "amount_followup",
+        "covered",
+        "low_cushion",
+        "essential_shortfall",
+        "goal_shortfall",
+        "unsupported_question",
+        "calculation_collapsed",
+        "calculation_expanded"
+      ]
+    },
+    {
+      "route": "chatCalculation",
+      "purpose": "Read the figures saved with a chosen Chat answer, then return to the same conversation.",
+      "treatment": "records",
+      "states": [
+        "saved_answer_or_unavailable"
+      ]
+    },
+    {
+      "route": "closeAccount",
+      "purpose": "Resolve blockers and request/follow/cancel simulated closure.",
+      "treatment": "account",
+      "states": [
+        "blockers",
+        "all_clear",
+        "request_confirmation",
+        "closing",
+        "cancellation_confirmation",
+        "closed"
+      ]
+    },
+    {
+      "route": "confirmPin",
+      "purpose": "Confirm the new PIN before saving.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "mismatch",
+        "saved"
+      ]
+    },
+    {
+      "route": "dataExport",
+      "purpose": "Prepare/download a local demo-data export with PIN validation.",
+      "treatment": "account",
+      "states": [
+        "not_prepared",
+        "wrong_pin",
+        "ready"
+      ]
+    },
+    {
+      "route": "devices",
+      "purpose": "Inspect/end simulated sessions.",
+      "treatment": "account",
+      "states": [
+        "sessions",
+        "end_confirmation",
+        "wrong_pin"
+      ]
+    },
+    {
+      "route": "essentialEdit",
+      "purpose": "Create/edit/remove an essential or mark external coverage.",
+      "treatment": "plan",
+      "states": [
+        "new",
+        "existing",
+        "invalid_fields",
+        "external_coverage",
+        "pending_link_blocks_remove",
+        "branded_confirmation"
+      ]
+    },
+    {
+      "route": "essentials",
+      "purpose": "Browse remaining planned essential costs.",
+      "treatment": "plan",
+      "states": [
+        "empty",
+        "remaining",
+        "covered",
+        "pending_link",
+        "pagination"
+      ]
+    },
+    {
+      "route": "feedback",
+      "purpose": "Save/download ambassador feedback locally.",
+      "treatment": "support",
+      "states": [
+        "empty",
+        "validation_error",
+        "saved",
+        "downloadable"
+      ]
+    },
+    {
+      "route": "firstEssentials",
+      "purpose": "Draft essentials and the optional plan period.",
+      "treatment": "plan",
+      "states": [
+        "empty",
+        "resumed",
+        "invalid_essential",
+        "period_choice"
+      ]
+    },
+    {
+      "route": "firstGoal",
+      "purpose": "Draft an optional goal and allocation.",
+      "treatment": "plan",
+      "states": [
+        "no_goal",
+        "existing_goal",
+        "invalid_target_or_allocation",
+        "skip_goal"
+      ]
+    },
+    {
+      "route": "firstPlanReview",
+      "purpose": "Review all planning choices before committing once.",
+      "treatment": "plan",
+      "states": [
+        "draft_review",
+        "invalid_draft",
+        "saved_once"
+      ]
+    },
+    {
+      "route": "goal",
+      "purpose": "Inspect and manage the selected goal.",
+      "treatment": "plan",
+      "states": [
+        "existing",
+        "missing_record",
+        "below_target",
+        "target_reached"
+      ]
+    },
+    {
+      "route": "goalEdit",
+      "purpose": "Create/edit a goal name and target.",
+      "treatment": "plan",
+      "states": [
+        "new",
+        "existing",
+        "invalid_fields"
+      ]
+    },
+    {
+      "route": "goals",
+      "purpose": "Browse saved goals and allocated amounts.",
+      "treatment": "plan",
+      "states": [
+        "empty",
+        "allocated",
+        "target_reached",
+        "pagination"
+      ]
+    },
+    {
+      "route": "help",
+      "purpose": "Read FAQs, open a saved support report or return to the originating task.",
+      "treatment": "support",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "home",
+      "purpose": "See available money separately from room after the plan; fund, pay or resume.",
+      "treatment": "primary",
+      "states": [
+        "fresh_unfunded",
+        "funded_no_plan",
+        "saved_plan",
+        "masked",
+        "revealed",
+        "plan_shortfall",
+        "pending_hold",
+        "returning_empty",
+        "saved_payment"
+      ]
+    },
+    {
+      "route": "identity",
+      "purpose": "Consent to the simulated identity check.",
+      "treatment": "dedicated",
+      "states": [
+        "initial",
+        "consent_missing"
+      ]
+    },
+    {
+      "route": "identityResult",
+      "purpose": "Follow the saved identity result or recovery/help path.",
+      "treatment": "dedicated",
+      "states": [
+        "approved",
+        "pending",
+        "linked_existing",
+        "attention",
+        "refused"
+      ]
+    },
+    {
+      "route": "livecheck",
+      "purpose": "Run the simulated live/identity check.",
+      "treatment": "dedicated",
+      "states": [
+        "ready",
+        "simulated_result"
+      ]
+    },
+    {
+      "route": "makeRoom",
+      "purpose": "Choose an essential/goal/funding adjustment.",
+      "treatment": "plan",
+      "states": [
+        "allocated_goals",
+        "no_goals",
+        "return_to_payment"
+      ]
+    },
+    {
+      "route": "merchant",
+      "purpose": "Inspect or enter the separate sample-business counter.",
+      "treatment": "dedicated",
+      "states": [
+        "not_approved",
+        "approved_counter",
+        "confirmed_sales",
+        "processing_collections"
+      ]
+    },
+    {
+      "route": "merchantApply",
+      "purpose": "Submit/follow sample business approval and terms.",
+      "treatment": "dedicated",
+      "states": [
+        "not_submitted",
+        "in_review",
+        "more_information",
+        "refused",
+        "approved"
+      ]
+    },
+    {
+      "route": "merchantCollect",
+      "purpose": "Create one fixed-amount sample sale request.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "merchantCollection",
+      "purpose": "Follow the selected sale collection and its settlement/refund status.",
+      "treatment": "dedicated",
+      "states": [
+        "waiting",
+        "expired",
+        "processing",
+        "unknown",
+        "confirmed",
+        "failed",
+        "reversed",
+        "missing_record"
+      ]
+    },
+    {
+      "route": "merchantDestination",
+      "purpose": "Inspect the sample verified settlement destination.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "merchantPayer",
+      "purpose": "Authorise a separate sample payer without using the student wallet.",
+      "treatment": "dedicated",
+      "states": [
+        "valid_sale",
+        "invalid_sample_pin",
+        "missing_approval",
+        "missing_sale"
+      ]
+    },
+    {
+      "route": "merchantSales",
+      "purpose": "Search sample-business sales and receipts.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "search",
+        "all_collection_statuses"
+      ]
+    },
+    {
+      "route": "missions",
+      "purpose": "Inspect completed milestones.",
+      "treatment": "plan",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "momoAdd",
+      "purpose": "Review/request/follow a simulated mobile-wallet top-up.",
+      "treatment": "funding",
+      "states": [
+        "form",
+        "validation_error",
+        "review",
+        "pending_credit",
+        "confirmed_credit",
+        "failed_credit",
+        "missing_reference"
+      ]
+    },
+    {
+      "route": "more",
+      "purpose": "Open profile, account, security, privacy, notifications or help.",
+      "treatment": "primary",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "notificationPrefs",
+      "purpose": "Change local notification choices.",
+      "treatment": "account",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "notifications",
+      "purpose": "Read saved updates.",
+      "treatment": "account",
+      "states": [
+        "empty",
+        "saved_updates"
+      ]
+    },
+    {
+      "route": "otp",
+      "purpose": "Enter/resend a sample verification code and preserve the purpose.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "invalid_code",
+        "expired_or_resend",
+        "signup",
+        "signin",
+        "recovery",
+        "replacement"
+      ]
+    },
+    {
+      "route": "pause",
+      "purpose": "Understand a triggered spending consequence and choose the next step.",
+      "treatment": "payment",
+      "states": [
+        "no_trigger_review",
+        "behavioral_trigger",
+        "essential_shortfall",
+        "goal_shortfall",
+        "existing_shortfall",
+        "linked_plan_correction",
+        "edited",
+        "deferred",
+        "cancelled",
+        "submitted_result"
+      ]
+    },
+    {
+      "route": "pauseDemo",
+      "purpose": "Inspect isolated sample decisions without changing the account.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "pauseLog",
+      "purpose": "Read recorded Pause exposures and choices.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "pay",
+      "purpose": "Choose transfers, Campus Pay or bills.",
+      "treatment": "primary",
+      "states": [
+        "send_tab",
+        "campus_tab",
+        "bills_tab",
+        "saved_draft",
+        "pending_count"
+      ]
+    },
+    {
+      "route": "paymentCancel",
+      "purpose": "Keep the unfinished draft, return or discard it.",
+      "treatment": "payment",
+      "states": [
+        "keep_draft",
+        "return_to_entry",
+        "discard_draft"
+      ]
+    },
+    {
+      "route": "paymentPlanLink",
+      "purpose": "Link the payment explicitly to an existing planned cost.",
+      "treatment": "payment",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "paymentResult",
+      "purpose": "See the actual simulated transaction outcome.",
+      "treatment": "payment",
+      "states": [
+        "confirmed",
+        "pending",
+        "failed",
+        "reversed",
+        "delivery_pending",
+        "delivery_failed",
+        "missing_record"
+      ]
+    },
+    {
+      "route": "paymentReview",
+      "purpose": "Check recipient, amount, fee and total before continuing.",
+      "treatment": "payment",
+      "states": [
+        "reviewable",
+        "insufficient_funds",
+        "plan_linked",
+        "missing_draft",
+        "submitted_result"
+      ]
+    },
+    {
+      "route": "pending",
+      "purpose": "Find payments or deliveries still awaiting confirmation.",
+      "treatment": "records",
+      "states": [
+        "empty",
+        "payment_pending",
+        "delivery_pending"
+      ]
+    },
+    {
+      "route": "phone",
+      "purpose": "Enter a sample mobile number for signup/signin/recovery.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "invalid_number",
+        "signup",
+        "signin",
+        "recovery",
+        "replacement"
+      ]
+    },
+    {
+      "route": "pilotUnavailable",
+      "purpose": "Explain unsupported campus pilot availability.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "pin",
+      "purpose": "Choose a six-digit PIN during setup or approved recovery.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "invalid_pin",
+        "signup",
+        "approved_recovery"
+      ]
+    },
+    {
+      "route": "plan",
+      "purpose": "Review the plan summary and open income, essentials and goals.",
+      "treatment": "primary",
+      "states": [
+        "empty",
+        "draft_in_progress",
+        "saved",
+        "shortfall"
+      ]
+    },
+    {
+      "route": "planBenefit",
+      "purpose": "Read a clearly labelled fixed example of Pause before optional planning.",
+      "treatment": "plan",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "planExplanation",
+      "purpose": "Explain the current account and planned commitments in a detail sheet.",
+      "treatment": "records",
+      "states": [
+        "current_plan_detail"
+      ]
+    },
+    {
+      "route": "planPeriod",
+      "purpose": "Set or revise the plan horizon.",
+      "treatment": "plan",
+      "states": [
+        "unspecified",
+        "specific_date",
+        "expected_income_date",
+        "invalid_date",
+        "saved",
+        "cancelled"
+      ]
+    },
+    {
+      "route": "planSetup",
+      "purpose": "Draft expected income; no received money is added.",
+      "treatment": "plan",
+      "states": [
+        "new_draft",
+        "resumed_draft",
+        "invalid_income",
+        "skip_income"
+      ]
+    },
+    {
+      "route": "privacy",
+      "purpose": "Inspect and change local privacy controls.",
+      "treatment": "account",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "privacyNotice",
+      "purpose": "Read preview privacy and information-handling terms.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "profile",
+      "purpose": "Read profile and account contact details.",
+      "treatment": "account",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "profileEdit",
+      "purpose": "Edit display name, handle and optional email.",
+      "treatment": "account",
+      "states": [
+        "initial",
+        "unsaved_session_draft",
+        "validation_error",
+        "saved",
+        "discard_confirmation"
+      ]
+    },
+    {
+      "route": "profilePhone",
+      "purpose": "Validate and confirm a phone change.",
+      "treatment": "account",
+      "states": [
+        "initial",
+        "invalid_pin",
+        "invalid_number",
+        "invalid_code",
+        "confirmation",
+        "saved"
+      ]
+    },
+    {
+      "route": "recovery",
+      "purpose": "Choose PIN or lost-phone recovery.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "recoveryOwnership",
+      "purpose": "Run a simulated ownership check.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "recoveryReplacement",
+      "purpose": "Confirm a replacement sample number.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "recoveryStatus",
+      "purpose": "Follow pending/approved/attention recovery outcomes.",
+      "treatment": "dedicated",
+      "states": [
+        "checking",
+        "pending",
+        "approved",
+        "attention"
+      ]
+    },
+    {
+      "route": "releaseGoal",
+      "purpose": "Enter how much planning allocation to release.",
+      "treatment": "plan",
+      "states": [
+        "valid",
+        "invalid_amount",
+        "missing_goal"
+      ]
+    },
+    {
+      "route": "releaseReview",
+      "purpose": "Confirm a single-use release; account money does not change.",
+      "treatment": "plan",
+      "states": [
+        "valid_review",
+        "consumed_operation",
+        "missing_goal"
+      ]
+    },
+    {
+      "route": "requestConfirm",
+      "purpose": "Confirm decline or cancellation of a request.",
+      "treatment": "records",
+      "states": [
+        "decline",
+        "cancel",
+        "missing_record",
+        "already_closed"
+      ]
+    },
+    {
+      "route": "requestCreate",
+      "purpose": "Compose, review and save a request without receiving money.",
+      "treatment": "records",
+      "states": [
+        "form",
+        "validation_error",
+        "review",
+        "created_once"
+      ]
+    },
+    {
+      "route": "requestDetail",
+      "purpose": "Read/pay/decline/cancel the selected request according to its status.",
+      "treatment": "records",
+      "states": [
+        "received_waiting",
+        "sent_waiting",
+        "processing",
+        "paid",
+        "declined",
+        "cancelled",
+        "expired",
+        "missing_record",
+        "wrong_owner"
+      ]
+    },
+    {
+      "route": "requests",
+      "purpose": "Browse sent and received money requests.",
+      "treatment": "records",
+      "states": [
+        "empty",
+        "sent",
+        "received",
+        "filtered",
+        "pagination"
+      ]
+    },
+    {
+      "route": "resetConfirm",
+      "purpose": "Explicitly confirm resetting demo progress.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "sampleConfirm",
+      "purpose": "Explicitly confirm replacing progress with bundled sample data.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "samplePause",
+      "purpose": "Read an isolated sample consequence before sign-up without creating a payment or account.",
+      "treatment": "dedicated",
+      "states": [
+        "isolated_example"
+      ]
+    },
+    {
+      "route": "security",
+      "purpose": "Manage PIN and security options.",
+      "treatment": "account",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "send",
+      "purpose": "Select/check a recipient and enter a payment amount.",
+      "treatment": "payment",
+      "states": [
+        "recipient_search",
+        "recipient_verification",
+        "amount_entry",
+        "linked_essential",
+        "fixed_amount",
+        "invalid_destination",
+        "invalid_amount",
+        "insufficient_funds",
+        "submitted_result"
+      ]
+    },
+    {
+      "route": "sendOptions",
+      "purpose": "Choose a transfer destination type.",
+      "treatment": "payment",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "settlementDetail",
+      "purpose": "Follow one batch result and its included sales.",
+      "treatment": "dedicated",
+      "states": [
+        "queued",
+        "processing",
+        "unknown",
+        "failed",
+        "settled",
+        "missing_record"
+      ]
+    },
+    {
+      "route": "settlements",
+      "purpose": "Create/follow batches of confirmed collections.",
+      "treatment": "dedicated",
+      "states": [
+        "none",
+        "unassigned_collections",
+        "queued_batches"
+      ]
+    },
+    {
+      "route": "setupChoice",
+      "purpose": "Choose optional plan setup or proceed.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "setupProgress",
+      "purpose": "Resume incomplete signup from saved checks.",
+      "treatment": "dedicated",
+      "states": [
+        "incomplete",
+        "resumable",
+        "complete"
+      ]
+    },
+    {
+      "route": "signin",
+      "purpose": "Validate sign-in credentials and restore a permitted return route.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "invalid_credentials",
+        "locked",
+        "permitted_return"
+      ]
+    },
+    {
+      "route": "statements",
+      "purpose": "Validate a date range and prepare/download a sample statement.",
+      "treatment": "account",
+      "states": [
+        "no_statement",
+        "invalid_dates",
+        "wrong_pin",
+        "ready",
+        "empty_period"
+      ]
+    },
+    {
+      "route": "story",
+      "purpose": "Understand confirmed spending by period/category.",
+      "treatment": "dedicated",
+      "states": [
+        "empty",
+        "confirmed_spending",
+        "period_7_30_90",
+        "category_scope"
+      ]
+    },
+    {
+      "route": "storyTx",
+      "purpose": "Review/correct a selected spending category.",
+      "treatment": "records",
+      "states": [
+        "existing",
+        "missing_record",
+        "category_change"
+      ]
+    },
+    {
+      "route": "supportCase",
+      "purpose": "Save a report locally; no live support message is sent.",
+      "treatment": "support",
+      "states": [
+        "initial",
+        "invalid_description",
+        "saved_once"
+      ]
+    },
+    {
+      "route": "testing",
+      "purpose": "Read the testing guide and sample scenarios.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    },
+    {
+      "route": "txDetail",
+      "purpose": "Read the selected receipt/status, retry/help or save a record.",
+      "treatment": "records",
+      "states": [
+        "success",
+        "pending",
+        "failed",
+        "reversed",
+        "delivery_pending",
+        "delivery_failed",
+        "refund",
+        "missing_record",
+        "retry"
+      ]
+    },
+    {
+      "route": "welcome",
+      "purpose": "Start/resume signup or sign in.",
+      "treatment": "dedicated",
+      "states": [
+        "initial"
+      ]
+    }
+  ],
+  "source_probe_errors": [],
+  "rendered_fit": "unverified"
+}

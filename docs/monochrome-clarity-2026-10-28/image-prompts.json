@@ -1,0 +1,22 @@
+[
+  {
+    "kind": "goal",
+    "prompt": "Use case: precise-object-edit. Edit the referenced image only. This is ONLY a palette edit of an existing finished illustration. Convert EVERY acid-lime, neon yellow-green, or other colored area to neutral grayscale: clothing, shoe panels, backpack straps, books, foliage, sky and background all become black/white/neutral grays. Replace the large flat acid-lime backdrop with a perfectly uniform solid very light neutral paper-gray background #f4f4f4. Strictly no hue or colored accents anywhere (RGB channels should be equal). Preserve the exact original illustration style, faces, hairstyles, expressions, people, poses, figure positions, composition, scale, negative left space, campus objects, unbranded clothing, Balme Library clock tower and architecture, and all ink line detail. Do not add, remove, move or redesign anything. Preserve the wide 2:1 canvas and the students on the right. Keep left space empty and fully opaque. No new text, objects, symbols, logos, UI or watermark.",
+    "reference": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus/goal.webp"
+  },
+  {
+    "kind": "runway",
+    "prompt": "Use case: precise-object-edit. Edit the referenced image only. This is ONLY a palette edit of an existing finished illustration. Convert EVERY acid-lime, neon yellow-green, or other colored area to neutral grayscale: clothing, shoe panels, backpack straps, books, foliage, sky and background all become black/white/neutral grays. Replace the large flat acid-lime backdrop with a perfectly uniform solid very light neutral paper-gray background #f4f4f4. Strictly no hue or colored accents anywhere (RGB channels should be equal). Preserve the exact original illustration style, faces, hairstyles, expressions, people, poses, figure positions, composition, scale, negative left space, campus objects, unbranded clothing, Balme Library clock tower and architecture, and all ink line detail. Do not add, remove, move or redesign anything. Preserve the wide 2:1 canvas and the students on the right. Keep left space empty and fully opaque. No new text, objects, symbols, logos, UI or watermark.",
+    "reference": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus/runway.webp"
+  },
+  {
+    "kind": "spending",
+    "prompt": "Use case: precise-object-edit. Edit the referenced image only. This is ONLY a palette edit of an existing finished illustration. Convert EVERY acid-lime, neon yellow-green, or other colored area to neutral grayscale: clothing, shoe panels, backpack straps, books, foliage, sky and background all become black/white/neutral grays. Replace the large flat acid-lime backdrop with a perfectly uniform solid very light neutral paper-gray background #f4f4f4. Strictly no hue or colored accents anywhere (RGB channels should be equal). Preserve the exact original illustration style, faces, hairstyles, expressions, people, poses, figure positions, composition, scale, negative left space, campus objects, unbranded clothing, Balme Library clock tower and architecture, and all ink line detail. Do not add, remove, move or redesign anything. Preserve the wide 2:1 canvas and the students on the right. Keep left space empty and fully opaque. No new text, objects, symbols, logos, UI or watermark.",
+    "reference": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus/spending.webp"
+  },
+  {
+    "kind": "affordability",
+    "prompt": "Use case: precise-object-edit. Edit the referenced image only. This is ONLY a palette edit of an existing finished illustration. Convert EVERY acid-lime, neon yellow-green, or other colored area to neutral grayscale: clothing, shoe panels, backpack straps, books, foliage, sky and background all become black/white/neutral grays. Replace the large flat acid-lime backdrop with a perfectly uniform solid very light neutral paper-gray background #f4f4f4. Strictly no hue or colored accents anywhere (RGB channels should be equal). Preserve the exact original illustration style, faces, hairstyles, expressions, people, poses, figure positions, composition, scale, negative left space, campus objects, unbranded clothing, Balme Library clock tower and architecture, and all ink line detail. Do not add, remove, move or redesign anything. Preserve the wide 2:1 canvas and the students on the right. Keep left space empty and fully opaque. No new text, objects, symbols, logos, UI or watermark.",
+    "reference": "/workspace/sites/lumo-minna-edition/dist/assets/ask-lumo-campus/affordability.webp"
+  }
+]

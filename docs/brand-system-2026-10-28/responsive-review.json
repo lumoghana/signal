@@ -1,0 +1,4272 @@
+{
+  "edition": "minna",
+  "total": 2376,
+  "totalCases": 297,
+  "withFindings": 0,
+  "privacyComparisons": [
+    {
+      "fixture": "long-values",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 265,
+            "height": 207.046875
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 265,
+            "height": 207.046875
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 327.4375,
+            "bottom": 520.1875,
+            "width": 265,
+            "height": 192.75
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 327.4375,
+            "bottom": 520.1875,
+            "width": 265,
+            "height": 192.75
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 271.046875,
+            "bottom": 321.4375,
+            "width": 265,
+            "height": 50.390625
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 271.046875,
+            "bottom": 321.4375,
+            "width": 265,
+            "height": 50.390625
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 336,
+            "top": 58,
+            "bottom": 268.0625,
+            "width": 312,
+            "height": 210.0625
+          },
+          "hidden": {
+            "left": 24,
+            "right": 336,
+            "top": 58,
+            "bottom": 268.0625,
+            "width": 312,
+            "height": 210.0625
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 336,
+            "top": 324.84375,
+            "bottom": 498,
+            "width": 312,
+            "height": 173.15625
+          },
+          "hidden": {
+            "left": 24,
+            "right": 336,
+            "top": 324.84375,
+            "bottom": 498,
+            "width": 312,
+            "height": 173.15625
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 336,
+            "top": 274.0625,
+            "bottom": 318.84375,
+            "width": 312,
+            "height": 44.78125
+          },
+          "hidden": {
+            "left": 24,
+            "right": 336,
+            "top": 274.0625,
+            "bottom": 318.84375,
+            "width": 312,
+            "height": 44.78125
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 276,
+            "right": 316,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 276,
+            "right": 316,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 74,
+            "bottom": 329.203125,
+            "width": 327,
+            "height": 255.203125
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 74,
+            "bottom": 329.203125,
+            "width": 327,
+            "height": 255.203125
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 397.203125,
+            "bottom": 554.765625,
+            "width": 327,
+            "height": 157.5625
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 397.203125,
+            "bottom": 554.765625,
+            "width": 327,
+            "height": 157.5625
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 341.203125,
+            "bottom": 385.203125,
+            "width": 327,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 341.203125,
+            "bottom": 385.203125,
+            "width": 327,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 287,
+            "right": 327,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 287,
+            "right": 327,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 327,
+            "height": 207.046875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 327,
+            "height": 207.046875
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 321.046875,
+            "bottom": 478.609375,
+            "width": 327,
+            "height": 157.5625
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 321.046875,
+            "bottom": 478.609375,
+            "width": 327,
+            "height": 157.5625
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 327,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 327,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 291,
+            "right": 331,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 291,
+            "right": 331,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 481.53125,
+            "width": 265,
+            "height": 423.53125
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 481.53125,
+            "width": 265,
+            "height": 423.53125
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 572.71875,
+            "bottom": 857.75,
+            "width": 265,
+            "height": 285.03125
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 572.71875,
+            "bottom": 857.75,
+            "width": 265,
+            "height": 285.03125
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 487.53125,
+            "bottom": 566.71875,
+            "width": 265,
+            "height": 79.1875
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 487.53125,
+            "bottom": 566.71875,
+            "width": 265,
+            "height": 79.1875
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 529,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 505,
+            "height": 207.046875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 529,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 505,
+            "height": 207.046875
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 529,
+            "top": 321.046875,
+            "bottom": 447.421875,
+            "width": 505,
+            "height": 126.375
+          },
+          "hidden": {
+            "left": 24,
+            "right": 529,
+            "top": 321.046875,
+            "bottom": 447.421875,
+            "width": 505,
+            "height": 126.375
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 529,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 505,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 529,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 505,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 469,
+            "right": 509,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 469,
+            "right": 509,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 744,
+            "top": 74,
+            "bottom": 345.578125,
+            "width": 720,
+            "height": 271.578125
+          },
+          "hidden": {
+            "left": 24,
+            "right": 744,
+            "top": 74,
+            "bottom": 345.578125,
+            "width": 720,
+            "height": 271.578125
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 744,
+            "top": 413.578125,
+            "bottom": 505.765625,
+            "width": 720,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 744,
+            "top": 413.578125,
+            "bottom": 505.765625,
+            "width": 720,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 744,
+            "top": 357.578125,
+            "bottom": 401.578125,
+            "width": 720,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 744,
+            "top": 357.578125,
+            "bottom": 401.578125,
+            "width": 720,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 680,
+            "right": 720,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 680,
+            "right": 720,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "long-values",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 999999.99,
+        "savings": 999999.99,
+        "room": 999649.99,
+        "essentials": 350
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 535,
+            "right": 930,
+            "top": 103,
+            "bottom": 413.390625,
+            "width": 395,
+            "height": 310.390625
+          },
+          "hidden": {
+            "left": 535,
+            "right": 930,
+            "top": 103,
+            "bottom": 413.390625,
+            "width": 395,
+            "height": 310.390625
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 535,
+            "right": 930,
+            "top": 481.390625,
+            "bottom": 623.359375,
+            "width": 395,
+            "height": 141.96875
+          },
+          "hidden": {
+            "left": 535,
+            "right": 930,
+            "top": 481.390625,
+            "bottom": 623.359375,
+            "width": 395,
+            "height": 141.96875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 535,
+            "right": 930,
+            "top": 425.390625,
+            "bottom": 469.390625,
+            "width": 395,
+            "height": 44
+          },
+          "hidden": {
+            "left": 535,
+            "right": 930,
+            "top": 425.390625,
+            "bottom": 469.390625,
+            "width": 395,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 866,
+            "right": 906,
+            "top": 123,
+            "bottom": 159,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 866,
+            "right": 906,
+            "top": 123,
+            "bottom": 159,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 265,
+            "height": 207.046875
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 265,
+            "height": 207.046875
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 327.4375,
+            "bottom": 470.40625,
+            "width": 265,
+            "height": 142.96875
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 327.4375,
+            "bottom": 470.40625,
+            "width": 265,
+            "height": 142.96875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 271.046875,
+            "bottom": 321.4375,
+            "width": 265,
+            "height": 50.390625
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 271.046875,
+            "bottom": 321.4375,
+            "width": 265,
+            "height": 50.390625
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 336,
+            "top": 58,
+            "bottom": 268.0625,
+            "width": 312,
+            "height": 210.0625
+          },
+          "hidden": {
+            "left": 24,
+            "right": 336,
+            "top": 58,
+            "bottom": 268.0625,
+            "width": 312,
+            "height": 210.0625
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 336,
+            "top": 324.84375,
+            "bottom": 417.03125,
+            "width": 312,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 336,
+            "top": 324.84375,
+            "bottom": 417.03125,
+            "width": 312,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 336,
+            "top": 274.0625,
+            "bottom": 318.84375,
+            "width": 312,
+            "height": 44.78125
+          },
+          "hidden": {
+            "left": 24,
+            "right": 336,
+            "top": 274.0625,
+            "bottom": 318.84375,
+            "width": 312,
+            "height": 44.78125
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 276,
+            "right": 316,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 276,
+            "right": 316,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 366,
+            "top": 74,
+            "bottom": 329.203125,
+            "width": 342,
+            "height": 255.203125
+          },
+          "hidden": {
+            "left": 24,
+            "right": 366,
+            "top": 74,
+            "bottom": 329.203125,
+            "width": 342,
+            "height": 255.203125
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 366,
+            "top": 397.203125,
+            "bottom": 489.390625,
+            "width": 342,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 366,
+            "top": 397.203125,
+            "bottom": 489.390625,
+            "width": 342,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 366,
+            "top": 341.203125,
+            "bottom": 385.203125,
+            "width": 342,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 366,
+            "top": 341.203125,
+            "bottom": 385.203125,
+            "width": 342,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 302,
+            "right": 342,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 302,
+            "right": 342,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 327,
+            "height": 207.046875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 327,
+            "height": 207.046875
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 321.046875,
+            "bottom": 413.234375,
+            "width": 327,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 321.046875,
+            "bottom": 413.234375,
+            "width": 327,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 351,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 327,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 351,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 327,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 291,
+            "right": 331,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 291,
+            "right": 331,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 354.0625,
+            "width": 265,
+            "height": 296.0625
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 58,
+            "bottom": 354.0625,
+            "width": 265,
+            "height": 296.0625
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 445.25,
+            "bottom": 633.71875,
+            "width": 265,
+            "height": 188.46875
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 445.25,
+            "bottom": 633.71875,
+            "width": 265,
+            "height": 188.46875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 20,
+            "right": 285,
+            "top": 360.0625,
+            "bottom": 439.25,
+            "width": 265,
+            "height": 79.1875
+          },
+          "hidden": {
+            "left": 20,
+            "right": 285,
+            "top": 360.0625,
+            "bottom": 439.25,
+            "width": 265,
+            "height": 79.1875
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 225,
+            "right": 265,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 529,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 505,
+            "height": 207.046875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 529,
+            "top": 58,
+            "bottom": 265.046875,
+            "width": 505,
+            "height": 207.046875
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 529,
+            "top": 321.046875,
+            "bottom": 413.234375,
+            "width": 505,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 529,
+            "top": 321.046875,
+            "bottom": 413.234375,
+            "width": 505,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 529,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 505,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 529,
+            "top": 271.046875,
+            "bottom": 315.046875,
+            "width": 505,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 469,
+            "right": 509,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 469,
+            "right": 509,
+            "top": 70,
+            "bottom": 106,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 744,
+            "top": 74,
+            "bottom": 345.578125,
+            "width": 720,
+            "height": 271.578125
+          },
+          "hidden": {
+            "left": 24,
+            "right": 744,
+            "top": 74,
+            "bottom": 345.578125,
+            "width": 720,
+            "height": 271.578125
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 744,
+            "top": 413.578125,
+            "bottom": 505.765625,
+            "width": 720,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 24,
+            "right": 744,
+            "top": 413.578125,
+            "bottom": 505.765625,
+            "width": 720,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 24,
+            "right": 744,
+            "top": 357.578125,
+            "bottom": 401.578125,
+            "width": 720,
+            "height": 44
+          },
+          "hidden": {
+            "left": 24,
+            "right": 744,
+            "top": 357.578125,
+            "bottom": 401.578125,
+            "width": 720,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 680,
+            "right": 720,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 680,
+            "right": 720,
+            "top": 94,
+            "bottom": 130,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    },
+    {
+      "fixture": "budget-heavy-values",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "tolerance": 1,
+      "status": "stable",
+      "passed": true,
+      "controlled": true,
+      "seededMoney": {
+        "operational": 10000,
+        "savings": 999999.99,
+        "room": 400,
+        "essentials": 9600
+      },
+      "artworkClear": true,
+      "artworkOverlap": {
+        "shown": [],
+        "hidden": []
+      },
+      "maxDifference": 0,
+      "issues": [],
+      "metrics": [
+        {
+          "selector": ".account-operational",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 535,
+            "right": 945,
+            "top": 103,
+            "bottom": 376.578125,
+            "width": 410,
+            "height": 273.578125
+          },
+          "hidden": {
+            "left": 535,
+            "right": 945,
+            "top": 103,
+            "bottom": 376.578125,
+            "width": 410,
+            "height": 273.578125
+          }
+        },
+        {
+          "selector": ".account-savings",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 535,
+            "right": 945,
+            "top": 444.578125,
+            "bottom": 536.765625,
+            "width": 410,
+            "height": 92.1875
+          },
+          "hidden": {
+            "left": 535,
+            "right": 945,
+            "top": 444.578125,
+            "bottom": 536.765625,
+            "width": 410,
+            "height": 92.1875
+          }
+        },
+        {
+          "selector": ".everyday-home-actions",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 535,
+            "right": 945,
+            "top": 388.578125,
+            "bottom": 432.578125,
+            "width": 410,
+            "height": 44
+          },
+          "hidden": {
+            "left": 535,
+            "right": 945,
+            "top": 388.578125,
+            "bottom": 432.578125,
+            "width": 410,
+            "height": 44
+          }
+        },
+        {
+          "selector": "#balance-eye",
+          "maxDifference": 0,
+          "differences": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          "shown": {
+            "left": 881,
+            "right": 921,
+            "top": 123,
+            "bottom": 159,
+            "width": 40,
+            "height": 36
+          },
+          "hidden": {
+            "left": 881,
+            "right": 921,
+            "top": 123,
+            "bottom": 159,
+            "width": 40,
+            "height": 36
+          }
+        }
+      ]
+    }
+  ],
+  "privacyFindings": [],
+  "guidanceComparisons": [
+    {
+      "route": "goals",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goals",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goal",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "goalEdit",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "balances",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "moneyStoryHome",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "planEdit",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "addMoney",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "sendOptions",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "requests",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "cardsHome",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "profile",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "security",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": false,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "paymentReview",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "authorize",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 0,
+      "firstExpanded": 0,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    },
+    {
+      "route": "essentialEdit",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "status": "stable",
+      "passed": true,
+      "guideCount": 1,
+      "firstExpanded": 1,
+      "returningExpanded": 0,
+      "critical": true,
+      "requiredContentStable": true,
+      "issues": []
+    }
+  ],
+  "guidanceFindings": [],
+  "aliases": [
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        320,
+        568,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        375,
+        667,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        390,
+        844,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        390,
+        480,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        320,
+        568,
+        1.5
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        568,
+        320,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        768,
+        1024,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    },
+    {
+      "name": "paymentReview · long-values",
+      "size": [
+        1100,
+        900,
+        1
+      ],
+      "alias": {
+        "requested": "paymentReview",
+        "actual": "pause"
+      }
+    }
+  ],
+  "setupErrors": 0,
+  "counts": {
+    "palette": 0,
+    "horizontal": 0,
+    "unreachable": 0,
+    "textClipping": 0,
+    "contentClipping": 0,
+    "collapsedScrollers": 0,
+    "homeArtworkOverlap": 0,
+    "planBoxesOverlap": 0,
+    "savingsHackPlacement": 0,
+    "guidanceState": 0,
+    "guidanceContentChanges": 0,
+    "privacyLayoutShifts": 0,
+    "endOcclusion": 0,
+    "endUnreachable": 0
+  },
+  "findings": []
+}

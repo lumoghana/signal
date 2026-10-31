@@ -1,0 +1,21 @@
+{
+  "command": "node scripts/check-edition-parity.cjs --regression --sequential",
+  "exitCode": 0,
+  "files": {
+    "dist/index.html": "3623a2f121b399cc3dadc7355870799ed8f5ff1ee5800005bb040a90bbc927af",
+    "dist/mono-design.js": "9357b4d112da527f82304c45c40fb6a9f950dd3e76e9c174b586888cca6a51f9",
+    "dist/mono-design.css": "4be7e72e20b476a0635e6132180b270deebca2b5c04d85d498f47ef54742b2e7",
+    "dist/mono-planning.css": "ff0602077b316bc16d74da6babd362a644b8b3c14a797719ea6dd562fbec5122",
+    "dist/mono-payments.css": "a782a9ad4d3e2d4c264630d3defc435e9023c5c37c6e7cc43cc75f0b688752cd",
+    "dist/mono-life.css": "057bb66d0add5f5da022c259a44b102ff580a4a47db7538a69cb9eb01d7c6a5f",
+    "config/editions.json": "1b7e6596fa30a343f21c1f7976db52256b9e759714dda0002b6fd3e589a05769",
+    "tests/monochrome-design.test.cjs": "5922e6e9e5095eec64be7be14ab30809696b3f894e65db79085be3275ac45892"
+  },
+  "changedDuringRun": [
+    "dist/index.html",
+    "dist/mono-design.css",
+    "dist/mono-planning.css",
+    "dist/mono-payments.css"
+  ],
+  "explanation": "Edition CSS continued browser-driven layout refinement during this run. All JavaScript, manifest and test inputs remained byte-identical. Node behavior checks do not prove rendered CSS; root browser QA covers final styles."
+}

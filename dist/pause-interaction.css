@@ -1,0 +1,18 @@
+/* Reserve the conclusion's space while the proposed money reaches the ring. */
+#app .screen [data-pause-effects]{opacity:1;transition:opacity 180ms ease-out}
+#app .screen [data-pause-effects][aria-hidden=true]{visibility:hidden;opacity:0;pointer-events:none}
+#app .sample-pause>.pause-conclusion-stage{margin-bottom:12px}
+#app .sample-pause>.pause-conclusion-stage>h1{font-size:1.5rem;line-height:1.2;font-weight:700;letter-spacing:-.035em;margin:0}
+.pause-conclusion-stage{display:grid;grid-template-columns:minmax(0,1fr);position:relative}
+.pause-conclusion-stage>.focus-pause-insight,.pause-conclusion-stage>h1,.pause-conclusion-stage>.pause-arrival-intro{grid-area:1/1}
+#app .screen .pause-arrival-intro{font:inherit;font-size:1.5rem;font-weight:700;line-height:1.18;letter-spacing:-.035em;margin:0;color:var(--ink);align-self:center}
+#app .screen .pause-arrival-intro[hidden]{display:none}
+#app .screen-pause .pause-timing-status{font-size:.8125rem;line-height:1.4;color:var(--muted);margin:0;min-height:1.4em}
+#app .screen [data-pause-hold]{position:relative;isolation:isolate;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#app .screen-pause .pause-decisions [data-pause-hold][aria-disabled=true],
+#app .task-sheet-layer .screen-pause .pause-decisions [data-pause-hold][aria-disabled=true]{border-style:dashed;color:var(--muted);cursor:wait}
+#app .screen [data-pause-hold]::after{content:'';position:absolute;z-index:-1;inset:0;background:var(--green);transform:scaleX(0);transform-origin:left;transition:none;pointer-events:none}
+#app .screen [data-pause-hold][data-hold-state=holding]::after{transform:scaleX(1);transition:transform 90ms linear}
+#app .screen [data-pause-hold][data-hold-state=complete]::after{transform:scaleX(1)}
+#app .screen [data-pause-hold]:focus-visible{outline:3px solid var(--green-ink);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){#app .screen [data-pause-effects]{transition:none!important}#app .screen [data-pause-hold]::after{transition:none!important}}

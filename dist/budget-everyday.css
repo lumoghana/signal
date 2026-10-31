@@ -1,0 +1,26 @@
+/* Shared geometry; each edition retains its own type, ink and accent tokens. */
+.budget-everyday{display:flex;flex-direction:column;gap:14px;min-width:0}
+.budget-everyday .actions{margin-top:0}
+.budget-conclusion{display:flex;flex-direction:column;gap:5px;padding:14px 0;border-top:1px solid var(--line,#deded8);border-bottom:1px solid var(--line,#deded8)}
+.budget-conclusion>span{font-size:.88rem;font-weight:600}
+.budget-conclusion>strong{font-size:clamp(1.85rem,8vw,2.5rem);line-height:1.1;letter-spacing:-.045em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.budget-purpose-hint{display:flex;align-items:center;flex-wrap:wrap;gap:0 8px;margin:0!important;line-height:1.4;color:var(--ink,#111)}
+.budget-inline-action{min-height:44px;padding:6px 0;border:0;background:transparent;color:inherit;font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;text-align:left;cursor:pointer}
+.budget-inline-action:focus-visible{outline:2px solid var(--ink,#111);outline-offset:3px;border-radius:4px}
+.budget-cycle-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.budget-cycle-dates .field{min-width:0}
+.budget-cycle-dates input{width:100%;min-width:0}
+.budget-cycle-items{display:flex;flex-direction:column;border-top:1px solid var(--line,#deded8)}
+.budget-cycle-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,43%);align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,#deded8)}
+.budget-cycle-item .field{min-width:0;margin:0}
+.budget-cycle-item .inline{gap:5px;min-width:0}
+.budget-cycle-item input[type=number]{min-width:0;width:100%;padding-inline:9px;font-variant-numeric:tabular-nums}
+.budget-cycle-choose{display:flex;align-items:center;gap:9px;min-height:44px;font-weight:600;cursor:pointer;overflow-wrap:anywhere}
+.budget-cycle-choose input{width:20px;height:20px;flex:0 0 20px;accent-color:var(--ink,#111)}
+.budget-everyday .summary-line{gap:14px}
+.budget-everyday .summary-line strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:340px){.budget-cycle-dates{grid-template-columns:1fr}.budget-cycle-item{grid-template-columns:1fr}.budget-cycle-item .field{padding-left:29px}}
+@media(prefers-reduced-motion:reduce){.budget-everyday,.budget-conclusion{animation:none!important;transition:none!important}}
+
+/* Keep the optional learning control from displacing the main entry action. */
+#app .task-sheet-layer .screen [data-payment-entry] .payment-plan-link{margin-bottom:2px}

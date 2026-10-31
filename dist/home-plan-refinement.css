@@ -1,0 +1,154 @@
+/* Home keeps one balance insight and two primary actions.
+   Account details and spending stories live in their own destinations. */
+#app .home-refined .home-greeting{padding:6px 0 12px}
+#app .home-refined .home-header-actions{display:flex;align-items:center;gap:6px}
+#app .home-refined .home-greeting .actual-wordmark{max-width:104px;height:auto}
+#app .home-refined .home-header-actions .icon-btn,#app .home-refined .home-header-actions .avatar{width:44px;height:44px;min-width:44px;min-height:44px;border-radius:16px}
+#app .home-refined .accounts-welcome{min-height:0;display:block;margin:3px 0 17px}
+#app .home-refined .accounts-welcome>p{font-size:21px;line-height:1.3;font-weight:600;letter-spacing:-.03em}
+#app .home-refined .pilot-campus-note{font-size:12px;line-height:1.5;padding:9px 12px;margin:0 0 12px;border-radius:12px}
+#app .home-refined .account-card{border:1px solid var(--line);border-radius:24px;margin-bottom:12px;background:var(--white)}
+#app .home-refined .account-operational{padding:18px 18px 0;box-shadow:0 5px 20px rgb(32 38 30 / .025)}
+#app .home-refined .account-card-heading h2{font-size:14px;line-height:1.4;font-weight:700;letter-spacing:-.02em}
+#app .home-refined .account-card-heading>span{font-size:10px;line-height:1.4;color:var(--muted)}
+#app .home-refined .account-available-secondary{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0;margin:0;border-top:1px solid var(--line);padding:12px 0}
+#app .home-refined .account-available-secondary>span{display:block;font-size:13px;line-height:1.4;color:var(--muted)}
+#app .home-refined .account-available-secondary>strong{display:block;font-size:16px;line-height:1.4;letter-spacing:0;margin:0;font-weight:600;max-width:65%;text-align:right}
+#app .home-refined .balance-eye{display:flex;align-items:center;justify-content:center;gap:5px;width:72px;min-width:72px;min-height:44px;border:1px solid var(--line);border-radius:16px;padding:7px 8px;background:var(--white);font-size:12px;font-weight:600;line-height:1.3;flex-shrink:0;white-space:nowrap}
+#app .home-refined .balance-eye>span{max-width:none;text-align:left;white-space:nowrap}
+#app .home-refined .balance-eye svg{width:18px;height:18px;flex-shrink:0}
+#app .home-refined .account-intelligence{display:flex;align-items:center;gap:2px;min-height:136px;margin:12px 0}
+#app .home-refined .account-room{position:relative;flex:1;min-width:0;background:transparent;border-radius:0;padding:0;margin:0;text-align:left;align-self:center}
+#app .home-refined .account-room>span{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;line-height:1.4}
+#app .home-refined .account-room .clarity-ring{position:static;display:inline-block;width:11px;height:11px;border:3px solid var(--green);border-radius:50%;margin:0;flex-shrink:0;background:transparent;box-shadow:none;transform:none}
+#app .home-refined .account-room>strong{display:table;font-size:44px;font-weight:600;line-height:1.2;letter-spacing:-1.5px;margin:6px 0 9px;padding-bottom:2px;background:linear-gradient(transparent 80%,var(--green) 80%,var(--green) 96%,transparent 96%);max-width:100%}
+#app .home-refined .account-room>small{font-size:12px;line-height:1.5;color:var(--muted);max-width:23ch}
+#app .home-refined .account-room>small svg{vertical-align:middle}
+#app .home-refined .accounts-home-art{flex:0 0 124px;width:124px;height:116px;overflow:visible;align-self:center}
+#app .home-refined .accounts-home-art>.scene-art.campus-scene{width:100%;height:116px!important;min-height:0!important;margin:0!important}
+#app .home-refined .accounts-home-art .legon-backdrop{opacity:.35}
+#app .home-refined .account-balance-primary{flex:1;min-width:0}
+#app .home-refined .account-balance-primary>span{font-size:12px;color:var(--muted)}
+#app .home-refined .account-balance-primary>strong{display:block;font-size:40px;font-weight:600;line-height:1.2;letter-spacing:-1.3px;margin-top:6px;overflow-wrap:anywhere}
+#app .home-refined .account-budget-invite{display:block;width:100%;background:transparent;padding:12px 0;margin:0;border-top:1px solid var(--line);min-width:0;border-radius:0;min-height:48px}
+#app .home-refined .account-budget-invite>strong{font-size:14px;font-weight:700;line-height:1.4;letter-spacing:0}
+#app .home-refined .account-budget-invite>span{font-size:12px;line-height:1.5;color:var(--muted);margin-top:4px}
+#app .home-refined .account-funding-row{border-top:1px solid var(--line);margin:0 -18px;padding:0 18px}
+#app .home-refined .account-add-money{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:46px;background:transparent;border:0;font-size:13px;font-weight:700;color:var(--ink);padding:10px}
+#app .home-refined .account-savings{display:flex;align-items:center;gap:10px;padding:0 14px}
+#app .home-refined .savings-symbol{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:14px;background:var(--soft);color:var(--green-ink);flex-shrink:0}
+#app .home-refined .account-savings>button{padding:14px 0;min-height:105px;gap:8px;min-width:0;flex:1}
+#app .home-refined .account-savings .account-card-heading{display:block}
+#app .home-refined .account-savings .account-card-heading>span{display:none}
+#app .home-refined .account-savings strong{font-size:25px;font-weight:600;letter-spacing:-.8px;margin-top:3px}
+#app .home-refined .account-savings small{font-size:11px;margin-top:2px;line-height:1.4}
+#app .home-refined .home-funding-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 18px}
+#app .home-refined .home-funding-actions button{min-height:52px;padding:12px 8px;font-size:var(--ui-action-compact,.875rem);font-weight:700;line-height:1.4;border-radius:var(--ui-control-curve,16px);gap:7px}
+#app .home-refined .home-funding-actions .secondary{background:var(--white);border:1px solid var(--control-line)}
+#app .home-refined .home-money-story{margin:0;border-top:1px solid var(--line)}
+#app .home-refined .home-story-open{padding:16px 0 10px;min-height:70px}
+#app .home-refined .home-story-title{font-size:11px;font-weight:500;line-height:1.4}
+#app .home-refined .home-story-insight{font-size:15px;font-weight:600;line-height:1.5;letter-spacing:-.02em;margin-top:5px}
+#app .home-refined .home-pending-status{margin:0 0 10px;font-size:12px;min-height:44px}
+
+/* One Plan destination, with Budget and Money Boxes as equal, separate tools. */
+#app .plan-hub .plan-hub-heading{margin:8px 0 12px}
+#app .plan-hub .plan-hub-heading h1{font-size:32px;line-height:1.15;letter-spacing:-1.1px;margin:0 0 8px}
+#app .plan-hub .plan-hub-heading p{font-size:14px;line-height:1.5;color:var(--muted);margin:0}
+#app .plan-hub .plan-budget-section,#app .plan-hub .plan-boxes-section{padding:19px;border:1px solid var(--line);border-radius:24px;background:var(--white);margin:0 0 14px}
+#app .plan-hub .plan-section-heading{display:flex;gap:11px;align-items:center;margin-bottom:10px}
+#app .plan-hub .plan-section-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:42px;height:42px;background:var(--soft);border-radius:14px;color:var(--green-ink)}
+#app .plan-hub .plan-section-heading h2{font-size:18px;line-height:1.3;margin:0 0 3px;letter-spacing:-.5px}
+#app .plan-hub .plan-section-heading p{font-size:12px;line-height:1.4;margin:0;color:var(--muted)}
+#app .plan-hub .plan-section-heading>div>span{display:block;font-size:12px;line-height:1.4;color:var(--muted)}
+#app .plan-hub .budget-summary{margin:0;padding:0;border:0}
+#app .plan-hub .plan-hub-summary>span{font-size:12px;font-weight:600;line-height:1.4;display:block}
+#app .plan-hub .plan-hub-amount{display:block;font-size:34px;font-weight:600;line-height:1.2;letter-spacing:-1px;margin:6px 0 9px}
+#app .plan-hub .plan-budget-section .plan-hub-amount{display:table;background:linear-gradient(transparent 82%,var(--green) 82%,var(--green) 96%,transparent 96%)}
+#app .plan-hub .plan-hub-facts,#app .plan-hub .plan-hub-note{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+#app .plan-hub .plan-hub-shortfall{display:flex;gap:6px;font-size:13px;line-height:1.5;color:var(--red);margin-top:9px}
+#app .plan-hub .plan-hub-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:17px 0 0}
+#app .plan-hub .plan-hub-actions button{min-height:46px;padding:10px 8px;font-size:12px;line-height:1.4;border-radius:14px}
+#app .plan-hub .plan-hub-actions>button:only-child{grid-column:1/-1}
+#app .plan-hub .plan-hub-details{border-top:1px solid var(--line);margin-top:12px}
+#app .plan-hub .plan-hub-details>summary{font-size:12px;font-weight:600;min-height:44px;padding:12px 0}
+#app .plan-hub .plan-hub-detail-actions{display:flex;flex-direction:column;align-items:stretch;gap:0}
+#app .plan-hub .plan-hub-detail-actions button{font-size:12px;text-align:left;min-height:44px;padding:9px 0}
+#app .plan-hub .plan-hub-empty{font-size:14px;line-height:1.5;margin:0;color:var(--muted)}
+#app .plan-hub .plan-hub-note{margin-top:12px}
+
+@media(max-width:380px){
+ #app .home-refined .account-operational{padding:15px 14px 0}
+ #app .home-refined .account-funding-row{margin-inline:-14px;padding-inline:14px}
+ #app .home-refined .account-room>strong{font-size:40px;letter-spacing:-1.3px}
+ #app .home-refined .accounts-home-art{flex-basis:100px;width:100px}
+ #app .home-refined .account-card-heading>span{font-size:9px}
+ #app .home-refined .home-funding-actions button{gap:5px}
+ #app .plan-hub .plan-budget-section,#app .plan-hub .plan-boxes-section{padding:16px}
+}
+@media(max-height:700px) and (min-width:320px){
+ #app .home-refined .home-greeting{padding-bottom:7px}
+ #app .home-refined .accounts-welcome{margin:2px 0 10px}
+ #app .home-refined .account-intelligence{min-height:118px;margin:8px 0}
+ #app .home-refined .accounts-home-art,#app .home-refined .accounts-home-art>.scene-art.campus-scene{height:108px!important}
+ #app .home-refined .account-room>strong{margin-top:4px;margin-bottom:6px}
+ #app .home-refined .account-savings>button{min-height:88px;padding-block:10px}
+ #app .home-refined .home-funding-actions{margin:12px 0}
+ #app .home-refined .home-funding-actions button{min-height:48px}
+ #app .home-refined .home-story-open{padding-block:10px;min-height:60px}
+ #app .plan-hub .plan-hub-heading{margin-bottom:14px}
+ #app .plan-hub .plan-hub-heading h1{font-size:28px}
+ #app .plan-hub .plan-budget-section,#app .plan-hub .plan-boxes-section{padding:14px;margin-bottom:10px}
+ #app .plan-hub .plan-section-heading{margin-bottom:10px}
+ #app .plan-hub .plan-hub-actions{margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){.home-refined *, .plan-hub *{scroll-behavior:auto;transition:none;animation:none}}
+
+/* Account names and their roles share one consistent heading stack. */
+#app .home-refined .home-greeting{flex-wrap:wrap;gap:8px}
+#app .home-refined .home-header-actions{min-width:0;max-width:100%;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+#app .home-refined .accounts-welcome{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+#app .home-refined .accounts-welcome>p{flex:1;min-width:0;margin:0;overflow-wrap:anywhere}
+#app .home-refined .account-operational>.account-card-heading{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+#app .home-refined .account-card-heading>span{font-size:.6875rem;line-height:1.4}
+#app .home-refined .account-savings .account-card-heading>span{display:block;margin-top:3px}
+#app .home-refined .home-header-actions .chat-banking-home-entry{padding:4px 0 4px 5px;gap:5px;flex-shrink:0}
+#app .home-refined .home-header-actions .chat-banking-home-entry small{white-space:nowrap}
+@media(max-width:359px){
+ #app .home-refined .home-header-actions .chat-banking-home-entry>svg{display:none}
+ #app .home-refined .home-header-actions .chat-banking-home-entry small svg{display:none}
+}
+
+/* Make room for a long figure before giving space to an illustration. */
+#app .home-refined .account-operational.has-wide-amount .account-intelligence{display:block;min-height:0;margin-block:14px}
+#app .home-refined .account-operational.has-wide-amount .accounts-home-art{display:none}
+
+/* Savings already has its own heading: keep its total and box count together. */
+#app .plan-hub .plan-boxes-summary{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#app .plan-hub .plan-boxes-summary .plan-hub-amount{margin:2px 0}
+@media(max-height:720px){#app .plan-hub .plan-hub-heading{margin:4px 0 10px}#app .plan-hub .plan-section-heading{margin-bottom:8px}}
+
+/* The visibility control belongs to the amount it changes. */
+#app .home-minimal .accounts-welcome{min-height:0;margin:2px 0 20px}
+#app .home-minimal .account-operational{padding:14px 20px 4px;margin:0}
+#app .home-minimal .home-card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+#app .home-minimal .home-card-heading>span{font-size:14px;font-weight:600;line-height:1.4}
+#app .home-minimal .home-card-heading .balance-eye{width:44px;min-width:44px;height:44px;padding:10px;border:0;border-radius:50%;background:var(--soft);color:var(--ink)}
+#app .home-minimal .home-card-heading .balance-eye>span{display:none}
+#app .home-minimal .account-intelligence{min-height:150px;margin:0 0 8px;gap:4px}
+#app .home-minimal .account-room>strong{margin:0 0 12px}
+#app .home-minimal .account-room>small.home-balance-details{font-size:12px;line-height:1.4}
+#app .home-minimal .account-balance-primary>strong{margin-top:0}
+#app .home-minimal .account-available-secondary{padding:14px 0}
+#app .home-minimal .account-budget-invite{padding:14px 0}
+#app .home-minimal .account-budget-invite>strong{display:flex;align-items:center;gap:7px}
+#app .home-minimal .home-funding-actions{margin:20px 0 0}
+#app .home-minimal .home-pending-status{margin:0 0 8px}
+@media(max-width:380px){#app .home-minimal .account-operational{padding-inline:16px}}
+@media(max-height:700px){#app .home-minimal .accounts-welcome{margin-bottom:14px}#app .home-minimal .account-intelligence{min-height:128px}#app .home-minimal .home-funding-actions{margin-top:16px}}
+@media(max-width:350px){
+ body #app .home-minimal .accounts-home-art{display:none}
+ body #app .home-minimal .account-intelligence{display:block;min-height:100px;margin:0 0 4px}
+ body #app .home-minimal .account-room{width:100%}
+ body #app .home-minimal .account-room>strong{font-size:40px}
+}

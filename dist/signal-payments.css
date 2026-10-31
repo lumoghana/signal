@@ -1,0 +1,298 @@
+/* Signal money journeys share Home's account-led rhythm. Dark surfaces hold
+   money, pale surfaces explain a choice, and native controls own every action. */
+
+/* The same readable hierarchy follows each payment family and its old records. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen:is(
+ .screen-pay,.screen-sendOptions,.screen-send,.screen-bill,.screen-paymentReview,
+ .screen-authorize,.screen-paymentResult,.screen-paymentCancel,.screen-paymentRecovery,
+ .screen-paymentPlanLink,.screen-everydayPayments,.screen-everydayRepeatChoice,
+ .screen-addMoney,.screen-momoAdd,.screen-bankAdd,.screen-budgetAfterFunding,
+ .screen-activity,.screen-pending,.screen-txDetail,.screen-requests,
+ .screen-requestCreate,.screen-requestDetail,.screen-requestConfirm,
+ .screen-cardsHome,.screen-myQr,.screen-campusPay,.screen-monoGroupDraftReplace,
+ [class*="screen-groupMoney"],[class*="screen-collectionPayout"],
+ [class*="screen-virtualCard"],[class*="screen-shared"],
+ [class*="screen-merchant"],[class*="screen-settlement"]
+) :is(.page-heading,.gm-heading,.focus-pay-heading)>h1 {
+ font-size:clamp(1.5rem,6.8vw,1.75rem)!important;line-height:1.16!important;
+ font-weight:800!important;letter-spacing:-.045em!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(
+ .screen-pay,.screen-addMoney,.screen-momoAdd,.screen-bankAdd,.screen-send,
+ .screen-sendOptions,.screen-bill,.screen-paymentReview,.screen-cardsHome,
+ .screen-myQr,.screen-campusPay,[class*="screen-groupMoney"],
+ [class*="screen-virtualCard"],[class*="screen-shared"],[class*="screen-merchant"]
+) .scene-art {display:none!important;}
+
+/* A small Lux note introduces related tasks without a second page-name masthead. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-finance-hero {
+ position:relative;isolation:isolate;min-width:0;min-height:96px;
+ margin:0 0 16px!important;padding:18px 94px 18px 18px!important;
+ border:1px solid #e6eddb!important;border-radius:20px!important;
+ background:var(--signal-guide,#f0f5e6)!important;
+ color:var(--signal-ink,#0d1510)!important;text-align:left!important;
+ overflow:visible;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen:is(.screen-pay,.screen-addMoney,.screen-groupMoneyHome,.screen-cardsHome,.screen-virtualCards) .signal-finance-hero :is(h1,h2) {
+ position:relative;z-index:1;max-width:22ch;
+ font-size:1.5rem!important;font-weight:800!important;
+ line-height:1.16!important;letter-spacing:-.045em!important;
+ color:var(--signal-ink,#0d1510)!important;margin:0 0 8px!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-hero>p {
+ position:relative;z-index:1;max-width:29ch;margin:0!important;
+ font-size:.875rem!important;line-height:1.45!important;
+ color:var(--signal-ink,#0d1510)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-lux {
+ display:block;position:absolute;right:14px;bottom:12px;z-index:0;
+ width:68px;height:68px;object-fit:contain;pointer-events:none;filter:none;
+}
+/* Only Pay's meaningful introduction is restored. Generic funding/Collect
+   titles remain concealed by the shared page-chrome rules. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .signal-finance-hero>h1 {
+ display:block!important;position:relative!important;width:auto!important;height:auto!important;
+ min-width:0!important;min-height:0!important;clip:auto!important;clip-path:none!important;
+ overflow:visible!important;white-space:normal!important;
+}
+
+/* Pay: one useful introduction, one money anchor, then clear destinations. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .focus-pay-heading {
+ margin-bottom:12px!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .focus-pay-art {display:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .payment-balance {
+ display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;
+ gap:7px 12px;margin:0 0 14px!important;padding:15px 18px!important;
+ border:0!important;border-radius:20px!important;
+ background:var(--signal-ink,#0d1510)!important;color:var(--signal-paper,#f7f6f0)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .payment-balance>span {
+ color:#c0c7bd!important;font-size:.8125rem!important;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .payment-balance>strong {
+ font-family:'Manrope UI',sans-serif!important;font-size:1.75rem!important;
+ line-height:1.15!important;font-weight:800!important;letter-spacing:-.045em!important;
+ color:var(--signal-lime,#d7ff3f)!important;font-variant-numeric:lining-nums tabular-nums;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .pay-tabs {
+ gap:4px!important;padding:4px!important;border:0!important;
+ border-radius:16px!important;background:var(--signal-soft,#eeede7)!important;
+ margin-bottom:12px!important;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .pay-tabs button {
+ min-height:44px!important;padding:10px 6px!important;border-radius:12px!important;
+ font-size:.8125rem!important;font-weight:750!important;letter-spacing:-.02em!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .pay-tabs button[aria-selected=true] {
+ background:var(--signal-ink)!important;color:var(--signal-paper)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay :is(.pay-option-list,.list) {
+ display:flex;flex-direction:column;gap:8px;border:0;background:transparent;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .pay-option-list .row,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .funding-choices .menu-choice,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-sendOptions .menu-choice {
+ display:flex;align-items:center;gap:12px;min-height:72px!important;
+ padding:13px 14px!important;border:1px solid var(--signal-line)!important;
+ border-radius:20px!important;background:var(--signal-surface)!important;
+ color:var(--signal-ink)!important;box-shadow:none;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .pay-option-list .row :is(.row-icon,.avatar),
+body.signal-edition #app :is(#view,#task-parent-view) .funding-choices .menu-icon,
+body.signal-edition #app :is(#view,#task-parent-view) .screen-sendOptions .menu-icon {
+ display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;
+ border:0!important;border-radius:14px!important;
+ background:var(--signal-soft)!important;color:var(--signal-ink)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) :is(.funding-choices,.screen-sendOptions) .menu-icon svg,
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .pay-option-list .row :is(.row-icon,.avatar) svg {
+ width:25px;height:25px;stroke-width:1.9;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .pay-option-list .row-copy strong,
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) :is(.funding-choices,.screen-sendOptions) .menu-choice strong {
+ font-size:.9375rem!important;font-weight:800!important;letter-spacing:-.03em!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .pay-option-list .row-copy small,
+body.signal-edition #app :is(#view,#task-parent-view) :is(.funding-choices,.screen-sendOptions) .menu-choice small {
+ font-size:.8125rem!important;line-height:1.4!important;color:var(--signal-muted)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .funding-choices {display:grid;gap:10px;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .vc-pay-entry {margin-top:12px;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .vc-pay-entry .row {min-height:64px;padding-block:12px;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-pay .pay-utilities {margin-top:8px;gap:8px;}
+
+/* Enter, review, approve: the real amount stays prominent through each step. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen:is(
+ .screen-send,.screen-bill,.screen-momoAdd,.screen-requestCreate,.screen-bankAdd,
+ .screen-virtualCardCreate,.screen-virtualCardDemo
+) .payment-amount-row {
+ min-height:88px!important;margin:8px 0 12px!important;padding:16px!important;
+ gap:8px!important;border:1.5px solid var(--signal-line)!important;
+ border-radius:20px!important;background:var(--signal-surface)!important;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen:is(
+ .screen-send,.screen-bill,.screen-momoAdd,.screen-requestCreate,.screen-bankAdd,
+ .screen-virtualCardCreate,.screen-virtualCardDemo
+) .payment-amount-row:focus-within {border-color:var(--signal-ink)!important;box-shadow:0 0 0 3px #d7ff3f50;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen:is(
+ .screen-send,.screen-bill,.screen-momoAdd,.screen-requestCreate,.screen-bankAdd,
+ .screen-virtualCardCreate,.screen-virtualCardDemo
+) .payment-amount-row .amount-input {
+ font-family:'Manrope UI',sans-serif!important;
+ font-size:clamp(2rem,10vw,2.75rem)!important;font-weight:800!important;
+ line-height:1.15!important;letter-spacing:-.05em!important;
+ min-height:0!important;box-shadow:none!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-send,.screen-bill,.screen-momoAdd,.screen-requestCreate,.screen-virtualCardCreate) .payment-currency {
+ font-size:1.125rem!important;font-weight:750!important;letter-spacing:-.025em;
+}
+body.signal-edition #app :is(#view,#task-parent-view) :is(.registered-wallet,.bank-funding-guide>.receipt) {
+ border-radius:20px!important;background:var(--signal-soft)!important;
+ border:1px solid var(--signal-line)!important;padding:14px 16px!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) :is(.registered-wallet,.bank-funding-guide>.receipt) strong {font-weight:750;letter-spacing:-.025em;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-send,.screen-bill) .entry-consequence {
+ border:1px solid #e6eddb!important;border-left:3px solid var(--signal-lime)!important;
+ border-radius:16px!important;background:var(--signal-guide,#f0f5e6)!important;
+ padding:14px!important;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-payment-title {
+ padding:14px 18px!important;margin:6px 0 10px!important;border:0!important;
+ border-radius:20px!important;background:var(--signal-ink)!important;color:var(--signal-paper)!important;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-payment-title h1 {
+ font-family:'Manrope UI',sans-serif!important;font-size:clamp(2rem,10vw,2.75rem)!important;
+ font-weight:800!important;line-height:1.15!important;letter-spacing:-.05em!important;
+ color:var(--signal-lime)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-payment-title>p {
+ font-size:1rem!important;line-height:1.4!important;color:var(--signal-paper)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-payment-title>:is(small,.eyebrow) {color:#c0c7bd!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-payment-title :is(.currency,.whole,.cents,.balance-number) {color:inherit!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-paymentReview,.screen-txDetail,.screen-requestConfirm,.screen-bankAdd,.screen-virtualCardAuthorize) :is(.receipt,.focus-receipt) {
+ padding:4px 16px!important;border:1px solid var(--signal-line)!important;
+ border-radius:20px!important;background:var(--signal-surface)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-receipt .focus-total strong {font-size:1.25rem!important;font-weight:800!important;letter-spacing:-.035em!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-receipt>div{padding-block:10px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .payment-consequence{margin-block:10px!important;}
+/* Keep the main decision prominent, with its two reversible alternatives on
+   one row where they fit. Larger text and narrow pages naturally stack them. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-review>.actions {
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9em),1fr));
+ gap:8px;margin-top:10px;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-review>.actions>button {
+ min-width:0;min-height:44px;white-space:normal;overflow-wrap:anywhere;
+}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-paymentReview .focus-review>.actions>button:first-child {grid-column:1/-1;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-authorize,.screen-virtualCardAuthorize) :is(#payment-pin,#vc-pin) {
+ min-height:60px!important;border:1.5px solid var(--signal-line)!important;
+ border-radius:16px!important;font-size:1.4rem!important;
+ background:var(--signal-surface)!important;letter-spacing:.24em!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-paymentResult .payment-result-compact .result-mark,
+body.signal-edition #app :is(#view,#task-parent-view) .screen-virtualCardStatus .vc-status-icon {
+ width:64px;height:64px;border-radius:20px;margin-bottom:18px;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .screen-paymentResult .payment-result-compact>h1 {font-size:1.75rem!important;line-height:1.16!important;letter-spacing:-.045em!important;font-weight:800!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-activity,.screen-pending,.screen-requests,.screen-everydayPayments,.screen-everydayRepeatChoice,[class*="screen-merchant"],[class*="screen-settlement"]) .row {min-height:72px;padding:14px 10px;gap:12px;border-radius:16px;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-activity,.screen-pending,.screen-requests,[class*="screen-merchant"]) .row :is(.row-icon,.avatar) {flex:0 0 42px;width:42px;height:42px;border-radius:14px;}
+
+/* Collection money uses the same account anchor; mandate facts stay separate. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .gm-page .gm-choice-row {
+ min-height:72px!important;padding:14px!important;gap:12px!important;
+ border:1px solid var(--signal-line)!important;border-radius:20px!important;
+ background:var(--signal-surface)!important;
+}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-choice-icon {flex:0 0 42px!important;width:42px!important;height:42px!important;border-radius:14px!important;background:var(--signal-soft)!important;color:var(--signal-ink)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-choice-icon svg {width:25px!important;height:25px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .gm-page .gm-choice-copy strong {font-size:.9375rem!important;line-height:1.3!important;font-weight:800!important;letter-spacing:-.03em!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-choice-copy small {font-size:.8125rem!important;line-height:1.4!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .gm-page .gm-hero {padding:18px!important;border:0!important;border-radius:20px!important;margin:0 0 16px!important;background:var(--signal-ink)!important;color:var(--signal-paper)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .gm-page .gm-amount {font-family:'Manrope UI',sans-serif!important;font-size:clamp(2rem,10vw,2.75rem)!important;line-height:1.15!important;font-weight:800!important;letter-spacing:-.05em!important;color:var(--signal-lime)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page :is(.gm-overline,.gm-caption) {font-size:.8125rem!important;line-height:1.45!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-hero :is(.gm-overline,.gm-caption) {color:#c0c7bd!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-hero .gm-status {background:#ffffff15!important;color:var(--signal-paper)!important;font-weight:750;font-size:.75rem;margin-bottom:10px;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-progress {height:7px;background:#ffffff25;margin-top:16px;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-progress>span {background:var(--signal-lime)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-summary {padding:3px 16px;border:1px solid var(--signal-line);border-radius:20px;background:var(--signal-surface);}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-summary>div,
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-summary dl>div {padding:12px 0;font-size:.875rem;line-height:1.5;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-summary dd {font-weight:750!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-mandate-summary,
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-invitation-role {border-radius:20px;padding:16px;background:var(--signal-soft);}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page :is(.gm-mandate-summary,.gm-invitation-role) :is(h2,strong) {font-size:1.0625rem!important;line-height:1.3!important;font-weight:800!important;letter-spacing:-.03em;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-tabs .chip.selected {background:var(--signal-ink)!important;color:var(--signal-paper)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-item {padding:13px 10px;min-height:68px;border-radius:16px;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page .gm-trailing {font-size:.9375rem;font-weight:800;}
+body.signal-edition #app :is(#view,#task-parent-view) .gm-page :is(.gm-note,.gm-collection-note,.mono-collection-context) {border-radius:16px;font-size:.8125rem;line-height:1.5;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen[class*="screen-shared"] :is(.shared-status,.shared-total,.shared-calculation) {border-radius:20px;}
+body.signal-edition #app :is(#view,#task-parent-view) .screen[class*="screen-shared"] .shared-status {background:var(--signal-guide,#f0f5e6);color:var(--signal-ink);padding:18px;}
+
+/* Cards keep a single visual identity, independent of list order or state. */
+body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-hero-cards {min-height:142px!important;padding:18px 94px 18px 18px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-finance-hero-cards :is(h1,h2,p) {color:var(--signal-ink)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-hero-cards .vc-empty-icon {display:grid;place-items:center;width:38px;height:32px;margin:0 0 10px;background:transparent;color:var(--signal-ink);border-radius:0;}
+body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-hero-cards .vc-empty-icon svg {width:30px;height:30px;}
+body.signal-edition #app :is(#view,#task-parent-view) .signal-cards-caption {position:relative;min-height:92px;margin:0 0 16px;padding:18px 94px 18px 18px;border:1px solid #e6eddb;border-radius:20px;background:var(--signal-guide,#f0f5e6);color:var(--signal-ink);}
+body.signal-edition #app :is(#view,#task-parent-view) .signal-cards-caption>span {display:block;max-width:21ch;font-size:1rem;font-weight:750;letter-spacing:-.025em;line-height:1.4;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-list {display:grid;gap:10px;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row {display:grid;grid-template-columns:42px minmax(0,1fr);align-items:center;gap:8px 12px;padding:16px!important;min-height:112px;border:1px solid var(--signal-line)!important;border-radius:20px!important;background:var(--signal-surface)!important;color:var(--signal-ink)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-symbol {display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:var(--signal-soft);color:inherit;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-symbol svg {width:25px;height:25px;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-copy>strong {color:inherit!important;font-size:1rem!important;line-height:1.3;font-weight:800;letter-spacing:-.03em;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-copy>small {color:var(--signal-muted)!important;font-size:.8125rem;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-end {grid-column:2;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;min-width:0;max-width:100%;text-align:left;color:inherit;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-end>strong {font-family:'Manrope UI',sans-serif!important;font-size:1.5rem!important;font-weight:800!important;letter-spacing:-.04em;line-height:1.2;color:inherit!important;font-variant-numeric:lining-nums tabular-nums;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-face {min-height:168px!important;padding:20px!important;gap:10px;border-radius:20px!important;background:var(--signal-ink)!important;color:var(--signal-paper)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-face :is(.vc-wordmark,.mono-brand-wordmark) {filter:brightness(0) invert(1)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-face .mono-brand-avatar {width:38px;height:42px;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-face .vc-masked-number {font-size:1.125rem;letter-spacing:.12em;}
+body.signal-edition #app :is(#view,#task-parent-view) .vc-money {padding:18px;background:var(--signal-soft)!important;border-radius:20px;margin:14px 0;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .vc-money>strong {font-family:'Manrope UI',sans-serif!important;font-size:2.25rem!important;font-weight:800!important;line-height:1.15!important;letter-spacing:-.045em!important;}
+
+/* Scan stays ink. My code returns to paper around an untouched high-contrast QR. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .qr-hub {padding-inline:18px!important;gap:16px!important;background:var(--signal-ink)!important;color:var(--signal-paper)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .qr-hub.is-code {background:var(--signal-paper)!important;color:var(--signal-ink)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub.is-code .qr-hub-tabs {background:var(--signal-soft)!important;border-color:var(--signal-line)!important;color:var(--signal-ink)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub-tabs {height:52px!important;border-radius:16px!important;padding:4px!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub-tabs button {min-height:44px!important;border-radius:12px!important;font-size:.875rem!important;font-weight:750!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub.is-code .qr-hub-tabs button[aria-selected=true] {background:var(--signal-ink)!important;color:var(--signal-paper)!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .qr-hub h1 {font-size:1.75rem!important;line-height:1.16!important;letter-spacing:-.045em!important;font-weight:800!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .qr-hub-subtitle {font-size:.875rem!important;line-height:1.45!important;color:inherit!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .qr-hub-viewfinder {border-radius:20px!important;border-width:2px!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .qr-hub-viewfinder i {border-color:var(--signal-lime)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .personal-qr-card {background:#fff!important;color:#111!important;border:1px solid var(--signal-line)!important;border-radius:20px!important;padding:18px!important;gap:14px!important;box-shadow:none!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .lumo-personal-qr {background:#fff!important;color:#000!important;filter:none!important;border:0!important;padding:0!important;border-radius:0!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .personal-qr-card figcaption strong {font-size:1.125rem!important;line-height:1.3;font-weight:800!important;letter-spacing:-.03em;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub.is-code .personal-qr-note {color:var(--signal-muted)!important;}
+body.signal-edition #app :is(#view,#task-parent-view) .qr-hub :is(.qr-hub-upload,.qr-camera-retry) {min-height:52px!important;border-radius:16px!important;font-size:.9375rem!important;font-weight:750!important;}
+
+/* Long text and narrow frames keep their controls and natural scroll surface. */
+@media(max-width:359px) {
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-finance-hero {padding:16px 86px 16px 16px!important;}
+ body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-lux {width:60px;height:60px;right:12px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-finance-hero :is(h1,h2) {font-size:1.375rem!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .gm-page .gm-choice-row {padding:12px!important;gap:10px!important;}
+ body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row {padding:14px!important;}
+}
+@media(max-height:720px) {
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-finance-hero {min-height:88px;padding-top:14px!important;padding-bottom:14px!important;}
+ body.signal-edition #app :is(#view,#task-parent-view) .qr-hub .personal-qr-card {padding:14px!important;gap:10px!important;}
+}
+@supports(container-type:inline-size) {
+ body.signal-edition #app :is(#view,#task-parent-view) .screen:is(.screen-pay,.screen-addMoney,.screen-cardsHome,.screen-groupMoneyHome,.screen-virtualCards) {container-type:inline-size;container-name:signal-money-page;}
+ @container signal-money-page (max-width:20em) {
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-finance-hero {padding-right:18px!important;}
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen:is(.screen-pay,.screen-addMoney,.screen-groupMoneyHome,.screen-virtualCards) .signal-finance-hero.page-heading,
+  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-pay .focus-pay-heading.signal-finance-hero {display:flow-root!important;}
+  body.signal-edition #app :is(#view,#task-parent-view) .signal-finance-hero>.signal-finance-lux {position:relative;float:right;right:auto;bottom:auto;margin:0 0 8px 12px;width:3.5em;height:3.5em;}
+  body.signal-edition #app :is(#view,#task-parent-view) .signal-cards-caption {padding-right:18px;}
+  body.signal-edition #app :is(#view,#task-parent-view) .signal-cards-caption .signal-finance-lux {position:relative;right:auto;bottom:auto;margin:10px 0 0 auto;width:3.5em;height:3.5em;}
+  body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row {grid-template-columns:minmax(0,1fr);}
+  body.signal-edition #app :is(#view,#task-parent-view) .vc-card-row .vc-row-end {grid-column:1;}
+ }
+}

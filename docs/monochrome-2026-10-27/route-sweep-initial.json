@@ -1,0 +1,4430 @@
+{
+  "total": 1128,
+  "routes": 188,
+  "experiences": [
+    "first",
+    "returning"
+  ],
+  "matrix": [
+    {
+      "viewport": "320,568",
+      "text": "1"
+    },
+    {
+      "viewport": "390,844",
+      "text": "1"
+    },
+    {
+      "viewport": "320,568",
+      "text": "2"
+    }
+  ],
+  "elapsedSeconds": 330,
+  "setupErrors": 0,
+  "paletteFailures": 59,
+  "layoutFailures": 16,
+  "findings": [
+    {
+      "requested": "ambassadorGuide",
+      "actual": "ambassadorGuide",
+      "renderedView": "ambassadorGuide",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 2,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "Use sample details only.Do not enter real Ghana Card details, banking ",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Tell us what happenedUse You → Ambassador guide → Leave feedback. Note",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorSample",
+      "actual": "ambassadorSample",
+      "renderedView": "ambassadorSample",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "The sample budget has GH₵320.00 still to cover, leaving GH₵400.00 afte",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorWelcome",
+      "actual": "ambassadorWelcome",
+      "renderedView": "ambassadorWelcome",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "color",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "textDecorationColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "caretColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "This is a sample experience.Payments, account details and verification",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "bill",
+      "actual": "bill",
+      "renderedView": "bill",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "Enter an amount to see its effect.",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseDemo",
+      "actual": "pauseDemo",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseLog",
+      "actual": "pauseLog",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pay",
+      "actual": "pay",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderTopColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderRightColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderBottomColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderLeftColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "paymentReview",
+      "actual": "paymentReview",
+      "renderedView": "paymentReview",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 3,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "color",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "textDecorationColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "caretColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "send",
+      "actual": "send",
+      "renderedView": "send",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "If this is extra spendingGH₵170.00 left after budget",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "testing",
+      "actual": "testing",
+      "renderedView": "testing",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Try the merchant sideUse the sample business, create a sale and inspec",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorGuide",
+      "actual": "ambassadorGuide",
+      "renderedView": "ambassadorGuide",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 2,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "Use sample details only.Do not enter real Ghana Card details, banking ",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Tell us what happenedUse You → Ambassador guide → Leave feedback. Note",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorSample",
+      "actual": "ambassadorSample",
+      "renderedView": "ambassadorSample",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "The sample budget has GH₵320.00 still to cover, leaving GH₵400.00 afte",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorWelcome",
+      "actual": "ambassadorWelcome",
+      "renderedView": "ambassadorWelcome",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "color",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "textDecorationColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "caretColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "This is a sample experience.Payments, account details and verification",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "bill",
+      "actual": "bill",
+      "renderedView": "bill",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "Enter an amount to see its effect.",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseDemo",
+      "actual": "pauseDemo",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseLog",
+      "actual": "pauseLog",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pay",
+      "actual": "pay",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderTopColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderRightColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderBottomColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderLeftColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "paymentReview",
+      "actual": "paymentReview",
+      "renderedView": "paymentReview",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 3,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "color",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "textDecorationColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "caretColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "send",
+      "actual": "send",
+      "renderedView": "send",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "If this is extra spendingGH₵170.00 left after budget",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "testing",
+      "actual": "testing",
+      "renderedView": "testing",
+      "experience": "deep-first",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Try the merchant sideUse the sample business, create a sale and inspec",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorGuide",
+      "actual": "ambassadorGuide",
+      "renderedView": "ambassadorGuide",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 2,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "Use sample details only.Do not enter real Ghana Card details, banking ",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Tell us what happenedUse You → Ambassador guide → Leave feedback. Note",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorSample",
+      "actual": "ambassadorSample",
+      "renderedView": "ambassadorSample",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "The sample budget has GH₵320.00 still to cover, leaving GH₵400.00 afte",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorWelcome",
+      "actual": "ambassadorWelcome",
+      "renderedView": "ambassadorWelcome",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "color",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "textDecorationColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "caretColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "This is a sample experience.Payments, account details and verification",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "bill",
+      "actual": "bill",
+      "renderedView": "bill",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "Enter an amount to see its effect.",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "cardsHome",
+      "actual": "cardsHome",
+      "renderedView": "cardsHome",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1470
+        },
+        "route": "cardsHome",
+        "actualRoute": "cardsHome",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Cards",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 295.9765625,
+              "width": 19.84375,
+              "height": 275.9765625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 32
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "cardsHome",
+          "guideCount": 1,
+          "expanded": 1,
+          "outsideCopy": "Cards You Ask Lumo Take Lumo online. Create a card with money from Everyday Money, ready for online payments. Create a virtual card Virtual card demo · No live card or payment.",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Create a virtual card"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1470,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "home",
+      "actual": "home",
+      "renderedView": "home",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 2,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1329
+        },
+        "route": "home",
+        "actualRoute": "home",
+        "horizontal": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "",
+            "label": "GH₵100.00",
+            "rect": {
+              "left": 83.22265625,
+              "right": 354.0625,
+              "top": 1215.56640625,
+              "bottom": 1278.06640625,
+              "width": 270.83984375,
+              "height": 62.5
+            }
+          }
+        ],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [],
+        "contentClipping": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "",
+            "label": "GH₵100.00",
+            "rect": {
+              "left": 83.22265625,
+              "right": 354.0625,
+              "top": 1215.56640625,
+              "bottom": 1278.06640625,
+              "width": 270.83984375,
+              "height": 62.5
+            },
+            "kind": "text-fragment",
+            "clippedBy": "account-card account-savings everyday-boxes-card mono-boxes-card",
+            "clipRect": {
+              "left": 20,
+              "right": 281.25,
+              "top": 1049.16015625,
+              "bottom": 1305.3515625,
+              "width": 261.25,
+              "height": 256.19140625
+            },
+            "axis": "horizontal"
+          }
+        ],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "home",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Home K Ask Lumo Hello, Kwame. Let’s make room for life. Everyday money Through 10 Nov Hide Left after budget GH₵ 250 .00 Available balance GH₵600.00 View budget Add money Transfer Request Money Boxes 1 box · Saved for what’s next GH₵100.00",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Updates",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Hide balances",
+            "Left after budget. See calculation",
+            "View budget",
+            "Add money",
+            "Transfer",
+            "Request",
+            "Money Boxes1 box · Saved for what’s nextGH₵100.00"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1329,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {
+          ".account-operational": {
+            "left": 20,
+            "right": 281.25,
+            "top": 311.11328125,
+            "bottom": 880.99609375,
+            "width": 261.25,
+            "height": 569.8828125
+          },
+          ".account-savings": {
+            "left": 20,
+            "right": 281.25,
+            "top": 1049.16015625,
+            "bottom": 1305.3515625,
+            "width": 261.25,
+            "height": 256.19140625
+          },
+          ".everyday-home-actions": {
+            "left": 20,
+            "right": 281.25,
+            "top": 900.99609375,
+            "bottom": 1029.16015625,
+            "width": 261.25,
+            "height": 128.1640625
+          },
+          "#overview-room": {
+            "left": 40,
+            "right": 261.25,
+            "top": 520.0390625,
+            "bottom": 708.046875,
+            "width": 221.25,
+            "height": 188.0078125
+          },
+          "#overview-balance": {
+            "left": 40,
+            "right": 176.26953125,
+            "top": 760.80078125,
+            "bottom": 797.1875,
+            "width": 136.26953125,
+            "height": 36.38671875
+          },
+          "#overview-savings": {
+            "left": 83.22265625,
+            "right": 263.0078125,
+            "top": 1214.31640625,
+            "bottom": 1287.109375,
+            "width": 179.78515625,
+            "height": 72.79296875
+          },
+          ".everyday-budget-link": {
+            "left": 40,
+            "right": 261.25,
+            "top": 818.18359375,
+            "bottom": 880.99609375,
+            "width": 221.25,
+            "height": 62.8125
+          },
+          "#balance-eye": {
+            "left": 221.25,
+            "right": 261.25,
+            "top": 334.1015625,
+            "bottom": 370.09765625,
+            "width": 40,
+            "height": 35.99609375
+          }
+        },
+        "homeMoney": {
+          "eyePressed": "true",
+          "room": "GH₵250.00",
+          "balance": "GH₵600.00",
+          "savings": "GH₵100.00",
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "moneyStoryHome",
+      "actual": "moneyStoryHome",
+      "renderedView": "moneyStoryHome",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 3191
+        },
+        "route": "moneyStoryHome",
+        "actualRoute": "moneyStoryHome",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Money Story",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 571.953125,
+              "width": 19.84375,
+              "height": 551.953125
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 38
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "moneyStoryHome",
+          "guideCount": 1,
+          "expanded": 1,
+          "outsideCopy": "Money Story You Ask Lumo 7 days 30 days 90 days Last 7 days · money out, including fees GH₵ 80 .00 Money out by calendar day GH₵80.00 highest 20 Oct 21 22 23 24 25 26 27 Money out from 20 Oct 2026 to 27 Oct 2026, including fees: GH₵80.00. Highest group: GH₵80.00. Graph values First day and today may be partial. The exact seven-day spending window is unchanged. 20 Oct, 06:25 to 21 Oct, 00:00 · partial day GH₵0.00 21 Oct, 00:00 to 22 Oct, 00:00 GH₵0.00 22 Oct, 00:00 to 23 Oct, 00:00 GH₵0.00 23 Oct, 00:00 to 24 Oct, 00:00 GH₵0.00 24 Oct, 00:00 to 25 Oct, 00:00 GH₵0.00 25 Oct, 00:00 to 26 Oct, 00:00 GH₵0.00 26 Oct, 00:00 to 27 Oct, 00:00 GH₵0.00 27 Oct, 00:00 to 27 Oct, 06:25 · partial day GH₵80.00 Food made up 100% of money out. GH₵80.00 of GH₵80.00 in this period. Categories Merchants Food GH₵80.00 100% Recent payments Akua’s Kitchen 27 Oct · Food GH₵80.00 Ask Lumo about this View payments",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "7 days",
+            "30 days",
+            "90 days",
+            "Categories",
+            "Merchants",
+            "Food",
+            "Akua’s Kitchen27 Oct · FoodGH₵80.00",
+            "Ask Lumo about this",
+            "View payments"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 3191,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "more",
+      "actual": "more",
+      "renderedView": "more",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1521
+        },
+        "route": "more",
+        "actualRoute": "more",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "You",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 185.5859375,
+              "width": 19.84375,
+              "height": 165.5859375
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 30
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "more",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "You You Ask Lumo Your Lumo. Your way. Kwame Mensah University of Ghana My QR Let someone scan to pay you Profile Your details Account Details & statements Security PIN & devices Privacy Your data & choices Notifications Your reminders Help We’re here to help Lumo · A little clearer. Sign out",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "My QRLet someone scan to pay you",
+            "ProfileYour details",
+            "AccountDetails & statements",
+            "SecurityPIN & devices",
+            "PrivacyYour data & choices",
+            "NotificationsYour reminders",
+            "HelpWe’re here to help",
+            "Sign out"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1521,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "pauseDemo",
+      "actual": "pauseDemo",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 534,
+          "scroll": 1896
+        },
+        "route": "pauseDemo",
+        "actualRoute": "pauseDemo",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Payments",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 461.5625,
+              "width": 19.84375,
+              "height": 441.5625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 40
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "pauseDemo",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Payments You Ask Lumo Make your move. To a friend, a wallet or a bank. Send money Campus Pay Bills & top-ups Recent ☆ Favourites Continue Akua’s Kitchen · GH₵80.00 To a Lumo user To mobile money To a bank account Scan QR Merchant or sale code Find Akua’s Kitchen Food · AK01 Campus Print Printing · CP02 Ride & Go Transport · RB03 Airtime Data bundles Electricity Water TV subscription Internet Virtual cards Pay online with a Lumo card Requests Activity",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [
+            "merchant-code"
+          ],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Send money",
+            "Campus Pay",
+            "Bills & top-ups",
+            "Recent",
+            "☆ Favourites",
+            "Continue Akua’s Kitchen · GH₵80.00",
+            "To a Lumo user",
+            "To mobile money",
+            "To a bank account",
+            "Scan QR",
+            "Find",
+            "Akua’s KitchenFood · AK01",
+            "Campus PrintPrinting · CP02",
+            "Ride & GoTransport · RB03",
+            "Airtime",
+            "Data bundles",
+            "Electricity",
+            "Water",
+            "TV subscription",
+            "Internet",
+            "Virtual cardsPay online with a Lumo card",
+            "Requests",
+            "Activity"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 534,
+            "scroll": 1896,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 534.3359375,
+              "width": 320,
+              "height": 534.3359375
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "pauseLog",
+      "actual": "pauseLog",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 534,
+          "scroll": 1896
+        },
+        "route": "pauseLog",
+        "actualRoute": "pauseLog",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Payments",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 461.5625,
+              "width": 19.84375,
+              "height": 441.5625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 40
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "pauseLog",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Payments You Ask Lumo Make your move. To a friend, a wallet or a bank. Send money Campus Pay Bills & top-ups Recent ☆ Favourites Continue Akua’s Kitchen · GH₵80.00 To a Lumo user To mobile money To a bank account Scan QR Merchant or sale code Find Akua’s Kitchen Food · AK01 Campus Print Printing · CP02 Ride & Go Transport · RB03 Airtime Data bundles Electricity Water TV subscription Internet Virtual cards Pay online with a Lumo card Requests Activity",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [
+            "merchant-code"
+          ],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Send money",
+            "Campus Pay",
+            "Bills & top-ups",
+            "Recent",
+            "☆ Favourites",
+            "Continue Akua’s Kitchen · GH₵80.00",
+            "To a Lumo user",
+            "To mobile money",
+            "To a bank account",
+            "Scan QR",
+            "Find",
+            "Akua’s KitchenFood · AK01",
+            "Campus PrintPrinting · CP02",
+            "Ride & GoTransport · RB03",
+            "Airtime",
+            "Data bundles",
+            "Electricity",
+            "Water",
+            "TV subscription",
+            "Internet",
+            "Virtual cardsPay online with a Lumo card",
+            "Requests",
+            "Activity"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 534,
+            "scroll": 1896,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 534.3359375,
+              "width": 320,
+              "height": 534.3359375
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "pay",
+      "actual": "pay",
+      "renderedView": "pay",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderTopColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderRightColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderBottomColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderLeftColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1885
+        },
+        "route": "pay",
+        "actualRoute": "pay",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Payments",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 125.41015625,
+              "bottom": 566.97265625,
+              "width": 19.84375,
+              "height": 441.5625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 40
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "pay",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Available balance GH₵ 600.00 Payments You Ask Lumo Make your move. To a friend, a wallet or a bank. Send money Campus Pay Bills & top-ups Recent ☆ Favourites Continue Akua’s Kitchen · GH₵80.00 To a Lumo user To mobile money To a bank account Scan QR Merchant or sale code Find Akua’s Kitchen Food · AK01 Campus Print Printing · CP02 Ride & Go Transport · RB03 Airtime Data bundles Electricity Water TV subscription Internet Virtual cards Pay online with a Lumo card Requests Activity",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [
+            "merchant-code"
+          ],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Send money",
+            "Campus Pay",
+            "Bills & top-ups",
+            "Recent",
+            "☆ Favourites",
+            "Continue Akua’s Kitchen · GH₵80.00",
+            "To a Lumo user",
+            "To mobile money",
+            "To a bank account",
+            "Scan QR",
+            "Find",
+            "Akua’s KitchenFood · AK01",
+            "Campus PrintPrinting · CP02",
+            "Ride & GoTransport · RB03",
+            "Airtime",
+            "Data bundles",
+            "Electricity",
+            "Water",
+            "TV subscription",
+            "Internet",
+            "Virtual cardsPay online with a Lumo card",
+            "Requests",
+            "Activity"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1885,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "paymentReview",
+      "actual": "paymentReview",
+      "renderedView": "paymentReview",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 3,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "color",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "textDecorationColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "caretColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "plan",
+      "actual": "plan",
+      "renderedView": "plan",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1678
+        },
+        "route": "plan",
+        "actualRoute": "plan",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Budget",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 351.171875,
+              "width": 19.84375,
+              "height": 331.171875
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 32
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "plan",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Budget You Ask Lumo Budget Everyday money Total Budget Budget period Through 10 Nov GH₵ 350 .00 Left after Budget GH₵250.00 Update budget View Budget items Hide Budget items 2 Food GH₵250.00 budgeted GH₵0.00 paid from Budget GH₵250.00 left Transport GH₵100.00 budgeted GH₵0.00 paid from Budget GH₵100.00 left Budget tools Budget period Through 10 Nov · Change date Use this budget again Through 10 Nov 2026 See the calculation Uses only your saved Budget costs Expected money Excluded until it arrives Suggest from my spending Review this period Delete entire Budget Money Boxes Savings account GH₵ 100 .00 1 Money Box View Money Boxes Add a box",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Change Budget period · Through 10 Nov",
+            "Update budget",
+            "Food. GH₵250.00 budgeted. GH₵0.00 paid from Budget. GH₵250.00 left.",
+            "Transport. GH₵100.00 budgeted. GH₵0.00 paid from Budget. GH₵100.00 left.",
+            "Budget periodThrough 10 Nov · Change date",
+            "Use this budget againThrough 10 Nov 2026",
+            "See the calculationUses only your saved Budget costs",
+            "Expected moneyExcluded until it arrives",
+            "Suggest from my spending",
+            "Review this period",
+            "Delete entire Budget",
+            "View Money Boxes",
+            "Add a box"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1678,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "send",
+      "actual": "send",
+      "renderedView": "send",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "If this is extra spendingGH₵170.00 left after budget",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "testing",
+      "actual": "testing",
+      "renderedView": "testing",
+      "experience": "deep-first",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Try the merchant sideUse the sample business, create a sale and inspec",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorGuide",
+      "actual": "ambassadorGuide",
+      "renderedView": "ambassadorGuide",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 2,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "Use sample details only.Do not enter real Ghana Card details, banking ",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Tell us what happenedUse You → Ambassador guide → Leave feedback. Note",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorSample",
+      "actual": "ambassadorSample",
+      "renderedView": "ambassadorSample",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "The sample budget has GH₵320.00 still to cover, leaving GH₵400.00 afte",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorWelcome",
+      "actual": "ambassadorWelcome",
+      "renderedView": "ambassadorWelcome",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "color",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "textDecorationColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "caretColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "This is a sample experience.Payments, account details and verification",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "bill",
+      "actual": "bill",
+      "renderedView": "bill",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "Enter an amount to see its effect.",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseDemo",
+      "actual": "pauseDemo",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseLog",
+      "actual": "pauseLog",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pay",
+      "actual": "pay",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderTopColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderRightColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderBottomColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderLeftColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "paymentReview",
+      "actual": "paymentReview",
+      "renderedView": "paymentReview",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 3,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "color",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "textDecorationColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "caretColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "testing",
+      "actual": "testing",
+      "renderedView": "testing",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Try the merchant sideUse the sample business, create a sale and inspec",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorGuide",
+      "actual": "ambassadorGuide",
+      "renderedView": "ambassadorGuide",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 2,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "Use sample details only.Do not enter real Ghana Card details, banking ",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Tell us what happenedUse You → Ambassador guide → Leave feedback. Note",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorSample",
+      "actual": "ambassadorSample",
+      "renderedView": "ambassadorSample",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "The sample budget has GH₵320.00 still to cover, leaving GH₵400.00 afte",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorWelcome",
+      "actual": "ambassadorWelcome",
+      "renderedView": "ambassadorWelcome",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "color",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "textDecorationColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "caretColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "This is a sample experience.Payments, account details and verification",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "bill",
+      "actual": "bill",
+      "renderedView": "bill",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "Enter an amount to see its effect.",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseDemo",
+      "actual": "pauseDemo",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pauseLog",
+      "actual": "pauseLog",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "pay",
+      "actual": "pay",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderTopColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderRightColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderBottomColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderLeftColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "paymentReview",
+      "actual": "paymentReview",
+      "renderedView": "paymentReview",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 3,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "color",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "textDecorationColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "caretColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "send",
+      "actual": "send",
+      "renderedView": "send",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "If this is extra spendingGH₵170.00 left after budget",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.12)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "testing",
+      "actual": "testing",
+      "renderedView": "testing",
+      "experience": "deep-returning",
+      "viewport": "390,844",
+      "textScale": 1,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Try the merchant sideUse the sample business, create a sale and inspec",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorGuide",
+      "actual": "ambassadorGuide",
+      "renderedView": "ambassadorGuide",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 2,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "Use sample details only.Do not enter real Ghana Card details, banking ",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Tell us what happenedUse You → Ambassador guide → Leave feedback. Note",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorSample",
+      "actual": "ambassadorSample",
+      "renderedView": "ambassadorSample",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "The sample budget has GH₵320.00 still to cover, leaving GH₵400.00 afte",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "ambassadorWelcome",
+      "actual": "ambassadorWelcome",
+      "renderedView": "ambassadorWelcome",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "color",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "textDecorationColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "ambassador-intro",
+            "label": "Pay for today. See what comes next.",
+            "property": "caretColor",
+            "value": "rgb(99, 113, 86)",
+            "pseudo": null
+          },
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "ambassador-boundary",
+            "label": "This is a sample experience.Payments, account details and verification",
+            "property": "backgroundColor",
+            "value": "rgb(237, 242, 229)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "bill",
+      "actual": "bill",
+      "renderedView": "bill",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "Enter an amount to see its effect.",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.03)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "cardsHome",
+      "actual": "cardsHome",
+      "renderedView": "cardsHome",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1266
+        },
+        "route": "cardsHome",
+        "actualRoute": "cardsHome",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Cards",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 295.9765625,
+              "width": 19.84375,
+              "height": 275.9765625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 32
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "cardsHome",
+          "guideCount": 1,
+          "expanded": 0,
+          "outsideCopy": "Cards You Ask Lumo Take Lumo online. Create a card with money from Everyday Money, ready for online payments. Create a virtual card Virtual card demo · No live card or payment.",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Create a virtual card"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1266,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "home",
+      "actual": "home",
+      "renderedView": "home",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": [
+          {
+            "src": "/brand/Lumo-Wordmark-Black.svg",
+            "filter": "none",
+            "monochromeByAncestor": false
+          }
+        ]
+      },
+      "layoutCount": 2,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1329
+        },
+        "route": "home",
+        "actualRoute": "home",
+        "horizontal": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "",
+            "label": "GH₵100.00",
+            "rect": {
+              "left": 83.22265625,
+              "right": 354.0625,
+              "top": 1215.56640625,
+              "bottom": 1278.06640625,
+              "width": 270.83984375,
+              "height": 62.5
+            }
+          }
+        ],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [],
+        "contentClipping": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "",
+            "label": "GH₵100.00",
+            "rect": {
+              "left": 83.22265625,
+              "right": 354.0625,
+              "top": 1215.56640625,
+              "bottom": 1278.06640625,
+              "width": 270.83984375,
+              "height": 62.5
+            },
+            "kind": "text-fragment",
+            "clippedBy": "account-card account-savings everyday-boxes-card mono-boxes-card",
+            "clipRect": {
+              "left": 20,
+              "right": 281.25,
+              "top": 1049.16015625,
+              "bottom": 1305.3515625,
+              "width": 261.25,
+              "height": 256.19140625
+            },
+            "axis": "horizontal"
+          }
+        ],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "home",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Home K Ask Lumo Hello, Kwame. Let’s make room for life. Everyday money Through 10 Nov Hide Left after budget GH₵ 250 .00 Available balance GH₵600.00 View budget Add money Transfer Request Money Boxes 1 box · Saved for what’s next GH₵100.00",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Updates",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Hide balances",
+            "Left after budget. See calculation",
+            "View budget",
+            "Add money",
+            "Transfer",
+            "Request",
+            "Money Boxes1 box · Saved for what’s nextGH₵100.00"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1329,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {
+          ".account-operational": {
+            "left": 20,
+            "right": 281.25,
+            "top": 311.11328125,
+            "bottom": 880.99609375,
+            "width": 261.25,
+            "height": 569.8828125
+          },
+          ".account-savings": {
+            "left": 20,
+            "right": 281.25,
+            "top": 1049.16015625,
+            "bottom": 1305.3515625,
+            "width": 261.25,
+            "height": 256.19140625
+          },
+          ".everyday-home-actions": {
+            "left": 20,
+            "right": 281.25,
+            "top": 900.99609375,
+            "bottom": 1029.16015625,
+            "width": 261.25,
+            "height": 128.1640625
+          },
+          "#overview-room": {
+            "left": 40,
+            "right": 261.25,
+            "top": 520.0390625,
+            "bottom": 708.046875,
+            "width": 221.25,
+            "height": 188.0078125
+          },
+          "#overview-balance": {
+            "left": 40,
+            "right": 176.26953125,
+            "top": 760.80078125,
+            "bottom": 797.1875,
+            "width": 136.26953125,
+            "height": 36.38671875
+          },
+          "#overview-savings": {
+            "left": 83.22265625,
+            "right": 263.0078125,
+            "top": 1214.31640625,
+            "bottom": 1287.109375,
+            "width": 179.78515625,
+            "height": 72.79296875
+          },
+          ".everyday-budget-link": {
+            "left": 40,
+            "right": 261.25,
+            "top": 818.18359375,
+            "bottom": 880.99609375,
+            "width": 221.25,
+            "height": 62.8125
+          },
+          "#balance-eye": {
+            "left": 221.25,
+            "right": 261.25,
+            "top": 334.1015625,
+            "bottom": 370.09765625,
+            "width": 40,
+            "height": 35.99609375
+          }
+        },
+        "homeMoney": {
+          "eyePressed": "true",
+          "room": "GH₵250.00",
+          "balance": "GH₵600.00",
+          "savings": "GH₵100.00",
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "moneyStoryHome",
+      "actual": "moneyStoryHome",
+      "renderedView": "moneyStoryHome",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 2612
+        },
+        "route": "moneyStoryHome",
+        "actualRoute": "moneyStoryHome",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Money Story",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 571.953125,
+              "width": 19.84375,
+              "height": 551.953125
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 38
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "moneyStoryHome",
+          "guideCount": 1,
+          "expanded": 0,
+          "outsideCopy": "Money Story You Ask Lumo 7 days 30 days 90 days Last 7 days · money out, including fees GH₵ 80 .00 Money out by calendar day GH₵80.00 highest 20 Oct 21 22 23 24 25 26 27 Money out from 20 Oct 2026 to 27 Oct 2026, including fees: GH₵80.00. Highest group: GH₵80.00. Graph values First day and today may be partial. The exact seven-day spending window is unchanged. 20 Oct, 06:28 to 21 Oct, 00:00 · partial day GH₵0.00 21 Oct, 00:00 to 22 Oct, 00:00 GH₵0.00 22 Oct, 00:00 to 23 Oct, 00:00 GH₵0.00 23 Oct, 00:00 to 24 Oct, 00:00 GH₵0.00 24 Oct, 00:00 to 25 Oct, 00:00 GH₵0.00 25 Oct, 00:00 to 26 Oct, 00:00 GH₵0.00 26 Oct, 00:00 to 27 Oct, 00:00 GH₵0.00 27 Oct, 00:00 to 27 Oct, 06:28 · partial day GH₵80.00 Food made up 100% of money out. GH₵80.00 of GH₵80.00 in this period. Categories Merchants Food GH₵80.00 100% Recent payments Akua’s Kitchen 27 Oct · Food GH₵80.00 Ask Lumo about this View payments",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "7 days",
+            "30 days",
+            "90 days",
+            "Categories",
+            "Merchants",
+            "Food",
+            "Akua’s Kitchen27 Oct · FoodGH₵80.00",
+            "Ask Lumo about this",
+            "View payments"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 2612,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "more",
+      "actual": "more",
+      "renderedView": "more",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1521
+        },
+        "route": "more",
+        "actualRoute": "more",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "You",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 185.5859375,
+              "width": 19.84375,
+              "height": 165.5859375
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 30
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "more",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "You You Ask Lumo Your Lumo. Your way. Kwame Mensah University of Ghana My QR Let someone scan to pay you Profile Your details Account Details & statements Security PIN & devices Privacy Your data & choices Notifications Your reminders Help We’re here to help Lumo · A little clearer. Sign out",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "My QRLet someone scan to pay you",
+            "ProfileYour details",
+            "AccountDetails & statements",
+            "SecurityPIN & devices",
+            "PrivacyYour data & choices",
+            "NotificationsYour reminders",
+            "HelpWe’re here to help",
+            "Sign out"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1521,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "pauseDemo",
+      "actual": "pauseDemo",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 534,
+          "scroll": 1896
+        },
+        "route": "pauseDemo",
+        "actualRoute": "pauseDemo",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Payments",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 461.5625,
+              "width": 19.84375,
+              "height": 441.5625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 40
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "pauseDemo",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Payments You Ask Lumo Make your move. To a friend, a wallet or a bank. Send money Campus Pay Bills & top-ups Recent ☆ Favourites Continue Akua’s Kitchen · GH₵80.00 To a Lumo user To mobile money To a bank account Scan QR Merchant or sale code Find Akua’s Kitchen Food · AK01 Campus Print Printing · CP02 Ride & Go Transport · RB03 Airtime Data bundles Electricity Water TV subscription Internet Virtual cards Pay online with a Lumo card Requests Activity",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [
+            "merchant-code"
+          ],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Send money",
+            "Campus Pay",
+            "Bills & top-ups",
+            "Recent",
+            "☆ Favourites",
+            "Continue Akua’s Kitchen · GH₵80.00",
+            "To a Lumo user",
+            "To mobile money",
+            "To a bank account",
+            "Scan QR",
+            "Find",
+            "Akua’s KitchenFood · AK01",
+            "Campus PrintPrinting · CP02",
+            "Ride & GoTransport · RB03",
+            "Airtime",
+            "Data bundles",
+            "Electricity",
+            "Water",
+            "TV subscription",
+            "Internet",
+            "Virtual cardsPay online with a Lumo card",
+            "Requests",
+            "Activity"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 534,
+            "scroll": 1896,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 534.3359375,
+              "width": 320,
+              "height": 534.3359375
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "pauseLog",
+      "actual": "pauseLog",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderTopColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderRightColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderBottomColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          },
+          {
+            "tag": "button",
+            "id": "",
+            "cls": "compact-draft",
+            "label": "Continue Akua’s Kitchen · GH₵80.00",
+            "property": "borderLeftColor",
+            "value": "rgb(209, 223, 192)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 534,
+          "scroll": 1896
+        },
+        "route": "pauseLog",
+        "actualRoute": "pauseLog",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Payments",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 461.5625,
+              "width": 19.84375,
+              "height": 441.5625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 40
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "pauseLog",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Payments You Ask Lumo Make your move. To a friend, a wallet or a bank. Send money Campus Pay Bills & top-ups Recent ☆ Favourites Continue Akua’s Kitchen · GH₵80.00 To a Lumo user To mobile money To a bank account Scan QR Merchant or sale code Find Akua’s Kitchen Food · AK01 Campus Print Printing · CP02 Ride & Go Transport · RB03 Airtime Data bundles Electricity Water TV subscription Internet Virtual cards Pay online with a Lumo card Requests Activity",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [
+            "merchant-code"
+          ],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Send money",
+            "Campus Pay",
+            "Bills & top-ups",
+            "Recent",
+            "☆ Favourites",
+            "Continue Akua’s Kitchen · GH₵80.00",
+            "To a Lumo user",
+            "To mobile money",
+            "To a bank account",
+            "Scan QR",
+            "Find",
+            "Akua’s KitchenFood · AK01",
+            "Campus PrintPrinting · CP02",
+            "Ride & GoTransport · RB03",
+            "Airtime",
+            "Data bundles",
+            "Electricity",
+            "Water",
+            "TV subscription",
+            "Internet",
+            "Virtual cardsPay online with a Lumo card",
+            "Requests",
+            "Activity"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 534,
+            "scroll": 1896,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 534.3359375,
+              "width": 320,
+              "height": 534.3359375
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "pay",
+      "actual": "pay",
+      "renderedView": "pay",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 4,
+        "findings": [
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderTopColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderRightColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderBottomColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          },
+          {
+            "tag": "span",
+            "id": "",
+            "cls": "row-icon",
+            "label": "",
+            "property": "borderLeftColor",
+            "value": "rgb(220, 226, 211)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1885
+        },
+        "route": "pay",
+        "actualRoute": "pay",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Payments",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 125.41015625,
+              "bottom": 566.97265625,
+              "width": 19.84375,
+              "height": 441.5625
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 40
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "pay",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Available balance GH₵ 600.00 Payments You Ask Lumo Make your move. To a friend, a wallet or a bank. Send money Campus Pay Bills & top-ups Recent ☆ Favourites Continue Akua’s Kitchen · GH₵80.00 To a Lumo user To mobile money To a bank account Scan QR Merchant or sale code Find Akua’s Kitchen Food · AK01 Campus Print Printing · CP02 Ride & Go Transport · RB03 Airtime Data bundles Electricity Water TV subscription Internet Virtual cards Pay online with a Lumo card Requests Activity",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [
+            "merchant-code"
+          ],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Send money",
+            "Campus Pay",
+            "Bills & top-ups",
+            "Recent",
+            "☆ Favourites",
+            "Continue Akua’s Kitchen · GH₵80.00",
+            "To a Lumo user",
+            "To mobile money",
+            "To a bank account",
+            "Scan QR",
+            "Find",
+            "Akua’s KitchenFood · AK01",
+            "Campus PrintPrinting · CP02",
+            "Ride & GoTransport · RB03",
+            "Airtime",
+            "Data bundles",
+            "Electricity",
+            "Water",
+            "TV subscription",
+            "Internet",
+            "Virtual cardsPay online with a Lumo card",
+            "Requests",
+            "Activity"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1885,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "paymentReview",
+      "actual": "paymentReview",
+      "renderedView": "paymentReview",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 3,
+        "findings": [
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "color",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "textDecorationColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          },
+          {
+            "tag": "p",
+            "id": "",
+            "cls": "",
+            "label": "Lunch",
+            "property": "caretColor",
+            "value": "rgb(88, 100, 78)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "plan",
+      "actual": "plan",
+      "renderedView": "plan",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 0,
+        "findings": [],
+        "unfilteredImages": []
+      },
+      "layoutCount": 1,
+      "layout": {
+        "width": 320,
+        "height": 567,
+        "app": {
+          "left": 0,
+          "right": 320,
+          "top": 0,
+          "bottom": 567.5,
+          "width": 320,
+          "height": 567.5
+        },
+        "documentWidth": 320,
+        "appScrollWidth": 320,
+        "viewScroll": {
+          "client": 370,
+          "scroll": 1678
+        },
+        "route": "plan",
+        "actualRoute": "plan",
+        "horizontal": [],
+        "unreachable": [],
+        "fixedClipped": [],
+        "textClipping": [
+          {
+            "tag": "h1",
+            "id": "",
+            "cls": "",
+            "label": "Budget",
+            "rect": {
+              "left": 20,
+              "right": 39.84375,
+              "top": 20,
+              "bottom": 351.171875,
+              "width": 19.84375,
+              "height": 331.171875
+            },
+            "kind": "text-width",
+            "client": 20,
+            "scroll": 32
+          }
+        ],
+        "contentClipping": [],
+        "homeArtworkOverlap": [],
+        "planBoxesOverlap": [],
+        "savingsHackPlacement": [],
+        "savingsHackGeometry": null,
+        "pageGuidance": {
+          "mode": "",
+          "route": "plan",
+          "guideCount": 0,
+          "expanded": 0,
+          "outsideCopy": "Budget You Ask Lumo Budget Everyday money Total Budget Budget period Through 10 Nov GH₵ 350 .00 Left after Budget GH₵250.00 Update budget View Budget items Hide Budget items 2 Food GH₵250.00 budgeted GH₵0.00 paid from Budget GH₵250.00 left Transport GH₵100.00 budgeted GH₵0.00 paid from Budget GH₵100.00 left Budget tools Budget period Through 10 Nov · Change date Use this budget again Through 10 Nov 2026 See the calculation Uses only your saved Budget costs Expected money Excluded until it arrives Suggest from my spending Review this period Delete entire Budget Money Boxes Savings account GH₵ 100 .00 1 Money Box View Money Boxes Add a box",
+          "critical": false,
+          "essentialHelpOutside": null,
+          "essentialAmountOutside": null,
+          "pinOutside": null,
+          "controlIds": [],
+          "actionLabels": [
+            "Notifications",
+            "You. Profile, security and settings",
+            "Ask Lumo. Open full-screen Chat",
+            "Scan QR or show my code",
+            "Change Budget period · Through 10 Nov",
+            "Update budget",
+            "Food. GH₵250.00 budgeted. GH₵0.00 paid from Budget. GH₵250.00 left.",
+            "Transport. GH₵100.00 budgeted. GH₵0.00 paid from Budget. GH₵100.00 left.",
+            "Budget periodThrough 10 Nov · Change date",
+            "Use this budget againThrough 10 Nov 2026",
+            "See the calculationUses only your saved Budget costs",
+            "Expected moneyExcluded until it arrives",
+            "Suggest from my spending",
+            "Review this period",
+            "Delete entire Budget",
+            "View Money Boxes",
+            "Add a box"
+          ]
+        },
+        "guidanceStateIssues": [],
+        "endOcclusion": [],
+        "endUnreachable": [],
+        "scrollers": [
+          {
+            "id": "view",
+            "cls": "lumo-balances-revealed",
+            "client": 370,
+            "scroll": 1678,
+            "rect": {
+              "left": 0,
+              "right": 320,
+              "top": 0,
+              "bottom": 369.55078125,
+              "width": 320,
+              "height": 369.55078125
+            }
+          }
+        ],
+        "collapsedScrollers": [],
+        "verifiedReachable": [],
+        "homeGeometry": {},
+        "homeMoney": {
+          "masks": 0
+        }
+      }
+    },
+    {
+      "requested": "send",
+      "actual": "send",
+      "renderedView": "send",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "payment-projection",
+            "cls": "payment-projection",
+            "label": "If this is extra spendingGH₵170.00 left after budget",
+            "property": "boxShadow",
+            "value": "rgba(32, 38, 30, 0.05)",
+            "pseudo": null
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    },
+    {
+      "requested": "testing",
+      "actual": "testing",
+      "renderedView": "testing",
+      "experience": "deep-returning",
+      "viewport": "320,568",
+      "textScale": 2,
+      "errors": [],
+      "renderFallback": false,
+      "palette": {
+        "count": 1,
+        "findings": [
+          {
+            "tag": "div",
+            "id": "",
+            "cls": "test-step",
+            "label": "Try the merchant sideUse the sample business, create a sale and inspec",
+            "property": "color",
+            "value": "rgb(125, 135, 111)",
+            "pseudo": "::before"
+          }
+        ],
+        "unfilteredImages": []
+      },
+      "layoutCount": 0
+    }
+  ]
+}

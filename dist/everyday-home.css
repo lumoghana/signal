@@ -1,0 +1,132 @@
+/* Everyday uses two account cards. Amount visibility never changes the grid,
+   line boxes, illustration position or surrounding controls. */
+body #app .edition-home.everyday-account-home{display:block;min-width:0}
+body #app .edition-home.everyday-account-home .home-greeting{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;padding:2px 0 10px;min-height:44px}
+body #app .edition-home.everyday-account-home .home-greeting .actual-wordmark{width:86px;max-width:86px;height:auto}
+body #app .edition-home.everyday-account-home .home-header-actions{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;margin-left:auto}
+body #app .edition-home.everyday-account-home .home-header-actions :is(.icon-btn,.avatar){width:36px;height:36px;min-width:36px;min-height:36px;border-radius:12px}
+body #app .edition-home.everyday-account-home .hibiscus-root-chat{display:flex;align-items:center;gap:4px;padding:5px;min-height:36px;font-size:11px;white-space:nowrap}
+body #app .edition-home.everyday-account-home .hibiscus-root-chat svg{width:17px;height:17px}
+body #app .edition-home.everyday-account-home .accounts-welcome{min-height:0;margin:0 0 14px}
+body #app .edition-home.everyday-account-home .accounts-welcome>p{font-size:19px;line-height:1.3}
+body #app .edition-home.everyday-account-home .account-card{margin:0;border:1px solid var(--line);border-radius:24px;background:var(--white);box-shadow:none;overflow:hidden}
+body #app .edition-home.everyday-account-home .everyday-money-card{padding:15px 18px 0}
+body #app .edition-home.everyday-account-home .everyday-account-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+body #app .edition-home.everyday-account-home .everyday-account-heading>div{min-width:0}
+body #app .edition-home.everyday-account-home .everyday-account-heading h2{margin:0;font-size:17px;line-height:1.3;letter-spacing:-.025em;font-weight:650}
+body #app .edition-home.everyday-account-home .everyday-account-heading p{font-size:11px;line-height:1.45;color:var(--muted);margin:2px 0 0}
+body #app .edition-home.everyday-account-home .balance-eye{flex:0 0 40px;width:40px;min-width:40px;height:40px;min-height:40px;padding:9px;border:0;border-radius:50%;background:var(--soft);color:var(--ink)}
+body #app .edition-home.everyday-account-home .balance-eye>span{display:none}
+body #app .edition-home.everyday-account-home .balance-eye svg{display:block;width:21px;height:21px}
+body #app .edition-home.everyday-account-home .everyday-money-main{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:8px;min-height:112px;margin:5px 0}
+body #app .edition-home.everyday-account-home .everyday-primary-money{display:block;width:100%;min-width:0;padding:0;text-align:left;border:0;border-radius:0;background:none;color:var(--ink)}
+body #app .edition-home.everyday-account-home .everyday-primary-label{display:block;font-size:11px;line-height:1.4;color:var(--muted);margin:0 0 5px}
+body #app .edition-home.everyday-account-home .everyday-primary-money>strong{display:block;width:100%;min-height:1.25em;margin:0;padding:0;font-size:40px;font-weight:600;line-height:1.25;letter-spacing:-.045em;background:none;font-variant-numeric:lining-nums tabular-nums;overflow-wrap:normal;white-space:nowrap}
+body #app .edition-home.everyday-account-home .everyday-home-art{display:block;flex:none;width:112px;height:100px;margin:0;overflow:hidden;align-self:center}
+body #app .edition-home.everyday-account-home .everyday-home-art>.scene-art.campus-scene{width:100%;height:100px!important;min-height:0!important;margin:0!important}
+body #app .edition-home.everyday-account-home .everyday-available-context{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:27px;margin:0 0 4px;color:var(--muted);font-size:11px;line-height:1.4}
+body #app .edition-home.everyday-account-home .everyday-available-context>strong{display:block;min-height:1.4em;font-size:13px;line-height:1.4;font-weight:600;white-space:nowrap;color:var(--ink);text-align:right}
+body #app .edition-home.everyday-account-home .everyday-budget-link{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:44px;padding:10px 0;border:0;border-top:1px solid var(--line);border-radius:0;background:none;text-align:left;font-size:12px;font-weight:600;line-height:1.4;color:var(--ink)}
+body #app .edition-home.everyday-account-home .everyday-add-money{display:flex;align-items:center;justify-content:center;gap:7px;width:calc(100% + 36px);min-height:48px;margin:0 -18px;padding:12px;border:0;border-top:1px solid var(--line);border-radius:0;background:var(--green-soft,var(--soft));color:var(--green-ink,var(--ink));font-size:13px;line-height:1.4;font-weight:650}
+body #app .edition-home.everyday-account-home :is(.everyday-gap,.everyday-pending){display:flex;align-items:center;gap:6px;width:100%;min-height:30px;padding:5px 0;border:0;background:none;color:var(--muted);font-size:11px;line-height:1.4;text-align:left}
+body #app .edition-home.everyday-account-home .everyday-gap{color:var(--red)}
+body #app .edition-home.everyday-account-home .everyday-boxes-card{display:block;margin-top:12px;padding:0 18px}
+body #app .edition-home.everyday-account-home .everyday-boxes-open{display:grid;grid-template-columns:38px minmax(0,1fr) 17px;align-items:start;gap:11px;width:100%;min-height:130px;margin:0;padding:17px 0;border:0;border-radius:0;background:none;color:var(--ink);text-align:left}
+body #app .edition-home.everyday-account-home .everyday-boxes-icon{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:13px;background:var(--soft);color:var(--green-ink)}
+body #app .edition-home.everyday-account-home .everyday-boxes-open>svg{align-self:center;margin:0}
+body #app .edition-home.everyday-account-home .everyday-boxes-copy{display:block;min-width:0}
+body #app .edition-home.everyday-account-home .everyday-boxes-title{display:block;font-size:17px;line-height:1.3;letter-spacing:-.025em;font-weight:650;margin:0}
+body #app .edition-home.everyday-account-home .everyday-boxes-copy>small{display:block;margin:3px 0 0;font-size:11px;line-height:1.4;color:var(--muted)}
+body #app .edition-home.everyday-account-home .everyday-savings-amount{display:block;width:100%;min-height:1.3em;margin:10px 0 0;font-size:27px;line-height:1.3;letter-spacing:-.025em;font-weight:600;white-space:nowrap;overflow-wrap:normal;color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
+body #app .edition-home.everyday-account-home .everyday-boxes-copy>.everyday-boxes-count{margin-top:4px}
+body #app .edition-home.everyday-account-home .everyday-home-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+body #app .edition-home.everyday-account-home .everyday-home-actions>button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;width:100%;padding:11px 7px;border:1px solid var(--control-line);border-radius:var(--curve-control,16px);background:var(--white);color:var(--ink);font-size:12px;line-height:1.4;font-weight:600}
+body #app .edition-home.everyday-account-home :is(.everyday-home-actions>button,.everyday-add-money)>svg{width:18px;height:18px;flex:none}
+body #app .edition-home.everyday-account-home [data-private-value]{line-height:inherit;vertical-align:baseline}
+body #app .edition-home.everyday-account-home .money-mask{display:inline-block;font-size:inherit;line-height:inherit;letter-spacing:.08em;vertical-align:baseline}
+body #app .edition-home.everyday-account-home :is(#overview-room,#overview-balance,#overview-savings){transform:none!important;opacity:1!important;transition:none!important;animation:none!important}
+/* Keep the illustration for larger balances, with the amount on its own row. */
+body #app .edition-home.everyday-account-home .has-wide-amount .everyday-money-main{display:block;position:relative;min-height:112px}
+body #app .edition-home.everyday-account-home .has-wide-amount .everyday-primary-money{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:64px auto;width:100%}
+body #app .edition-home.everyday-account-home .has-wide-amount .everyday-primary-label{display:flex;align-items:center;min-height:64px;padding-right:100px;margin:0}
+body #app .edition-home.everyday-account-home .has-wide-amount .everyday-primary-money>strong{font-size:32px;min-height:1.25em;white-space:normal;overflow-wrap:anywhere}
+body #app .edition-home.everyday-account-home .has-wide-amount .everyday-home-art{display:block!important;position:absolute;right:0;top:0;width:90px;height:64px!important;min-height:0!important;margin:0}
+body #app .edition-home.everyday-account-home .has-wide-amount .everyday-home-art>.scene-art.campus-scene{display:block!important;width:100%!important;max-width:100%!important;height:64px!important;min-height:0!important;margin:0!important}
+body #app .edition-home.everyday-account-home .has-huge-amount .everyday-primary-money>strong{min-height:2.5em;white-space:normal;overflow-wrap:anywhere}
+body #app .edition-home.everyday-account-home .everyday-savings-amount.has-wide-savings{font-size:21px}
+body #app .edition-home.everyday-account-home .everyday-migration{font-size:11px;line-height:1.4;margin:8px 0 0}
+@media(max-width:350px){
+ body #app .edition-home.everyday-account-home .home-greeting .actual-wordmark{width:80px;max-width:80px}
+ body #app .edition-home.everyday-account-home .hibiscus-root-chat>span{display:none}
+ body #app .edition-home.everyday-account-home .everyday-money-card{padding-inline:14px}
+ body #app .edition-home.everyday-account-home .everyday-money-main{grid-template-columns:minmax(0,1fr) 90px;gap:6px}
+ body #app .edition-home.everyday-account-home .everyday-home-art{width:90px}
+ body #app .edition-home.everyday-account-home .everyday-primary-money>strong{font-size:34px}
+ body #app .edition-home.everyday-account-home .everyday-add-money{width:calc(100% + 28px);margin-inline:-14px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-card{padding-inline:14px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-open{grid-template-columns:32px minmax(0,1fr) 15px;gap:9px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-icon{width:32px;height:32px;border-radius:11px}
+ body #app .edition-home.everyday-account-home .everyday-savings-amount{font-size:24px}
+ body #app .edition-home.everyday-account-home .everyday-savings-amount.has-wide-savings{font-size:19px}
+}
+@media(max-height:700px){
+ body #app .edition-home.everyday-account-home .home-greeting{padding-block:0 7px}
+ body #app .edition-home.everyday-account-home .accounts-welcome{margin-bottom:9px}
+ body #app .edition-home.everyday-account-home .accounts-welcome>p{font-size:18px}
+ body #app .edition-home.everyday-account-home .everyday-money-card{padding-top:10px}
+ body #app .edition-home.everyday-account-home .everyday-account-heading{min-height:40px}
+ body #app .edition-home.everyday-account-home .everyday-money-main{min-height:86px;margin-block:2px}
+ body #app .edition-home.everyday-account-home .everyday-home-art,body #app .edition-home.everyday-account-home .everyday-home-art>.scene-art.campus-scene{height:82px!important;min-height:0!important}
+ body #app .edition-home.everyday-account-home .everyday-available-context{min-height:23px;margin-bottom:2px}
+ body #app .edition-home.everyday-account-home .everyday-budget-link{min-height:38px;padding-block:7px}
+ body #app .edition-home.everyday-account-home .everyday-add-money{min-height:44px;padding-block:10px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-card{margin-top:10px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-open{min-height:112px;padding-block:12px}
+ body #app .edition-home.everyday-account-home .everyday-savings-amount{margin-top:7px;font-size:25px}
+ body #app .edition-home.everyday-account-home .everyday-home-actions{margin-top:10px}
+ body #app .edition-home.everyday-account-home .everyday-home-actions>button{min-height:44px;padding-block:9px}
+}
+@media(max-height:620px){
+ body #app .edition-home.everyday-account-home .home-greeting{padding-bottom:4px}
+ body #app .edition-home.everyday-account-home .accounts-welcome{margin-bottom:7px}
+ body #app .edition-home.everyday-account-home .accounts-welcome>p{font-size:17px}
+ body #app .edition-home.everyday-account-home .everyday-money-card{padding-top:8px}
+ body #app .edition-home.everyday-account-home .everyday-account-heading{min-height:36px}
+ body #app .edition-home.everyday-account-home .everyday-account-heading h2{font-size:16px}
+ body #app .edition-home.everyday-account-home .everyday-account-heading p{font-size:10px}
+ body #app .edition-home.everyday-account-home .balance-eye{width:36px;min-width:36px;height:36px;min-height:36px;padding:7px}
+ body #app .edition-home.everyday-account-home .everyday-money-main{min-height:72px;margin-block:0}
+ body #app .edition-home.everyday-account-home .everyday-home-art,body #app .edition-home.everyday-account-home .everyday-home-art>.scene-art.campus-scene{height:72px!important}
+ body #app .edition-home.everyday-account-home .everyday-primary-label{font-size:10px;margin-bottom:2px}
+ body #app .edition-home.everyday-account-home .everyday-primary-money>strong{font-size:34px}
+ body #app .edition-home.everyday-account-home .everyday-available-context{min-height:21px;margin:0;font-size:10px}
+ body #app .edition-home.everyday-account-home .everyday-available-context>strong{font-size:12px}
+ body #app .edition-home.everyday-account-home .everyday-budget-link{min-height:34px;padding-block:6px;font-size:11px}
+ body #app .edition-home.everyday-account-home .everyday-add-money{min-height:40px;padding-block:8px;font-size:12px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-card{margin-top:8px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-open{min-height:100px;padding-block:10px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-title{font-size:16px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-copy>small{font-size:10px;margin-top:2px}
+ body #app .edition-home.everyday-account-home .everyday-savings-amount{font-size:23px;margin-top:5px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-copy>.everyday-boxes-count{margin-top:2px}
+ body #app .edition-home.everyday-account-home .everyday-home-actions{margin-top:8px;gap:8px}
+ body #app .edition-home.everyday-account-home .everyday-home-actions>button{font-size:11px;min-height:40px;padding-block:8px}
+}
+
+body #app .edition-home.everyday-account-home .everyday-budget-link>span>small{display:block;margin-top:3px;font-size:11px;font-weight:400;color:var(--muted)}
+@media(max-height:620px){
+ body #app .edition-home.everyday-account-home .accounts-welcome{display:none}
+ body #app .edition-home.everyday-account-home .home-greeting{min-height:36px}
+ body #app .edition-home.everyday-account-home .everyday-money-main{min-height:64px}
+ body #app .edition-home.everyday-account-home .everyday-home-art,body #app .edition-home.everyday-account-home .everyday-home-art>.scene-art.campus-scene{height:64px!important}
+ body #app .edition-home.everyday-account-home .everyday-boxes-open{min-height:86px;padding-block:8px}
+ body #app .edition-home.everyday-account-home .everyday-boxes-title{font-size:15px;line-height:1.25}
+ body #app .edition-home.everyday-account-home .everyday-boxes-copy>small{font-size:9px;line-height:1.3;margin-top:2px}
+ body #app .edition-home.everyday-account-home .everyday-savings-amount{font-size:21px;line-height:1.25;margin-top:3px}
+}
+@media(max-height:700px){
+ body #app #view .screen-home{padding-bottom:0}
+ body #app .edition-home.everyday-account-home .accounts-welcome{margin-bottom:6px}
+ body #app .edition-home.everyday-account-home .everyday-money-main{margin-block:0}
+ body #app .edition-home.everyday-account-home .everyday-boxes-card,body #app .edition-home.everyday-account-home .everyday-home-actions{margin-top:8px}
+}

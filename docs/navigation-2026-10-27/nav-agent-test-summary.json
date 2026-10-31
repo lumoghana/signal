@@ -1,0 +1,11 @@
+{
+  "tests": 129,
+  "pass": 129,
+  "fail": 0,
+  "command": "node scripts/check-edition-parity.cjs --regression --sequential",
+  "regressionFiles": 86,
+  "newNavigationCases": 26,
+  "sourceChangedDuringRun": [],
+  "localContractChecks": 8,
+  "peerComparison": "Skipped; no peer checkout. Local approved source, namespace, routes, financial and approval checks passed."
+}

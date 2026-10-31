@@ -1,0 +1,21 @@
+/* Lumo illustration grammar. Load after the shared design system.
+   A scene supports a conclusion; it never contains financial interface text. */
+:root{
+ --art-intro-size:clamp(148px,23dvh,196px);
+ --art-everyday-size:clamp(108px,17dvh,144px);
+ --art-decision-size:76px;
+}
+.screen .scene-art.scene-size-intro{height:var(--art-intro-size)!important;margin:0 auto 12px!important}
+.screen .scene-art.scene-size-everyday,.screen .scene-service{height:var(--art-everyday-size)!important;margin:0 auto 12px!important}
+.screen .scene-art.scene-size-decision{height:var(--art-decision-size)!important;margin:0 auto 8px!important}
+.screen.screen-welcome .welcome-illustration,.screen.screen-welcome .welcome-illustration .scene-art.scene-size-intro{height:var(--art-intro-size)!important;margin:0 auto 12px!important}
+/* Compact states retain their original composed underlay in the SVG for reuse,
+   but render only the single foreground action so the consequence stays first. */
+.scene-size-decision .legon-backdrop{display:none}
+.scene-art svg,.option-art svg{overflow:hidden;max-width:100%}
+.screen .scene-art.scene-decision{overflow:hidden;isolation:isolate}
+.screen .scene-art.scene-decision svg{max-width:180px;margin:0 auto}
+.screen .home-stage:before{display:none}
+@media(max-height:700px){
+ :root{--art-intro-size:148px;--art-everyday-size:108px;--art-decision-size:64px}
+}

@@ -1,0 +1,19 @@
+{
+  "fullScreenshotSize": [
+    1363,
+    936
+  ],
+  "phoneBounds": {
+    "height": 844,
+    "width": 390,
+    "x": 486.5,
+    "y": 57
+  },
+  "cropPixels": [
+    486,
+    57,
+    877,
+    901
+  ],
+  "transform": "Exact browser pixel crop. No UI changes."
+}

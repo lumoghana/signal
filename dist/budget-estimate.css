@@ -1,0 +1,8 @@
+/* Shared optional calculator; inherits each edition's typography and actions. */
+.screen .budget-estimate-open{display:inline-flex;min-height:44px;align-items:center;margin:-6px 0 4px}
+.screen .budget-estimate .page-heading{margin-bottom:12px}
+.screen .budget-estimate-rate{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;align-items:start}
+.screen .budget-estimate-result{display:grid;gap:5px;margin:8px 0 12px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:.875rem;line-height:1.45}
+.screen .budget-estimate-result strong{font-size:1.75rem;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap}
+.screen .budget-estimate-result .budget-estimate-equation{font-weight:500}
+@media(max-width:340px){.screen .budget-estimate-rate{grid-template-columns:1fr;gap:0}}
