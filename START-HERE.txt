@@ -11,7 +11,7 @@ the complete application source, build scripts, tests and live website assets.
 2. UPLOAD TO GITHUB
    Recommended: use GitHub Desktop, especially for this many files.
    - Sign in to GitHub Desktop.
-   - Clone https://github.com/lumoghana/signal to your computer.
+   - Clone your lumoghana/signal repository to your computer.
    - Copy the CONTENTS of the extracted lumo-signal folder into that clone.
      If asked about an existing README, use the README from this package.
    - Commit the changes, then click Push origin.
