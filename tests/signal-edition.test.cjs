@@ -30,8 +30,11 @@ test('Signal Home uses original brand composition with real available, planned a
  assert(root);const classes=root.children.map(n=>n.className);
  const order=['signal-money-card','signal-home-actions','signal-buddy','signal-home-destinations'].map(name=>classes.findIndex(value=>value.split(/\s+/).includes(name)));
  assert(order.every(n=>n>=0));assert(order.every((n,i)=>!i||n>order[i-1]));
- assert.equal(root.querySelectorAll('.signal-lux').length,2,'The original 2D avatar appears in the balance and contextual insight');
- assert.equal(root.querySelectorAll('img').filter(n=>n.getAttribute('src')==='/brand/lumo-avatar-icon-512.png').length,2);
+ assert.equal(root.querySelectorAll('.signal-lux').length,1,'The original 2D buddy stays in the contextual insight');
+ assert.equal(root.querySelectorAll('img').filter(n=>n.getAttribute('src')==='/brand/lumo-avatar-icon-512.png').length,1);
+ assert.equal(root.querySelector('.signal-money-card .signal-lux'),null,'The balance card no longer contains the avatar');
+ assert.equal(root.querySelector('.signal-hero-campus'),null,'The balance card has no illustration slot');
+ assert.equal(root.querySelector('.signal-money-card img'),null,'The balance card contains no avatar or campus artwork');
  assert(root.querySelector('.signal-wordmark'));assert.equal(root.querySelector('.signal-money-label').textContent,'Room to spend');
  assert.equal(L.accountBalances().available,1000);assert.equal(h.document.getElementById('overview-balance').textContent,'₵1,000');
  assert.equal(L.balances().essentials+L.balances().allocated,200);assert.equal(h.document.getElementById('signal-planned-costs').textContent,'₵200');
@@ -83,6 +86,35 @@ test('Signal information disclosure retains native budget and date controls with
  L.openTab('home');L.state.planHorizon=null;L.state.allowance.date='';L.render();settle(h);const undated=money(L);
  info=view(h).querySelector('.signal-plan-details');info.querySelector('summary').click();settle(h);assert(info.hasAttribute('open'));
  const dates=info.querySelector('.mono-budget-date-action');assert(dates);assert.equal(dates.textContent,'Add dates');assert.equal(dates.getAttribute('onclick'),"L.go('planPeriod')");dates.click();settle(h);assert.equal(L.route,'planPeriod');assert.equal(L.taskSheet.parentRoute,'home');assert.equal(money(L),undated);clean(h);
+});
+
+test('Signal balance-card Budget action opens the actual Plan page for new, unfinished, saved and ended budgets',()=>{
+ for(const kind of ['new','unfinished','saved','ended']){
+  const h=fixture(),L=h.L,has=kind==='saved'||kind==='ended';
+  if(!has){
+   L.state.planSaved=false;L.state.essentials=[];L.state.planHorizon=null;L.state.allowance={amount:0,date:''};L.state.planDraft=null;
+   if(kind==='unfinished')L.state.planDraft={step:'firstEssentials',allowance:{amount:0,date:''},essentials:[],goals:[],planHorizon:{mode:'unspecified',date:''}};
+  }else if(kind==='ended')L.state.planHorizon={mode:'date',date:date(h,-1)};
+  L.render();settle(h);assert.equal(L.hasMeaningfulPlan(),has);
+  const before=money(L),draft=JSON.stringify(L.state.planDraft),card=view(h).querySelector('.signal-money-card'),button=card.querySelector('.signal-card-budget');
+  assert(button,kind+' exposes its Budget action directly in the balance card');
+  assert.equal(button.textContent.trim(),has?'View budget':'Create a budget',kind+' uses the requested label');
+  assert.equal(button.closest('details'),null,'The Budget action is visible without opening an information popup');
+  assert.equal(button.parentNode,card,'The Budget action belongs to the balance card');
+  assert(card.children.indexOf(button)>card.children.indexOf(card.querySelector('.signal-balance-breakdown')),'The Budget action follows Available balance and Planned costs');
+  if(kind==='ended'){
+   const info=card.querySelector('.signal-plan-details');assert(!info.hasAttribute('open'));info.querySelector('summary').click();settle(h);
+   const original=info.querySelector('.mono-budget-link');assert.equal(original.textContent.trim(),'Review budget dates');assert.equal(original.getAttribute('onclick'),"L.go('planPeriod')");
+   original.click();settle(h);assert.equal(L.route,'planPeriod','The existing dated-budget disclosure still opens the date editor');
+   L.closeTask();settle(h);assert.equal(L.route,'home');
+  }
+  view(h).querySelector('.signal-card-budget').click();settle(h);
+  assert.equal(L.route,'plan',kind+' opens Plan directly rather than a setup or date task');
+  assert.equal(h.history.state.route,'plan');assert.equal(L.taskSheet.active,false);assert(view(h).querySelector('.plan-hub'),'The actual Plan page renders');
+  if(has)assert(view(h).querySelector('[data-budget-items-disclosure]').hasAttribute('open'),'Saved Budget details are expanded');
+  else assert(view(h).querySelector('.plan-hub-actions button'),'Plan retains its native setup or resume action');
+  assert.equal(JSON.stringify(L.state.planDraft),draft,kind+' preserves any unfinished setup');assert.equal(money(L),before,kind+' navigation changes no money');clean(h);
+ }
 });
 
 test('expected allowance and an incoming IOU due tomorrow do not alter Signal balances or planned costs',()=>{
