@@ -3,35 +3,38 @@
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-home{display:flex!important;flex-direction:column;min-height:100%;padding:12px 16px 8px!important;}
 /* Keep the account, actions and guidance in one composed stack. Extra screen
    height belongs below the content, not between every unrelated section. */
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home{flex:1 0 auto;justify-content:flex-start;gap:10px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home{flex:1 0 auto;justify-content:flex-start;gap:6px;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-header .signal-brand-wordmark{flex-basis:116px;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-wordmark{width:116px!important;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting{margin:0 0 4px!important;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting p{font-size:1.75rem!important;line-height:1.08!important;letter-spacing:-.055em;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-greeting :is(.signal-greeting-detail,.signal-greeting-note){display:block;margin-top:4px;font-size:.9375rem;line-height:1.35;color:var(--signal-muted);font-weight:500;letter-spacing:-.02em;}
 
-/* Keep the approved account composition; the original 2D mark has no floor light. */
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-money-card{background:#0c1410!important;color:var(--signal-paper)!important;border:0!important;border-radius:4cqw!important;padding:5cqw 6cqw 2.5cqw!important;min-height:63.6cqw;container-type:normal!important;overflow:visible;box-shadow:none!important;}
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-heading{position:relative;min-height:11.2cqw;align-items:flex-start!important;justify-content:space-between!important;padding-right:52px!important;}
+/* Legon fills the upper-right card. Financial text and controls stay above it. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-money-card{background:#0c1410!important;color:var(--signal-paper)!important;border:0!important;border-radius:4cqw!important;padding:5cqw 6cqw 2.5cqw!important;min-height:0;container-type:normal!important;overflow:visible;box-shadow:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-heading{position:relative;z-index:2;min-height:10cqw;align-items:flex-start!important;justify-content:space-between!important;padding-right:52px!important;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-copy{display:flex;flex-direction:column;gap:4px;min-width:0;padding-top:0;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-label{font-size:1rem!important;line-height:1.2!important;color:var(--signal-paper)!important;box-shadow:none;font-weight:750!important;letter-spacing:-.035em;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-subtitle{font-size:.75rem;line-height:1.3;font-weight:500;color:#b8bfb8;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .balance-eye{position:absolute!important;right:-6px!important;top:-3px!important;margin:0!important;background:#ffffff12!important;color:var(--signal-paper)!important;min-width:44px!important;width:44px!important;min-height:44px!important;height:44px!important;}
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{position:relative;isolation:isolate;grid-template-columns:minmax(0,1fr) 29cqw;min-height:29.3cqw;gap:8px;margin:0;align-items:start;}
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus{position:relative;z-index:1;display:block!important;width:29cqw;max-width:100%;height:29cqw;margin:0 3cqw 0 0;overflow:hidden;justify-self:end;align-self:center;transform:none;filter:none;pointer-events:none;}
-/* Frame the existing Balme Library illustration around its clock tower. The
-   artwork keeps the avatar slot, so it cannot change balance/privacy geometry. */
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus>img{position:absolute;display:block;width:185%;max-width:none;height:auto;right:-8%;top:-18%;object-fit:contain;pointer-events:none;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{position:relative;isolation:isolate;display:block;min-height:25cqw;gap:0;margin:0;align-items:start;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus{position:absolute;z-index:0;display:block!important;width:48cqw;max-width:none;height:40cqw;right:1cqw;top:-15cqw;margin:0;overflow:hidden;transform:none;filter:none;pointer-events:none;}
+/* The tightly framed 2D landmark has a real presence, with a quiet left
+   edge for the amount. It never intercepts money or privacy controls. */
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus>img{display:block;width:100%;height:100%;object-fit:contain;object-position:right bottom;pointer-events:none;mask-image:linear-gradient(to right,transparent,#000 22%);}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-card-budget{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px!important;margin:9px 0 2px!important;padding:9px 13px!important;border:0!important;border-radius:11px!important;background:var(--signal-lime)!important;color:var(--signal-ink)!important;font-size:.8125rem!important;font-weight:800!important;line-height:1.2!important;text-align:left;box-shadow:none!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-card-budget:focus-visible{outline:2px solid var(--signal-paper);outline-offset:3px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-card-budget svg{width:17px;height:17px;flex:none;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage::before,
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage::after{content:none;display:none;}
 
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money{color:var(--signal-lime)!important;align-self:start;padding-top:3px!important;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money{position:relative;z-index:1;width:calc(100% - 30cqw);color:var(--signal-lime)!important;align-self:start;padding-top:3px!important;text-shadow:0 2px 15px #0c1410;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money>strong{font-size:4rem!important;color:var(--signal-lime)!important;letter-spacing:-.045em!important;line-height:1.03!important;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-wide-amount .everyday-primary-money>strong{font-size:3.25rem!important;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-long-amount .everyday-primary-money>strong{font-size:2.45rem!important;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-huge-amount .everyday-primary-money>strong{font-size:2rem!important;overflow-wrap:anywhere;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money :is(.currency,.money-currency,.cents,.money-mask){color:inherit!important;}
-body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-breakdown{position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid #ffffff24;padding:4cqw 0 0;gap:14px;}
+body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-breakdown{position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid #ffffff24;padding:2.5cqw 0 0;gap:14px;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell{gap:3px;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell+.signal-balance-cell{border-left:1px solid #ffffff24;border-top:0;padding:0 0 0 17px;}
 body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-cell>span{color:#b8bfb8;font-size:.75rem;line-height:1.25;font-weight:500;}
@@ -156,7 +159,8 @@ body.signal-edition.minna-edition #app:has(#view>.screen-home) #nav .nav-item.ac
    either financial amounts or the contextual question behind artwork. */
 @container signal-home (max-width:20em){
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{grid-template-columns:minmax(0,1fr);min-height:0;gap:5px;}
- body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus{justify-self:end;width:92px;height:102px;margin-right:10px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus{position:relative;right:auto;top:auto;justify-self:end;width:160px;height:150px;margin:0 0 0 auto;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money{width:100%;}
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .everyday-primary-money>strong{font-size:3.5rem!important;}
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-wide-amount .everyday-primary-money>strong{font-size:3rem!important;}
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .has-huge-amount .everyday-primary-money>strong{font-size:2.1rem!important;}
@@ -171,4 +175,19 @@ body.signal-edition.minna-edition #app:has(#view>.screen-home) #nav .nav-item.ac
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-art img{width:44px;height:44px;}
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-buddy-rays{width:24px!important;height:22px!important;}
  body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home-destinations{grid-template-columns:minmax(0,1fr);}
+}
+
+/* A short phone spends height on the account and its Budget action first. */
+@media(max-height:720px) and (min-width:360px){
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .screen-home{padding:6px 14px 3px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home{gap:2px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-heading{min-height:9cqw;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-money-card{padding:4.3cqw 6cqw 1.8cqw!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-balance-breakdown{padding-top:1.5cqw;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-card-budget{margin:2px 0 0!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-money-stage{min-height:23cqw;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-hero-campus{height:38cqw;top:-15cqw;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action{min-height:72px!important;padding:6px 4px!important;gap:3px!important;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home .signal-action .mono-action-icon{width:25px!important;height:25px!important;min-width:25px;min-height:25px;}
+ body.signal-edition.minna-edition #app :is(#view,#task-parent-view) .signal-home :is(.everyday-boxes-open,.signal-story-card>button){min-height:60px!important;}
 }
