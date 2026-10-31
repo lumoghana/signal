@@ -33,7 +33,8 @@ test('Signal Home uses original brand composition with real available, planned a
  assert.equal(root.querySelectorAll('.signal-lux').length,1,'The original 2D buddy stays in the contextual insight');
  assert.equal(root.querySelectorAll('img').filter(n=>n.getAttribute('src')==='/brand/lumo-avatar-icon-512.png').length,1);
  assert.equal(root.querySelector('.signal-money-card .signal-lux'),null,'The balance card no longer contains the avatar');
- assert.equal(root.querySelector('.signal-hero-campus img').getAttribute('src'),'/assets/signal/legon-balme-expressive.png');
+ assert.equal(root.querySelector('.signal-hero-campus'),null,'The balance card has no illustration slot');
+ assert.equal(root.querySelector('.signal-money-card img'),null,'The balance card contains no avatar or campus artwork');
  assert(root.querySelector('.signal-wordmark'));assert.equal(root.querySelector('.signal-money-label').textContent,'Room to spend');
  assert.equal(L.accountBalances().available,1000);assert.equal(h.document.getElementById('overview-balance').textContent,'₵1,000');
  assert.equal(L.balances().essentials+L.balances().allocated,200);assert.equal(h.document.getElementById('signal-planned-costs').textContent,'₵200');

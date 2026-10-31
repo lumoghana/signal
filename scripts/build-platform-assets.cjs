@@ -72,7 +72,7 @@ function buildPlatformAssets({root=path.resolve(__dirname,'..'),entry,capture=fa
   'fonts/Manrope-Variable.woff2','fonts/LumoSans-Regular.woff2',
   'brand/Lumo-Wordmark-Black.svg','brand/Lumo-Wordmark-White.svg','brand/lumo-avatar-icon.svg',
   'brand/lumo-avatar-icon-180.png','brand/lumo-avatar-icon-192.png','brand/lumo-avatar-icon-512.png',
-  'assets/signal/signal-wordmark.webp','assets/signal/legon-balme-expressive.png']);
+  'assets/signal/signal-wordmark.webp']);
  // Font fallbacks and four current Home scenes make the installed shell useful
  // offline without caching the complete legacy art archive.
  for(const file of byPath.keys())if(/^fonts\/[^/]+\.woff2$/.test(file)||/^assets\/ask-lumo-campus-immersive\/[^/]+\.webp$/.test(file))wanted.add(file);
