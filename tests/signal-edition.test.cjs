@@ -30,8 +30,10 @@ test('Signal Home uses original brand composition with real available, planned a
  assert(root);const classes=root.children.map(n=>n.className);
  const order=['signal-money-card','signal-home-actions','signal-buddy','signal-home-destinations'].map(name=>classes.findIndex(value=>value.split(/\s+/).includes(name)));
  assert(order.every(n=>n>=0));assert(order.every((n,i)=>!i||n>order[i-1]));
- assert.equal(root.querySelectorAll('.signal-lux').length,2,'The original 2D avatar appears in the balance and contextual insight');
- assert.equal(root.querySelectorAll('img').filter(n=>n.getAttribute('src')==='/brand/lumo-avatar-icon-512.png').length,2);
+ assert.equal(root.querySelectorAll('.signal-lux').length,1,'The original 2D buddy stays in the contextual insight');
+ assert.equal(root.querySelectorAll('img').filter(n=>n.getAttribute('src')==='/brand/lumo-avatar-icon-512.png').length,1);
+ assert.equal(root.querySelector('.signal-money-card .signal-lux'),null,'The balance card no longer contains the avatar');
+ assert.equal(root.querySelector('.signal-hero-campus img').getAttribute('src'),'/assets/legon-balme-v21.webp');
  assert(root.querySelector('.signal-wordmark'));assert.equal(root.querySelector('.signal-money-label').textContent,'Room to spend');
  assert.equal(L.accountBalances().available,1000);assert.equal(h.document.getElementById('overview-balance').textContent,'₵1,000');
  assert.equal(L.balances().essentials+L.balances().allocated,200);assert.equal(h.document.getElementById('signal-planned-costs').textContent,'₵200');

@@ -212,9 +212,9 @@
   },
   "bundles": {
     "script": {
-      "path": "lumo-runtime.d864e008eee5.js",
-      "sha256": "d864e008eee5b984d8c9b45b579f4bc4694c5781e9731b838523e0625dcc43a5",
-      "sizeBytes": 2097676,
+      "path": "lumo-runtime.3cac0df8212a.js",
+      "sha256": "3cac0df8212a9f13cfb2eedc894816ded67eb2cf9d79bf94ce3029dace2e89c8",
+      "sizeBytes": 2097662,
       "sources": [
         {
           "url": "/core.js?v=deep-review-20261027-1",
@@ -1059,8 +1059,8 @@
         {
           "url": "/signal-edition.js?v=signal-20261030",
           "path": "signal-edition.js",
-          "sha256": "79ad0a45dc70302088ffdd1b0661168372437a64752770a18d644546a52f17c1",
-          "sizeBytes": 14996,
+          "sha256": "9ce799d38ff6c4df4f0b3589683d467b9b73708dbec81db476cdcc4f7285b3ef",
+          "sizeBytes": 14982,
           "startLine": 27406,
           "endLine": 27515
         },
@@ -1123,9 +1123,9 @@
       ]
     },
     "stylesheet": {
-      "path": "lumo-ui.afac6d043f39.css",
-      "sha256": "afac6d043f393e19f386d0fdb9cd132c41d9f738f33c26def6f980f1c97dc565",
-      "sizeBytes": 1045310,
+      "path": "lumo-ui.b7c2a979a198.css",
+      "sha256": "b7c2a979a19887c5e781b9d9ced1ad5352b81aee1b0dfa077a42712133cdeb36",
+      "sizeBytes": 1045721,
       "sources": [
         {
           "url": "/style.css?v=minna-1",
@@ -1834,10 +1834,10 @@
         {
           "url": "/signal-ring-home.css?v=signal-ring-home-20261030",
           "path": "signal-ring-home.css",
-          "sha256": "466e58e82eab3785c6e0a519428d71b3f596e617a56438459b27f5976c8ff6e8",
-          "sizeBytes": 25901,
+          "sha256": "b9b060d7d79ad7166d0f4174303ec767e85151c164d6825f6b6a3d17820d1d57",
+          "sizeBytes": 26312,
           "startLine": 11206,
-          "endLine": 11377
+          "endLine": 11380
         }
       ]
     }
@@ -2795,7 +2795,7 @@
     },
     {
       "path": "index.html",
-      "sha256": "e9bc82e4fdd9d4a44dd82ccdb1f779137e0b06f4358799f35b9f8cf2942f45e1",
+      "sha256": "cc167ad7f2df7448464f04cd773691c57fa3bb7e102031a0ae488f5140ee3028",
       "sizeBytes": 3131
     },
     {
@@ -3275,8 +3275,8 @@
     },
     {
       "path": "signal-edition.js",
-      "sha256": "79ad0a45dc70302088ffdd1b0661168372437a64752770a18d644546a52f17c1",
-      "sizeBytes": 14996
+      "sha256": "9ce799d38ff6c4df4f0b3589683d467b9b73708dbec81db476cdcc4f7285b3ef",
+      "sizeBytes": 14982
     },
     {
       "path": "signal-home.css",
@@ -3315,8 +3315,8 @@
     },
     {
       "path": "signal-ring-home.css",
-      "sha256": "466e58e82eab3785c6e0a519428d71b3f596e617a56438459b27f5976c8ff6e8",
-      "sizeBytes": 25901
+      "sha256": "b9b060d7d79ad7166d0f4174303ec767e85151c164d6825f6b6a3d17820d1d57",
+      "sizeBytes": 26312
     },
     {
       "path": "signal-system.css",
@@ -3421,8 +3421,8 @@
   ],
   "shell": {
     "namespace": "lumo-signal-edition-v1",
-    "version": "81a122b11c44d96d86dc",
-    "precacheBytes": 4644861,
-    "assetCount": 22
+    "version": "993f71c9bb6055400953",
+    "precacheBytes": 4890966,
+    "assetCount": 23
   }
 }
