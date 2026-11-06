@@ -1,0 +1,145 @@
+/* Campus Run keeps the stage quiet so Lux and the next choice lead. */
+.campus-game-page{display:flex;flex-direction:column;min-height:100%;padding:0 24px max(22px,env(safe-area-inset-bottom));color:var(--text);position:relative;isolation:isolate;animation:none}
+.campus-game-entry{position:relative;isolation:isolate;color:var(--text)}
+.campus-game-page h1,.campus-game-entry h1{font-size:30px;line-height:1.12;letter-spacing:-.045em;font-weight:550;white-space:pre-line;margin:0}
+.campus-game-page h2,.campus-game-entry h2{font-size:22px;line-height:1.2;letter-spacing:-.035em;font-weight:550}
+.campus-game-page .eyebrow,.campus-game-entry .eyebrow{font-size:12px;line-height:1.4;letter-spacing:.05em;color:var(--muted)}
+.campus-header{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:62px;margin:0 0 12px;font-size:12px;flex-shrink:0}
+.campus-header>span{flex:1;min-width:0;text-align:center;font-size:12px;line-height:1.35;font-weight:450;color:var(--muted)}
+.campus-header button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px;padding:8px 0;font-size:12px;color:var(--muted)}
+.campus-header .campus-home{color:var(--accent,var(--lime));min-width:44px}
+.campus-header-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.campus-header .campus-details-button{width:44px;min-width:44px;padding:8px;font-size:20px;letter-spacing:2px;color:var(--muted)}
+.campus-header .campus-back{min-width:44px;justify-content:flex-start}
+.campus-hero{display:flex;align-items:center;justify-content:center;flex-shrink:0;margin:6px auto 22px;width:190px;height:190px;position:relative;isolation:isolate}
+.campus-buddy{display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%;margin:0 auto;isolation:isolate}
+.campus-lux{width:100%;height:100%;position:relative;transform:none;isolation:isolate}
+.campus-lux>img,.campus-buddy img{width:100%;height:100%;object-fit:contain;display:block}
+.campus-equipped{position:absolute;right:0;top:5px;font-size:22px;line-height:1;color:var(--accent,var(--lime))}
+.campus-scene-emoji,.campus-orbit,.campus-diorama,.campus-motion-toolbar,.campus-entry-score,.campus-mini-route{display:none}
+.campus-clean-copy{text-align:center;max-width:360px;width:100%;margin:0 auto}
+.campus-clean-copy h1{font-size:30px;line-height:1.12;margin:0 0 12px}
+.campus-clean-copy>p{font-size:14px;line-height:1.55;color:var(--muted);margin:0 auto;max-width:340px}
+.campus-wallet-pill{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:44px;max-width:100%;width:fit-content;margin:15px auto 20px;padding:8px 13px;border:1px solid var(--line);border-radius:24px;color:var(--muted);background:transparent;font-size:12px;line-height:1.45;text-align:center}
+.campus-wallet-pill strong,.campus-wallet-pill b{font-weight:500;color:var(--accent,var(--lime));white-space:nowrap;font-variant-numeric:tabular-nums}
+.campus-wallet-pill svg{width:14px;height:14px;margin-left:2px;color:var(--muted)}
+.campus-choices{display:flex;flex-direction:column;gap:9px;width:100%;margin:0}
+.campus-choice{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:55px;width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--surface);text-align:left;color:var(--text);font-size:14px;line-height:1.35;font-weight:450;transition:border-color .15s ease,background .15s ease}
+.campus-choice>span{flex:1;min-width:0}.campus-choice>svg{width:17px;height:17px;color:var(--muted)}
+.campus-choice:hover,.campus-choice:focus-visible{border-color:var(--lime)}
+.campus-choice:focus-visible{outline:1px solid var(--lime);outline-offset:3px}
+.campus-footer{position:sticky;bottom:0;z-index:3;margin-top:auto;padding:20px 0 max(16px,env(safe-area-inset-bottom));background:var(--bg);flex-shrink:0}
+.campus-footer>.button{min-height:53px;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.campus-text-button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:44px;padding:10px 0;color:var(--muted);font-size:12px;line-height:1.4;text-align:center;background:none}
+.campus-footer>.campus-text-button{width:100%;font-size:12px;margin-top:2px}
+.campus-error{font-size:12px;line-height:1.5;margin:12px 0;color:var(--red)}.campus-error:empty{display:none}
+.campus-fine{font-size:12px;line-height:1.5;color:var(--muted);margin:14px 0 0}
+.campus-result-line{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;width:fit-content;max-width:100%;margin:16px auto 4px;padding:7px 10px;border:0;background:none;color:var(--accent,var(--lime));font-size:12px;line-height:1.4;text-align:center;font-variant-numeric:tabular-nums}
+.campus-result-line strong{display:inline-flex;align-items:center;gap:6px;font-weight:500}.campus-result-line svg{width:14px;height:14px;color:var(--muted)}
+.campus-result-line small{font-size:12px;color:var(--muted)}
+.campus-consequence .campus-hero,.campus-completion .campus-hero{margin-top:24px;margin-bottom:24px}
+.campus-consequence .campus-clean-copy,.campus-completion .campus-clean-copy{max-width:340px}
+.campus-completion-stage{display:flex;flex-direction:column;align-items:center}
+.campus-completion .campus-stars{align-self:center;margin:0 auto 16px;font-size:27px;gap:8px}
+.campus-stars{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;color:var(--muted);font-size:18px;line-height:1}
+.campus-stars .earned{color:var(--accent,var(--lime))}
+.campus-entry-clean{display:flex;flex-direction:column;align-items:center;text-align:center;padding:13px 0 0;min-height:480px}
+.campus-entry-top{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:0 0 5px}.campus-entry-top>span{font-size:12px;line-height:1.4;color:var(--muted)}.campus-entry-top .campus-details-button{display:grid;place-items:center;width:44px;min-width:44px;height:44px;color:var(--muted);padding:10px}
+.campus-entry-clean>.eyebrow{font-size:12px;letter-spacing:.015em;color:var(--muted);margin:0 0 9px}
+.campus-entry-clean .campus-hero{width:205px;height:205px;margin:6px auto 23px}
+.campus-entry-clean .campus-clean-copy h1{font-size:28px;line-height:1.15;margin-bottom:10px}
+.campus-entry-clean .campus-clean-copy p{font-size:13px;max-width:280px;line-height:1.55}
+.campus-entry-clean>.button{min-height:53px;font-size:14px;width:100%;margin-top:24px;gap:8px}
+.campus-entry-links{display:flex;align-items:center;justify-content:center;gap:25px;width:100%;margin-top:4px}
+.campus-entry-links .campus-text-button{font-size:12px;min-height:44px;color:var(--muted)}
+.campus-entry-links .campus-text-button svg{width:14px;height:14px}
+.campus-entry-clean .campus-fine,.campus-clean-fine{font-size:12px;line-height:1.5;color:var(--muted);margin-top:5px}
+.campus-clean-unlock{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;width:fit-content;margin:8px auto 0;padding:9px 3px;font-size:12px;color:var(--accent,var(--lime))}
+.campus-map-intro{text-align:center;margin:0 auto 15px;max-width:330px}
+.campus-map-intro .campus-hero{width:112px;height:112px;margin:0 auto 13px}
+.campus-map-intro h1{font-size:27px;line-height:1.15;margin:0 0 7px}
+.campus-map-summary{font-size:12px;color:var(--muted);line-height:1.5;margin:8px 0 0;text-align:center}
+.campus-map-summary strong,.campus-map-summary b{font-weight:500;color:var(--accent,var(--lime))}
+.campus-trail{position:relative;width:100%;margin:8px 0 12px;padding:0}
+.campus-stop{position:relative;border-bottom:1px solid var(--line);padding:0}
+.campus-stop:first-child{border-top:1px solid var(--line)}
+.campus-path-dot{display:none}
+.campus-mission-node{display:flex;align-items:center;gap:12px;width:100%;min-height:68px;padding:12px 0;border:0;border-radius:0;background:transparent;text-align:left}
+.campus-mission-node:disabled{opacity:.48}
+.campus-node-copy{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.campus-node-copy>small{font-size:12px;color:var(--muted);line-height:1.35}
+.campus-node-copy>strong{font-size:14px;font-weight:450;line-height:1.35}
+.campus-node-copy>span{font-size:12px;color:var(--muted);line-height:1.4}
+.campus-node-copy .campus-stars{font-size:14px}
+.campus-node-index{font-size:12px;line-height:1;width:22px;flex:0 0 22px;text-align:center;color:var(--muted)}
+.campus-node-arrow,.campus-mission-node>svg{color:var(--muted)}
+.campus-stop.next .campus-node-copy>strong,.campus-stop.next .campus-node-arrow,.campus-stop.next .campus-mission-node>svg{color:var(--accent,var(--lime))}
+.campus-chapter-unlock{font-size:12px;line-height:1.5;color:var(--accent,var(--lime));text-align:center;padding:7px 0 12px}
+.campus-chapter-unlock small{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+.campus-notice{font-size:12px;line-height:1.5;color:var(--muted);padding:12px 0;margin:0 0 12px}
+.campus-resume{width:100%;margin:10px 0 18px}
+.campus-resume .button{min-height:48px;font-size:13px}
+.campus-rewards-hero{text-align:center;margin:3px auto 18px}
+.campus-rewards-hero .campus-hero{width:160px;height:160px;margin:0 auto 20px}
+.campus-rewards-hero h1{font-size:28px;margin:0 0 9px}
+.campus-rewards-hero>p{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.campus-stars-total{display:inline-flex;color:var(--muted);font-size:12px;line-height:1.5;margin-top:12px}
+.campus-reward-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;width:100%;margin:0 0 16px}
+.campus-reward{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;min-height:137px;border:1px solid var(--line);border-radius:15px;background:transparent;padding:14px 10px;text-align:center}
+.campus-reward.equipped{border-color:var(--lime)}.campus-reward:disabled{opacity:.45}
+.campus-reward-art{position:relative;width:55px;height:55px;display:grid;place-items:center;color:var(--muted);isolation:isolate}
+.campus-reward-art>img{display:block;width:100%;height:100%;object-fit:contain}.campus-reward-art>i{position:absolute;right:-7px;top:-5px;font-size:19px;color:var(--accent,var(--lime));font-style:normal}
+.campus-reward strong{font-size:12px;line-height:1.3;font-weight:450}.campus-reward small{font-size:12px;line-height:1.4;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:4px}
+.campus-reward.equipped small{color:var(--accent,var(--lime))}
+.campus-missing{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;gap:15px}
+.campus-missing .campus-hero{margin:10px auto 8px}.campus-missing>p{font-size:13px;line-height:1.5;color:var(--muted);max-width:290px}.campus-missing .button{margin-top:7px}
+/* A selected look is the only ornament on Lux. */
+.campus-buddy[data-look="lime-trail"] .campus-lux:after{content:'';position:absolute;z-index:-1;inset:12px 0 0;border:1px solid color-mix(in srgb,var(--lime) 50%,transparent);border-radius:50%;transform:rotate(-12deg)}
+.campus-buddy[data-look="orbit-trail"] .campus-lux:after{content:'';position:absolute;z-index:-1;inset:12px -9px;border:1px solid color-mix(in srgb,var(--lime) 50%,transparent);border-radius:50%;transform:rotate(-25deg)}
+/* Extra game information belongs in the native detail sheet. */
+.campus-details-sheet h2{font-size:26px;line-height:1.15;letter-spacing:-.04em;margin-bottom:17px}
+.campus-details-sheet h3{font-size:14px;line-height:1.4;font-weight:500;margin:22px 0 10px}
+.campus-details-sheet p{font-size:13px;line-height:1.6;color:var(--muted);margin:0 0 15px}
+.campus-detail-row{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;min-height:44px;padding:12px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.45}
+.campus-detail-row>span:first-child{color:var(--muted)}.campus-detail-row>strong,.campus-detail-row>b{font-size:13px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.campus-details-actions{display:flex;flex-direction:column;gap:0;margin:14px 0 0}
+.campus-details-actions>button,.campus-details-sheet .campus-motion-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px;width:100%;padding:12px 0;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;font-size:13px;text-align:left;color:var(--text)}
+.campus-details-actions>button svg{color:var(--muted)}.campus-details-sheet .campus-motion-toggle{color:var(--muted);justify-content:flex-start}
+.campus-details-sheet .campus-motion-toggle[aria-pressed="true"]{color:var(--accent,var(--lime))}
+.campus-details-note{font-size:12px!important}.campus-details-tip{font-size:12px!important;color:var(--muted)}
+.campus-choice-notes,.campus-skill-notes{list-style:none;padding:0;margin:12px 0}.campus-choice-notes>li{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.45}.campus-choice-notes strong{font-weight:500}.campus-choice-notes span{font-size:12px;color:var(--muted)}.campus-skill-notes>li{font-size:12px;line-height:1.5;color:var(--muted);padding:5px 0}.campus-details-motion{margin-top:14px}
+.campus-details-sheet .campus-fine{font-size:12px;line-height:1.6;margin:15px 0 0}
+.campus-details-sheet .campus-skill-checks{display:flex;flex-direction:column;gap:9px;font-size:12px;line-height:1.45;margin:12px 0}
+.campus-skill-checks>div{display:flex;gap:8px;align-items:center;color:var(--muted)}.campus-skill-checks>div.earned{color:var(--text)}.campus-skill-checks>div>span{color:var(--accent,var(--lime))}
+/* Motion is finite, cancellable and never moves the surrounding information. */
+.campus-game-page button,.campus-game-entry button{touch-action:manipulation}
+.campus-game-page [data-motion],.campus-game-entry [data-motion]{backface-visibility:hidden}
+.campus-game-page [data-motion="lux"],.campus-game-entry [data-motion="lux"]{transform-origin:50% 85%}
+.campus-game-page [data-motion="choice"],.campus-game-entry [data-motion="choice"]{transform-origin:50% 50%}
+.campus-game-page [data-motion="number"]{display:inline-block;font-variant-numeric:tabular-nums;font:inherit}
+.campus-game-page [data-motion="star"],.campus-game-entry [data-motion="star"]{display:inline-block}
+.campus-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.campus-motion-particles{position:absolute;inset:0;z-index:8;overflow:hidden;pointer-events:none;border-radius:inherit;contain:layout paint}
+.campus-motion-particle{position:absolute;left:50%;top:25%;width:6px;height:9px;border-radius:2px;background:var(--lime);pointer-events:none;transform-origin:center}
+.campus-motion-particle:nth-child(3n){width:7px;height:7px;background:var(--purple);border-radius:50%}
+.campus-game-page .campus-motion-particles,.campus-game-entry .campus-motion-particles{display:none!important}
+.campus-motion-off,.campus-motion-paused{scroll-behavior:auto!important}
+.campus-motion-off *,.campus-motion-off *:before,.campus-motion-off *:after,.campus-motion-paused *,.campus-motion-paused *:before,.campus-motion-paused *:after{animation:none!important;transition:none!important}
+@media(max-width:360px){.campus-game-page{padding-left:19px;padding-right:19px}.campus-header{gap:6px}.campus-header>span{font-size:12px}.campus-header-actions{gap:3px}.campus-hero{width:172px;height:172px;margin-bottom:18px}.campus-clean-copy h1{font-size:27px}.campus-clean-copy>p{font-size:13px}.campus-choice{min-height:53px;padding:13px 14px;font-size:13px}.campus-wallet-pill{font-size:12px;padding:8px 10px}.campus-entry-clean .campus-hero{width:184px;height:184px}.campus-entry-clean .campus-clean-copy h1{font-size:26px}.campus-entry-links{gap:22px}.campus-rewards-hero .campus-hero{width:145px;height:145px}.campus-reward{min-height:126px}.campus-consequence .campus-hero,.campus-completion .campus-hero{margin-top:18px}}
+@media(max-height:740px){.campus-header{min-height:54px;margin-bottom:8px}.campus-hero{width:152px;height:152px;margin:0 auto 17px}.campus-clean-copy h1{font-size:27px;margin-bottom:9px}.campus-clean-copy>p{font-size:13px;line-height:1.45}.campus-wallet-pill{margin:11px auto 15px}.campus-choice{min-height:51px;padding:12px 14px}.campus-entry-clean{min-height:420px;padding-top:7px}.campus-entry-clean .campus-hero{width:172px;height:172px;margin-bottom:18px}.campus-entry-clean>.button{margin-top:19px}.campus-consequence .campus-hero,.campus-completion .campus-hero{margin-top:13px;margin-bottom:20px}.campus-footer{padding-top:15px}.campus-map-intro .campus-hero{width:90px;height:90px;margin-bottom:10px}.campus-rewards-hero .campus-hero{width:130px;height:130px;margin-bottom:15px}}
+@media(prefers-reduced-motion:reduce){.campus-game-page,.campus-game-entry,.campus-game-page *,.campus-game-entry *,.campus-game-page *:before,.campus-game-page *:after,.campus-game-entry *:before,.campus-game-entry *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.campus-motion-particles{display:none!important}}
+.learning-game-home .learning-home-tabs{gap:19px;justify-content:center;background:none;border-radius:0;padding:0;margin:0 0 7px}
+.learning-game-home .learning-home-tabs button{min-height:44px;padding:9px 3px;border-radius:0;border-bottom:2px solid transparent;background:none;font-size:12px;line-height:1.4;font-weight:450;color:var(--muted)}
+.learning-game-home .learning-home-tabs button.selected{background:none;border-bottom-color:var(--lime);color:var(--text)}
+.learning-game-welcome .learning-body{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.learning-game-welcome .learning-lux-hero{width:190px;height:190px;margin:8px auto 23px}
+.learning-game-welcome .learning-lux-hero img{width:100%;height:100%;object-fit:contain;display:block}
+.learning-game-welcome h1{font-size:31px;line-height:1.12;margin:8px 0 15px;max-width:310px}
+.learning-game-welcome .learning-intro{font-size:14px;line-height:1.5;max-width:280px;margin:0 auto}
+@media(max-height:740px){.learning-game-welcome .learning-lux-hero{width:150px;height:150px;margin:3px auto 18px}.learning-game-welcome h1{font-size:28px}}
+
+.campus-details-sheet .campus-details-progress{font-size:12px;line-height:1.4;color:var(--muted);margin:0 0 9px}
+.campus-moment-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--text);list-style:none;cursor:pointer}
+.campus-moment-details>summary::-webkit-details-marker{display:none}
+.campus-moment-details[open]>summary>svg{transform:rotate(90deg)}
+.campus-moment-details[open]{padding-bottom:10px}

@@ -1,0 +1,200 @@
+/* Ink + Lime light appearance. Shared layouts, journeys and branded artwork stay intact. */
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f3f4f1;
+  --surface:#ffffff;
+  --surface-2:#eceee8;
+  --line:#cdd0c8;
+  --text:#191a22;
+  --muted:#565963;
+  --accent:#191a22;
+  --panel:var(--surface);
+  --red:#b33c38;
+  --purple:#824498;
+  --blue:#286d9f;
+  --yellow:#876511;
+  --light-tint:#e8efcf;
+  --positive:#416b17;
+}
+[data-theme="light"] body{background:#e5e8e1}
+[data-theme="light"] .app::before{border-color:#25282108}
+[data-theme="light"] input[type="date"]{color-scheme:light}
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder{color:#73796b}
+[data-theme="light"] :is(button,a,input,select,textarea):focus-visible{outline-color:var(--accent)}
+[data-theme="light"] .tab{color:var(--muted)}
+[data-theme="light"] .tab.active{color:var(--text)}
+[data-theme="light"] :is(.row,.group-detail-line,.learning-record-list>div+div){border-color:var(--line)}
+[data-theme="light"] :is(.icon-button:hover,.row[data-action]:hover,.keypad button:hover){background:#25282107}
+[data-theme="light"] .row-icon{background:var(--surface-2)}
+[data-theme="light"] :is(.row-chevron,.back-button.labelled-back){color:var(--muted)}
+[data-theme="light"] .button.danger{background:#f8e9e6}
+[data-theme="light"] .bottom-action{background:linear-gradient(0deg,var(--bg) 85%,transparent)}
+[data-theme="light"] .page>.bottom-action{background:linear-gradient(0deg,var(--bg) 83%,transparent)}
+[data-theme="light"] :is(.progress,.setup-progress>span){background:var(--line)}
+[data-theme="light"] .notice{background:var(--light-tint);border-color:#cedbb1;color:#4e612e}
+[data-theme="light"] .chip.selected{background:var(--light-tint);border-color:var(--accent)}
+[data-theme="light"] :is(.avatar,.life-avatar){background:var(--light-tint)}
+[data-theme="light"] :is(.switch:not(.on),.life-toggle:not(.on)){background:#979f8b}
+[data-theme="light"] .sheet{background:var(--surface)}
+[data-theme="light"] .sheet-handle{background:#b4bca9}
+[data-theme="light"] .sheet .panel{background:var(--bg)}
+[data-theme="light"] .sheet .bottom-action{background:var(--surface)}
+[data-theme="light"] .menu-tile{background:var(--bg)}
+[data-theme="light"] .pin-display span{border-color:#8c957f}
+[data-theme="light"] :is(.box-card,.tour-demo){border-color:var(--line)}
+[data-theme="light"] .box-card-new{background:transparent;border-color:#acb59e}
+[data-theme="light"] .pool-card{background:var(--bg)}
+[data-theme="light"] :is(.review-summary .total-row,.group-payout-status){background:var(--surface-2)}
+[data-theme="light"] :is(.life-info-copy,.box-partner-explain,.chat-message.assistant){color:var(--text)}
+[data-theme="light"] :is(.welcome-copy p,.prototype-note,.balance-label,.balance-main .icon-button,.pause-copy,.service-back){color:var(--muted)}
+[data-theme="light"] :is(.home-insight,.chat-live-summary,.box-partner-pending-note,.bp-feedback){color:#4e612e;background:var(--light-tint)}
+[data-theme="light"] .bp-feedback.is-error{color:var(--red);background:#f8e9e6}
+[data-theme="light"] :is(.box-partner-demo,.bp-demo-note){color:var(--muted)}
+[data-theme="light"] .person-avatar.violet,
+[data-theme="light"] .person-avatar:not(.peach):not(.blue):not(.green){color:var(--purple)}
+[data-theme="light"] .person-avatar.peach{color:#a34c24}
+[data-theme="light"] .person-avatar.blue{color:var(--blue)}
+[data-theme="light"] .offline-banner{background:var(--surface-2);border-color:var(--line)}
+
+/* A. Ink + Lime: one dark anchor, a light everyday canvas. */
+[data-theme="light"] .wordmark{color:#191a22}
+[data-theme="light"] .profile-button{color:#191a22;border-color:#bfc3b9}
+[data-theme="light"] .tab{color:#62646d;font-weight:500}
+[data-theme="light"] .tab.active{color:#191a22;font-weight:700}
+[data-theme="light"] .home-ref-card{--accent:#d4f65a;--muted:#bfc1cd;--text:#f5f5f7;background:#191a22;border-color:#191a22;color:#f5f5f7;box-shadow:none}
+[data-theme="light"] .home-ref-card-heading>button{font-weight:600}
+[data-theme="light"] .home-ref-card-heading .home-ref-eye{color:#c7c9d3}
+[data-theme="light"] .home-ref-hero{color:#d4f65a;font-weight:650}
+[data-theme="light"] .home-ref-hint{color:#bfc1cd}
+[data-theme="light"] .home-ref-breakdown small{color:#bfc1cd}
+[data-theme="light"] .home-ref-breakdown strong{color:#f5f5f7;font-weight:600}
+[data-theme="light"] .home-ref-breakdown>div+div{border-color:#454650}
+[data-theme="light"] .home-ref-budget{color:#d4f65a;font-weight:600}
+[data-theme="light"] .home-ref-add{background:#ffffff;border:1px solid #bfc3b9;color:#191a22}
+[data-theme="light"] .home-ref-pay{background:#d4f65a;color:#191a22;border:1px solid #b3ce49}
+[data-theme="light"] .home-ref-insight{background:#e8efcf;border-color:#cbd7a5}
+[data-theme="light"] .home-ref-insight>svg:first-child{color:#191a22}
+[data-theme="light"] .home-ref-insight>span{color:#303326}
+[data-theme="light"] .home-ref-shortcuts{background:#fff;border-color:#cdd0c8}
+[data-theme="light"] .home-ref-shortcuts>button{font-weight:550}
+[data-theme="light"] .home-ref-shortcuts>button>svg:first-child{color:#191a22}
+[data-theme="light"] .home-ref-shortcuts>button+button{border-color:#cdd0c8}
+[data-theme="light"] .home-ref-latest-heading>span{color:#191a22;font-weight:650}
+[data-theme="light"] .home-ref-latest-heading>button{color:#40434c;font-weight:500}
+[data-theme="light"] .home-ref-transactions{background:#fff;border-color:#cdd0c8}
+[data-theme="light"] .home-ref-transaction-copy>strong{font-weight:600;color:#191a22}
+[data-theme="light"] .home-ref-transaction-copy>small{color:#565963}
+[data-theme="light"] .home-ref-transaction-amount{font-weight:600;color:#191a22}
+[data-theme="light"] .home-ref-transaction-icon{background:#eceee8}
+[data-theme="light"] .white-list .row-sub,
+[data-theme="light"] .white-list .muted,
+[data-theme="light"] .white-list .row-right small{color:var(--muted)}
+
+
+/* Dark olive fills keep the used portion distinct from light chart tracks. */
+[data-theme="light"] .insights-ref{--insights-accent:var(--accent);color:var(--text)}
+[data-theme="light"] .insights-ref-sheet{color:var(--text)}
+[data-theme="light"] :is(.insights-ref-month,.insights-ref-summary,.insights-ref-ring>div){background:var(--surface);border-color:var(--line)}
+[data-theme="light"] .insights-ref-ring{background:conic-gradient(#55691b var(--insights-progress),var(--line) 0)}
+[data-theme="light"] :is(.insights-ref-statistics,.insights-ref-statistics>div,.insights-ref-month-list button){border-color:var(--line)}
+[data-theme="light"] :is(.insights-ref-heading p,.insights-ref-spending>p:first-child,.insights-ref-comparison,.insights-ref-ring small,.insights-ref-statistics span,.insights-ref-plan-note,.insights-ref-category-top small,.insights-ref-empty,.insights-ref-sheet>p){color:var(--muted)}
+[data-theme="light"] .insights-ref-category-icon{background:var(--surface-2);color:var(--text)}
+[data-theme="light"] .insights-ref-bar{background:var(--line)}
+[data-theme="light"] .insights-ref-bar>span,
+[data-theme="light"] .insights-ref-sheet .insights-ref-bar>span{background:#55691b}
+[data-theme="light"] .insights-ref-noticed{background:var(--light-tint);border-color:#d1deb6}
+[data-theme="light"] .insights-ref-noticed>span{border-color:#bdcd9e}
+[data-theme="light"] .insights-ref-month-list button[aria-current]{background:var(--light-tint);color:var(--accent)}
+
+/* Signup, activation and the skippable introduction. */
+[data-theme="light"] :is(.onb-description,.onb-consent,.onb-selfie-progress>li,.onb-privacy-line,.onb-privacy-line>svg,.onb-verification-stages>li,.onb-verification-panel>.onb-result-note,.onb-verification-retry-note,.onb-chapter,.onb-card-memory){color:var(--muted)}
+[data-theme="light"] :is(.onb-progress>span,.activation-progress>span,.tour-dots button>span){background:var(--line)}
+[data-theme="light"] :is(.onb-footer,.activation-footer,.tour-essentials){border-color:var(--line)}
+[data-theme="light"] :is(.onb-field .onb-question-input,.activation-money>div,.service-money>div){border-color:#a9b39b}
+[data-theme="light"] :is(.onb-selfie-progress>li>span,.onb-verification-stages>li>span){border-color:var(--line)}
+[data-theme="light"] :is(.onb-selfie-progress>li.active,.onb-verification-stages>li.active){color:var(--text)}
+[data-theme="light"] :is(.onb-selfie-progress>li.done,.onb-verification-stages>li.done,.onb-verification-tag,.onb-returned-head small,.onb-name-preview,.onb-step-selfie .onb-selfie-count){color:var(--accent)}
+[data-theme="light"] .onb-account-note{background:var(--light-tint);color:#4e612e;border-color:#dce6c5}
+[data-theme="light"] .onb-verification-retry-note{background:var(--surface-2)}
+[data-theme="light"] .onb-verification-orb.failed{color:var(--yellow);background:#f5eedc;border-color:#dccb9a}
+[data-theme="light"] :is(.tour-skip,.tour-description,.tour-sample-label,.tour-demo-top,.tour-demo-number>span,.tour-essentials>div>span,.tour-saving-caption,.tour-back){color:var(--muted)}
+[data-theme="light"] .tour-demo-result{color:var(--accent)}
+[data-theme="light"] .tour-savings-track{background:var(--line)}
+[data-theme="light"] .tour-try:disabled{color:var(--accent);background:var(--light-tint)}
+
+/* Keep the camera stage legible over video in either appearance. */
+[data-theme="light"] .onb-camera-frame{--accent:var(--lime);--muted:#a7adad;color:#f5f5f7}
+
+/* Private Ask Lumo and human group chat retain their own message treatments. */
+[data-theme="light"] :is(.chat-home,.gc-home,.gc-lux-questions>button){color:var(--text)}
+[data-theme="light"] :is(.chat-page .chat-quick-actions button,.chat-page .chat-disclaimer,.chat-swipe-hint,.chat-disclaimer,.gc-date,.gc-message-meta>strong,.gc-message.is-mine .gc-message-meta>strong,.gc-message-time,.gc-empty small,.gc-local-note,.gc-lux-answer p){color:var(--muted)}
+[data-theme="light"] :is(.chat-page .chat-composer-wrap,.chat-composer,.gc-composer-wrap){border-color:var(--line)}
+[data-theme="light"] .chat-composer :is(input,textarea){border-color:var(--line)}
+[data-theme="light"] :is(.chat-page .chat-composer:focus-within,.gc-composer:focus-within){border-color:var(--accent)}
+[data-theme="light"] .chat-freshness.is-stale{color:var(--yellow)}
+[data-theme="light"] :is(.group-tabs>button.selected,.gc-simulation,.gc-date>span,.gc-message.is-removed .gc-bubble,.gc-reply-draft){background:var(--surface-2)}
+[data-theme="light"] .gc-quote{background:var(--surface-2);color:var(--muted);border-color:var(--accent)}
+[data-theme="light"] .gc-message.is-mine .gc-quote{background:#0000000b;color:#4b5234;border-color:#59643480}
+[data-theme="light"] .gc-message.is-mine .gc-message-time{color:#5d683e}
+[data-theme="light"] .gc-system{background:#f0f5e6;border-color:#d7e2c2}
+[data-theme="light"] .gc-system-label{color:var(--accent)}
+[data-theme="light"] .gc-system>strong{color:#44532f}
+[data-theme="light"] .gc-system.is-warning{background:#f8f2df;border-color:#e7d8ab}
+[data-theme="light"] .gc-message.is-failed .gc-bubble{background:#f8efe3;border-color:#ddb5aa}
+
+/* Money IQ keeps Lux and the lime rewards, with quieter text and pale cards. */
+[data-theme="light"] :is(.miq-source-pill,.miq-intro,.miq-context,.miq-progress,.miq-fine,.miq-details,.miq-insight-card .miq-eyebrow,.miq-insight-body,.miq-comparison-row>span:first-child,.miq-comparison-row>strong,.miq-reward){color:var(--muted)}
+[data-theme="light"] :is(.miq-option,.miq-insight-card,.miq-lesson){border-color:var(--line)}
+[data-theme="light"] :is(.miq-progress>div>span,.miq-comparison-track){background:var(--line)}
+[data-theme="light"] .miq-progress>div>span.miq-filled{background:var(--lime)}
+[data-theme="light"] .miq-comparison-track>i{background:#a2ac93}
+[data-theme="light"] .miq-comparison-current .miq-comparison-track>i{background:var(--lime)}
+[data-theme="light"] .miq-comparison-row.miq-comparison-current>strong{color:var(--accent)}
+[data-theme="light"] .miq-option.miq-selected{background:var(--light-tint);border-color:var(--accent)}
+[data-theme="light"] .miq-recovery-note{background:var(--light-tint);color:#4e612e;border-color:#d1deb6}
+[data-theme="light"] .miq-receipt{color:#68745d}
+[data-theme="light"] .miq-data-icon{color:#68745d;border-color:#8f9a82}
+[data-theme="light"] .miq-lux-art:after{background:#929e7e44}
+
+/* Preserve completed and current states after the neutral light tracks. */
+[data-theme="light"] :is(.setup-progress>span.done,.onb-progress>span.done,.activation-progress>span.done,.tour-dots button[aria-current="step"]>span){background:var(--lime)}
+[data-theme="light"] :is(.onb-selfie-progress>li.active>span,.onb-verification-stages>li.active>span){border-color:var(--accent)}
+[data-theme="light"] :is(.onb-selfie-progress>li.done>span,.onb-verification-stages>li.done>span){border-color:var(--lime)}
+[data-theme="light"] .celebration .button{color:var(--lime)}
+
+/* The live scanner, amber Pause, virtual cards and game scenery keep their artwork palettes. */
+[data-theme="light"] .qr-screen{--accent:var(--lime);--text:#f9faf8;--muted:#c3c6bf;--surface:#24252f;--surface-2:#2d2e38;--line:#474b42;--ink:#272831}
+[data-theme="light"] .lux-world-page{--accent:var(--lime);--bg:#191a22;--surface:#24252f;--surface-2:#2d2e38;--line:#34353f;--text:#f5f5f7;--muted:#999aa6;--red:#ff8c89;--yellow:#ecd76f;background:var(--bg);color:var(--text)}
+@media(min-width:600px){
+  [data-theme="light"] .app{border-color:#cbd1c2;box-shadow:0 24px 80px #35402522}
+}
+
+/* Financial direction and status keep their meaning on a neutral canvas. */
+[data-theme="light"] .success,
+[data-theme="light"] .activity-list .feed-positive,
+[data-theme="light"] .group-payout-status.success,
+[data-theme="light"] .group-payout-status.approved,
+[data-theme="light"] .account-recipient .recipient-found,
+[data-theme="light"] .home-ref-transaction-amount.is-incoming{color:var(--positive)}
+
+/* A warmer secondary canvas gives white surfaces and lime actions a clear role.
+   Home keeps its approved gradient and all of its existing theme values. */
+[data-theme="light"] .app[data-home=false]{
+  --bg:#eeefe7;
+  --surface:#ffffff;
+  --surface-2:#e2e6d9;
+  --line:#c3c9b8;
+  --text:#191c17;
+  --muted:#505749;
+  --accent:#20271a;
+  --light-tint:#e5edcc;
+}
+[data-theme="light"] .app[data-home=false] :is(.root-page-head h1,.payments-hub-heading h1,.section-label){color:var(--text)}
+[data-theme="light"] .app[data-home=false] :is(.payments-hub-tabs,.payments-topup-grid>button,.payments-everyday-bills){box-shadow:inset 0 0 0 1px #d7dccd}
+[data-theme="light"] .app[data-home=false] :is(.chip.selected,.planning-page .chip.selected){background:var(--light-tint);border-color:#6a7d35;color:var(--text);font-weight:600}
+[data-theme="light"] .app[data-home=false] .planning-page .progress-bar{background:#55691b}
+[data-theme="light"] .app[data-home=false] .activity-list .row-icon{background:var(--surface);border:1px solid #d7dccd}
+[data-theme="light"] .app[data-home=false] :is(.payments-hub-row-copy>strong,.activity-list .row-title){color:var(--text)}
+[data-theme="light"] .app[data-home=false] .payments-hub-tabs>button[aria-current=page]{box-shadow:inset 0 0 0 1px #a4bb46;color:#20271a}
+[data-theme="light"] .app[data-home=false] .planning-page .plan-tracker{border-bottom-color:var(--line)}

@@ -1,0 +1,4 @@
+.app>.offline-banner{flex:0 0 auto;position:relative;z-index:30;padding:9px 15px;background:#333126;border-bottom:1px solid #625b3d;color:#f3e3b2;font-size:12px;line-height:1.45;text-align:left;letter-spacing:0}
+.app>.offline-banner[hidden]{display:none}
+[data-theme="light"] .app>.offline-banner{background:#f7edce;color:#55431e;border-color:#ccb77e}
+@media(max-height:650px){.app>.offline-banner{padding:7px 13px;font-size:11px}}

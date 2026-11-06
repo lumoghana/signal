@@ -1,29 +1,41 @@
 # Lumo · Signal
 
-The current Lumo Signal prototype, with the original 2D Lumo avatar.
+The approved Lumo student prototype, exported from live version **53**. This replaces the older Signal application in this repository. The shipped `dist/` files match the approved live build byte for byte.
+
+## Run and test
+
+Serve `dist/` from an HTTP server for local development. Use HTTPS for a deployed app so camera and supported device authentication can work. App navigation remains at the root URL; no catch-all rewrite is needed.
+
+With a recent Node.js LTS release:
+
+```sh
+npm test
+node scripts/build-offline-shell.mjs
+```
+
+This is a buildless ES-module app. No dependency installation, server or environment variables are required. The offline-shell command updates only the public service-worker cache map. Saved customer records are never packaged or cached as public assets.
 
 ## Deploy to Vercel
 
-Import this repository into Vercel. The included `vercel.json` selects the Other preset, skips dependency installation, builds with `node scripts/build-release.cjs`, and publishes `dist/`.
+Import this repository and keep Root Directory at the repository root. `vercel.json` selects the Other preset, skips dependency installation, runs `node scripts/build-offline-shell.mjs`, and publishes `dist/`. Versionless assets are revalidated so new deployments do not retain stale screens.
 
-No npm packages, environment variables or server are required for this prototype. The build uses Node.js built-in modules. App navigation stays at the root URL, so no catch-all rewrite is required.
+## Included experience
 
-For a prebuilt-only deployment, serve the existing `dist/` folder and leave the build command empty instead.
+- Light and dark appearances, account-led Home and swipe-to-reveal activity.
+- Guided signup with real camera capture and simulated Ghana Card verification.
+- Lumo, MoMo, bank and campus payment journeys, top-ups, campus bills and Pause.
+- Dated budgets, Money Boxes, Savings Hacks and partner-protected boxes.
+- Group collections and local group-chat simulation with contribution and payout states.
+- IOUs, outside-money records, recovery, Insights, Ask Lux and Money IQ.
 
-## Verify a change
+## Prototype scope
 
-```sh
-node scripts/build-release.cjs
-node scripts/build-release.cjs --check
-node scripts/check-edition-parity.cjs --regression
-```
+Money, identity verification, SMS, bank/MoMo lookups and remote member communication are simulated. No real money moves and no bank, MoMo or NIA service is connected. Camera and supported device-authentication features use the browser's actual permission and capability checks.
 
-## Prototype data
+Demo progress is stored in each browser and origin. Existing records on the ChatGPT Site, or in the older Signal storage namespace, are not migrated into this build. Use demo credentials only. Never commit signing keys, private exports, credentials or customer records.
 
-This is an interactive prototype using browser-local sample records. Hosting it on Vercel does not connect live payment or bank services. Saved demo records belong to each browser and origin, so records on the ChatGPT Site do not automatically follow to a Vercel domain.
+## Provenance and verification
 
-## Source provenance
+`source-provenance.json` identifies the approved live version and source commit. `dist-sha256.json` lists the exact shipped asset hashes. The native Android application is delivered separately and is not part of this web repository.
 
-Exported from Signal version 15, source commit `e6d2bb5c6af65286bc400d85ddeca956c640d815`. Existing source, tests, live assets and text review history are included. Historical review screenshots are omitted from the download. The original Site hosting metadata is retained for test provenance; this repository's deployment target is Vercel. Do not publish this export back to the original ChatGPT Site.
-
-Start with `START-HERE.txt` for upload and deployment instructions. The historical development README is in `docs/SOURCE-README.md`.
+This is the GitHub/Vercel export. Do not push it to a Sites source remote or publish it through Sites.

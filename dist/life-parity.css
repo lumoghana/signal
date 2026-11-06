@@ -1,0 +1,58 @@
+/* The extended money journeys use the existing panel, type and accent system. */
+.recovery-cost{padding:18px 20px}.recovery-protect{display:flex;align-items:flex-start;gap:12px;line-height:1.45;cursor:pointer}.recovery-protect input{width:21px;height:21px;margin:3px 0 0;accent-color:var(--accent,#d6ff55);flex-shrink:0}.recovery-protect strong,.recovery-protect small{display:block}.recovery-protect small{color:var(--muted,#9899a7);font-size:12px;margin-top:4px}.recovery-cost>.field{margin-top:15px}.recovery-cost>.field[hidden]{display:none}.recovery-costs{gap:12px}.recovery-active .life-total{padding-top:14px}.recovery-active .life-total .amount-xl{margin:10px 0}.recovery-active .panel.life-padded .section-label{margin:0 0 14px}.outside-history{display:grid;gap:12px;max-height:55dvh;overflow:auto;margin-bottom:20px}.outside-history .panel p{margin:6px 0;font-size:13px}.onb-demo-control{font-size:12px;color:var(--muted,#9899a7);margin:14px 0}.onb-demo-control summary{cursor:pointer}.onb-demo-control .button{margin-top:10px;font-size:13px;min-height:44px}.iou-wizard select.input{color:inherit;max-width:100%}.iou-wizard .field small{color:var(--muted,#9899a7);font-size:12px;line-height:1.5}.recovery-active .life-note{font-size:12px}
+@media(max-width:360px){.recovery-cost{padding:15px}.recovery-active .large-question{font-size:30px}}
+
+/* Everyday records use open sections and a single primary action. */
+.life-page{font:inherit;font-size:15px;line-height:1.5;min-width:0}
+.life-page .large-question{font-size:34px;line-height:1.16;letter-spacing:-.035em;font-weight:650;margin:24px 0 14px}
+.life-page>p,.life-page .panel>p{font-size:14px;line-height:1.6}
+.life-page .life-total{padding:26px 30px 28px;font-weight:600;letter-spacing:-.035em}
+.life-page .life-total>.muted{font-size:14px;line-height:1.5;margin-bottom:12px;letter-spacing:0}
+.life-page .life-total .amount-xl{font-size:clamp(32px,9vw,44px);line-height:1.15;font-weight:650;letter-spacing:-.035em;overflow-wrap:anywhere;margin:8px 0}
+.life-page .life-total .icon-button{right:0;top:40px;min-width:44px;min-height:44px}
+.life-page .life-total p{font-size:14px;line-height:1.5;font-weight:400;letter-spacing:0}
+.life-page .section-label{font-size:20px;line-height:1.3;letter-spacing:-.02em;font-weight:600;margin-top:26px;margin-bottom:12px}
+.life-page .outside-section-head{margin:26px 0 12px;min-height:44px}
+.life-page .outside-section-head h2{font-size:22px;line-height:1.25;font-weight:600;letter-spacing:-.025em}
+.life-page .outside-section-head>span{font-size:15px;line-height:1.4}
+.life-page .outside-section-head .text-button{min-height:44px;min-width:44px;padding:8px 0}
+.life-page .row-title{font-size:15px;line-height:1.4}
+.life-page .row-sub{font-size:12px;line-height:1.6}
+.life-page .row-right{font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+.life-page .life-note,.life-page .outside-hero-note{font-size:12px;line-height:1.6;font-weight:400;letter-spacing:0}
+.life-page .notice{font-size:13px;line-height:1.6;gap:12px;padding:16px}
+.life-page .notice>svg{flex:none;margin-top:2px}
+.life-page .life-padded{padding:20px}
+.life-page .life-padded>h2{font-size:22px;line-height:1.3;letter-spacing:-.025em;font-weight:600}
+.life-page .stat>strong{font-size:26px;line-height:1.2;letter-spacing:-.025em;overflow-wrap:anywhere}
+.life-page .stat>.muted{font-size:13px;line-height:1.5}
+.life-page .life-tabs{margin:14px 0 8px;gap:8px}
+.life-page .life-tabs .chip{min-height:44px;font-size:14px;line-height:1.4}
+.life-page .inline-actions{gap:12px}
+.life-page .inline-actions>.button{min-height:46px;font-size:14px;line-height:1.4}
+.life-page .inline-actions>.button.secondary{background:transparent;border-color:var(--line)}
+.life-page .text-button{min-height:44px;line-height:1.4}
+.life-page .life-choice{min-height:88px;padding:16px 10px;border-radius:16px}
+.life-page .life-choice strong{font-size:26px;font-weight:600}
+.life-page .life-choice span{font-size:14px}
+.life-page .life-option strong{font-size:15px;line-height:1.4}
+.life-page .life-option small{font-size:12px;line-height:1.5}
+.recovery-active .panel.life-padded .section-label{font-size:14px;line-height:1.5;font-weight:550;letter-spacing:0}
+.recovery-active .panel.life-padded .section-label>span{font-size:14px}
+.recovery-protect{min-height:48px;align-items:flex-start;padding:6px 0}
+.recovery-protect strong{font-size:15px;line-height:1.4}
+.recovery-protect small{font-size:12px;line-height:1.6;margin-top:6px}
+.activity-page .section-label{font-size:24px;line-height:1.25;letter-spacing:-.025em;font-weight:600;margin-bottom:18px}
+.activity-page .section-label>button{font-size:14px;min-height:44px;display:flex;align-items:center;gap:5px}
+.activity-page .activity-tools{gap:10px;margin:12px 0 20px}
+.activity-page .activity-tools .chip{min-height:46px;font-size:14px}
+.activity-page .activity-tools input{font-size:15px;min-height:46px;border-radius:14px}
+.activity-page .chips{gap:8px;flex-wrap:wrap}
+.activity-page .chips .chip{min-height:44px;font-size:14px}
+.activity-page .feed-date{padding:16px 16px 10px;font-size:12px;letter-spacing:.04em;line-height:1.5}
+.activity-page .row-title{font-size:15px;line-height:1.4}
+.activity-page .row-sub{font-size:12px;line-height:1.6}
+.activity-page .row-right{font-size:15px;line-height:1.4}
+.activity-page .activity-snapshot{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;font-size:12px;line-height:1.6;margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.activity-page .activity-snapshot .text-button{font-size:13px;min-height:44px;padding:8px 0;color:var(--accent,var(--lime))}
+@media(max-width:360px){.life-page .large-question{font-size:32px}.life-page .outside-section-head h2{font-size:21px}.life-page .life-total{padding-left:26px;padding-right:26px}.life-page .life-padded{padding:18px}.life-page .inline-actions{flex-wrap:wrap}.life-page .inline-actions>.button{flex:1 1 120px}.life-page .row-right{font-size:14px}.activity-page .activity-tools{gap:8px}.activity-page .chips .chip{padding-left:12px;padding-right:12px}}

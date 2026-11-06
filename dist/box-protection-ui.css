@@ -1,0 +1,44 @@
+/* Protection requests follow the same clear hierarchy as account and payment sheets. */
+.box-protection-sheet .bp-heading{padding:4px 0 24px}
+.bp-symbol{display:none}
+.box-protection-sheet .eyebrow{font-size:12px;line-height:1.5}
+.box-protection-sheet h2{font-size:var(--ui-title,32px);line-height:1.15;letter-spacing:-.035em;margin:10px 0 18px}
+.bp-heading>p:not(.eyebrow),.bp-subtitle{font-size:15px;line-height:1.6;color:var(--muted)}
+.box-protection-sheet .form-stack{gap:20px}
+.box-protection-sheet .field>span{font-size:14px;line-height:1.5}
+.box-protection-sheet .input{font-size:16px;min-height:54px}
+.box-protection-sheet .button{margin-top:12px;min-height:50px;font-size:15px}
+.box-protection-sheet .form-stack .button{margin-top:0}
+.box-protection-sheet .button.secondary{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;justify-content:flex-start;color:var(--muted);box-shadow:none;padding:14px 0;min-height:48px;font-size:14px;text-align:left}
+.bp-note{font-size:14px;line-height:1.6;color:var(--muted);margin:22px 0}
+.bp-demo-note{font-size:12px;line-height:1.6;color:var(--muted);margin-top:24px;text-align:center}
+.bp-partner-card{display:flex;align-items:center;gap:14px;padding:20px 0;background:transparent;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0}
+.bp-person{width:44px;height:44px;flex:0 0 44px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--accent,var(--lime));font-size:20px}
+.bp-partner-card>div{min-width:0;flex:1;display:flex;flex-direction:column;gap:7px}
+.bp-partner-card strong{font-size:20px;line-height:1.3;font-weight:550;overflow-wrap:anywhere}
+.bp-partner-card span:not(.bp-person){color:var(--muted);font-size:14px}
+.bp-partner-card small{font-size:13px;color:var(--accent,var(--lime));line-height:1.5}
+.bp-partner-card>svg{color:var(--accent,var(--lime));flex-shrink:0}
+.bp-request-summary{padding:4px 0 24px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;margin:0 0 24px}
+.bp-request-summary>span{display:none}
+.bp-request-summary>strong{display:block;font-size:40px;line-height:1.2;letter-spacing:-.04em;font-weight:550;color:var(--accent,var(--lime));overflow-wrap:anywhere}
+.bp-request-summary>p{font-size:14px;line-height:1.6;color:var(--muted);margin-top:16px}
+.box-protection-sheet .bp-code-input{font-size:28px!important;letter-spacing:.18em;text-align:center;min-height:66px}
+.bp-role-label{color:var(--muted);font-size:12px;line-height:1.5;letter-spacing:0;margin-top:8px}
+.bp-partner-view{display:grid;grid-template-columns:1fr;gap:8px;background:transparent;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;padding:20px 0;margin:24px 0}
+.bp-partner-view>span{color:var(--muted);font-size:13px;line-height:1.5}
+.bp-partner-view>strong{font-size:20px;line-height:1.4;overflow-wrap:anywhere;margin-bottom:14px;font-weight:550}
+.bp-partner-view>strong:last-child{margin-bottom:0}
+.bp-code-card{padding:24px 16px;border:1px solid var(--line);background:var(--surface);border-radius:var(--ui-radius,18px);text-align:center;margin:24px 0}
+.bp-code-card>span{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
+.bp-code-card>strong{display:block;font-size:36px;letter-spacing:.18em;font-weight:550;color:var(--accent,var(--lime));margin:20px 0}
+.bp-code-card>small{display:block;font-size:12px;color:var(--muted);line-height:1.6}
+.bp-consent{display:flex;gap:13px;align-items:flex-start;font-size:14px;color:var(--muted);line-height:1.6;margin:24px 0;min-height:44px}
+.bp-consent input{width:22px;height:22px;min-height:22px;flex:0 0 22px;padding:0;margin:3px 0 0;accent-color:var(--lime)}
+.bp-feedback{padding:14px 16px;border-left:2px solid var(--accent,var(--lime));background:var(--surface);color:var(--text);font-size:14px;line-height:1.6;margin:20px 0}
+.bp-feedback.is-error{border-color:var(--red);color:var(--red)}
+.bp-error:empty{display:none}
+.bp-pending-invitation{padding:20px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;margin:20px 0;background:transparent}
+.bp-pending-invitation strong{font-size:15px;font-weight:550}
+.bp-pending-invitation p{font-size:14px;line-height:1.6;color:var(--muted);margin-top:10px}
+@media(max-width:350px){.bp-code-card>strong{font-size:32px;letter-spacing:.14em}.bp-partner-card{gap:11px}.bp-request-summary>strong{font-size:36px}}

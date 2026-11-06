@@ -1,0 +1,104 @@
+/* Shared interface language. Home keeps its approved account-led composition. */
+:root{
+  --ui-font:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
+  --ui-title:32px;--ui-section:22px;--ui-body:15px;--ui-label:14px;--ui-caption:12px;
+  --ui-radius:18px;--ui-control-radius:14px;--ui-control-height:52px;--radius:18px;
+}
+body,button,input,select,textarea{font-family:var(--ui-font)}
+button,input,select,textarea{font-synthesis:none}
+/* Readable everyday screens share a scale; the approved Home remains unchanged. */
+.app[data-home=false]{--ui-body:16px;--ui-caption:14px}
+.app[data-home=false] .activity-list .row{min-height:82px;padding:17px 20px;gap:12px}
+.app[data-home=false] .activity-list .row-title{font-size:17px;font-weight:550;line-height:1.35}
+.app[data-home=false] .activity-list .row-sub{font-size:14px;line-height:1.45}
+.app[data-home=false] .activity-list .row-right{font-size:17px;font-weight:550;max-width:43%;min-width:0;overflow-wrap:anywhere}
+.app[data-home=false] .activity-list .feed-date{font-size:13px;font-weight:550;padding:16px 20px 8px;letter-spacing:.05em}
+.app[data-home=false] .activity-tools input{font-size:16px;min-height:48px}
+.app[data-detail=true] #shell>.topbar{display:none}
+.app[data-detail=true] #view{padding-top:env(safe-area-inset-top)}
+.page{padding-left:20px;padding-right:20px}
+.page-head{min-height:60px;height:auto;margin:0 -8px 20px;gap:8px;padding:5px 0;font-size:var(--ui-label);font-weight:550;line-height:1.4}
+.page-head .head-action{max-width:110px;min-width:44px}
+.page-head .head-action button{font-size:var(--ui-label);min-height:44px;line-height:1.35}
+.page-head .back-button.labelled-back{font-size:13px;min-height:44px;max-width:104px}
+.page-head .eyebrow{font-size:var(--ui-caption);letter-spacing:.08em}
+.root-page-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 0 0;margin:0 0 22px;min-height:60px}
+.page .root-page-head h1{font-size:var(--ui-title);line-height:1.13;font-weight:600;letter-spacing:-.035em;margin:0}
+.root-page-head button{display:inline-flex;align-items:center;gap:5px;min-height:44px;font-size:var(--ui-label);color:var(--accent,var(--lime))}
+.page>.large-question,.page .large-question,.page>.page-title,.page>.life-big-question{font-size:var(--ui-title);line-height:1.13;letter-spacing:-.035em;font-weight:600;margin-top:16px;margin-bottom:20px;text-wrap:pretty}
+.page h1{font-weight:600;letter-spacing:-.035em;line-height:1.13}
+.page h2{font-size:var(--ui-section);line-height:1.25;letter-spacing:-.025em;font-weight:600}
+.page h3{font-size:18px;line-height:1.3;font-weight:550}
+.page p{line-height:1.5}
+.section-label{font-size:19px;font-weight:550;line-height:1.35;margin:26px 0 12px}
+.section-label button{font-size:var(--ui-label);min-height:44px;padding-top:10px;padding-bottom:10px}
+.button{min-height:var(--ui-control-height);border-radius:var(--ui-control-radius);padding:15px 18px;font-size:var(--ui-body);font-weight:550;line-height:1.35;gap:8px}
+.button.text{min-height:44px;padding:10px 12px}
+.bottom-action .button.ghost{background:transparent;border-color:transparent;min-height:44px;font-size:var(--ui-label)}
+.text-button{font-size:var(--ui-label);line-height:1.4;min-height:44px}
+.icon-button{width:44px;height:44px;min-width:44px;min-height:44px}
+.row{min-height:68px;padding:16px;gap:12px}
+.row-title{font-size:var(--ui-body);line-height:1.35;font-weight:500}
+.row-sub{font-size:var(--ui-caption);line-height:1.5}
+.row-right{font-size:var(--ui-body);line-height:1.35;font-variant-numeric:tabular-nums}
+.row-right small{font-size:var(--ui-caption);line-height:1.4}
+.row-icon{width:36px;height:36px;flex-basis:36px;border-radius:11px;font-size:22px}
+.panel{border-radius:var(--ui-radius)}
+.panel.padded{padding:18px}
+.white-list{background:var(--surface);color:var(--text)}
+.white-list .row{border-bottom-color:var(--line)}
+.white-list .row:hover{background:var(--surface-2)}
+.white-list .row-icon{background:var(--surface-2)}
+.white-list .row-sub,.white-list .muted,.white-list .row-right small,.white-list .row-chevron{color:var(--muted)}
+.white-list .accent{color:var(--accent,var(--lime))}
+.app[data-flow=false] .tab{font-size:12px}
+.field{font-size:var(--ui-label);line-height:1.4;gap:8px;margin-bottom:20px}
+.field .input,.field select,.field textarea{min-height:52px;border-radius:var(--ui-control-radius);font-size:16px;line-height:1.4;padding:14px 15px;letter-spacing:-.01em}
+.field textarea{min-height:104px}
+.error{font-size:13px;line-height:1.5}
+.notice{font-size:var(--ui-label);line-height:1.5;border-radius:var(--ui-control-radius);padding:16px}
+.chip{min-height:44px;font-size:var(--ui-label);line-height:1.35;padding:10px 15px}
+.empty{padding:32px 18px 26px;gap:15px}
+.empty h2{font-size:26px;line-height:1.15}
+.empty p{font-size:var(--ui-label);line-height:1.5}
+.empty .button{margin-top:10px}
+.sheet{background:var(--surface);color:var(--text);border-radius:24px 24px 0 0;padding-left:20px;padding-right:20px}
+.sheet-handle{width:40px}
+.sheet h2{font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-.025em;padding-right:36px;margin-top:12px;margin-bottom:16px}
+.sheet>p{font-size:var(--ui-label);line-height:1.5}
+.sheet .panel{background:var(--bg);border-radius:var(--ui-radius)}
+.sheet .row{padding:16px 2px}
+.sheet .field{font-size:var(--ui-label)}
+.sheet .button{font-size:var(--ui-body)}
+.sheet details>summary,.page details>summary{font-size:var(--ui-label);line-height:1.45;min-height:44px;cursor:pointer}
+.page details>summary::marker,.sheet details>summary::marker{color:var(--accent,var(--lime))}
+.pin-hint,.pool-hint,.target-note,.prototype-note,.appearance-hint,.group-step-label,.person,.life-status{font-size:var(--ui-caption);line-height:1.5}
+.eyebrow{font-size:var(--ui-caption);letter-spacing:.08em;line-height:1.4}
+.stat>span:first-child,.stat>.muted{font-size:var(--ui-caption);line-height:1.4}
+.stat strong{font-size:24px;font-weight:600;line-height:1.2}
+.amount,.amount-xl,.life-total,.box-amount{font-variant-numeric:tabular-nums}
+.app>.offline-banner{font-size:var(--ui-caption);line-height:1.45}
+.welcome-copy h1{font-size:44px;line-height:1.07;font-weight:600;letter-spacing:-.04em}
+.welcome-copy p{font-size:var(--ui-body);line-height:1.5}
+.celebration h1{font-size:38px;line-height:1.1;font-weight:600}
+.celebration p{font-size:var(--ui-body);line-height:1.5}
+.celebration .button{font-size:var(--ui-body);border-radius:var(--ui-control-radius)}
+.appearance-hint{font-size:var(--ui-caption);line-height:1.5}
+@media(min-width:650px){.app[data-flow=false] .page>.bottom-action{bottom:0}}
+@media(max-width:350px){
+  :root{--ui-title:30px}
+  .page{padding-left:17px;padding-right:17px}
+  .page-head{font-size:13px;gap:5px;grid-template-columns:minmax(44px,auto) minmax(0,1fr) minmax(44px,auto)}
+  .page-head .back-button.labelled-back{font-size:12px;max-width:88px}
+  .page-head .head-action button{font-size:13px}
+  .sheet{padding-left:17px;padding-right:17px}
+  .row{padding:15px 13px;gap:10px}
+  .row-right{font-size:14px}
+  .inline-actions{gap:8px}
+  .inline-actions .button{padding-left:10px;padding-right:10px;font-size:14px}
+  .welcome-copy h1{font-size:40px}
+  .app[data-home=false] .activity-list .row{padding-left:17px;padding-right:17px;gap:9px}
+  .app[data-home=false] .activity-list .row-title,.app[data-home=false] .activity-list .row-right{font-size:16px}
+  .app[data-home=false] .activity-list .row-icon{width:32px;height:32px;flex-basis:32px}
+}
+@media(prefers-reduced-motion:reduce){.page{animation:none}}

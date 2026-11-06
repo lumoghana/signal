@@ -1,0 +1,113 @@
+.account-recipient {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  color: var(--text);
+}
+.account-recipient .page-head { flex-shrink: 0; margin-bottom: 16px; }
+/* These actions follow the details inside #view, which already ends above the
+   main navigation. A fixed footer can cover a confirmed number on short phones. */
+.app[data-flow] .page.account-recipient > .recipient-footer {
+  position: static;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  width: 100%;
+}
+.app[data-flow] .page.account-recipient:has(> .recipient-footer) { padding-bottom: 0; }
+.account-recipient .recipient-main { flex: 1 0 auto; min-width: 0; padding: 10px 0 12px; }
+.account-recipient .recipient-step { font-size:12px; font-weight: 600; letter-spacing: .13em; line-height: 1.4; color: var(--accent,var(--lime)); margin: 0 0 12px; }
+.account-recipient h1 { font-size: 34px; font-weight: 650; letter-spacing: -.05em; line-height: 1.12; margin: 0; }
+.account-recipient .recipient-intro { color: var(--muted); font-size: 15px; line-height: 1.5; margin-top: 20px; max-width: 310px; }
+.account-recipient .recipient-form { margin-top: 38px; display: flex; flex-direction: column; gap: 20px; }
+.account-recipient .recipient-number-field,
+.account-recipient .recipient-bank-field { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.account-recipient .recipient-number-field > span,
+.account-recipient .recipient-bank-field > span { font-size: 14px; color: var(--muted); line-height: 1.4; }
+.account-recipient .recipient-number-field > div { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 68px; border: 1px solid var(--line); border-radius: 14px; padding: 0 15px; background: var(--surface); transition: border-color .15s; }
+.account-recipient .recipient-number-field > div:focus-within { border-color: var(--lime); }
+.account-recipient .recipient-number-field > div > svg { color: var(--accent,var(--lime)); }
+.account-recipient .recipient-number-field input { min-width: 0; min-height: 66px; padding: 12px 0; border: 0; background: transparent; border-radius: 0; font-size: 25px; font-variant-numeric: tabular-nums; letter-spacing: -.025em; outline: 0; }
+.account-recipient .recipient-number-field input::placeholder { font-size: 23px; }
+.account-recipient .recipient-number-field input[aria-invalid=true] { color: var(--red); }
+.account-recipient .recipient-bank-field select { min-height: 56px; font-size: 16px; border-radius: 14px; background: var(--surface); padding: 14px 15px; }
+.account-recipient .recipient-bank-field select[aria-invalid=true] { border-color: var(--red); }
+.account-recipient .recipient-demo { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; min-height: 44px; margin-top: -6px; padding: 7px 0; font-size: 14px; color: var(--accent,var(--lime)); text-align: left; }
+.account-recipient .recipient-feedback { display: flex; align-items: center; gap: 10px; min-height: 0; margin-top: 9px; color: var(--accent,var(--lime)); font-size: 14px; line-height: 1.5; }
+.account-recipient .recipient-feedback:has([data-recipient-status]:empty) { margin-top: 0; }
+.account-recipient .recipient-loading-dots { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.account-recipient .recipient-loading-dots[hidden] { display: none; }
+.account-recipient .recipient-loading-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--lime); animation: recipient-finding 1s ease-in-out infinite; }
+.account-recipient .recipient-loading-dots i:nth-child(2) { animation-delay: .15s; }
+.account-recipient .recipient-loading-dots i:nth-child(3) { animation-delay: .3s; }
+.account-recipient .recipient-error { color: var(--red); font-size: 14px; line-height: 1.45; margin: 12px 0 0; overflow-wrap: anywhere; }
+.account-recipient .recipient-error[hidden] { display: none; }
+.account-recipient > .recipient-footer { margin-top: auto; padding: 16px 0 max(18px, env(safe-area-inset-bottom)); background: var(--bg); flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+.account-recipient .recipient-footer .button { min-height: 55px; font-size: 16px; border-radius: 12px; }
+.account-recipient .recipient-demo-note { color: var(--muted); font-size:12px; line-height: 1.4; text-align: center; margin: 0; }
+.account-recipient .recipient-edit { min-height: 44px; font-size: 14px; color: var(--muted); align-self: center; padding: 10px 18px; }
+.account-recipient--confirm .recipient-main { padding-top: 6px; display: flex; flex-direction: column; }
+.account-recipient--confirm h1 { font-size: 32px; }
+.account-recipient .recipient-identity { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 24px 0 18px; padding: 10px 0 16px; border-radius: 0; background: transparent; min-width: 0; }
+.account-recipient .recipient-initials { width: 68px; height: 68px; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; background: var(--lime); color: var(--ink); font-size: 29px; font-weight: 600; letter-spacing: -.05em; }
+.account-recipient .recipient-initials > span { position: absolute; display: flex; align-items: center; justify-content: center; width: 25px; height: 25px; border-radius: 50%; bottom: 0; right: -1px; background: var(--surface); color: var(--accent,var(--lime)); border: 3px solid var(--surface); }
+.account-recipient .recipient-found { font-size:14px; line-height: 1.3; color: var(--accent,var(--lime)); margin-top: 15px; }
+.account-recipient .recipient-identity h2 { max-width: 100%; font-size: 26px; font-weight: 600; line-height: 1.15; letter-spacing: -.035em; margin: 7px 0 5px; overflow-wrap: anywhere; }
+.account-recipient .recipient-name-label { color: var(--muted); font-size:14px; line-height: 1.4; }
+.account-recipient .recipient-identity dl { width: 100%; display: grid; gap: 13px; margin: 22px 0 0; padding-top: 18px; border-top: 1px solid var(--line); text-align: left; }
+.account-recipient .recipient-identity dl > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-width: 0; }
+.account-recipient .recipient-identity dt { color: var(--muted); font-size:14px; flex-shrink: 0; line-height: 1.4; }
+.account-recipient .recipient-identity dd { color: var(--text); font-size: 16px; font-weight: 550; line-height: 1.4; text-align: right; margin: 0; min-width: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.account-recipient--confirm > .recipient-footer { gap: 4px; padding-top: 12px; }
+@keyframes recipient-finding { 0%, 65%, 100% { transform: translateY(0); opacity: .45; } 32% { transform: translateY(-4px); opacity: 1; } }
+@media (max-height: 760px) {
+  .account-recipient { padding-left: 20px; padding-right: 20px; }
+  .account-recipient .page-head { margin-bottom: 7px; }
+  .account-recipient .recipient-main { padding-top: 6px; padding-bottom: 6px; }
+  .account-recipient .recipient-step { margin-bottom: 9px; }
+  .account-recipient h1 { font-size: 32px; }
+  .account-recipient .recipient-intro { margin-top: 14px; font-size: 14px; line-height: 1.5; }
+  .account-recipient .recipient-form { margin-top: 25px; gap: 16px; }
+  .account-recipient .recipient-number-field,
+  .account-recipient .recipient-bank-field { gap: 8px; }
+  .account-recipient .recipient-number-field > div { min-height: 60px; padding: 0 13px; }
+  .account-recipient .recipient-number-field input { min-height: 58px; font-size: 23px; }
+  .account-recipient .recipient-number-field input::placeholder { font-size: 20px; }
+  .account-recipient .recipient-bank-field select { min-height: 52px; }
+  .account-recipient .recipient-demo { margin-top: -8px; }
+  .account-recipient .recipient-error { margin-top: 8px; font-size:14px; }
+  .account-recipient > .recipient-footer { padding-top: 12px; padding-bottom: max(14px, env(safe-area-inset-bottom)); gap: 9px; }
+  .account-recipient .recipient-footer .button { min-height: 52px; }
+  .account-recipient--confirm h1 { font-size: 34px; }
+  .account-recipient .recipient-identity { margin: 18px 0 12px; padding: 8px 0 14px; border-radius: 0; }
+  .account-recipient .recipient-initials { width: 66px; height: 66px; font-size: 25px; }
+  .account-recipient .recipient-found { margin-top: 12px; font-size:14px; }
+  .account-recipient .recipient-identity h2 { font-size: 24px; margin-top: 5px; }
+  .account-recipient .recipient-identity dl { margin-top: 16px; padding-top: 13px; gap: 10px; }
+  .account-recipient .recipient-identity dd { font-size: 16px; }
+  .account-recipient--confirm > .recipient-footer { gap: 1px; padding-top: 8px; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+}
+/* Keep lookup errors beside the two bank fields on shorter phones. */
+@media (max-height: 700px) {
+  .account-recipient--bank .recipient-main { padding-top: 3px; }
+  .account-recipient--bank .recipient-intro { margin-top: 10px; }
+  .account-recipient--bank .recipient-form { margin-top: 16px; gap: 12px; }
+  .account-recipient--bank .recipient-number-field,
+  .account-recipient--bank .recipient-bank-field { gap: 6px; }
+  .account-recipient--bank > .recipient-footer { padding-top: 8px; }
+}
+@media (max-width: 350px) {
+  .account-recipient { padding-left: 18px; padding-right: 18px; }
+  .account-recipient h1 { font-size: 34px; }
+  .account-recipient .recipient-number-field > div { gap: 10px; padding: 0 12px; }
+  .account-recipient .recipient-number-field input { font-size: 22px; }
+  .account-recipient .recipient-bank-field select { font-size: 16px; }
+  .account-recipient .recipient-identity dt { font-size:14px; }
+  .account-recipient .recipient-identity dd { font-size: 16px; }
+  .account-recipient .recipient-demo-note { font-size:12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-recipient *, .account-recipient *::before, .account-recipient *::after { animation: none !important; transition: none !important; }
+  .account-recipient .recipient-loading-dots i { opacity: 1; }
+}

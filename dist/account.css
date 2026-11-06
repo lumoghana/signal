@@ -1,0 +1,61 @@
+/* Account tools share the calm type and spacing of the everyday money pages. */
+.account-page{font:inherit;font-size:15px;line-height:1.5;min-width:0}
+.account-page h1{font-size:34px;line-height:1.15;letter-spacing:-.035em;font-weight:650;margin:24px 0 14px;overflow-wrap:anywhere}
+.account-page h2{font-size:22px;line-height:1.25;letter-spacing:-.025em;font-weight:600;margin:0 0 12px}
+.account-page p{font-size:14px;line-height:1.6;margin:12px 0}
+.account-page p.muted{color:var(--muted)}
+.account-page form{display:grid;gap:16px;margin:24px 0}
+.account-page form .field{margin:0}
+.account-page form .field>span{font-size:14px;line-height:1.4}
+.account-page .button{margin:8px 0;min-height:48px}
+.account-page .text-button{min-height:44px}
+.account-intro{text-align:center;padding:16px 0}
+.account-icon{color:var(--accent,var(--lime));display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:var(--surface);border:1px solid var(--line);border-radius:20px}
+.account-page p.account-local{font-size:12px;text-align:left;color:var(--muted);margin:28px 0 16px;padding-top:18px;border-top:1px solid var(--line)}
+.account-padded{padding:20px}
+.account-check{display:flex;gap:12px;align-items:flex-start;line-height:1.5;min-height:44px}
+.account-check input{width:22px;height:22px;min-height:22px;padding:0;margin:2px 0;flex:none;accent-color:var(--accent,var(--lime))}
+.account-check>span{min-width:0;font-size:14px}
+.account-check small{display:block;color:var(--muted);font-size:12px;line-height:1.6;margin-top:6px}
+.account-device{display:flex;align-items:flex-start;gap:14px;padding:18px;border-bottom:1px solid var(--line)}
+.account-device:last-child{border-bottom:0}
+.account-device>svg{flex:none;margin-top:2px}
+.account-device>div{flex:1;min-width:0}
+.account-device strong{font-size:15px;font-weight:600;overflow-wrap:anywhere}
+.account-page .account-device p{font-size:12px;line-height:1.5;margin:6px 0}
+.account-device>.text-button{padding:0 4px;flex-shrink:0}
+.account-linked{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;color:inherit;background:var(--surface);border:1px solid var(--line);min-height:48px}
+.account-linked strong{font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.account-linked span{font-size:12px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
+.account-timeline{list-style:none;padding:0;margin:20px 0}
+.account-timeline li{border-left:2px solid var(--line);padding:4px 0 18px 16px}
+.account-timeline small{color:var(--muted);font-size:12px;line-height:1.5}
+.account-timeline p{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0;font-size:14px}
+.account-simulation,.account-disclosure{border:1px solid var(--line);border-radius:16px;padding:0 16px;margin:20px 0;color:var(--text);font-size:14px;background:transparent}
+.account-simulation summary,.account-disclosure summary{display:list-item;min-height:52px;padding:15px 2px;font-size:14px;line-height:1.5;font-weight:550;cursor:pointer;touch-action:manipulation}
+.account-disclosure-body{padding:0 0 16px}
+.account-disclosure-body>p:first-child{margin-top:0}
+.account-disclosure-body>.row{padding-left:0;padding-right:0}
+.account-disclosure-body form{margin:8px 0 0}
+.account-page textarea{min-height:112px;resize:vertical}
+.account-biometric{text-align:center}
+.account-biometric .account-icon{margin:20px auto}
+.account-biometric .eyebrow{display:block;font-size:12px}
+.account-biometric h2{font-size:24px;line-height:1.2}
+.account-biometric p{font-size:14px;line-height:1.6}
+.persistence-page{padding-top:max(28px,env(safe-area-inset-top));min-height:100%;display:flex;flex-direction:column;justify-content:center}
+.persistence-page .account-icon{margin-bottom:16px}
+.persistence-page .button{margin:7px 0}
+.persistence-copy{width:100%;height:112px;font-size:13px}
+.offline-banner{font-size:12px;line-height:1.5;color:var(--muted);text-align:center;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.account-readonly-banner{margin:12px 20px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px;line-height:1.5;background:var(--surface)}
+.account-page .account-download-status{font-size:13px;line-height:1.5;color:var(--accent,var(--lime));margin:9px 0}
+.account-download-status:empty,[data-export-error]:empty{display:none}
+.account-page input[type=date]{cursor:pointer}
+.account-statement-date{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--text);text-align:left;font-size:16px;font-family:inherit}
+.account-statement-date>span{min-width:0;overflow-wrap:anywhere}
+.account-page .row-title{font-size:15px;line-height:1.4}
+.account-page .row-sub{font-size:12px;line-height:1.6}
+@media(max-width:360px){.account-page h1{font-size:32px}.account-page h2{font-size:21px}.account-device{padding:16px 14px;gap:10px}.account-padded{padding:18px}.account-simulation,.account-disclosure{padding-left:14px;padding-right:14px}}
+
+.account-page [hidden]{display:none!important}

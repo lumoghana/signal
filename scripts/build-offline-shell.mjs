@@ -1,0 +1,11 @@
+import {readdir,readFile,writeFile} from 'node:fs/promises';
+import {join,relative} from 'node:path';
+import {createHash} from 'node:crypto';
+const root=new URL('../dist/',import.meta.url).pathname;
+const allowed=/\.(?:html|js|css|svg|webmanifest|woff2?|png|webp|jpe?g)$/i;
+async function walk(path){const result=[];for(const entry of await readdir(path,{withFileTypes:true})){const full=join(path,entry.name);if(entry.isDirectory())result.push(...await walk(full));else if(allowed.test(entry.name)&&entry.name!=='sw.js')result.push(full);}return result;}
+const files=(await walk(root)).sort(),assets=['/',...files.filter(p=>!p.endsWith('/index.html')).map(p=>'/'+relative(root,p))];
+const digest=createHash('sha256');for(const path of files)digest.update(await readFile(path));
+const source=`/* Public app shell only. Customer records, uploads, financial responses and URL queries are never cached. */\nconst CACHE='lumo-public-shell-${digest.digest('hex').slice(0,12)}';\nconst ASSETS=${JSON.stringify(assets)};\nconst PATHS=new Set(ASSETS);\nself.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));});\nself.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('lumo-public-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});\nself.addEventListener('fetch',event=>{const request=event.request,url=new URL(request.url);if(request.method!=='GET'||url.origin!==self.location.origin)return;if(request.mode==='navigate'){event.respondWith(fetch(request,{cache:'no-store'}).catch(async()=>{const shell=await caches.match('/');return shell||new Response('Lumo is offline. Reconnect to load the app once.',{status:503,headers:{'Content-Type':'text/plain'}});}));return;}if(!PATHS.has(url.pathname)||url.search)return;event.respondWith(caches.open(CACHE).then(async cache=>{try{const response=await fetch(request,{cache:'no-cache'});if(response.ok)await cache.put(url.pathname,response.clone());return response;}catch{return await cache.match(url.pathname)||new Response('Public asset unavailable offline',{status:503});}}));});\n`;
+await writeFile(join(root,'sw.js'),source);
+console.log(`Prepared public offline shell: ${assets.length} assets. No saved customer state included.`);

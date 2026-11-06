@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "product": "Lumo",
+  "repository": "lumoghana/signal",
+  "approved_live_url": "https://lumo-new-experience.oness15.chatgpt.site/",
+  "site_version": 53,
+  "source_commit": "16610ba64dee49dcbfe9b3853eb197c15eb21232",
+  "source_date": "2026-11-06",
+  "export_target": "GitHub / Vercel",
+  "static_directory": "dist",
+  "asset_manifest": "dist-sha256.json",
+  "shipped_dist": "Byte-exact copy of the approved source commit. No application behavior changed during export.",
+  "prototype_boundary": "Local sample money and participant/provider simulation; no live bank, MoMo or NIA connection.",
+  "android": "Delivered separately; no Android binaries or signing material included.",
+  "validation": {
+    "automated_tests": {
+      "passed": 1117,
+      "failed": 0
+    },
+    "approved_dist_file_count": 127,
+    "approved_dist_byte_parity": true,
+    "offline_rebuild_preserved_dist": true
+  }
+}

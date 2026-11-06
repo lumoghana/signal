@@ -1,0 +1,48 @@
+/* Menu-only refinement. The approved Home composition stays untouched. */
+.lumo-menu.menu-refined{color:var(--text);padding-bottom:4px}
+.lumo-menu.menu-refined .menu-title-row{min-height:44px;align-items:center;margin-bottom:12px}
+.lumo-menu.menu-refined .menu-title-row h2{margin:0;padding:0;font-size:24px;line-height:1.2}
+.lumo-menu.menu-refined .menu-intro{display:flex;align-items:center;gap:12px;padding:0 0 18px;margin:0 0 18px}
+.lumo-menu.menu-refined .menu-intro .avatar{width:40px;height:40px;min-width:40px;font-size:18px}
+.lumo-menu.menu-refined .menu-intro>div{min-width:0}
+.lumo-menu.menu-refined .menu-intro strong{display:block;font-size:18px;line-height:1.3;font-weight:600;overflow-wrap:anywhere}
+.lumo-menu.menu-refined .menu-intro p{font-size:14px;line-height:1.4;margin-top:4px;color:var(--muted)}
+.menu-refined .menu-section{margin-bottom:18px}
+.menu-refined .menu-section-heading{font-size:14px;line-height:1.4;font-weight:600;letter-spacing:0;color:var(--muted);margin:0 0 9px}
+.lumo-menu.menu-refined .menu-groups-entry{min-height:70px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.lumo-menu.menu-refined .menu-groups-entry .row-title{font-weight:600}
+.lumo-menu.menu-refined .row-sub{font-size:14px;line-height:1.4}
+.menu-refined .menu-tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:8px}
+.lumo-menu.menu-refined .menu-tool-grid .row{display:flex;align-items:center;gap:9px;min-height:68px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.lumo-menu.menu-refined .menu-tool-grid .row-title{font-size:15px;line-height:1.35;font-weight:550;overflow-wrap:normal}
+.lumo-menu.menu-refined .menu-tool-grid .row-icon{width:25px;flex-basis:25px;height:30px}
+.menu-refined .menu-tool-grid .row-chevron{display:none}
+.menu-refined .menu-disclosure{border-bottom:1px solid var(--line)}
+.menu-refined .menu-disclosure>summary{display:flex;align-items:center;gap:12px;list-style:none;min-height:54px;padding:12px 0;font-size:16px;line-height:1.4;font-weight:500;cursor:pointer}
+.menu-refined .menu-disclosure>summary::-webkit-details-marker{display:none}
+.menu-refined .menu-disclosure>summary>span{flex:1;min-width:0}
+.menu-refined .menu-disclosure>summary>svg:last-child{color:var(--muted);transition:transform .16s ease}
+.menu-refined .menu-disclosure[open]>summary>svg:last-child{transform:rotate(90deg)}
+.menu-refined .menu-disclosure>summary:focus-visible{outline:2px solid var(--accent,var(--lime));outline-offset:2px;border-radius:8px}
+.menu-refined .menu-disclosure-content{padding:0 0 8px 8px}
+.lumo-menu.menu-refined .menu-disclosure-content .row{min-height:54px;padding:11px 0;border-bottom-color:var(--line)}
+.lumo-menu.menu-refined .menu-disclosure-content .row-title{font-size:16px;line-height:1.35}
+.lumo-menu.menu-refined .menu-disclosure-content .row-icon{width:26px;flex-basis:26px}
+.menu-refined .menu-appearance-entry{margin-top:2px;border-bottom:1px solid var(--line)}
+.lumo-menu.menu-refined .menu-appearance-entry .row{min-height:60px;padding:10px 0;gap:12px}
+.lumo-menu.menu-refined .menu-appearance-entry .row-copy{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
+.lumo-menu.menu-refined .menu-appearance-entry .row-sub{font-size:14px}
+.lumo-menu.menu-refined .menu-appearance-entry .row-icon{width:21px;flex-basis:21px}
+.menu-refined .menu-account-disclosure{border-bottom:0}
+@media(max-width:350px){
+  .lumo-menu.menu-refined .menu-tool-grid .row{padding:10px;gap:7px}
+  .lumo-menu.menu-refined .menu-tool-grid .row-title{font-size:14px}
+  .menu-refined .menu-tool-grid{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){.menu-refined .menu-disclosure>summary>svg:last-child{transition:none}}
+
+.about-experience>p{font-size:16px;line-height:1.5;color:var(--muted)}
+.about-experience dl{margin:24px 0}
+.about-experience dl>div{padding:16px 0;border-top:1px solid var(--line)}
+.about-experience dt{font-size:16px;line-height:1.4;font-weight:600}
+.about-experience dd{margin:6px 0 0;font-size:14px;line-height:1.5;color:var(--muted)}

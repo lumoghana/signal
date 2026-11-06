@@ -1,0 +1,15 @@
+/* Appearance controls use the same accessible sheet as the rest of Lumo. */
+.appearance-sheet{padding:10px 22px max(23px,env(safe-area-inset-bottom));border-radius:26px 26px 0 0}
+.appearance-picker h2{font-size:21px;font-weight:600;line-height:1.2;margin:11px 0 24px;padding:0 37px 19px 0;border-bottom:1px solid var(--line)}
+.appearance-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0;border:0;margin:0;min-width:0}
+.appearance-choice{position:relative;min-width:0;cursor:pointer}
+.appearance-choice input{position:absolute;opacity:0;inset:0;margin:0;min-height:0;padding:0;width:100%;height:100%;cursor:pointer}
+.appearance-choice-face{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;min-height:143px;padding:17px 7px;border-radius:20px;background:var(--bg);border:2px solid transparent;color:var(--muted);transition:border-color .18s,color .18s,background .18s}
+.appearance-choice-face>span{font-size:14px;font-weight:550;color:var(--text)}
+.appearance-choice-face>i{position:absolute;right:7px;top:7px;width:17px;height:17px;display:grid;place-items:center;background:var(--lime);color:#252a13;border-radius:50%;opacity:0}
+.appearance-choice input:checked+.appearance-choice-face{border-color:var(--accent,var(--lime));color:var(--text);background:var(--surface)}
+.appearance-choice input:checked+.appearance-choice-face>i{opacity:1}
+.appearance-choice input:focus-visible+.appearance-choice-face{outline:2px solid var(--accent,var(--lime));outline-offset:4px}
+.appearance-hint{min-height:18px;text-align:center;font-size:11px;line-height:1.5;color:var(--muted);margin:19px 0 0}
+@media(max-width:350px){.appearance-sheet{padding-left:18px;padding-right:18px}.appearance-options{gap:8px}.appearance-choice-face{min-height:126px;gap:13px;border-radius:17px}.appearance-choice-face>span{font-size:13px}.appearance-choice-face>svg{width:36px;height:36px}}
+@media(prefers-reduced-motion:reduce){.appearance-choice-face{transition:none}}

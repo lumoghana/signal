@@ -1,51 +1,30 @@
-LUMO SIGNAL - UPLOAD AND DEPLOY
+LUMO SIGNAL · APPROVED BUILD 53
 
-This package contains Signal version 15 with the original 2D Lumo avatar,
-the complete application source, build scripts, tests and live website assets.
+The repository root is the application source. dist/ contains the ready-to-serve web app; package.json, scripts/ and tests/ belong beside it.
 
-1. EXTRACT THIS ZIP
-   Open the extracted lumo-signal folder. README.md, vercel.json, config/,
-   scripts/ and dist/ belong directly in your GitHub repository root.
-   Keep all folder names and paths intact.
+VERIFY
+  npm test
+  node scripts/build-offline-shell.mjs
 
-2. UPLOAD TO GITHUB
-   Recommended: use GitHub Desktop, especially for this many files.
-   - Sign in to GitHub Desktop.
-   - Clone your lumoghana/signal repository to your computer.
-   - Copy the CONTENTS of the extracted lumo-signal folder into that clone.
-     If asked about an existing README, use the README from this package.
-   - Commit the changes, then click Push origin.
+DEPLOY TO VERCEL
+  Root Directory: repository root
+  Framework: Other
+  Install command: empty
+  Build command: node scripts/build-offline-shell.mjs
+  Output directory: dist
 
-   Browser alternative: open your repository, choose Add file > Upload files,
-   and upload the extracted files/folders in batches of up to 100 files.
-   Preserve subfolders. Commit each batch and upload all batches before Deploy.
-   Individual files in this package are below GitHub's browser file-size limit.
+No environment variables or live provider connections are required. Deploy over HTTPS for camera and supported device features. No catch-all rewrite is required.
 
-3. DEPLOY ON VERCEL
-   - Sign in to Vercel.
-   - Choose Add New > Project and import your GitHub repository.
-   - Keep Root Directory at the repository root.
-   - vercel.json already selects these settings:
-       Framework: Other
-       Build command: node scripts/build-release.cjs
-       Install command: empty (no dependencies required)
-       Output directory: dist
-   - Click Deploy.
+CHECK THE DEPLOYMENT
+  Choose Take a look around or complete simulated signup.
+  Check Home in Light and Dark, Payments, Plan, Money Boxes, Groups and Ask Lux.
+  Verify that the recipient's name and number are clear before continuing.
 
-   If Vercel asks for the settings manually, use the values above.
-   No environment variables are required for this prototype.
+IMPORTANT
+  This is a prototype. No real money moves. Group participants, provider outcomes and identity verification are simulated. Saved records are local to the browser and origin. The older Signal storage namespace is not imported.
 
-4. QUICK CHECK AFTER DEPLOYING
-   - Open Home, Pay, Money Boxes, Money Story and Ask Lumo.
-   - Check the original 2D avatar and balance privacy toggle.
-   - Walk through signup and the sample Pause; no live money moves.
+  The native Android application is delivered separately. No APK or signing material belongs in this web export.
 
-NOTES
-   This is the interactive prototype, using browser-local sample records.
-   Existing browser records on the ChatGPT Site do not automatically move to
-   a Vercel domain. No credentials or saved personal browser records are included.
-   Historical review screenshots are omitted; application assets are included.
+  This export targets GitHub/Vercel only. Do not deploy it through Sites or push it into a Sites source repository.
 
-REFERENCE
-   https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository
-   https://vercel.com/docs/builds/configure-a-build
+Read README.md, source-provenance.json and dist-sha256.json for the approved source and verification details.

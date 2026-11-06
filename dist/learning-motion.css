@@ -1,0 +1,41 @@
+/* Motion for Lux stories and practice. Money records remain ordinary text. */
+.learning-motion-scope{position:relative;isolation:isolate}
+.learning-page .head-action{display:flex;align-items:center;justify-content:flex-end;gap:3px;max-width:104px}
+.learning-motion-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;min-width:44px;height:44px;min-height:44px;padding:10px;border:0;background:transparent;color:var(--accent,var(--lime));border-radius:50%}
+.learning-motion-toggle svg{width:18px;height:18px}
+.learning-motion-toggle.is-off,.learning-motion-toggle[aria-pressed="false"]{color:var(--muted)}
+.learning-motion-toggle:focus-visible{outline:1px solid var(--lime);outline-offset:-3px}
+.learning-motion-scope [data-motion]{backface-visibility:hidden;animation:none!important}
+.learning-motion-scope [data-motion="hero"],.learning-motion-scope [data-motion="lux"]{transform-origin:50% 85%}
+.learning-motion-scope button{touch-action:manipulation}
+.learning-motion-scope .learning-chat-bubble{transform-origin:20% 100%}
+.learning-motion-scope .learning-chat-bubble.from-lux{transform-origin:0 100%}
+.learning-motion-scope .learning-scene-stage{isolation:isolate}
+.learning-motion-scope .learning-scene-stage:after{content:'';position:absolute;left:20%;right:16%;bottom:20px;height:7px;border-radius:50%;background:color-mix(in srgb,var(--lime) 6%,transparent);z-index:-1;pointer-events:none}
+.learning-motion-scope .learning-scene-emoji,.learning-motion-scope .learning-scene-lux,.learning-motion-scope .learning-celebration>div,.learning-motion-scope .learning-feature-scene>i{animation:none}
+.learning-motion-scope .learning-celebration:after{content:'';position:absolute;width:205px;height:205px;border:1px dashed color-mix(in srgb,var(--lime) 18%,transparent);border-radius:50%;z-index:0;pointer-events:none}
+.learning-motion-scope .learning-feature{overflow:hidden;isolation:isolate}
+.learning-motion-scope .learning-feature:after{content:'';position:absolute;right:-35px;top:-40px;width:130px;height:130px;border:1px dashed color-mix(in srgb,var(--ink) 17%,transparent);border-radius:50%;pointer-events:none;z-index:0}
+.learning-motion-scope .learning-options [data-motion="choice"],.learning-motion-scope .learning-reflections [data-motion="choice"]{transform-origin:50% 50%}
+.learning-motion-scope .learning-beats>span{position:relative;overflow:hidden}
+.learning-motion-scope .learning-beats>span.filled:after{content:'';position:absolute;inset:0;background:var(--lime);transform-origin:left;pointer-events:none}
+.learning-motion-scope .learning-chat-reply>svg,.learning-motion-scope .learning-feature-cta>svg,.learning-motion-scope .learning-route>svg{transition:translate .18s ease}
+.learning-motion-scope .learning-chat-reply:hover>svg,.learning-motion-scope .learning-feature:hover .learning-feature-cta>svg,.learning-motion-scope .learning-route:hover>svg{translate:3px 0}
+@media(prefers-reduced-motion:no-preference){
+ .learning-motion-scope:not(.campus-motion-off):not(.campus-motion-paused) .learning-scene-emoji:not([data-motion]){animation:learning-scene-sway 3.2s ease-in-out 1}
+ .learning-motion-scope:not(.campus-motion-off):not(.campus-motion-paused) .learning-scene-lux:not([data-motion])>img{animation:learning-lux-breathe 3.6s ease-in-out 1}
+ .learning-motion-scope:not(.campus-motion-off):not(.campus-motion-paused) .learning-celebration:after{animation:learning-orbit-settle 1.5s cubic-bezier(.2,.8,.2,1) 1}
+ .learning-motion-scope:not(.campus-motion-off):not(.campus-motion-paused) .learning-celebration>span{animation:learning-spark-settle .75s ease-out 1}
+ .learning-motion-scope:not(.campus-motion-off):not(.campus-motion-paused) .learning-feature:after{animation:learning-orbit-settle 2.5s cubic-bezier(.2,.8,.2,1) 1}
+ .learning-motion-scope:not(.campus-motion-off):not(.campus-motion-paused) .learning-beats>span.filled:after{animation:learning-beat-fill .5s cubic-bezier(.2,.8,.2,1) 1}
+}
+@keyframes learning-scene-sway{0%,100%{translate:0 0;rotate:0deg}25%{translate:0 -5px;rotate:-5deg}65%{translate:0 2px;rotate:3deg}}
+@keyframes learning-lux-breathe{0%,100%{translate:0 0;scale:1}30%{translate:0 -5px;scale:1.025}70%{translate:0 1px;scale:.99}}
+@keyframes learning-orbit-settle{from{rotate:-45deg;scale:.85}to{rotate:0deg;scale:1}}
+@keyframes learning-spark-settle{0%{scale:.5;rotate:-25deg}60%{scale:1.15;rotate:5deg}100%{scale:1;rotate:0deg}}
+@keyframes learning-beat-fill{from{scale:0 1}to{scale:1 1}}
+.learning-motion-scope.campus-motion-off *,.learning-motion-scope.campus-motion-off *:before,.learning-motion-scope.campus-motion-off *:after,.learning-motion-scope.campus-motion-paused *,.learning-motion-scope.campus-motion-paused *:before,.learning-motion-scope.campus-motion-paused *:after{animation:none!important;transition:none!important}
+.learning-motion-scope.campus-motion-off .learning-option:hover,.learning-motion-scope.campus-motion-paused .learning-option:hover{transform:none;translate:none}
+@media(prefers-reduced-motion:reduce){.learning-motion-scope,.learning-motion-scope *,.learning-motion-scope *:before,.learning-motion-scope *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.learning-motion-scope .learning-option:hover{transform:none;translate:none}}
+
+.learning-motion-toggle[hidden]{display:none!important}

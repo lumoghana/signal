@@ -1,8 +1,0 @@
-{
-  "routes": 120,
-  "fixtures": 204,
-  "layouts": 1020,
-  "horizontalOverflowFindings": [],
-  "sizes": ["360x640", "390x844", "412x915", "320x640", "320x640 at 150% root font size"],
-  "note": "Settled static geometry with actual shipped styles; live user journeys checked separately."
-}

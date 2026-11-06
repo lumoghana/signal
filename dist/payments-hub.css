@@ -1,0 +1,109 @@
+/* Clear balance, payment methods first, supporting tools together. */
+.payments-hub{padding:18px 20px 24px;min-height:100%;min-width:0;color:var(--text);animation:page-in .2s ease both}
+.payments-hub [hidden]{display:none!important}
+.payments-hub button,.payments-hub summary,.payments-hub input{font:inherit}
+.payments-hub button:focus-visible,.payments-hub summary:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+.payments-hub-heading h1{font-size:var(--ui-title,32px);font-weight:600;line-height:1.2;letter-spacing:-.045em;margin:0}
+.payments-hub-balance{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:21px 0 23px;color:var(--muted);font-size:14px;line-height:1.4}
+.payments-hub-balance strong{font-size:34px;line-height:1.15;letter-spacing:-.045em;color:var(--accent,var(--lime));font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;max-width:100%}
+.payments-hub-tabs{display:flex;gap:3px;padding:4px;border-radius:14px;background:var(--surface);margin-bottom:16px;min-height:52px}
+.payments-hub-tabs>button{flex:1;min-width:0;min-height:44px;padding:8px 5px;border-radius:10px;font-size:14px;line-height:1.3;font-weight:550;color:var(--muted)}
+.payments-hub-tabs>button[aria-current=page]{color:var(--ink);background:var(--lime)}
+.payments-hub-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 18px}
+.payments-hub-shortcuts>button{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;min-height:44px;padding:9px 6px;font-size:14px;font-weight:500;color:var(--muted)}
+.payments-hub-shortcuts>button:hover{background:var(--surface);color:var(--text)}
+.payments-hub-row{width:100%;min-height:64px;display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);text-align:left}
+.payments-hub-row>svg{color:var(--muted);margin-left:auto;flex-shrink:0}
+.payments-hub-icon{flex:0 0 41px;width:41px;height:41px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text);font-size:23px}
+.payments-hub-row-copy{min-width:0;display:flex;flex-direction:column;gap:4px;flex:1}
+.payments-hub-row-copy>strong{font-size:17px;font-weight:550;line-height:1.3;letter-spacing:-.025em}
+.payments-hub-row-copy>small{font-size:14px;line-height:1.4;color:var(--muted)}
+.payments-hub-rails{border-radius:0;background:transparent;padding:0}
+.payments-hub-rails .payments-hub-row{min-height:64px;gap:13px}
+.payments-hub-rails .payments-hub-row:last-child{border-bottom:0}
+.payments-hub-rails .payments-hub-icon{background:none;width:30px;height:38px;flex-basis:30px;border-radius:0;color:var(--accent,var(--lime))}
+.payments-hub-tools{display:grid;grid-template-columns:1fr 1fr;border-radius:0;background:transparent;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.payments-hub-tools>button{display:flex;align-items:center;gap:9px;min-width:0;min-height:54px;padding:11px 13px;font-size:14px;font-weight:500;text-align:left;line-height:1.35}
+.payments-hub-tools>button:nth-child(odd){border-right:1px solid var(--line)}
+.payments-hub-tools>button:nth-child(-n+2){border-bottom:1px solid var(--line)}
+.payments-hub-tools>button>span{flex:1;min-width:0}
+.payments-hub-tools>button>svg{flex-shrink:0;color:var(--muted)}
+.payments-hub-tools>button>svg:last-child{width:12px}
+.payments-hub-resume{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;color:var(--accent,var(--lime));min-height:44px;margin:-7px 0 14px;font-size:14px;text-align:left;border-bottom:1px solid var(--line)}
+.payments-hub-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:17px 0 8px;min-height:18px}
+.payments-hub-section-title h2{font-size:20px;font-weight:600;line-height:1.3;letter-spacing:-.02em;margin:0}
+.payments-hub-section-title>small{font-size:14px;line-height:1.35;color:var(--muted);text-align:right}
+.payments-hub-services .payments-hub-row:last-child{border-bottom:0}
+.campus-quick-pay{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.campus-quick-pay>button{display:flex;align-items:center;gap:9px;min-width:0;min-height:78px;border-radius:15px;padding:13px 12px;text-align:left}
+.campus-scan-now{color:var(--ink);background:var(--lime)}
+.campus-scan-now>span{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.campus-scan-now strong{font-size:16px;font-weight:650;line-height:1.15}
+.campus-scan-now small{font-size:14px;line-height:1.35}
+.campus-scan-now>svg:last-child{margin-left:auto}
+.campus-enter-code{background:var(--surface);border:1px solid var(--line);color:var(--text)}
+.campus-enter-code>span{font-size:14px;font-weight:550;line-height:1.35;min-width:0}
+.campus-enter-code>svg:first-child{color:var(--accent,var(--lime))}
+.campus-enter-code>svg:last-child{display:none}
+.campus-merchant-search{display:flex;align-items:center;min-width:0;min-height:48px;gap:10px;border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:0 12px;color:var(--muted)}
+.campus-merchant-search:focus-within{border-color:var(--lime)}
+.campus-merchant-search input{min-width:0;flex:1;width:100%;min-height:46px;padding:9px 0;border:0;background:none;font-size:16px;letter-spacing:-.025em;border-radius:0;outline:0}
+.campus-merchant-search input::-webkit-search-cancel-button{display:none}
+.campus-merchant-search>button{width:44px;min-width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:0;margin-right:-11px;color:var(--muted)}
+.campus-merchant-results .payments-hub-row{min-height:69px}
+.campus-search-empty{padding:24px 0 17px;text-align:center}
+.campus-search-empty>strong{display:block;font-size:17px;font-weight:550;line-height:1.3}
+.campus-search-empty p{font-size:14px;line-height:1.5;color:var(--muted);margin:9px auto 0;max-width:260px}
+.payments-topup-heading{margin-top:0}
+.payments-topup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.payments-topup-grid>button{display:flex;align-items:center;gap:10px;min-width:0;min-height:79px;padding:13px 11px;border-radius:15px;background:var(--surface);text-align:left}
+.payments-topup-symbol{font-size:26px;line-height:1;flex-shrink:0}
+.payments-topup-grid>button>span:not(.payments-topup-symbol){display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.payments-topup-grid strong{font-size:16px;font-weight:600;line-height:1.25;letter-spacing:-.03em}
+.payments-topup-grid small{font-size:14px;color:var(--muted);line-height:1.35}
+.payments-topup-grid>button>svg{color:var(--muted);margin-left:auto}
+.payments-campus-bills-heading{margin-top:19px;margin-bottom:4px}
+.campus-bills-services .payments-hub-row{min-height:62px;padding:9px 0}
+.payments-everyday-bills{margin-top:16px;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:var(--surface)}
+.payments-everyday-bills>summary{list-style:none;cursor:pointer;min-height:65px;display:flex;align-items:center;gap:11px;padding:11px 13px}
+.payments-everyday-bills>summary::-webkit-details-marker{display:none}
+.payments-utility-symbol{display:flex;align-items:center;justify-content:center;width:35px;height:35px;flex:0 0 35px;color:var(--accent,var(--lime))}
+.payments-everyday-bills>summary>span:nth-child(2){display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.payments-everyday-bills>summary strong{font-size:16px;font-weight:550;line-height:1.3}
+.payments-everyday-bills>summary small{font-size:14px;color:var(--muted);line-height:1.35}
+.payments-everyday-bills>summary>svg{color:var(--muted);transition:transform .16s}
+.payments-everyday-bills[open]>summary>svg{transform:rotate(90deg)}
+.payments-everyday-bills>.payments-hub-services{padding:0 13px 4px;border-top:1px solid var(--line)}
+.payments-everyday-bills .payments-hub-icon{background:var(--bg)}
+@media(max-width:350px){
+ .payments-hub{padding-left:17px;padding-right:17px}
+ .payments-hub-tabs>button{font-size:14px;padding-left:3px;padding-right:3px}
+ .payments-hub-heading h1{font-size:var(--ui-title,32px)}
+ .payments-hub-tools>button{padding-left:10px;padding-right:10px;gap:7px}
+ .payments-hub-tools>button>svg:last-child{display:none}
+ .campus-quick-pay{gap:8px}
+ .campus-quick-pay>button{gap:7px;padding-left:10px;padding-right:10px}
+ .campus-scan-now>svg:last-child{display:none}
+ .campus-enter-code>span{font-size:14px}
+ .payments-topup-grid{gap:8px}
+ .payments-topup-grid>button{gap:7px;padding-left:9px;padding-right:9px}
+ .payments-topup-symbol{font-size:23px}
+ .payments-topup-grid strong{font-size:15px}
+ .payments-topup-grid>button>svg{display:none}
+ .payments-hub-section-title>small{font-size:14px}
+}
+@media(max-height:760px){
+ .payments-hub{padding-top:14px;padding-bottom:20px}
+ .payments-hub-balance{margin-top:17px;margin-bottom:19px}
+ .payments-hub-tabs{margin-bottom:12px}
+ .campus-quick-pay{margin-bottom:12px}
+ .campus-quick-pay>button{min-height:64px;padding-top:10px;padding-bottom:10px}
+ .campus-merchant-results .payments-hub-row{min-height:60px;padding-top:8px;padding-bottom:8px}
+ .payments-topup-grid>button{min-height:72px;padding-top:10px;padding-bottom:10px}
+ .payments-campus-bills-heading{margin-top:15px;margin-bottom:3px}
+ .campus-bills-services .payments-hub-row{min-height:58px;padding-top:8px;padding-bottom:8px}
+ .payments-everyday-bills{margin-top:11px}
+}
+@media(prefers-reduced-motion:reduce){.payments-hub{animation:none}.payments-hub *{transition:none!important}}
+/* Keep the amount as the decision; personal planning controls are optional. */
+.pay-amount .balance-hint{font-size:14px;line-height:1.6;margin-bottom:30px}.payment-optional-details{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:26px 0 16px}.payment-optional-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;min-height:62px;font-size:14px}.payment-optional-details>summary::-webkit-details-marker{display:none}.payment-optional-details>summary small{display:inline-block;color:var(--muted);font-size:14px;margin-left:8px}.payment-optional-details>summary>svg{color:var(--muted);transition:transform .2s}.payment-optional-details[open]>summary>svg{transform:rotate(90deg)}.payment-optional-content{padding:0 0 18px}.payment-optional-content .section-label{margin-top:9px}.payment-optional-content .category-chips{flex-wrap:wrap;gap:8px;margin:16px 0 22px}.payment-optional-content .field{margin-bottom:18px}.payment-remember-choice{display:flex;align-items:flex-start;gap:12px;font-size:14px;line-height:1.5;cursor:pointer;min-height:44px}.payment-remember-choice input[type=checkbox]{appearance:auto;width:20px;height:20px;min-height:20px;flex:0 0 20px;margin:0;accent-color:var(--accent,var(--lime))}.payment-note-control{max-width:100%;overflow-wrap:anywhere;text-align:left;line-height:1.5}.pay-amount .money-entry{margin-top:44px;margin-bottom:16px}
