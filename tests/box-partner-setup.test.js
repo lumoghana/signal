@@ -32,6 +32,16 @@ test('accountability partner is a visible optional fifth-stage setup choice, wit
   assert.match(html,/Accountability partner/);assert.match(html,/Step 4 of 5/);assert.match(html,/Save with a little backup/);
   assert.match(html,/fresh code for each move back to Everyday/);assert.match(html,/confirm with your PIN/);
   assert.match(html,/No SMS or message is sent/);assert.match(html,/Not now/);
+  assert.match(html,/This is still your money\. Your partner cannot spend it/);
+  assert.match(html,/<details[^>]*><summary>If your partner is unavailable/);
+  assert.match(html,/Toll-free number to be confirmed/);
+  assert.match(html,/relationship changes|urgent access/);
+  assert.match(html,/verify your identity and record a review/);
+  assert.match(html,/accountability partner controls/);
+  assert.match(html,/current partner or verified Lumo support must approve/);
+  assert.match(html,/Once they accept/);
+  assert.ok(html.indexOf('Toll-free number to be confirmed') < html.indexOf('data-action="p:box-partner-toggle"'), 'recovery guidance is available before the optional partner is enabled');
+  assert.doesNotMatch(html,/href="tel:/);
   assert.doesNotMatch(html,/name="box-partner-phone"/);
   const before=JSON.stringify(ctx.state);renderPlanning(ctx,createRoute('partner'));assert.equal(JSON.stringify(ctx.state),before);
 });

@@ -13,6 +13,14 @@
 .activation-optional{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:22px 0}.activation-optional>summary{min-height:52px;cursor:pointer;font-size:14px;line-height:1.5;color:var(--text);padding:14px 0}.activation-optional>summary>span{font-size:12px;color:var(--muted);margin-left:8px}.activation-optional .activation-money{margin:12px 0}.activation-optional .activation-money input{font-size:28px}
 .activation-win{display:flex;align-items:center;justify-content:center;padding:8px 0 24px;color:var(--accent,var(--lime))}.activation-win>svg{width:64px;height:64px;padding:16px;border-radius:50%;background:var(--surface)}.activation-win>span{display:none}.activation-summary{margin:0;border-top:1px solid var(--line)}.activation-summary>div{display:flex;justify-content:space-between;gap:16px;align-items:center;border-bottom:1px solid var(--line);padding:18px 0;font-size:14px;line-height:1.5}.activation-summary dt{color:var(--muted)}.activation-summary dd{margin:0;font-size:20px;font-weight:500;letter-spacing:-.025em}.activation-summary>div:last-child dd{color:var(--accent,var(--lime));font-size:24px;font-weight:600}
 .activation-error{font-size:14px;line-height:1.5;margin:14px 0 0}.activation-error:empty{display:none}.activation-footer{flex:0 0 auto;padding:12px 24px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:stretch;gap:4px;background:var(--bg);border-top:1px solid var(--line)}.activation-footer>.button{min-height:52px;font-size:15px}.activation-footer>small{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;margin-top:4px}.activation-defer{align-self:center;min-height:44px}
+.activation-funding-phone{margin:16px 0}.activation-funding-phone>.input{margin-top:8px;min-height:48px}
+.activation-funding-idle .activation-main{padding-top:16px}.activation-funding-idle .activation-main h1{margin-top:14px;margin-bottom:10px}.activation-funding-idle .activation-description{margin-bottom:20px}.activation-funding-idle .activation-sources{margin-bottom:18px}.activation-funding-idle .activation-money{margin-top:20px;margin-bottom:12px}.activation-funding-idle .activation-money>span{margin-bottom:8px}.activation-funding-idle .activation-presets{margin-bottom:16px}
+.activation-funding-amount{margin:8px 0 24px}.activation-funding-amount>strong{display:block;font-size:2.375rem;font-weight:550;line-height:1.2;letter-spacing:-.045em;color:var(--text);overflow-wrap:anywhere}.activation-funding-amount>span{display:block;font-size:.875rem;line-height:1.5;color:var(--muted);margin-top:8px;overflow-wrap:anywhere}
+.activation-funding-watch{display:flex;align-items:center;gap:10px;font-size:.875rem;line-height:1.5;color:var(--text);margin:20px 0 8px}.activation-funding-spinner{width:18px;height:18px;flex:none;border:2px solid var(--line);border-top-color:var(--accent,var(--lime));border-radius:50%;animation:activation-funding-spin 1s linear infinite}.activation-funding-check-note{font-size:.8125rem;line-height:1.55;color:var(--muted);margin:0}
+.activation-transfer-details{margin:0 0 18px;border-top:1px solid var(--line)}.activation-transfer-details>div{padding:12px 0;border-bottom:1px solid var(--line)}.activation-transfer-details dt{color:var(--muted);font-size:.75rem;line-height:1.5;margin-bottom:4px}.activation-transfer-details dd{margin:0;color:var(--text);font-size:.9375rem;line-height:1.5;overflow-wrap:anywhere}.activation-transfer-number{display:flex;align-items:center;justify-content:space-between;gap:12px}.activation-transfer-number output{min-width:0;font-variant-numeric:tabular-nums;letter-spacing:.035em;user-select:all;overflow-wrap:anywhere}.activation-transfer-number button{min-height:44px;min-width:44px;color:var(--accent,var(--lime));font-size:.8125rem}.activation-transfer-reference{font-variant-numeric:tabular-nums;letter-spacing:.035em;user-select:all}
+.activation-provider-demo{margin:22px 0 0;border-top:1px solid var(--line);font-size:.75rem;line-height:1.5;color:var(--muted)}.activation-provider-demo summary{min-height:44px;padding:13px 0;color:var(--muted)}.activation-provider-demo p{margin:0 0 12px}.activation-provider-demo [data-activation-demo-feedback]:empty{display:none}.activation-provider-demo>div{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.activation-provider-demo button{min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;color:var(--text);text-align:left}.activation-funding-confirmed{display:flex;align-items:center;gap:8px;color:var(--accent,var(--lime));font-size:.875rem;line-height:1.5}
+@keyframes activation-funding-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.activation-funding-spinner{animation:none}}
 @media(max-width:350px){.activation-main,.activation-footer{padding-left:20px;padding-right:20px}.activation-progress{margin-left:20px;margin-right:20px}.activation-main h1{font-size:32px}.activation-sources>button{flex-direction:column;gap:7px;font-size:14px}.activation-categories{gap:8px}.activation-plan-list>div{gap:8px}.activation-summary dd{font-size:18px}.activation-summary>div:last-child dd{font-size:22px}}
 @media(max-height:740px){.activation-main{padding-top:18px}.activation-main h1{margin-top:18px}.activation-footer{padding-bottom:max(14px,env(safe-area-inset-bottom))}.activation-win{padding-bottom:20px}}
 /* A brief arrival and a small acknowledgement, never a wait before moving on. */
@@ -29,3 +37,53 @@
 @keyframes activation-win-in{0%{opacity:0;transform:scale(.7) rotate(-8deg)}65%{opacity:1;transform:scale(1.06) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes activation-choice-in{from{transform:scale(.97)}to{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.activation-page *{animation:none!important;transition:none!important}}
+
+/* The account milestone is an arrival, before the first funding choice. */
+.activation-page.activation-step-account-created{--bg:#d4f65a;--surface:#d4f65a;--text:#111218;--muted:#111218;--line:#11121834;--accent:#111218;--lime:#d4f65a;position:relative;isolation:isolate;min-height:100%;height:auto;max-height:none;overflow:hidden;padding:max(20px,env(safe-area-inset-top)) 28px max(22px,env(safe-area-inset-bottom));background:#d4f65a;color:#111218;color-scheme:light}
+.activation-step-account-created .activation-arrival-confetti{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+.activation-step-account-created>header,.activation-step-account-created>main,.activation-step-account-created>footer{position:relative;z-index:1}
+.activation-step-account-created .activation-arrival-header{display:flex;justify-content:space-between;align-items:center;min-height:44px;flex:none;gap:12px}
+.activation-step-account-created .activation-arrival-wordmark{font-size:1.6875rem;line-height:1;font-weight:760;letter-spacing:-.075em;color:#111218}
+.activation-step-account-created .activation-arrival-header .icon-button{color:#111218;margin-right:-10px}
+.activation-step-account-created .activation-arrival-header .icon-button:hover{background:#1112180c}
+.activation-step-account-created .activation-arrival-story{flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;padding:32px 0 25px}
+.activation-step-account-created .activation-arrival-greeting{font-size:.9375rem;line-height:1.45;font-weight:500;margin:0 0 16px;color:#111218;overflow-wrap:anywhere}
+.activation-step-account-created .activation-arrival-story h1{font-size:4rem;line-height:.98;letter-spacing:-.065em;font-weight:660;margin:0;color:#111218;overflow-wrap:anywhere}
+.activation-step-account-created .activation-arrival-story h1>span{display:block;color:#111218}
+.activation-step-account-created .activation-arrival-promise{font-size:.9375rem;line-height:1.45;font-weight:450;letter-spacing:-.015em;margin:19px 0 0;color:#111218;max-width:26em}
+.activation-step-account-created .activation-arrival-footer{flex:none;margin-top:auto;padding:0;border:0;background:transparent;display:block;color:#111218}
+.activation-step-account-created .activation-arrival-account{border-top:1px solid #11121834;padding:14px 0 21px;min-width:0}
+.activation-step-account-created .activation-arrival-account-label{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:5px 12px;font-size:.75rem;line-height:1.4;font-weight:650;margin:0;color:#111218}
+.activation-step-account-created .activation-arrival-account-label>span{font-size:.75rem;font-weight:450;color:#111218}
+.activation-step-account-created .activation-account-number-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:44px}
+.activation-step-account-created .activation-account-number{display:block;min-width:0;flex:1;font-size:1.0625rem;line-height:1.4;font-weight:560;letter-spacing:.035em;font-variant-numeric:tabular-nums;color:#111218;overflow-wrap:anywhere;word-break:break-all;user-select:all}
+.activation-step-account-created .activation-account-number:focus{outline:2px solid #111218;outline-offset:3px;border-radius:4px}
+.activation-step-account-created .activation-copy-number{width:44px;min-width:44px;height:44px;min-height:44px;display:grid;place-items:center;border:0;background:transparent;color:#111218;padding:0;margin-right:-10px;flex:none}
+.activation-step-account-created .activation-copy-number:disabled{opacity:.55}
+.activation-step-account-created .activation-account-unavailable{font-size:1rem;line-height:1.45;color:#111218;overflow-wrap:anywhere}
+.activation-step-account-created .activation-arrival-bank{font-size:.75rem;line-height:1.5;font-weight:450;margin:0;color:#111218;overflow-wrap:anywhere}
+.activation-step-account-created .activation-copy-feedback{font-size:.75rem;line-height:1.5;margin:10px 0 0;color:#111218;overflow-wrap:anywhere}
+.activation-step-account-created .activation-copy-feedback:empty{display:none}
+.activation-step-account-created .activation-arrival-footer>.button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:54px;padding:15px 19px;border:0;border-radius:16px;background:#111218;color:#d4f65a;font-size:.875rem;line-height:1.4;font-weight:600;text-align:left;white-space:normal}
+.activation-step-account-created .activation-arrival-footer>.button>span{color:#d4f65a}
+.activation-step-account-created .activation-arrival-footer>.button:disabled{opacity:.55}
+.activation-step-account-created .activation-account-demo-boundary{font-size:.75rem;line-height:1.45;font-weight:450;text-align:center;margin:11px 0 0;color:#111218;overflow-wrap:anywhere}
+.activation-step-account-created .activation-error{color:#7b1725;margin:0 0 12px}
+@media(max-width:350px){
+  .activation-page.activation-step-account-created{padding-left:24px;padding-right:24px}
+  .activation-step-account-created .activation-arrival-story h1{font-size:3.1875rem}
+  .activation-step-account-created .activation-arrival-story{padding:26px 0 23px}
+  .activation-step-account-created .activation-arrival-account{padding-top:12px;padding-bottom:17px}
+}
+@media(max-height:700px){
+  .activation-page.activation-step-account-created{padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))}
+  .activation-step-account-created .activation-arrival-story{padding-top:22px;padding-bottom:20px}
+  .activation-step-account-created .activation-arrival-story h1{font-size:3.1875rem}
+}
+@media(max-height:620px){
+  .activation-step-account-created .activation-arrival-story{padding-top:15px;padding-bottom:17px}
+  .activation-step-account-created .activation-arrival-greeting{margin-bottom:12px}
+  .activation-step-account-created .activation-arrival-story h1{font-size:2.75rem}
+  .activation-step-account-created .activation-arrival-promise{margin-top:15px}
+  .activation-step-account-created .activation-arrival-account{padding-bottom:15px}
+}

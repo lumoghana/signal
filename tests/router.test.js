@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouter } from '../dist/js/router.js';
 import { routeKey, sectionForRoute, parentRoute, safeRoute } from '../dist/js/navigation.js';
+import { confirmFunding } from './helpers/activation-funding.js';
 
 const home = { section: 'home', page: 'home' };
 const groups = { section: 'life', page: 'groups' };
@@ -292,6 +293,7 @@ test('rebasing signup at current Settings keeps external history outside its fin
 
   const signupSuffix = [
     { section: 'welcome' },
+    { section: 'terms' },
     { section: 'onboarding', step: 'name' },
     { section: 'onboarding', step: 'phone' },
     { section: 'onboarding', step: 'code' },
@@ -314,18 +316,22 @@ test('rebasing signup at current Settings keeps external history outside its fin
   assert.equal(h.pointer, prefix.length + 1);
 });
 
-test('finishing first funding and budget removes activation pages from native history', async () => {
+test('finishing account creation, funding and budget removes activation pages from native history', async () => {
   const { createEmptyState } = await import('../dist/js/model.js');
-  const { createActivationDraft, fundActivation, addActivationBudgetItem, saveActivationBudget, completeActivation } = await import('../dist/js/activation-model.js');
+  const { createActivationDraft, acknowledgeCreatedAccount, fundActivation, addActivationBudgetItem, saveActivationBudget, completeActivation } = await import('../dist/js/activation-model.js');
   let state = createEmptyState();
   const draft = {};
   const h = harness({ initialRoute: { section: 'welcome' }, normalizer: r => safeRoute(r, state, draft) });
   h.router.initialise();
   const account = createEmptyState(); account.onboardingDone = true;
+  account.accounts = [{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];
   draft.activation = createActivationDraft({ state: account });
-  h.router.go({ section: 'activation', step: 'fund' }, { finish: true }); h.flush();
+  h.router.go({ section: 'activation', step: 'account-created' }, { finish: true }); h.flush();
+  assert.deepEqual(h.router.current, { section: 'activation', step: 'account-created' });
+  assert.equal(acknowledgeCreatedAccount(draft.activation).ok, true);
+  h.router.go({ section: 'activation', step: 'fund' }); h.flush();
   assert.deepEqual(h.router.current, { section: 'activation', step: 'fund' });
-  fundActivation(draft.activation, { amount: 10000, source: 'Mobile money' });
+  assert.equal(confirmFunding(draft.activation, { amount: 10000, source: 'Mobile money' }).ok, true);
   h.router.go({ section: 'activation', step: 'purpose' }); h.flush();
   addActivationBudgetItem(draft.activation, { name: 'Transport', amount: 6000 }); saveActivationBudget(draft.activation);
   h.router.go({ section: 'activation', step: 'ready' }); h.flush();

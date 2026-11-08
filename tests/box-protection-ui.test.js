@@ -44,6 +44,86 @@ function setup({ protectedBox = true, accepted = true, balance = 5000 } = {}) {
 function requestWithdrawal(h, amount = '10') { openProtectedBoxWithdrawal(h.ctx, h.box); h.field('protectedAmount', amount); h.submit('data-bp-amount-form'); return h.box.protectionRequests[0]; }
 function partnerApprove(h, request) { h.click('partner-view'); h.click('issue'); const code = getPartnerRequestView(h.box, request).code; assert.match(h.ctx.current.html, new RegExp(code)); h.click('owner'); h.field('partnerCode', code); h.submit('data-bp-code-form'); assert.equal(request.status, 'approved'); }
 
+function assertSupportDisclosure(html) {
+  assert.match(html, /<details[^>]*><summary>If your partner is unavailable/);
+  assert.match(html, /relationship changes/);
+  assert.match(html, /urgent access/);
+  assert.match(html, /Toll-free number to be confirmed/);
+  assert.match(html, /verify your identity and record a review/);
+  assert.match(html, /Money Box’s accountability partner controls/);
+  assert.match(html, /current partner or verified Lumo support must approve/);
+  assert.doesNotMatch(html, /href="tel:|data-bp="call"/);
+}
+
+test('ownership and the planned support route are disclosed before inviting a partner and in active controls', () => {
+  for (const protectedBox of [false, true]) {
+    const h = setup({ protectedBox }), before = JSON.stringify(h.state);
+    openBoxProtection(h.ctx, h.box);
+    assert.match(h.ctx.current.html, /This is still your money\. Your partner cannot spend it/);
+    assertSupportDisclosure(h.ctx.current.html);
+    assert.equal(JSON.stringify(h.state), before);
+    assert.equal(h.ctx.calls.length, 0);
+    if (protectedBox) {
+      assert.match(h.ctx.current.html, /data-bp="change"/);
+      assert.match(h.ctx.current.html, /data-bp="remove"/);
+      openProtectedBoxWithdrawal(h.ctx, h.box);
+      assertSupportDisclosure(h.ctx.current.html);
+      assert.match(h.ctx.current.html, /partner’s code and your PIN/);
+      assert.equal(JSON.stringify(h.state), before);
+    }
+  }
+});
+
+test('Ask Lumo support explains the planned contact route before explicitly requesting a demo review', () => {
+  const h = setup(), request = requestWithdrawal(h), wallet = h.state.wallet, saved = h.box.balance;
+  const before = JSON.stringify(h.state), callCount = h.ctx.calls.length;
+  h.click('support');
+  assert.equal(request.status, 'pending');
+  assert.equal(h.ctx.calls.length, callCount, 'opening contact guidance cannot request or approve recovery');
+  assert.equal(JSON.stringify(h.state), before);
+  assert.match(h.ctx.current.html, /planned route is Lumo’s toll-free support line/);
+  assert.match(h.ctx.current.html, /Toll-free number to be confirmed/);
+  assert.match(h.ctx.current.html, /verify your identity and record a review/);
+  assert.match(h.ctx.current.html, /does not release money automatically/);
+  assert.match(h.ctx.current.html, /No call is made and no real request is sent/);
+  assert.match(h.ctx.current.html, /confirmed with GCB before launch/);
+  assert.doesNotMatch(h.ctx.current.html, /href="tel:|data-bp="approve"|data-bp="pin"/);
+  h.click('owner'); assert.equal(request.status, 'pending');
+  h.click('support');
+  const staleButton = h.ctx.current.querySelector('[data-bp="support-request"]');
+  h.click('support-request'); staleButton.click();
+  assert.equal(request.status, 'support-pending');
+  assert.equal(h.ctx.calls.filter(call => call.type === 'requestBoxSupportReview').length, 1);
+  assert.equal(h.state.wallet, wallet); assert.equal(h.box.balance, saved);
+  assert.equal(hasBoxProtection(h.box), true); assert.equal(h.ctx.authPending, null);
+});
+
+test('withdrawal, partner-change and removal each offer the same verified review route without automatic access', () => {
+  for (const kind of ['withdrawal', 'change-partner', 'remove-protection']) {
+    const h = setup(), wallet = h.state.wallet, saved = h.box.balance;
+    if (kind === 'withdrawal') requestWithdrawal(h);
+    else {
+      openBoxProtection(h.ctx, h.box);
+      if (kind === 'change-partner') {
+        h.click('change'); assertSupportDisclosure(h.ctx.current.html);
+        h.field('partnerName', 'Adwoa'); h.field('partnerPhone', '0271234567'); h.submit('data-bp-partner-form');
+      } else { h.click('remove'); assertSupportDisclosure(h.ctx.current.html); h.click('request'); }
+    }
+    const request = h.box.protectionRequests[0]; assert.equal(request.kind, kind);
+    h.click('support'); assert.equal(request.status, 'pending');
+    assert.match(h.ctx.current.html, /withdrawal, partner change or removal/);
+    assert.match(h.ctx.current.html, /Your PIN is still required/);
+    h.click('support-request'); assert.equal(request.status, 'support-pending');
+    h.click('support-view');
+    assert.match(h.ctx.current.html, /account owner’s money/);
+    assert.match(h.ctx.current.html, /Toll-free number to be confirmed/);
+    h.click('approve'); assert.equal(request.status, 'support-pending');
+    assert.match(h.ctx.current.error.textContent, /verification/);
+    assert.equal(h.state.wallet, wallet); assert.equal(h.box.balance, saved);
+    assert.equal(hasBoxProtection(h.box), true); assert.equal(h.ctx.authPending, null);
+  }
+});
+
 test('a protected withdrawal needs the partner code and a separate PIN, and repeated callbacks cannot duplicate it', () => {
   const h = setup(), wallet = h.state.wallet, saved = h.box.balance;
   const request = requestWithdrawal(h); assert.equal(request.status, 'pending'); assert.equal(h.state.wallet, wallet);
@@ -103,7 +183,7 @@ test('a pending invitation can be cancelled or declined without PIN or a release
 
 test('verified support is explicit and does not move money until the owner confirms with PIN', () => {
   const h = setup(), wallet = h.state.wallet, saved = h.box.balance, request = requestWithdrawal(h);
-  h.click('support'); assert.equal(request.status, 'support-pending'); h.click('support-view'); h.click('approve'); assert.equal(request.status, 'support-pending'); assert.match(h.ctx.current.error.textContent, /verification/);
+  h.click('support'); h.click('support-request'); assert.equal(request.status, 'support-pending'); h.click('support-view'); h.click('approve'); assert.equal(request.status, 'support-pending'); assert.match(h.ctx.current.error.textContent, /verification/);
   h.ctx.current.querySelector('[name="supportIdentityVerified"]').checked = true; h.click('approve');
   assert.equal(request.status, 'approved'); assert.equal(h.state.wallet, wallet); assert.equal(h.box.balance, saved); assert.equal(h.ctx.authPending, null); assert.match(h.ctx.current.html, /verified support/);
   h.click('pin'); h.pin(); assert.equal(h.state.wallet, wallet + 1000); assert.equal(request.approvedBy, 'verified-support');
@@ -120,7 +200,7 @@ test('changing a partner consumes its approval and invites the replacement while
 test('removal requires specific approval and owner PIN; a support request alone leaves protection intact', () => {
   const h = setup(), wallet = h.state.wallet, saved = h.box.balance;
   openBoxProtection(h.ctx, h.box); h.click('remove'); h.click('request'); const request = h.box.protectionRequests[0];
-  h.click('support'); assert.equal(hasBoxProtection(h.box), true); h.click('support-view'); h.ctx.current.querySelector('[name="supportIdentityVerified"]').checked = true; h.click('approve'); assert.equal(hasBoxProtection(h.box), true);
+  h.click('support'); h.click('support-request'); assert.equal(hasBoxProtection(h.box), true); h.click('support-view'); h.ctx.current.querySelector('[name="supportIdentityVerified"]').checked = true; h.click('approve'); assert.equal(hasBoxProtection(h.box), true);
   h.click('pin'); h.pin(); assert.equal(request.status, 'consumed'); assert.equal(hasBoxProtection(h.box), false); assert.equal(h.box.balance, saved); assert.equal(h.state.wallet, wallet);
 });
 
@@ -149,7 +229,7 @@ test('detached partner controls cannot issue or approve a replacement request', 
 test('recovery-required protection uses verified support without exposing a pretend partner view', () => {
   const h = setup(), wallet = h.state.wallet; h.box.protection = { status: 'active', partner: { phone: 'damaged' } }; ensureBoxProtectionState(h.state);
   openBoxProtection(h.ctx, h.box); assert.match(h.ctx.current.html, /Partner details need review/); assert.doesNotMatch(h.ctx.current.html, /data-bp="invite-view"/);
-  requestWithdrawal(h); assert.doesNotMatch(h.ctx.current.html, /data-bp="partner-view"/); h.click('support'); h.click('support-view');
+  requestWithdrawal(h); assert.doesNotMatch(h.ctx.current.html, /data-bp="partner-view"/); h.click('support'); h.click('support-request'); h.click('support-view');
   assert.match(h.ctx.current.html, /Verified support/); assert.doesNotMatch(h.ctx.current.html, /GH₵2,430.00|GH₵50.00|GH₵1,000.00/);
   h.ctx.current.querySelector('[name="supportIdentityVerified"]').checked = true; h.click('approve'); h.click('pin'); h.pin();
   assert.equal(h.state.wallet, wallet + 1000); assert.equal(hasBoxProtection(h.box), true);

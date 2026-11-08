@@ -6,7 +6,12 @@ const baseNow=new Date('2026-11-04T12:00:00Z');
 const later=days=>new Date(baseNow.getTime()+days*86400000);
 const helpers=(s,now=baseNow)=>({getSummary,summary:getSummary(s),now});
 function run(s,type,p={},now=baseNow){const r=handleLearningAction(s,type,p,helpers(s,now));assert.equal(r.ok,true,r.message);return r;}
-function student({personalised=false,wealth=false}={}){const s=wealth?createDemoState():createEmptyState();s.onboardingDone=true;ensureLearningState(s);run(s,'learningEnroll',{goal:'allowance',personalised});return s;}
+function student({personalised=false,wealth=false}={}){
+ const s=wealth?createDemoState():createEmptyState();
+ // Demo income follows the real clock; keep this prerequisite before the fixture's now.
+ if(wealth)s.transactions.find(t=>t.type==='income').at=new Date(baseNow.getTime()-2*86400000).toISOString();
+ s.onboardingDone=true;ensureLearningState(s);run(s,'learningEnroll',{goal:'allowance',personalised});return s;
+}
 function lesson(s,lessonId,{review=false,now=baseNow}={}){const r=run(s,'learningStartLesson',{lessonId,review},now),definition=LEARNING_LESSONS.find(l=>l.id===lessonId);return run(s,'learningAnswer',{sessionId:r.sessionId,option:definition.questions[review?1:0].correct},now);}
 function practice(s,kind='weekly-review',mode='example',now=baseNow,reflection=mode==='actual'?'still-fits':'example-reviewed'){
  const {sessionId}=run(s,'learningStartPractice',{kind,mode},now),session=s.learning.sessions.find(x=>x.id===sessionId);

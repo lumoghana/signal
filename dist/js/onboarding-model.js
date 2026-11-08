@@ -1,5 +1,6 @@
 import { createEmptyState } from './model.js';
 import { normalizeUsername, validUsername, validLoginCredential } from './login-credentials.js';
+import { hasAcceptedSetupTerms, normalizeSetupTermsAcceptance } from './setup-terms-model.js';
 
 /** Camera capture is local; number lookup and identity verification remain simulated. */
 export const ONBOARDING_SCHEMA = 8;
@@ -44,7 +45,7 @@ export function createOnboardingDraft({ preview = false } = {}) {
     consent: false, liveness: { completed: [], passed: false }, selfieCaptured: false,
     captureResumeNotice: false, verified: false, verificationStatus: 'idle', verificationAttempt: 0,
     verificationRecord: null, identityConfirmed: false, campus: 'Your campus', login: null, pin: '', pinConfirm: '',
-    completedSteps: [], preview: !!preview, completed: false, currentStep: 'name',
+    completedSteps: [], preview: !!preview, completed: false, currentStep: 'name', termsAcceptance: null,
   };
 }
 
@@ -61,6 +62,7 @@ export function canonicalOnboardingStep(requested) {
 export function normalizeOnboardingDraft(input) {
   const source = object(input) ? input : {};
   const draft = createOnboardingDraft({ preview: source.preview === true });
+  draft.termsAcceptance = normalizeSetupTermsAcceptance(source);
   for (const key of ['name', 'phone', 'campus']) if (typeof source[key] === 'string') draft[key] = source[key];
   if (source.schema !== ONBOARDING_SCHEMA) {
     // Preserve accepted introductions and a bound demo OTP, never older identity proof.
@@ -329,11 +331,13 @@ export function persistableOnboardingDraft(input) {
 
 export function buildOnboardingState(draft) {
   if (!active(draft)) return fail('This signup has already been completed.');
+  if (!hasAcceptedSetupTerms(draft)) return fail('Accept the current setup terms before creating your demo account.');
   if (firstIncomplete(draft)) return fail('Finish setup before creating the demo account.');
   const state = createEmptyState({ name: draft.name.trim(), phone: draft.phone.trim(), campus: draft.campus });
   state.onboardingDone = true; state.buffer = 0; state.settings.pin = '1234';
   state.account ||= {};
   state.account.login = safeLogin(draft.login);
+  state.termsAcceptance = normalizeSetupTermsAcceptance(draft);
   state.profile.legalName = draft.verificationRecord.fullName;
   state.verification = { mode: 'simulation', capture: 'live-camera', status: 'complete', method: 'ghana-card-number', liveness: 'guided-camera', sampleIdentity: true, detailsConfirmed: true, completedAt: new Date().toISOString() };
   state.accounts = [

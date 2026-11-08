@@ -6,8 +6,10 @@ import { TOUR_SCHEMA, safeTourStep } from './tour-model.js';
 import { getPaymentService, getServiceHubTab } from './payment-catalog.js';
 import { recipientLookupMatches } from './recipient-lookup.js';
 import { canReadGroup } from './group-ledger.js';
+import { hasAcceptedSetupTerms } from './setup-terms-model.js';
 
 const HOME = Object.freeze({ section: 'home', page: 'home' });
+const WELCOME_PAGES = new Set(['home', 'explore']);
 const PAYMENT_STEPS = new Set(['recipient', 'recipient-confirm', 'amount', 'review', 'pause']);
 const MAIN_SECTIONS = new Set(['home', 'activity', 'pay', 'boxes', 'plan', 'groups']);
 const PAGES = {
@@ -33,9 +35,10 @@ function normalize(route) {
     next.section = 'life';
     next.page = ({ home: 'groups', detail: 'group-detail', chat: 'group-chat', create: 'group-create' })[next.page || 'home'] || next.page;
   }
-  if (next.section === 'welcome') return { ...next, page: 'home' };
+  if (next.section === 'welcome') return { ...next, page: ['impact', 'impact-extra'].includes(next.page) ? 'explore' : WELCOME_PAGES.has(next.page) ? next.page : 'home' };
+  if (next.section === 'terms') return { section: 'terms' };
   if (next.section === 'tour') return { section: 'tour', step: safeTourStep(next.step) };
-  if (next.section === 'activation') return { section: 'activation', step: ['fund', 'purpose', 'ready'].includes(next.step) ? next.step : 'fund' };
+  if (next.section === 'activation') return { section: 'activation', step: ['account-created', 'fund', 'purpose', 'ready'].includes(next.step) ? next.step : 'account-created' };
   if (next.section === 'onboarding') return { ...next, step: canonicalOnboardingStep(next.step) || 'name' };
   if (!PAGES[next.section]) return home();
   const fallback = next.section === 'life' ? 'overview' : 'home';
@@ -70,6 +73,7 @@ export function routeLabel(route) {
   const r = normalize(route);
   if (r.section === 'learn') return ({home:'Money IQ',library:'More with Lux',start:'Your learning journey',lesson:'Money lesson',practice:'Money practice',progress:'Your progress',preferences:'Learning preferences',review:'Knowledge check',game:'Campus Run',play:'Campus mission',rewards:'Lux looks','money-iq':'Money IQ'})[r.page] || 'Learn with Lux';
   if (r.section === 'welcome') return 'Welcome';
+  if (r.section === 'terms') return 'Setup terms';
   if (r.section === 'tour') return 'Lumo tour';
   if (r.section === 'activation') return 'First steps';
   if (r.section === 'onboarding') return 'Previous step';
@@ -103,12 +107,14 @@ function createParent(route, steps, root) {
 export function parentRoute(route, state = {}, draft = {}) {
   const r = normalize(route), explicit = explicitParent(r);
   if (explicit) return explicit;
+  if (r.section === 'welcome' && r.page !== 'home') return { section: 'welcome', page: 'home' };
+  if (r.section === 'terms') return { section: 'welcome' };
   if (r.section === 'learn') return ['home','start'].includes(r.page) ? home() : {section:'learn',page:['play','rewards'].includes(r.page)?'game':'home'};
   if (r.section === 'tour') return r.step > 0 ? { section: 'tour', step: r.step - 1 } : draft.tour?.replay ? draft.tour.returnTo || { section: 'life', page: 'settings' } : { section: 'welcome' };
-  if (r.section === 'activation') return r.step === 'ready' ? { section: 'activation', step: 'purpose' } : r.step === 'purpose' ? { section: 'activation', step: 'fund' } : { section: 'welcome' };
+  if (r.section === 'activation') return r.step === 'ready' ? { section: 'activation', step: 'purpose' } : r.step === 'purpose' ? { section: 'activation', step: 'fund' } : r.step === 'fund' ? { section: 'activation', step: 'account-created' } : { section: 'welcome' };
   if (r.section === 'onboarding') {
     const index = ONBOARDING_STEPS.indexOf(r.step);
-    return index > 0 ? { section: 'onboarding', step: ONBOARDING_STEPS[index - 1] } : { section: 'welcome' };
+    return index > 0 ? { section: 'onboarding', step: ONBOARDING_STEPS[index - 1] } : { section: 'terms' };
   }
   if (r.section === 'boxes') {
     if (['hacks','archive'].includes(r.page)) return {section:'boxes',page:'home'};
@@ -177,7 +183,7 @@ function outsideFlow(route, fallback) {
 /** The conversation is a separate screen; returning keeps the app's own task state. */
 export function chatReturnRoute(route, state = {}, draft = {}) {
   let candidate = route?.returnTo || draft.chatReturnTo || home();
-  if (!hasRoute(candidate) || ['chat','welcome','onboarding','activation','tour'].includes(candidate.section)) candidate = home();
+  if (!hasRoute(candidate) || ['chat','welcome','terms','onboarding','activation','tour'].includes(candidate.section)) candidate = home();
   if (candidate.section === 'pay' && candidate.edit && ['recipient','recipient-confirm'].includes(candidate.page)) candidate = { section: 'pay', page: 'review' };
   const checked = safeRoute(candidate, state, draft);
   return checked.section === 'chat' ? safeRoute(home(), state, draft) : checked;
@@ -202,11 +208,12 @@ export function safeRoute(route, state = {}, draft = {}) {
   if (r.section === 'tour') {
     const t = draft.tour;
     if (t?.schema === TOUR_SCHEMA && (state.onboardingDone !== true || t.replay || signupPreview)) return r;
-    return state.onboardingDone ? home() : draft.onboarding ? { section: 'onboarding', step: safeOnboardingStep(draft.onboarding, draft.onboarding.currentStep) } : { section: 'welcome' };
+    return state.onboardingDone ? home() : draft.onboarding ? hasAcceptedSetupTerms(draft.onboarding) ? { section: 'onboarding', step: safeOnboardingStep(draft.onboarding, draft.onboarding.currentStep) } : { section: 'terms' } : { section: 'welcome' };
   }
-  if (state.onboardingDone === false && !['welcome', 'onboarding'].includes(r.section) && !(r.section === 'life' && ['account-access','account-recovery'].includes(r.page))) return { section: 'welcome' };
-  if (state.onboardingDone === true && ['welcome', 'onboarding'].includes(r.section) && !signupPreview) return home();
-  if (r.section === 'onboarding') return { ...r, step: safeOnboardingStep(draft.onboarding, route?.step) };
+  if (state.onboardingDone === false && !['welcome', 'terms', 'onboarding'].includes(r.section) && !(r.section === 'life' && ['account-access','account-recovery'].includes(r.page))) return { section: 'welcome' };
+  if (signupPreview && state.onboardingDone === true && r.section === 'welcome' && r.page !== 'home') return { section: 'welcome', page: 'home' };
+  if (state.onboardingDone === true && ['welcome', 'terms', 'onboarding'].includes(r.section) && !signupPreview) return home();
+  if (r.section === 'onboarding') return hasAcceptedSetupTerms(draft.onboarding) ? { ...r, step: safeOnboardingStep(draft.onboarding, route?.step) } : { section: 'terms' };
   if (r.section === 'pay' && r.page === 'service' && !getPaymentService(r.id)) return { section: 'pay', page: 'home' };
   if (r.section === 'boxes') {
     if (r.page === 'create' && (!draft.box || draft.box.completed || draft.box.createdId)) return outsideFlow(r, { section: 'boxes', page: 'home' });
@@ -245,7 +252,7 @@ export function safeRoute(route, state = {}, draft = {}) {
 
 function transient(route) {
   const r = normalize(route);
-  return ['welcome', 'onboarding', 'activation', 'tour'].includes(r.section)
+  return ['welcome', 'terms', 'onboarding', 'activation', 'tour'].includes(r.section)
     || (['boxes', 'plan'].includes(r.section) && r.page === 'create')
     || (r.section === 'pay' && (PAYMENT_STEPS.has(r.page) || ['status', 'fund-status', 'fund'].includes(r.page)))
     || (r.section === 'life' && ['group-create', 'iou-create', 'recovery'].includes(r.page));

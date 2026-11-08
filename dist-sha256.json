@@ -1,771 +1,144 @@
 {
-  "schema_version": 1,
-  "source_commit": "16610ba64dee49dcbfe9b3853eb197c15eb21232",
-  "site_version": 53,
-  "file_count": 127,
-  "total_bytes": 3147462,
-  "files": [
-    {
-      "path": "dist/account-date-picker.css",
-      "size_bytes": 2217,
-      "sha256": "4b5595d8ea8c53ee69023bc2c0e5347acee30d8a8b1c733fcdceee3796c659fb",
-      "git_blob_sha1": "67e7b6860a0d5109e5e3bd67d0e4b4d9449c44da"
-    },
-    {
-      "path": "dist/account.css",
-      "size_bytes": 5190,
-      "sha256": "07b60d3dd497f042c51cc97a01db97c3bcfa143365ff841aa23701b77a3a3092",
-      "git_blob_sha1": "36549588bd915f7120a98604bd617659f589a47c"
-    },
-    {
-      "path": "dist/activation.css",
-      "size_bytes": 8956,
-      "sha256": "6b8a68cf4f2984cf96961069768e1b38e2b228772c447e69fc02f30d28c161a2",
-      "git_blob_sha1": "7d98c5d65fe560a92ec0c290a378d2a55fc3c6bb"
-    },
-    {
-      "path": "dist/appearance-light.css",
-      "size_bytes": 15188,
-      "sha256": "3e4f3a2ebf8ecaa2b2654d431956bda28c49aa4674f176000d92621bcfe0783b",
-      "git_blob_sha1": "e0ca8008ddd0bbfb871b91fee0c337231259c5e7"
-    },
-    {
-      "path": "dist/appearance.css",
-      "size_bytes": 2031,
-      "sha256": "ab82736d8a4fdb086507251486ea559e23273e95be4dd7b026b77bc45aac83ff",
-      "git_blob_sha1": "c5e95fe0b6bb3efdaa98ccec58fa8b0fe27910b0"
-    },
-    {
-      "path": "dist/assets/lux-chat-2d.webp",
-      "size_bytes": 452946,
-      "sha256": "669a7994c4c1c695bcc080ed3fca18b1f439d03ff8f82f828535a096ed7cf7fa",
-      "git_blob_sha1": "e3cfa61b33f51782ec1799d7ec5310c7536a3f7b"
-    },
-    {
-      "path": "dist/assets/lux-pause-2d.webp",
-      "size_bytes": 478588,
-      "sha256": "b1c0681f07f62a639216636f7c039014b8af264357954e377458bb8b6f73b091",
-      "git_blob_sha1": "a7fe57ebee457f4473db4b0af79191f56d45eee3"
-    },
-    {
-      "path": "dist/auth-access.css",
-      "size_bytes": 7993,
-      "sha256": "c286db3ce1d101932a47b4f82544349151d58209260c741b561710fa7d7bc7a9",
-      "git_blob_sha1": "d278e4ab5531ebc653d43ff4ec17c66dce324d65"
-    },
-    {
-      "path": "dist/box-partner.css",
-      "size_bytes": 5776,
-      "sha256": "b430d3625af095de997976faeb813fe9662f8c62661046f96400b4f095e77f84",
-      "git_blob_sha1": "ba13646b6b6000b93c0f92cde08de0b207fec97a"
-    },
-    {
-      "path": "dist/box-protection-ui.css",
-      "size_bytes": 4451,
-      "sha256": "095c2c59254f844e7b28170ad0cf6f88ee40c894d8687ef248621da09c0dc77d",
-      "git_blob_sha1": "ee60904e14d266472d6e458ef130405ee497e4fc"
-    },
-    {
-      "path": "dist/chat.css",
-      "size_bytes": 13955,
-      "sha256": "1ac1a2693c94dfb7197a24c5ece38855e0591712075101260bb71496126a0fd9",
-      "git_blob_sha1": "e2566dbcc666e89eb3862e18a20c303a2a184527"
-    },
-    {
-      "path": "dist/consistency.css",
-      "size_bytes": 7552,
-      "sha256": "f9419958542b5a66f9fc773828a8e2e36b3ebe9f62073c4669d33385ce287d7f",
-      "git_blob_sha1": "dd71e6241063e21de0104b6c6e702662c087a884"
-    },
-    {
-      "path": "dist/favicon.svg",
-      "size_bytes": 168,
-      "sha256": "2839ed1bf340832240e576d3f6b161ad80c6afb0afe56df47a9fe429872021bc",
-      "git_blob_sha1": "3bade65753db79203e31a2dcba4bef5bb7c4b4b4"
-    },
-    {
-      "path": "dist/group-chat.css",
-      "size_bytes": 28416,
-      "sha256": "6db50ec4fd43b030e5eb967e6d123ec1c661e2c654f90cc0d154c5fa90487a63",
-      "git_blob_sha1": "252d6bbaf8035266c374f20aa4d65986c6974d0c"
-    },
-    {
-      "path": "dist/group-overview.css",
-      "size_bytes": 13144,
-      "sha256": "9a2ad0fa703dadcd0d9e763511e857c2958670c16c056738862e928aecc23230",
-      "git_blob_sha1": "1e4f44aaa5792fa3f80dda83e93fb4d867c8f996"
-    },
-    {
-      "path": "dist/group-parity.css",
-      "size_bytes": 1051,
-      "sha256": "c36073e86287552be2feaec416b16bb281a896f9aa635cfb89ee6c726e68b514",
-      "git_blob_sha1": "82ff8a02c6ec40cfef2e117fae46fea2fdd7d022"
-    },
-    {
-      "path": "dist/home-overview.css",
-      "size_bytes": 15176,
-      "sha256": "019a873864621037ea258eb40012760dcc643f42dd988135eadfc89ffe4f642b",
-      "git_blob_sha1": "a5603926e2aa96063432699e810309c0426680b7"
-    },
-    {
-      "path": "dist/index.html",
-      "size_bytes": 2708,
-      "sha256": "e9f551b82a9f28583274ce7157e8caee40525e2a114bc380cda7d00d0d82d745",
-      "git_blob_sha1": "84e4a4273558027e46d4132d67543b514809350d"
-    },
-    {
-      "path": "dist/insights.css",
-      "size_bytes": 9627,
-      "sha256": "656f28c8be786c44b3d368f138684d0eec1691584e0ca6fe91c882775725b8ef",
-      "git_blob_sha1": "8237d202e61869419bce3dc6e76208d3f35295d5"
-    },
-    {
-      "path": "dist/js/account-date-picker.js",
-      "size_bytes": 4520,
-      "sha256": "7f55e4be66e2f7df20d8655ea50a0b6bafd13f9db07cccef5b5b5086c5b3841a",
-      "git_blob_sha1": "35eb665d844f5e13cd8b6ccfaf78a4ca42a7096e"
-    },
-    {
-      "path": "dist/js/account-model.js",
-      "size_bytes": 23583,
-      "sha256": "3fc5ea1d520444757e7b2ebdcdebfd27c286222914f4bf1fc7e66eb5018e0424",
-      "git_blob_sha1": "c19a8eb0929529834a6c4c148af38f9ea08a8650"
-    },
-    {
-      "path": "dist/js/account-records.js",
-      "size_bytes": 3962,
-      "sha256": "a4f886fe34f4461640c703da29be29daf0088408654a5f0b95d8b6393f7f9774",
-      "git_blob_sha1": "9cf49b5e1b906e3962f1aaf75f783d5886da3d5d"
-    },
-    {
-      "path": "dist/js/account-support-drafts.js",
-      "size_bytes": 2248,
-      "sha256": "ec966cca49e2cf9be8235a76abd09ee802ec97d7a15db41c4bc3039578fba63f",
-      "git_blob_sha1": "a389970f8e4e5a7b5457c5064c16bd3e47f28227"
-    },
-    {
-      "path": "dist/js/account-ui.js",
-      "size_bytes": 42818,
-      "sha256": "a3337d35dd4b6f80a7b3765b0cc6be0394451cf85394d2e570c0a0f192846552",
-      "git_blob_sha1": "2a4f693e16349c330764774ce00dae2ceb3438a7"
-    },
-    {
-      "path": "dist/js/activation-model.js",
-      "size_bytes": 5897,
-      "sha256": "b56c266e2c310c215acd321a184eaa5578a5dc2a8e1acb6eb1507707a41b8c60",
-      "git_blob_sha1": "d7f815b186d4aeec2dc4cec434528143bffc0f76"
-    },
-    {
-      "path": "dist/js/activation.js",
-      "size_bytes": 13105,
-      "sha256": "957a948ec543f720892058a615ae041137a3e7b928e709de49069c1fef4aa8ae",
-      "git_blob_sha1": "687270c38321244a979d21069c621ad4fc1c438b"
-    },
-    {
-      "path": "dist/js/activity-view.js",
-      "size_bytes": 6485,
-      "sha256": "dde01b24b1f55a81a704fa37a33877f6e2914cc6506357e50326fab162c613ed",
-      "git_blob_sha1": "1fdc056380773ba8b1ca57f8257c9c9a339eb9f1"
-    },
-    {
-      "path": "dist/js/app.js",
-      "size_bytes": 40328,
-      "sha256": "51dbd661bead8a8f44f3489ecc17f3e2d6b9127faaac7579b40ddd9151a2aa2c",
-      "git_blob_sha1": "f1364b60d0ff3df7ea6fe5c80ec620190225d6c4"
-    },
-    {
-      "path": "dist/js/appearance-ui.js",
-      "size_bytes": 3030,
-      "sha256": "93b9c18b6f50b42f9544fe86cec13a73a21811f24ddd15bc6da8de8e427d14d5",
-      "git_blob_sha1": "3d47b3bd36572d18bef7189b30b546c8863693c0"
-    },
-    {
-      "path": "dist/js/appearance.js",
-      "size_bytes": 1827,
-      "sha256": "b81ad008068151c73488811131576e3a854812132105d9bdb8f128df7c24b3c5",
-      "git_blob_sha1": "bba1ed166b338f9b0548f04b8230fa1a166a2201"
-    },
-    {
-      "path": "dist/js/box-partner-invitation.js",
-      "size_bytes": 10565,
-      "sha256": "f3678e36dd418d342e0d1a21033bac50ff4bfa2e14edb07033f602b381d8d404",
-      "git_blob_sha1": "ff3a2e441ecb27228149cb7a34b014274706c2a1"
-    },
-    {
-      "path": "dist/js/box-partner-setup.js",
-      "size_bytes": 11598,
-      "sha256": "3c78f19f54bb3856326a545fcda7ad499809ad2dde450196202123d15c1b5950",
-      "git_blob_sha1": "301191ce5a658becaa1696526d8d8857eab4da2d"
-    },
-    {
-      "path": "dist/js/box-protection-ui.js",
-      "size_bytes": 24012,
-      "sha256": "df8ff34f15fa997d17bce5ee5e5f2dd20b03b0f0eb01c58feef5b1ed06eab945",
-      "git_blob_sha1": "f613cf38f6f1e450af720e29323d784e16aebff7"
-    },
-    {
-      "path": "dist/js/box-protection.js",
-      "size_bytes": 23144,
-      "sha256": "943faee52c113301a087ad478cbf1438faef856e1d44a3efb1139338f41def78",
-      "git_blob_sha1": "f27524d72ca0d29d28694ea7eaad383cc9bb2410"
-    },
-    {
-      "path": "dist/js/budget-quick.js",
-      "size_bytes": 3076,
-      "sha256": "1fc7f399302cee27821c19b2c7c5b8ee7ae8055cb8414603a4732d5dedc7a6ed",
-      "git_blob_sha1": "b69ac389f9a22b98300e916b72ed4a7fb177fe85"
-    },
-    {
-      "path": "dist/js/camera.js",
-      "size_bytes": 10505,
-      "sha256": "57a94f90ddd2fd10c306de553d189b97a0c4d5d84103f2a3fa9ebf8ff701ece5",
-      "git_blob_sha1": "55ada310cd8bcf9042387b9de6f29327e111cfd3"
-    },
-    {
-      "path": "dist/js/card-parity-ui.js",
-      "size_bytes": 11964,
-      "sha256": "480dae60947886fa894f088a3c10e826c5597b4489a8a19e29d065bd28c18965",
-      "git_blob_sha1": "fcdf56ade14e046c840f6bfc2b13e4195a31bc6b"
-    },
-    {
-      "path": "dist/js/chat-action-model.js",
-      "size_bytes": 16004,
-      "sha256": "49e17b27b66036bdc013dc1615db5ae8b09fc87020018fdf07f4337ac9d07514",
-      "git_blob_sha1": "a52fcd93f900a5b33e544d300cf5c0613aea9123"
-    },
-    {
-      "path": "dist/js/chat-gestures.js",
-      "size_bytes": 5683,
-      "sha256": "63b46440efb96fb34b8ff231a4b3ccd662c4a9efb49b05aed8ae68f43e8cb0bd",
-      "git_blob_sha1": "0cfba8acd649aacdf29512af5bb2f5ec462e59b3"
-    },
-    {
-      "path": "dist/js/chat-language.js",
-      "size_bytes": 24999,
-      "sha256": "a97990042f17863d1947dd02b63c5ab7a2f9bf82f150447bd8079e6af0cd37dd",
-      "git_blob_sha1": "65c20a6723ce4cf57c34740d3a6b4005d846fd73"
-    },
-    {
-      "path": "dist/js/chat.js",
-      "size_bytes": 19885,
-      "sha256": "45ac1bdc919d9ca272c876c786efb7a7e147f92081dce9ac0681f966368b1bd1",
-      "git_blob_sha1": "663de38a307d2af3d1f14be1ae441b65cc94dd3e"
-    },
-    {
-      "path": "dist/js/device-auth.js",
-      "size_bytes": 16221,
-      "sha256": "90b71b0160f4e0f27a3be1cede9fb6b2f5f208c74427bd04e01e1afd5cd2f9d9",
-      "git_blob_sha1": "70f924ecd2e3c7febdcb116272f35bc7e0a832c8"
-    },
-    {
-      "path": "dist/js/group-actions.js",
-      "size_bytes": 50423,
-      "sha256": "1800a5b1fda1251367740113d476b55d697355869e25f9e9338c0423d7e04b20",
-      "git_blob_sha1": "e0e81bca7825ecf93e59052e3b5630ac43cc5905"
-    },
-    {
-      "path": "dist/js/group-chat-model.js",
-      "size_bytes": 20203,
-      "sha256": "2aff76951f5f130323e647c360fd73905a950b2ae8792f51d4e727688dff9d68",
-      "git_blob_sha1": "92c958bc946be7c6756b6f786589dc12c33bae63"
-    },
-    {
-      "path": "dist/js/group-chat.js",
-      "size_bytes": 31748,
-      "sha256": "c9d74bec4ea6a6b0008a1134fa7d9e5c3b5f74bc669855f41e30dec03d679798",
-      "git_blob_sha1": "7656f6935668f0b314e21128b060c185f18f593c"
-    },
-    {
-      "path": "dist/js/group-ledger.js",
-      "size_bytes": 42147,
-      "sha256": "8a933de0263c606312275d7bd78d56f71f124c4525e9ccb2bc4bfcfb457670ae",
-      "git_blob_sha1": "4d925494dc1060c4204da1f518367451702aac34"
-    },
-    {
-      "path": "dist/js/group-overview.js",
-      "size_bytes": 10245,
-      "sha256": "209084f05e9e12ffb7268b2213253d703855405ae43cada34b6d06e5792b030b",
-      "git_blob_sha1": "f4551c3ffc95752f7a820179afe65711a0bc6a9c"
-    },
-    {
-      "path": "dist/js/group-policy.js",
-      "size_bytes": 5982,
-      "sha256": "73c79c4ecc6873e5a84238ea564535732c0c5621cbdb125ceee5f0eacb684554",
-      "git_blob_sha1": "7ca6ad420d9c0db33fa3415dc1b730bb3438779e"
-    },
-    {
-      "path": "dist/js/home-gestures.js",
-      "size_bytes": 5676,
-      "sha256": "153845d5803c606d7230e3990517f4c22e4c23d43575e9d241e3831c15c601f9",
-      "git_blob_sha1": "b767726e537c22d9f19e4e42f4e93d9bfa259ca6"
-    },
-    {
-      "path": "dist/js/home-overview.js",
-      "size_bytes": 9102,
-      "sha256": "9ebd6d5c51d5a4d1da1183c645560906363d09401b3c8a8b9bc848a79d1bf332",
-      "git_blob_sha1": "29081105e73c957caabab6cdf0286a1c7b7c8897"
-    },
-    {
-      "path": "dist/js/home-view.js",
-      "size_bytes": 122,
-      "sha256": "e16f55ad733f232e1676c77872e2b8b8da4a8c66b3c987ce80896cb7892e2560",
-      "git_blob_sha1": "5cc0506ee6829c49117129e70f8f4b391ee84780"
-    },
-    {
-      "path": "dist/js/insights.js",
-      "size_bytes": 15020,
-      "sha256": "7c7e54d84b0431941f21a2dd71f49e10ca234e81ea52a2925cc6a2553962ba11",
-      "git_blob_sha1": "87c2c6f1a43634a61326e575dabcefd16a62c8fd"
-    },
-    {
-      "path": "dist/js/learning-content.js",
-      "size_bytes": 18571,
-      "sha256": "0b1c426921e6561661b7589c28e6ba01263e0e4d2b412b1b1648f6a7f87cb017",
-      "git_blob_sha1": "150732bc29211b802b0ee89e932c2e3d970a544a"
-    },
-    {
-      "path": "dist/js/learning-entry.js",
-      "size_bytes": 4103,
-      "sha256": "f415050bbf74da50483b624ad4465ce76dc74ad3db344150ebb79202e2e33429",
-      "git_blob_sha1": "e65636750533e0d6f8fc59936da847fcf786c764"
-    },
-    {
-      "path": "dist/js/learning-game-content.js",
-      "size_bytes": 37375,
-      "sha256": "2e2df323ad4f3ec6786a82e4f2c6c6b16f84974ec73ae40a454f7a198deeedb6",
-      "git_blob_sha1": "075bc4fa398090046272bc431d560764f54aa317"
-    },
-    {
-      "path": "dist/js/learning-game-model.js",
-      "size_bytes": 13365,
-      "sha256": "fdf9fd92082515acd28cc1b8578f2e8b0b28d0bcae21ab9bd5bb75b29f6118b5",
-      "git_blob_sha1": "62a8512873ec09f01f9b8e53f6ca171ade020985"
-    },
-    {
-      "path": "dist/js/learning-game-motion.js",
-      "size_bytes": 11541,
-      "sha256": "0ab689647105c27cb0f09a3f50f1c857c55726daee582764675b5e3b2f426352",
-      "git_blob_sha1": "c929fbc4a2d4bfa66d7e8e7291f2bb503d1a84b3"
-    },
-    {
-      "path": "dist/js/learning-game-reflection.js",
-      "size_bytes": 10917,
-      "sha256": "dc5359fd36f62651e9aae3d9458d2f9ccf82be5c108da5d8912dcffea033a95f",
-      "git_blob_sha1": "9f2ae245cd7ceb38ec355fe773e8fe336920f163"
-    },
-    {
-      "path": "dist/js/learning-game-ui.js",
-      "size_bytes": 40200,
-      "sha256": "daea222f90e64bb4a9a6304d2f405b9037b60863cbe619f21b644227fa612d00",
-      "git_blob_sha1": "aa9b4f9b776f3ba05e4be14e822a5119717945fb"
-    },
-    {
-      "path": "dist/js/learning-game-world-art.js",
-      "size_bytes": 8406,
-      "sha256": "993855fe85a922c9fd2e8363daba5d991fdbd8a8953ffc8b0bb18ef304131a56",
-      "git_blob_sha1": "ca61180ff50e228cbe646fe3af0c47bbe71139e4"
-    },
-    {
-      "path": "dist/js/learning-game-world-content.js",
-      "size_bytes": 12072,
-      "sha256": "070b70a2a3f192b5c0a8bc4cf1aa7773388d08f94f13929d8c9cd85a65e2ad34",
-      "git_blob_sha1": "b9f6e58b3e2e75605ef6076e4d4fa3b6c0e129e3"
-    },
-    {
-      "path": "dist/js/learning-game-world-motion.js",
-      "size_bytes": 16695,
-      "sha256": "67846b7ca42a8e9abef7583f21e21fb6d37946ff71e0a3efd7f45e2b9901431a",
-      "git_blob_sha1": "ad26098d85522fce963699eb5f1f944db9527a0d"
-    },
-    {
-      "path": "dist/js/learning-model.js",
-      "size_bytes": 32158,
-      "sha256": "dc18f0413d35b4c927a2947f4b39542bd324c1936d968b203dea438de7d46e11",
-      "git_blob_sha1": "6222b7a8627d39c8ed3e15bddabe4e5058f9e97a"
-    },
-    {
-      "path": "dist/js/learning-ui.js",
-      "size_bytes": 45106,
-      "sha256": "1d2c66427bca190ee89eaf2abd5ff5731da70485de0bc98276b1a366bc5a5867",
-      "git_blob_sha1": "ae8353049e51cd3a933216c1dc26e65bf1cb7e3b"
-    },
-    {
-      "path": "dist/js/life.js",
-      "size_bytes": 90632,
-      "sha256": "9806062330468d51c2d7c7c942fd2e58c4e8c430e6910098faa65c7d9a022eb2",
-      "git_blob_sha1": "bac2c8c589a2f6ab038174d07014e71ba2b52899"
-    },
-    {
-      "path": "dist/js/login-credentials.js",
-      "size_bytes": 2661,
-      "sha256": "6ce9d085dc8e6130800f81508621a1ba8350e1232f654f49512546ac01378506",
-      "git_blob_sha1": "51cbd73a9724c58e6f4ada1ff7dae70f6b9e7ce1"
-    },
-    {
-      "path": "dist/js/merchant-code.js",
-      "size_bytes": 1913,
-      "sha256": "562374231a7b3626834d27df031e8931659e3213239404bc8dc6b1d82bd21e26",
-      "git_blob_sha1": "f7671142a7ad39da7e9e5775c71882e794dfc73b"
-    },
-    {
-      "path": "dist/js/model.js",
-      "size_bytes": 62146,
-      "sha256": "60f146ccb2b65658d67b645322642400938b9e9a9246ff334777eb827ca86d13",
-      "git_blob_sha1": "70d4af3986442a69493d06e468f94e6fdf1bdf2e"
-    },
-    {
-      "path": "dist/js/money-answers.js",
-      "size_bytes": 31605,
-      "sha256": "d59366e7c7f5abc7603c858946fc929e98a5e855648d7729db8312457729060e",
-      "git_blob_sha1": "0269d53f4de7cf52a9463ba5e920904de673a63d"
-    },
-    {
-      "path": "dist/js/money-iq-model.js",
-      "size_bytes": 23713,
-      "sha256": "1b4dd7e0dc100f22b66e7cba9f7c758e31b8705738763392f89970f3f91acca6",
-      "git_blob_sha1": "d03178580ced5626862b70086077a5f9db0812a1"
-    },
-    {
-      "path": "dist/js/money-iq-ui.js",
-      "size_bytes": 15407,
-      "sha256": "e5fc5d47567b78c6c831ee94c61ff09261d5f6383c3a80ab186aa56169bd1f1a",
-      "git_blob_sha1": "4471a169f02ebb228e3a0b49ca4b270418d71d05"
-    },
-    {
-      "path": "dist/js/navigation.js",
-      "size_bytes": 21684,
-      "sha256": "f9119732236c432a5fb72d3fc06d484cbcf44810dc9676dae5f60296dadd8713",
-      "git_blob_sha1": "f24cc1380e9ea5075f86eb61d39ea560fdbc182d"
-    },
-    {
-      "path": "dist/js/offline-shell.js",
-      "size_bytes": 1886,
-      "sha256": "603bada23688a71407db461c9490af8455d1f51e1b04c763b8edba7d7a4a1b30",
-      "git_blob_sha1": "86818e077acb947549ebe927b542125d91bd04ac"
-    },
-    {
-      "path": "dist/js/onboarding-model.js",
-      "size_bytes": 24300,
-      "sha256": "b8a1467e4ec961efcf040b3dc444f8090a53c92f77b9bf07fa640a8d4fb876cd",
-      "git_blob_sha1": "8687a524a02b92858fae7a0ba79641eb0a61608b"
-    },
-    {
-      "path": "dist/js/onboarding.js",
-      "size_bytes": 40475,
-      "sha256": "d9b790e48ec26df71e581df01e3d9e9a83ec210e523104f707a6474f25ad2fc2",
-      "git_blob_sha1": "36b10858a70f9fc25f350d4e91ed6ef90b646a2b"
-    },
-    {
-      "path": "dist/js/outflow-impact.js",
-      "size_bytes": 3140,
-      "sha256": "34b56feaa9b66d8246374fc4846e35d684414808cc46a2c2fd096a58f8f9c625",
-      "git_blob_sha1": "b6e7e0f243442b22802fafd2fced5c366083997c"
-    },
-    {
-      "path": "dist/js/pause-history.js",
-      "size_bytes": 4987,
-      "sha256": "2172d9267588979f6f0deb4b886acf745ac12dddc35bde62d5569a56c2a09b09",
-      "git_blob_sha1": "4a958230d99c1fc53c687580415156eef1894c3d"
-    },
-    {
-      "path": "dist/js/pause-intelligence.js",
-      "size_bytes": 5303,
-      "sha256": "7f4f69019b708ecfc65442787657921c09a181d96d122f6a2e3cfb46de5181c3",
-      "git_blob_sha1": "8aec1901979fa39f60a0452ab523ac23f09a3bd1"
-    },
-    {
-      "path": "dist/js/pause-view.js",
-      "size_bytes": 2863,
-      "sha256": "62a3437f9dca1f86c498554fa56f2ce7ae4c559acd3ea41ef1e6a8bf23621a21",
-      "git_blob_sha1": "8f1779d83119d4dfb042ae4e33ac3cdb11c70c99"
-    },
-    {
-      "path": "dist/js/payment-catalog.js",
-      "size_bytes": 8985,
-      "sha256": "4f5a1a3b2c8c59b9b78ca791efed1e9e93a7ccd5ebd0ca47d4029b403cd6e3b4",
-      "git_blob_sha1": "b215ade0895745d3f8cb0b42f449f31d6855c929"
-    },
-    {
-      "path": "dist/js/payment-extras.js",
-      "size_bytes": 14496,
-      "sha256": "c863de616c665e70b525fcae18a0c8838757c94b71f2859d8ed0ab2d50a5ab54",
-      "git_blob_sha1": "14b5b1afc4de604c35b393349511038719dc5832"
-    },
-    {
-      "path": "dist/js/payment-recipient.js",
-      "size_bytes": 10118,
-      "sha256": "e6f7ceada54a60a63c903c208d35bedc1addd11b6f8d72168a0b794b3bf9ce8f",
-      "git_blob_sha1": "1049e6d19a071c0fde31b6a50f8eaadff0ca6333"
-    },
-    {
-      "path": "dist/js/payment-services.js",
-      "size_bytes": 10650,
-      "sha256": "c85b13fa07fb9b20e31921f72d52a34345595773b0688b4489932b0f63de8a2b",
-      "git_blob_sha1": "aa4d3fd939e78600b8e51592fe28b05e56ecfcbe"
-    },
-    {
-      "path": "dist/js/payments-hub.js",
-      "size_bytes": 10362,
-      "sha256": "fe0c34236cd43fac473c0479283dfde8f07a022edbc6f39ee2047cce16ab8478",
-      "git_blob_sha1": "237262466254046f3e4079861a41b50580bedfea"
-    },
-    {
-      "path": "dist/js/payments-parity-model.js",
-      "size_bytes": 24496,
-      "sha256": "83a2f4a3b6749e2209cb9d404d9ba7e89d839e6d31898aec33c3c017cb1e0cd4",
-      "git_blob_sha1": "47fbea0e4d7573c6ac15d91b1f1c82a10bf72bd3"
-    },
-    {
-      "path": "dist/js/payments-parity-ui.js",
-      "size_bytes": 18657,
-      "sha256": "d3be09b3f68c26da6ff16ab0344c9a66dcf65efdd7260c24c453be6b55b10eb7",
-      "git_blob_sha1": "38ba2d2796933a74d08be4e480bce21f93c99da4"
-    },
-    {
-      "path": "dist/js/payments.js",
-      "size_bytes": 69399,
-      "sha256": "dc59cbdbd15d8ab6c4e13f8b8a009f77c8cb44d3cce084833cbb7c0264d5620a",
-      "git_blob_sha1": "538093689c7bc1ff91910c414286ecd16fba6eb8"
-    },
-    {
-      "path": "dist/js/persistence.js",
-      "size_bytes": 9242,
-      "sha256": "1277f1b4fcef26f5efb99aea3a10f6e45375e2ff496a3138bd8a2944ae887e10",
-      "git_blob_sha1": "bb8a47e0093c11dd5a722aa04ccc4a5ce0f09f28"
-    },
-    {
-      "path": "dist/js/planning-parity-ui.js",
-      "size_bytes": 21648,
-      "sha256": "3f1ddd819a1f87eff8e122d09d5c592052e5644691a847a7baf751e4ef0e6f97",
-      "git_blob_sha1": "cf9423c49898a1e1b5ae0ae597858b47f87f4765"
-    },
-    {
-      "path": "dist/js/planning.js",
-      "size_bytes": 68030,
-      "sha256": "dc82e31dfa0488231556cb5a6184f19d7eff04fcd0e1c2288322f49bc14113f6",
-      "git_blob_sha1": "00dd9710dd3650edba1a8db204b874e6717ea9b6"
-    },
-    {
-      "path": "dist/js/qr-decoder.js",
-      "size_bytes": 4405,
-      "sha256": "2ee025d38dbf80259cc5df65b4eca717272c69386bda7adb8a11be22ec9ddb11",
-      "git_blob_sha1": "46cc10897e4509f33661ba05a47091c67ddf8356"
-    },
-    {
-      "path": "dist/js/qr-scanner.js",
-      "size_bytes": 2657,
-      "sha256": "3dbd82aed7a0bdd1d4abfc2492d12710838096358117b313f8eb85130c077079",
-      "git_blob_sha1": "7e9a1ca5bccf292c43a894bc65e8c3c951bc3878"
-    },
-    {
-      "path": "dist/js/qr-screen.js",
-      "size_bytes": 8395,
-      "sha256": "a880c5cffd38bc77002ed336ddab95bd771f0273e5ddfe289b8cd74e20d97c39",
-      "git_blob_sha1": "7ffe5fa5cba9c5eb880a065659b9663104666b7b"
-    },
-    {
-      "path": "dist/js/recipient-lookup.js",
-      "size_bytes": 8114,
-      "sha256": "8b0535cff7521111d7ed3aa0f303c9e1bcc8d84d98fc0e2eeda96b165446029e",
-      "git_blob_sha1": "b07a1a174266513e37d3234d1cb6f33e60e49bf0"
-    },
-    {
-      "path": "dist/js/router.js",
-      "size_bytes": 9505,
-      "sha256": "743c25153890d92ff97e1596b9e471a31b6d2b6bc042b543a43954d54accab3f",
-      "git_blob_sha1": "ca844514ad65f0432c44d19d390c7f6875edaa17"
-    },
-    {
-      "path": "dist/js/savings-parity-model.js",
-      "size_bytes": 12368,
-      "sha256": "f517fb494c6c208520cb22c741003eeb7edbf8b5694b0a8d802ff4067bfdbcbc",
-      "git_blob_sha1": "0d980639bb118bf727ae102b268094187f7f5ad7"
-    },
-    {
-      "path": "dist/js/state-boundary.js",
-      "size_bytes": 1522,
-      "sha256": "21c320798699c5c37b385f406636996a53430be6873034afd1867f860207783c",
-      "git_blob_sha1": "a1d5648ceb786f7466497c4307503c935f17ac3d"
-    },
-    {
-      "path": "dist/js/tour-model.js",
-      "size_bytes": 3733,
-      "sha256": "c6a07e01b80b3c32702ef0acfe8684334b7fefa92784b17dac39bfa88623d48f",
-      "git_blob_sha1": "28cf75a6518f89171067a8d5bffac5a4f556b75a"
-    },
-    {
-      "path": "dist/js/tour.js",
-      "size_bytes": 6613,
-      "sha256": "4ff1dd1f13bdf23b8ceaf57b46491e29d3de89da457614ac62e422f3fbf50b74",
-      "git_blob_sha1": "779e460a3290bc4a3f098bef2de9ea10485a5c5d"
-    },
-    {
-      "path": "dist/js/ui.js",
-      "size_bytes": 6364,
-      "sha256": "1578621c39c5a82be5b9bb79ad1f3212ace55447dd98939a631d407d8238db13",
-      "git_blob_sha1": "f377e0cb24e47a5f89332f9efefaff7384f4a9d9"
-    },
-    {
-      "path": "dist/js/vendor/jsqr-LICENSE.txt",
-      "size_bytes": 11358,
-      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
-      "git_blob_sha1": "8f71f43fee3f78649d238238cbde51e6d7055c82"
-    },
-    {
-      "path": "dist/js/vendor/jsqr.js",
-      "size_bytes": 257165,
-      "sha256": "4ee6947c9120ab80275c340711ae06ecbfb0a34e516e667d4fd733db47503744",
-      "git_blob_sha1": "313823807d09fe7d56c7ab90029ed1c185674382"
-    },
-    {
-      "path": "dist/js/vendor/qrcode.js",
-      "size_bytes": 56802,
-      "sha256": "c453b5e2281e9fedd0595db29fbc09bd4b6cac5146cb8a53a1c31531ec283287",
-      "git_blob_sha1": "63364d46c66c96e2d6d1076b1c330089452d51d7"
-    },
-    {
-      "path": "dist/js/verification-animation.js",
-      "size_bytes": 1697,
-      "sha256": "f6c379a30613c12abfc307f263ed34aed00155f15047e866eeb38a486aff2be9",
-      "git_blob_sha1": "40ec85482d193505d6e7d379c5496c5da50c2f32"
-    },
-    {
-      "path": "dist/learning-game-reflection.css",
-      "size_bytes": 22255,
-      "sha256": "5646871afe190145375e70256b68d8859b81b3c91e87f72b5535e272eb3313d5",
-      "git_blob_sha1": "884c5a4b18b807c158068232c3cff5cf2f13072c"
-    },
-    {
-      "path": "dist/learning-game-world.css",
-      "size_bytes": 31866,
-      "sha256": "6d3ae93a9b76cc38d364aa5f39f7979fdd857fb78765c2ed2f07c7108de24c2e",
-      "git_blob_sha1": "154d6741b63dfca4add8e010032cceae2ea908ac"
-    },
-    {
-      "path": "dist/learning-game.css",
-      "size_bytes": 18832,
-      "sha256": "471436ef161bf3d32aac72561161339ca0af96914606a7a3ef315facc7fe4cbe",
-      "git_blob_sha1": "a55cdb92c82d0d4be6883fa72ff8de9a621eeaf9"
-    },
-    {
-      "path": "dist/learning-motion.css",
-      "size_bytes": 5351,
-      "sha256": "959f5f9a5bdf4c687c24aa74d4d35deea853c79da394bdb39f1d1ec234c9f579",
-      "git_blob_sha1": "78f870c5f56c825741252c4812f7f24853dfa5c0"
-    },
-    {
-      "path": "dist/learning.css",
-      "size_bytes": 44018,
-      "sha256": "c05bb69c448412f710e9274e56cbfb346fa9ab4e33ea4216e08061068e8266f9",
-      "git_blob_sha1": "48c0c4a106c930dde3082deac72883c7cdeff290"
-    },
-    {
-      "path": "dist/life-parity.css",
-      "size_bytes": 6071,
-      "sha256": "3fee96e0dc5b0b6169aadb43ee2412f01e5a0e0429959b86368b0cad31430df8",
-      "git_blob_sha1": "cea6c4d67cc6fac766e415d146515c1da815c2ed"
-    },
-    {
-      "path": "dist/manifest.webmanifest",
-      "size_bytes": 214,
-      "sha256": "a29f7b803a0bb6fc0ab8a8bb20159b39bfe039dadc9565448e5c19f788c90d99",
-      "git_blob_sha1": "ea5668826975714b15542335f64164482c5df7c1"
-    },
-    {
-      "path": "dist/menu-refinement.css",
-      "size_bytes": 4135,
-      "sha256": "c31b5ef25c15d2830ae48d64130ac117d2bdd5c3d4e56ddabb7d2391e047fcb1",
-      "git_blob_sha1": "5cc85ae3f4981255aefaf3f5838cfe13cdeba451"
-    },
-    {
-      "path": "dist/money-iq.css",
-      "size_bytes": 16603,
-      "sha256": "592613da7c94b06563b21efb5f953725d1403243fcfffa7deb6059363ea56f8a",
-      "git_blob_sha1": "49a5a7c48260724993009b015a4f0391f1bb6431"
-    },
-    {
-      "path": "dist/offline.css",
-      "size_bytes": 432,
-      "sha256": "100569bc14459630bff1c9884506de87204e19d1922f8a7016c87b27b73883c7",
-      "git_blob_sha1": "39c1ef03d0dc535357ea0008d2d03db5808baa39"
-    },
-    {
-      "path": "dist/onboarding.css",
-      "size_bytes": 19187,
-      "sha256": "d6d56cdd88845336cd12fe59289b670734aa8b6974c36361fb90f929aafe3364",
-      "git_blob_sha1": "85e3c911d446b8a092d4a1bdd0dc889f5b185511"
-    },
-    {
-      "path": "dist/pause.css",
-      "size_bytes": 6190,
-      "sha256": "551a3a38c74b1ea600c02e852f5dbd47e179015f824fc4968f5e5d81cec345da",
-      "git_blob_sha1": "d3fbcfa3349b14455cc238571c48129721c2bd0f"
-    },
-    {
-      "path": "dist/payment-extras.css",
-      "size_bytes": 6154,
-      "sha256": "95c35eca73bda38b504e54b1df19192d898e5f2c1452ee53380ac29219345732",
-      "git_blob_sha1": "7b02b9ebfd170c662b9be159b2a851d7ba9ddcbd"
-    },
-    {
-      "path": "dist/payment-parity.css",
-      "size_bytes": 7930,
-      "sha256": "85fb4eaeff98b26fd19e83e34c60b7c61467e22ad8430979d2c8c0c447ab246e",
-      "git_blob_sha1": "6050bddbd90f694454eda3fbf26e983a1f944638"
-    },
-    {
-      "path": "dist/payment-recipient.css",
-      "size_bytes": 9985,
-      "sha256": "6e0886edff163913745be2d837a1b155f740028af25120676850964f1289de05",
-      "git_blob_sha1": "6980833898b689705f1861e09085cfd926b6f4f0"
-    },
-    {
-      "path": "dist/payment-services.css",
-      "size_bytes": 11308,
-      "sha256": "97df819b4e76e9eea099880693b390b3582c3e84c2e1a049ee0b4b6d5bc5bd18",
-      "git_blob_sha1": "6855249ee690176d7a8ad8d39be5b069c3875001"
-    },
-    {
-      "path": "dist/payment-success.css",
-      "size_bytes": 5789,
-      "sha256": "c979c24f5feceb3d09ccfc8aa0e237213fdff95ff130e28c405efc0d72454c3a",
-      "git_blob_sha1": "a3271dc5fdcdb4fe92790c7f2ae0a9a0d0fb8947"
-    },
-    {
-      "path": "dist/payments-hub.css",
-      "size_bytes": 10947,
-      "sha256": "0b7f289b2ccec644934a5e3e018ab9b1d967149124c579d906bcc85723dd06ea",
-      "git_blob_sha1": "fb3b840c0a374d0bbe95baa42bd32e3f4e735693"
-    },
-    {
-      "path": "dist/planning-consistency.css",
-      "size_bytes": 15050,
-      "sha256": "e9ad0e84a6dc969b6000746da8f5e9549c5fd2e713e0da8a3f04f62cac7e4c25",
-      "git_blob_sha1": "0c3133f9dc0be37039ecf7d4b41028c8ce74153b"
-    },
-    {
-      "path": "dist/qr-screen.css",
-      "size_bytes": 7831,
-      "sha256": "81ea41ab61019d52bd135ec3b22e3f25ee603660f13adad8351a79f499bf292b",
-      "git_blob_sha1": "c596ebaed8211e4634f34929a1d42d77b7f7c341"
-    },
-    {
-      "path": "dist/style.css",
-      "size_bytes": 56194,
-      "sha256": "9cb8f9b496f1888ddce49d7b110581434cc4191240143b05b6f3d01b4e3dfb24",
-      "git_blob_sha1": "a3b25d80435d607db12b921ab198adb5b9152259"
-    },
-    {
-      "path": "dist/sw.js",
-      "size_bytes": 4157,
-      "sha256": "b2469645ecad685345ed1e7a5c811958f6ac126fc5f2e50e6abe068dc92243b0",
-      "git_blob_sha1": "e6f0cdfa4a5b0e28568be3243528972b322314b4"
-    },
-    {
-      "path": "dist/tour.css",
-      "size_bytes": 5698,
-      "sha256": "d2ba359ca1739fe91763af1da2933ef4f8407bfd902aedc5cf6070f9bfab5248",
-      "git_blob_sha1": "a73d93188fffdebe80ddf79d79b42b6f0916c263"
-    }
-  ]
+  "dist/account-date-picker.css": "4b5595d8ea8c53ee69023bc2c0e5347acee30d8a8b1c733fcdceee3796c659fb",
+  "dist/account.css": "07b60d3dd497f042c51cc97a01db97c3bcfa143365ff841aa23701b77a3a3092",
+  "dist/activation.css": "85cb90c5761e107fb245ece3727de1aeb8b1e18329371a87ca0f91458eff9efb",
+  "dist/appearance-light.css": "3e4f3a2ebf8ecaa2b2654d431956bda28c49aa4674f176000d92621bcfe0783b",
+  "dist/appearance.css": "ab82736d8a4fdb086507251486ea559e23273e95be4dd7b026b77bc45aac83ff",
+  "dist/assets/lux-chat-2d.webp": "291c59b39d3349c28841608856f8963a032643845f0f93b7a9b2fd5baa50dd87",
+  "dist/assets/lux-pause-2d.webp": "8dc5c0df6557be54bd33b9008b92f211e5368f12bc2e9177b8f4464c041972af",
+  "dist/assets/student-warm-welcome.png": "5f27156498872a33e79d709acf81bfee6a3abbbb1716165cb4c30b62c7dd7dbe",
+  "dist/auth-access.css": "c286db3ce1d101932a47b4f82544349151d58209260c741b561710fa7d7bc7a9",
+  "dist/box-partner.css": "b430d3625af095de997976faeb813fe9662f8c62661046f96400b4f095e77f84",
+  "dist/box-protection-ui.css": "095c2c59254f844e7b28170ad0cf6f88ee40c894d8687ef248621da09c0dc77d",
+  "dist/chat.css": "1ac1a2693c94dfb7197a24c5ece38855e0591712075101260bb71496126a0fd9",
+  "dist/consistency.css": "f9419958542b5a66f9fc773828a8e2e36b3ebe9f62073c4669d33385ce287d7f",
+  "dist/explore.css": "b0a3ec3cfa6a2732b2fe21f0b949e562def183f0f0e33affb230828e146e0b09",
+  "dist/favicon.svg": "dab846eb02a29b691ca99b85529489c863e1e2cd5951ae1349299f583a76ebb2",
+  "dist/group-chat.css": "6db50ec4fd43b030e5eb967e6d123ec1c661e2c654f90cc0d154c5fa90487a63",
+  "dist/group-overview.css": "9a2ad0fa703dadcd0d9e763511e857c2958670c16c056738862e928aecc23230",
+  "dist/group-parity.css": "c36073e86287552be2feaec416b16bb281a896f9aa635cfb89ee6c726e68b514",
+  "dist/home-overview.css": "019a873864621037ea258eb40012760dcc643f42dd988135eadfc89ffe4f642b",
+  "dist/index.html": "56ecb9aef797a1e00d89311927e2661f59c11cfd7bcc929d2f90d2b3e306ac06",
+  "dist/insights.css": "656f28c8be786c44b3d368f138684d0eec1691584e0ca6fe91c882775725b8ef",
+  "dist/js/account-date-picker.js": "7f55e4be66e2f7df20d8655ea50a0b6bafd13f9db07cccef5b5b5086c5b3841a",
+  "dist/js/account-model.js": "3fc5ea1d520444757e7b2ebdcdebfd27c286222914f4bf1fc7e66eb5018e0424",
+  "dist/js/account-records.js": "a4f886fe34f4461640c703da29be29daf0088408654a5f0b95d8b6393f7f9774",
+  "dist/js/account-support-drafts.js": "ec966cca49e2cf9be8235a76abd09ee802ec97d7a15db41c4bc3039578fba63f",
+  "dist/js/account-ui.js": "e46217b2829562915482ae40e36beb25dcefb03425eb60093f729dcdde00b8e0",
+  "dist/js/activation-confetti.js": "e39c65f4b84c1bf41140753807aa4dc70f8db1224e043b6e341b6765db037919",
+  "dist/js/activation-funding-demo.js": "2a43da0567b84e69156ae2d4fadfbfdd6cf9842059799df4e41c4a0968d9cc20",
+  "dist/js/activation-funding-view.js": "07525d188a21c02c5b006b5ce6e711ca36202bd339d5072d62b1066cf7c934bd",
+  "dist/js/activation-model.js": "86eb2faba4b5b899f5e2775118be423cbf90c9b4276e970d894d88712b7e32ff",
+  "dist/js/activation.js": "ebb066254781daa9cb198ff562d5e990a221de6e45e1e20004150a03b8c864e0",
+  "dist/js/activity-view.js": "dde01b24b1f55a81a704fa37a33877f6e2914cc6506357e50326fab162c613ed",
+  "dist/js/app.js": "f8999f014d0b8ee955fde7f3198d6bddf9482ad1a79cad90f33d7287fe32ea69",
+  "dist/js/appearance-ui.js": "93b9c18b6f50b42f9544fe86cec13a73a21811f24ddd15bc6da8de8e427d14d5",
+  "dist/js/appearance.js": "b81ad008068151c73488811131576e3a854812132105d9bdb8f128df7c24b3c5",
+  "dist/js/box-partner-invitation.js": "f3678e36dd418d342e0d1a21033bac50ff4bfa2e14edb07033f602b381d8d404",
+  "dist/js/box-partner-setup.js": "ebd4454cbae1795d8b5c136cc250208d26d96f1db17824ba5887ebd828eb4b91",
+  "dist/js/box-protection-ui.js": "38b31ef08c9ba5b665123d1beb783e299de9f1ecdfc279c7054a6710de095ce8",
+  "dist/js/box-protection.js": "943faee52c113301a087ad478cbf1438faef856e1d44a3efb1139338f41def78",
+  "dist/js/budget-quick.js": "1fc7f399302cee27821c19b2c7c5b8ee7ae8055cb8414603a4732d5dedc7a6ed",
+  "dist/js/camera.js": "57a94f90ddd2fd10c306de553d189b97a0c4d5d84103f2a3fa9ebf8ff701ece5",
+  "dist/js/card-parity-ui.js": "4f3a7ba7c87268e91bf3e0b6ae3df066162dc3437cbe757c182cff7a097a148c",
+  "dist/js/chat-action-model.js": "49e17b27b66036bdc013dc1615db5ae8b09fc87020018fdf07f4337ac9d07514",
+  "dist/js/chat-gestures.js": "63b46440efb96fb34b8ff231a4b3ccd662c4a9efb49b05aed8ae68f43e8cb0bd",
+  "dist/js/chat-language.js": "e4b5166fd194bb4ef0d6ac281ecaecd1b67daaa9db32623013017b12338b81b3",
+  "dist/js/chat.js": "45ac1bdc919d9ca272c876c786efb7a7e147f92081dce9ac0681f966368b1bd1",
+  "dist/js/device-auth.js": "90b71b0160f4e0f27a3be1cede9fb6b2f5f208c74427bd04e01e1afd5cd2f9d9",
+  "dist/js/explore-model.js": "7a4ebfb22da7b39c487211a5825e50aaa4e9f1dca257299ecd11d4663b22c359",
+  "dist/js/explore-playback.js": "b401124c601b15f6bf2a6812b3cbde5b87a882a2897873494f1a82e6218c250e",
+  "dist/js/explore-view.js": "a380359e043a33bd5a88d1aa11c345125c1874f974edca4da17cfba8743a85bc",
+  "dist/js/group-actions.js": "1800a5b1fda1251367740113d476b55d697355869e25f9e9338c0423d7e04b20",
+  "dist/js/group-chat-model.js": "2aff76951f5f130323e647c360fd73905a950b2ae8792f51d4e727688dff9d68",
+  "dist/js/group-chat.js": "c9d74bec4ea6a6b0008a1134fa7d9e5c3b5f74bc669855f41e30dec03d679798",
+  "dist/js/group-ledger.js": "8a933de0263c606312275d7bd78d56f71f124c4525e9ccb2bc4bfcfb457670ae",
+  "dist/js/group-overview.js": "209084f05e9e12ffb7268b2213253d703855405ae43cada34b6d06e5792b030b",
+  "dist/js/group-policy.js": "73c79c4ecc6873e5a84238ea564535732c0c5621cbdb125ceee5f0eacb684554",
+  "dist/js/home-gestures.js": "153845d5803c606d7230e3990517f4c22e4c23d43575e9d241e3831c15c601f9",
+  "dist/js/home-overview.js": "9ebd6d5c51d5a4d1da1183c645560906363d09401b3c8a8b9bc848a79d1bf332",
+  "dist/js/home-view.js": "e16f55ad733f232e1676c77872e2b8b8da4a8c66b3c987ce80896cb7892e2560",
+  "dist/js/insights.js": "7c7e54d84b0431941f21a2dd71f49e10ca234e81ea52a2925cc6a2553962ba11",
+  "dist/js/learning-content.js": "0b1c426921e6561661b7589c28e6ba01263e0e4d2b412b1b1648f6a7f87cb017",
+  "dist/js/learning-entry.js": "f415050bbf74da50483b624ad4465ce76dc74ad3db344150ebb79202e2e33429",
+  "dist/js/learning-game-content.js": "2e2df323ad4f3ec6786a82e4f2c6c6b16f84974ec73ae40a454f7a198deeedb6",
+  "dist/js/learning-game-model.js": "fdf9fd92082515acd28cc1b8578f2e8b0b28d0bcae21ab9bd5bb75b29f6118b5",
+  "dist/js/learning-game-motion.js": "0ab689647105c27cb0f09a3f50f1c857c55726daee582764675b5e3b2f426352",
+  "dist/js/learning-game-reflection.js": "dc5359fd36f62651e9aae3d9458d2f9ccf82be5c108da5d8912dcffea033a95f",
+  "dist/js/learning-game-ui.js": "daea222f90e64bb4a9a6304d2f405b9037b60863cbe619f21b644227fa612d00",
+  "dist/js/learning-game-world-art.js": "993855fe85a922c9fd2e8363daba5d991fdbd8a8953ffc8b0bb18ef304131a56",
+  "dist/js/learning-game-world-content.js": "070b70a2a3f192b5c0a8bc4cf1aa7773388d08f94f13929d8c9cd85a65e2ad34",
+  "dist/js/learning-game-world-motion.js": "67846b7ca42a8e9abef7583f21e21fb6d37946ff71e0a3efd7f45e2b9901431a",
+  "dist/js/learning-model.js": "dc18f0413d35b4c927a2947f4b39542bd324c1936d968b203dea438de7d46e11",
+  "dist/js/learning-ui.js": "1d2c66427bca190ee89eaf2abd5ff5731da70485de0bc98276b1a366bc5a5867",
+  "dist/js/life.js": "9806062330468d51c2d7c7c942fd2e58c4e8c430e6910098faa65c7d9a022eb2",
+  "dist/js/login-credentials.js": "6ce9d085dc8e6130800f81508621a1ba8350e1232f654f49512546ac01378506",
+  "dist/js/merchant-code.js": "562374231a7b3626834d27df031e8931659e3213239404bc8dc6b1d82bd21e26",
+  "dist/js/model.js": "60f146ccb2b65658d67b645322642400938b9e9a9246ff334777eb827ca86d13",
+  "dist/js/money-answers.js": "ad14e0045f55b97d0f443b802d8d30c5a5c3154b8db007aa9ce95b8954fe8463",
+  "dist/js/money-iq-model.js": "1b4dd7e0dc100f22b66e7cba9f7c758e31b8705738763392f89970f3f91acca6",
+  "dist/js/money-iq-ui.js": "490e616b373c66695a70f5984aa615027eb6afc1594c42d22b54e15ee19f5095",
+  "dist/js/navigation.js": "8ec4f9e16a76d0cfc3ed15c5b42a22c044d53e18a00e81f89c3bcd7e8a395713",
+  "dist/js/offline-shell.js": "603bada23688a71407db461c9490af8455d1f51e1b04c763b8edba7d7a4a1b30",
+  "dist/js/onboarding-model.js": "0d91a7ea2070473fa981d096eb44d7e430e43af29e241c3fcc67ef8ff466e725",
+  "dist/js/onboarding.js": "d9b790e48ec26df71e581df01e3d9e9a83ec210e523104f707a6474f25ad2fc2",
+  "dist/js/outflow-impact.js": "34b56feaa9b66d8246374fc4846e35d684414808cc46a2c2fd096a58f8f9c625",
+  "dist/js/pause-history.js": "2172d9267588979f6f0deb4b886acf745ac12dddc35bde62d5569a56c2a09b09",
+  "dist/js/pause-intelligence.js": "893698fa5f7f5f025bcb99b0a79031786dacf2693ab9ac27d21b916bb9bf0275",
+  "dist/js/pause-view.js": "5bc52e18dadc5e8de1744ae5c0f10b900cb10dbdd955fdd4286b7a6c26cfa551",
+  "dist/js/payment-catalog.js": "4f5a1a3b2c8c59b9b78ca791efed1e9e93a7ccd5ebd0ca47d4029b403cd6e3b4",
+  "dist/js/payment-extras.js": "c863de616c665e70b525fcae18a0c8838757c94b71f2859d8ed0ab2d50a5ab54",
+  "dist/js/payment-recipient.js": "e6f7ceada54a60a63c903c208d35bedc1addd11b6f8d72168a0b794b3bf9ce8f",
+  "dist/js/payment-services.js": "c85b13fa07fb9b20e31921f72d52a34345595773b0688b4489932b0f63de8a2b",
+  "dist/js/payments-hub.js": "fe0c34236cd43fac473c0479283dfde8f07a022edbc6f39ee2047cce16ab8478",
+  "dist/js/payments-parity-model.js": "83a2f4a3b6749e2209cb9d404d9ba7e89d839e6d31898aec33c3c017cb1e0cd4",
+  "dist/js/payments-parity-ui.js": "d3be09b3f68c26da6ff16ab0344c9a66dcf65efdd7260c24c453be6b55b10eb7",
+  "dist/js/payments.js": "2254041410901000441038ddb6ad7de25aafcc3ca393cd74acf42f5078b75b66",
+  "dist/js/persistence.js": "1277f1b4fcef26f5efb99aea3a10f6e45375e2ff496a3138bd8a2944ae887e10",
+  "dist/js/planning-parity-ui.js": "0d2bf50663fb46354d3c8e3529e79cfca2e6fe31dda26ac4222b25516855ef45",
+  "dist/js/planning.js": "51378abbb2a97321f42b77e831d4d5ce1b81d1144333a5c297f5962c06e8c01b",
+  "dist/js/qr-decoder.js": "2ee025d38dbf80259cc5df65b4eca717272c69386bda7adb8a11be22ec9ddb11",
+  "dist/js/qr-scanner.js": "3dbd82aed7a0bdd1d4abfc2492d12710838096358117b313f8eb85130c077079",
+  "dist/js/qr-screen.js": "17b1685552c4fc7ad7d06f0eb44722b68ac9024edbff016632dcad73d5050fc5",
+  "dist/js/recipient-lookup.js": "8b0535cff7521111d7ed3aa0f303c9e1bcc8d84d98fc0e2eeda96b165446029e",
+  "dist/js/router.js": "743c25153890d92ff97e1596b9e471a31b6d2b6bc042b543a43954d54accab3f",
+  "dist/js/savings-hack-disclosure.js": "21884bae0d8c18fc7080b345ce6526b32444870931e7b8f7eb51dcf3d6870bcc",
+  "dist/js/savings-parity-model.js": "f517fb494c6c208520cb22c741003eeb7edbf8b5694b0a8d802ff4067bfdbcbc",
+  "dist/js/setup-terms-model.js": "a7beb89ce1d152c1c4b0ed93dd9787e8f9f85ecfe4898e62d4d92655f33f48c2",
+  "dist/js/setup-terms.js": "ae8363227f5d18c3f2f257a217f7ee0fed4afea4a1fa99db32812077a377ad4c",
+  "dist/js/state-boundary.js": "21c320798699c5c37b385f406636996a53430be6873034afd1867f860207783c",
+  "dist/js/tour-model.js": "a665d1fdaaa4840a93c9cc929d014f45314d5ccd2b94bd0dbae85e8894fc67cd",
+  "dist/js/tour.js": "19c6a0b83dd1cd56b72bf31cf9944d4db931e09c83a98243957daa746935f55f",
+  "dist/js/ui.js": "1578621c39c5a82be5b9bb79ad1f3212ace55447dd98939a631d407d8238db13",
+  "dist/js/vendor/jsqr-LICENSE.txt": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+  "dist/js/vendor/jsqr.js": "4ee6947c9120ab80275c340711ae06ecbfb0a34e516e667d4fd733db47503744",
+  "dist/js/vendor/qrcode.js": "c453b5e2281e9fedd0595db29fbc09bd4b6cac5146cb8a53a1c31531ec283287",
+  "dist/js/verification-animation.js": "f6c379a30613c12abfc307f263ed34aed00155f15047e866eeb38a486aff2be9",
+  "dist/js/welcome-view.js": "0546a1e96c62de896c9020a4472392a548be344daba9d8b1255db2db0f5ea1b3",
+  "dist/learning-game-reflection.css": "5646871afe190145375e70256b68d8859b81b3c91e87f72b5535e272eb3313d5",
+  "dist/learning-game-world.css": "0b5df67083fb146dd03eaa85d39326ad7006cca44f316a2bc697ac06c1ae8aa4",
+  "dist/learning-game.css": "471436ef161bf3d32aac72561161339ca0af96914606a7a3ef315facc7fe4cbe",
+  "dist/learning-motion.css": "959f5f9a5bdf4c687c24aa74d4d35deea853c79da394bdb39f1d1ec234c9f579",
+  "dist/learning.css": "c05bb69c448412f710e9274e56cbfb346fa9ab4e33ea4216e08061068e8266f9",
+  "dist/life-parity.css": "3fee96e0dc5b0b6169aadb43ee2412f01e5a0e0429959b86368b0cad31430df8",
+  "dist/manifest.webmanifest": "a29f7b803a0bb6fc0ab8a8bb20159b39bfe039dadc9565448e5c19f788c90d99",
+  "dist/menu-refinement.css": "c31b5ef25c15d2830ae48d64130ac117d2bdd5c3d4e56ddabb7d2391e047fcb1",
+  "dist/money-iq.css": "592613da7c94b06563b21efb5f953725d1403243fcfffa7deb6059363ea56f8a",
+  "dist/offline.css": "100569bc14459630bff1c9884506de87204e19d1922f8a7016c87b27b73883c7",
+  "dist/onboarding.css": "d6d56cdd88845336cd12fe59289b670734aa8b6974c36361fb90f929aafe3364",
+  "dist/pause.css": "db300c4ddb5f3627adb0b2d1919275f5d1a5cfbd3a9511d103fea5f88b7a6bc3",
+  "dist/payment-extras.css": "95c35eca73bda38b504e54b1df19192d898e5f2c1452ee53380ac29219345732",
+  "dist/payment-parity.css": "85fb4eaeff98b26fd19e83e34c60b7c61467e22ad8430979d2c8c0c447ab246e",
+  "dist/payment-recipient.css": "6e0886edff163913745be2d837a1b155f740028af25120676850964f1289de05",
+  "dist/payment-services.css": "97df819b4e76e9eea099880693b390b3582c3e84c2e1a049ee0b4b6d5bc5bd18",
+  "dist/payment-success.css": "c979c24f5feceb3d09ccfc8aa0e237213fdff95ff130e28c405efc0d72454c3a",
+  "dist/payments-hub.css": "0b7f289b2ccec644934a5e3e018ab9b1d967149124c579d906bcc85723dd06ea",
+  "dist/planning-consistency.css": "e9ad0e84a6dc969b6000746da8f5e9549c5fd2e713e0da8a3f04f62cac7e4c25",
+  "dist/qr-screen.css": "81ea41ab61019d52bd135ec3b22e3f25ee603660f13adad8351a79f499bf292b",
+  "dist/setup-terms.css": "bcece25dcc4cc0ab4ee1cb9ac3655a84cc1ca8da8f31409088b618cb0f17cf93",
+  "dist/style.css": "d4d45416c950198865d872526eaa11cfdd8fa67b36b6ba8ac9d350d4093b873b",
+  "dist/sw.js": "dedfb717e4ccf9b894c758d67ef30963cecff39a3e07a6b3db9ea079c754222d",
+  "dist/tour.css": "44d99c10d8d6742455528b0870cad96828c5632963af4d9c929e9e6c1a21fd83",
+  "dist/welcome-photo.css": "b19f8641956553156650918527af2387eb80bbda9d0ddb5488307fcfdd933121",
+  "dist/welcome.css": "58eb0102daa4e5891c35787b6cbb1d06a6cbeadd9f63d06e1260d3896ec564c6"
 }

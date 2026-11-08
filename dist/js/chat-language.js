@@ -153,7 +153,7 @@ function financialReply(state, topic, canonicalQuestion, now, rest = {}) {
     case 'daily':
       if (title === 'Here is your daily guide.') title = 'A little room for today.';
       followUps = ['Can I spend GH₵50 on lunch?', 'My allowance is late']; break;
-    case 'balance': title = answer.title === 'Every cedi has a place.' ? 'Here’s the money story.' : answer.title; paragraphs = paragraphs.slice(0, 2); followUps = ['How much can I spend today?', 'Where did my money go?']; break;
+    case 'balance': title = answer.title === 'Every cedi has a place.' ? 'Here’s the money story.' : answer.title; paragraphs = paragraphs.slice(0, 3); followUps = ['How much can I spend today?', 'Where did my money go?']; break;
   }
   return { ...answer, title, paragraphs, followUps, context: ctx };
 }
@@ -212,7 +212,7 @@ function conversationAnswer(state, question, { messages = [], now = new Date() }
 
   if (/\b(?:hungry|need lunch)\b/.test(q) && !amount.found) return { ...smallReply('afford', 'Let’s check lunch first.', ['Tell me what it would cost, and I’ll check how it sits with your plan.'], ['How much can I spend today?']), context: context('afford', { amount: null, subject: 'lunch' }) };
 
-  if (/^(?:what|how much)(?: money)? can i (?:spend|use)(?: in| from)? lumo(?: now)?[.!?\s]*$/.test(q)) return financialReply(state, 'balance', 'Explain my available balance', now);
+  if (/^(?:what|how much)(?: money)? can i (?:spend|use)(?:(?: in| from)? lumo)?(?: now)?[.!?\s]*$/.test(q)) return financialReply(state, 'balance', 'Explain my available balance', now);
   if (/\b(?:make|help).*(?:allowance|money).*(?:last|stretch)|\bstretch.*(?:allowance|money)|\b(?:allowance|money).*last (?:until|till|to)\b/.test(q)) return { ...financialReply(state, 'daily', 'How much can I spend today?', now), followUps: ['What’s left in my plan?', 'My allowance is late'] };
 
   const saving = /\b(?:save|saving|savings|money box|money boxes|goal|goals|round.?up|hack|hacks)\b|put.*aside/.test(q);

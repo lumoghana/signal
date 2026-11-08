@@ -1,6 +1,13 @@
 /** Benefit-tour state is separate from account balances, identity and signup proof. */
 export const TOUR_SCHEMA = 1;
 export const TOUR_STORAGE_KEY = 'lumo-benefit-tour-v1';
+/** Fixed examples for the optional introduction, never a member's account data. */
+const available = 100000, planned = 65000, cushion = 10000, goalSaved = 25000, hackPayment = 2000, hackPercent = 5;
+const hackSaved = Math.round(hackPayment * hackPercent / 100);
+export const TOUR_SAMPLE = Object.freeze({ available, planned, cushion,
+  leftAfterPlan: available - planned - cushion,
+  goalSaved, hackPayment, hackPercent, hackSaved, goalAfter: goalSaved + hackSaved, goalTarget: 150000,
+});
 const object = value => !!value && typeof value === 'object' && !Array.isArray(value);
 const statuses = new Set(['completed', 'skipped']);
 
@@ -21,7 +28,7 @@ export function createTourDraft({ replay = false, returnTo = null } = {}) {
   return {
     schema: TOUR_SCHEMA, step: 0, replay: replay === true,
     returnTo: safeReturnTo(returnTo, replay === true),
-    essentialsShown: false, paymentTried: false, smallerPayment: false, saved: false,
+    essentialsShown: false, paymentTried: false, smallerPayment: false, saved: false, luxReplied: false,
   };
 }
 
@@ -30,7 +37,7 @@ export function normalizeTourDraft(input) {
   const draft = createTourDraft({ replay: source.replay === true, returnTo: source.returnTo });
   if (source.schema !== TOUR_SCHEMA) return draft;
   draft.step = safeTourStep(source.step);
-  for (const key of ['essentialsShown', 'paymentTried', 'saved']) draft[key] = source[key] === true;
+  for (const key of ['essentialsShown', 'paymentTried', 'saved', 'luxReplied']) draft[key] = source[key] === true;
   draft.smallerPayment = draft.paymentTried && source.smallerPayment === true;
   return draft;
 }
@@ -38,7 +45,7 @@ export function normalizeTourDraft(input) {
 /** Demonstrations only set presentation flags. No action receives account state. */
 export function updateTourDemo(draft, action) {
   if (!object(draft) || draft.schema !== TOUR_SCHEMA) return false;
-  const field = { essentials: 'essentialsShown', payment: 'paymentTried', 'smaller-payment': 'smallerPayment', save: 'saved' };
+  const field = { essentials: 'essentialsShown', payment: 'paymentTried', 'smaller-payment': 'smallerPayment', save: 'saved', 'lux-reply': 'luxReplied' };
   if (!Object.hasOwn(field, action) || (action === 'smaller-payment' && draft.paymentTried !== true)) return false;
   draft[field[action]] = true;
   return true;

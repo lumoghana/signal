@@ -1,18 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { confirmFunding } from './helpers/activation-funding.js';
 import { createEmptyState, createDemoState, getSummary, applyAction, loadState, saveState } from '../dist/js/model.js';
-import { createActivationDraft, fundActivation, addActivationBudgetItem, saveActivationBudget } from '../dist/js/activation-model.js';
+import { createActivationDraft, acknowledgeCreatedAccount, fundActivation, addActivationBudgetItem, saveActivationBudget } from '../dist/js/activation-model.js';
 import { createOnboardingDraft, completeOnboardingStep, updateOnboardingField, attemptOnboardingCode, resendOnboardingCode, expireOnboardingCode, demoCodeError, LIVENESS_PROMPTS, recordSelfieCapture, beginIdentityVerification, resolveIdentityVerification, checkPendingIdentityVerification, confirmIdentityDetails, persistableOnboardingDraft, normalizeOnboardingDraft } from '../dist/js/onboarding-model.js';
 import { renderIdentityVerification, renderOnboarding } from '../dist/js/onboarding.js';
 import { renderLife } from '../dist/js/life.js';
+import { acceptSetupTerms } from '../dist/js/setup-terms-model.js';
 const ok = r => { assert.equal(r.ok,true,r.message); return r; };
-function codeReady(){const d=createOnboardingDraft();updateOnboardingField(d,'name','Ama');ok(completeOnboardingStep(d,'name'));ok(completeOnboardingStep(d,'phone'));return d;}
+function codeReady(){const d=createOnboardingDraft();ok(acceptSetupTerms(d,{accepted:true}));updateOnboardingField(d,'name','Ama');ok(completeOnboardingStep(d,'name'));ok(completeOnboardingStep(d,'phone'));return d;}
 function faceReady(){const d=codeReady();updateOnboardingField(d,'code','123456');ok(completeOnboardingStep(d,'code'));updateOnboardingField(d,'ghanaCardNumber','GHA-000000000-0');ok(completeOnboardingStep(d,'card-number'));updateOnboardingField(d,'consent',true);LIVENESS_PROMPTS.forEach(p=>ok(recordSelfieCapture(d,p)));return d;}
 function ctx(state=createDemoState()){return {state,draft:{},route:{section:'life'},$:()=>null};}
 
 test('first signup budget duration controls daily guide and never invents income',()=>{
-  const s=createEmptyState();s.onboardingDone=true;s.buffer=0;
-  const d=createActivationDraft({state:s});ok(fundActivation(d,{amount:10000,source:'Mobile money'}));ok(addActivationBudgetItem(d,{name:'Food',amount:3000}));
+  const s=createEmptyState();s.onboardingDone=true;s.buffer=0;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];
+  const d=createActivationDraft({state:s});ok(acknowledgeCreatedAccount(d));ok(confirmFunding(d,{amount:10000,source:'Mobile money'}));ok(addActivationBudgetItem(d,{name:'Food',amount:3000}));
   const expectedDate=d.state.income.nextDate;const due=new Date(Date.now()+30*86400000).toISOString().slice(0,10);ok(saveActivationBudget(d,{due}));
   assert.equal(d.state.income.nextDate,expectedDate);assert.equal(d.state.budget.endDate,due);assert.equal(d.state.income.amount,0);assert.equal(getSummary(d.state).daysLeft,30);assert.equal(getSummary(d.state).dailyAllowance,233);assert.equal(d.state.wallet,10000);
 });

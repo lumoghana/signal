@@ -4,6 +4,7 @@ import { webcrypto } from 'node:crypto';
 import { getSummary, saveState } from '../dist/js/model.js';
 import { createLoginCredential, derivePasswordProof } from '../dist/js/login-credentials.js';
 import { renderOnboarding } from '../dist/js/onboarding.js';
+import { acceptSetupTerms } from '../dist/js/setup-terms-model.js';
 import { ONBOARDING_SCHEMA, ONBOARDING_STEPS, LIVENESS_PROMPTS, SAMPLE_CARD_NUMBER, SAMPLE_IDENTITY_DETAILS, beginIdentityVerification, resolveIdentityVerification, cancelIdentityVerification, confirmIdentityDetails, createOnboardingDraft, normalizeOnboardingDraft, persistableOnboardingDraft, updateOnboardingField, validateIdentityNumber, validateOnboardingStep, completeOnboardingStep, recordSelfieCapture, resetCameraCaptures, resetLiveness, firstIncompleteOnboardingStep, safeOnboardingStep, canonicalOnboardingStep, setOnboardingLogin, buildOnboardingState } from '../dist/js/onboarding-model.js';
 
 const demoCredential = { version: 1, algorithm: 'PBKDF2-SHA-256', iterations: 210000, salt: 'ab'.repeat(16), verifier: 'cd'.repeat(32) };
@@ -11,6 +12,7 @@ const okay = result => { assert.equal(result.ok, true, result.message); return r
 function captureAll(draft) { for (const prompt of LIVENESS_PROMPTS) okay(recordSelfieCapture(draft, prompt)); }
 function verify(draft, success = true) { const { attemptId } = okay(beginIdentityVerification(draft)); return okay(resolveIdentityVerification(draft, { success, attemptId })); }
 function through(draft, last) {
+  okay(acceptSetupTerms(draft, { accepted: true, now: '2026-11-08T00:00:00.000Z' }));
   for (const step of ONBOARDING_STEPS) {
     if (step === 'name') updateOnboardingField(draft, 'name', 'Ama');
     if (step === 'code') updateOnboardingField(draft, 'code', '123456');

@@ -1,23 +1,91 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEmptyState } from '../dist/js/model.js';
-import { createActivationDraft, fundActivation, addActivationBudgetItem, saveActivationBudget, safeActivationStep, completeActivation } from '../dist/js/activation-model.js';
+import { createActivationDraft, restoreActivationDraft, acknowledgeCreatedAccount, addActivationBudgetItem, saveActivationBudget, safeActivationStep, completeActivation, requestActivationFunding } from '../dist/js/activation-model.js';
 import { renderActivation, bindActivation } from '../dist/js/activation.js';
+import { confirmFunding } from './helpers/activation-funding.js';
 
-function draft({ funded = false } = {}) {
-  const state = createEmptyState(); state.onboardingDone = true;
+function draft({ funded = false, acknowledged = true } = {}) {
+  const state = createEmptyState({ name: 'Ama' }); state.onboardingDone = true;
+  state.accounts = [
+    { type: 'operational', holderName: 'Ama Mensah', status: 'simulated-ready', reference: 'DEMO-OPERATIONAL' },
+    { type: 'savings', holderName: 'Savings decoy', accountNumber: '999999999999', status: 'simulated-ready' },
+  ];
   const d = createActivationDraft({ state, preview: true });
-  if (funded) assert.equal(fundActivation(d, { amount: 10000, source: 'Mobile money' }).ok, true);
+  if (acknowledged || funded) assert.equal(acknowledgeCreatedAccount(d).ok, true);
+  if (funded) assert.equal(confirmFunding(d, { amount: 10000, source: 'Mobile money' }).ok, true);
   return d;
 }
+
+test('signup first celebrates only the stored Everyday account and labels the sample number honestly', () => {
+  const d = draft({ acknowledged: false });
+  d.state.profile.name = 'Unverified nickname';
+  const before = JSON.stringify(d), html = renderActivation({ draft: { activation: d } }, { step: 'fund' });
+  assert.match(html, /Your sample account is ready, Ama/);
+  assert.match(html, /Money just.*got personal/s);
+  assert.match(html, /GCB Bank/);
+  assert.match(html, /000000000001/);
+  assert.match(html, /Ama Mensah/);
+  assert.match(html, /Example number/);
+  assert.match(html, /No live account/);
+  assert.match(html, /Do not transfer real money/);
+  assert.match(html, /data-activation-action="acknowledge-account"/);
+  assert.match(html, /data-activation-action="copy-account-number"/);
+  assert.doesNotMatch(html, /999999999999|Savings decoy|Unverified nickname|DEMO-SAVINGS/);
+  assert.doesNotMatch(html, /data-activation-action="fund"|id="activation-funding"|data-activation-action="defer"/);
+  assert.equal(JSON.stringify(d), before, 'Rendering congratulates without funding or changing the checkpoint.');
+});
+
+test('an operational number is used as supplied while a missing operational record never falls back to Savings', () => {
+  const d = draft({ acknowledged: false });
+  const everyday = d.state.accounts.find(item => item.type === 'operational');
+  everyday.accountNumber = '100200300400'; everyday.status = 'ready'; delete everyday.demoNumber;
+  const provided = renderActivation({ draft: { activation: d } }, { step: 'account-created' });
+  assert.match(provided, /100200300400/);
+  assert.doesNotMatch(provided, /000000000001|999999999999|Savings decoy/);
+  delete everyday.accountNumber;
+  const unavailable = renderActivation({ draft: { activation: d } }, { step: 'account-created' });
+  assert.doesNotMatch(unavailable, /000000000001|999999999999|data-activation-action="copy-account-number"/);
+  assert.match(unavailable.match(/<button\b[^>]*data-activation-action="acknowledge-account"[^>]*>/)?.[0] || '', /\bdisabled\b/);
+  assert.equal(acknowledgeCreatedAccount(d).ok, false);
+  d.state.accounts = d.state.accounts.filter(item => item.type === 'savings');
+  const missing = renderActivation({ draft: { activation: d } }, { step: 'account-created' });
+  assert.doesNotMatch(missing, /100200300400|000000000001|999999999999|Savings decoy/);
+  assert.doesNotMatch(missing, /data-activation-action="copy-account-number"/);
+  assert.match(missing.match(/<button\b[^>]*data-activation-action="acknowledge-account"[^>]*>/)?.[0] || '', /\bdisabled\b/);
+  assert.equal(acknowledgeCreatedAccount(d).ok, false);
+});
+
+test('an invalid supplied operational number cannot show or copy an older valid demo number', () => {
+  const d = draft({ acknowledged: false });
+  d.state.accounts.find(account => account.type === 'operational').accountNumber = 'invalid-bank-reference';
+  const before = JSON.stringify(d), html = renderActivation({ draft: { activation: d } }, { step: 'account-created' });
+  assert.doesNotMatch(html, /000000000001|999999999999|invalid-bank-reference|data-activation-action="copy-account-number"/);
+  assert.match(html.match(/<button\b[^>]*data-activation-action="acknowledge-account"[^>]*>/)?.[0] || '', /\bdisabled\b/);
+  assert.equal(JSON.stringify(d), before);
+  assert.equal(acknowledgeCreatedAccount(d).ok, false);
+});
+
+test('the arrival view never creates a missing sample number until the saved draft is explicitly restored', () => {
+  const d = draft({ acknowledged: false });
+  delete d.state.accounts.find(account => account.type === 'operational').demoNumber;
+  const before = JSON.stringify(d), original = renderActivation({ draft: { activation: d } }, { step: 'account-created' });
+  assert.equal(JSON.stringify(d), before);
+  assert.doesNotMatch(original, /000000000001|data-activation-action="copy-account-number"/);
+  assert.match(original.match(/<button\b[^>]*data-activation-action="acknowledge-account"[^>]*>/)?.[0] || '', /\bdisabled\b/);
+  const restored = restoreActivationDraft(d), html = renderActivation({ draft: { activation: restored } }, { step: 'account-created' });
+  assert.match(html, /000000000001/);
+  assert.match(html, /Example number/);
+  assert.doesNotMatch(html.match(/<button\b[^>]*data-activation-action="acknowledge-account"[^>]*>/)?.[0] || '', /\bdisabled\b/);
+});
 
 test('funding shows the demo boundary and returning to a completed top-up has one next action', () => {
   const d = draft();
   const first = renderActivation({ draft: { activation: d } }, { step: 'fund' });
-  assert.match(first, /No real money leaves/);
+  assert.match(first, /No real request or transfer is made/);
   assert.match(first, /SIGNUP PREVIEW/);
   assert.match(first, /id="activation-funding"/);
-  assert.equal(fundActivation(d, { amount: 10000, source: 'Mobile money' }).ok, true);
+  assert.equal(confirmFunding(d, { amount: 10000, source: 'Mobile money' }).ok, true);
   const returned = renderActivation({ draft: { activation: d } }, { step: 'fund' });
   assert.doesNotMatch(returned, /id="activation-funding"/);
   assert.doesNotMatch(returned, /data-activation-action="fund"/);
@@ -39,18 +107,104 @@ test('purpose controls reveal the selected category and used categories cannot b
 });
 
 function binder(d, { step = 'purpose', fields = [] } = {}) {
-  const handlers = {}, navigations = [], error = { textContent: '' };
-  let refreshes = 0, captureCurrent = null;
+  const handlers = {}, navigations = [], error = { textContent: '' }, copyFeedback = { textContent: '' };
+  let refreshes = 0, exits = 0, captureCurrent = null;
   const root = {
     isConnected: true,
     querySelectorAll(selector) { return selector === '[data-activation-field]' ? fields : []; },
-    querySelector(selector) { return selector === '.activation-error' ? error : null; },
+    querySelector(selector) { return selector === '.activation-error' ? error : selector === '[data-activation-copy-feedback]' ? copyFeedback : null; },
     addEventListener(name, handler) { handlers[name] = handler; }, removeEventListener() {},
   };
-  const ctx = { draft: { activation: d }, $: () => root, setCapture(callback) { captureCurrent = callback; }, saveDraft() {}, refresh() { captureCurrent?.(); refreshes++; }, go(route) { captureCurrent?.(); navigations.push(route); } };
+  const ctx = { draft: { activation: d }, $: () => root, setCapture(callback) { captureCurrent = callback; }, saveDraft() {}, refresh() { captureCurrent?.(); refreshes++; }, go(route) { captureCurrent?.(); navigations.push(route); }, exitActivation() { captureCurrent?.(); exits++; } };
   const cleanup = bindActivation(ctx, { step });
-  return { error, navigations, cleanup, get refreshes() { return refreshes; }, input(target) { handlers.input({ target }); }, change(target) { handlers.change({ target }); }, click(dataset) { handlers.click({ target: { closest() { return { dataset, disabled: false }; } } }); } };
+  return { error, copyFeedback, navigations, cleanup, get refreshes() { return refreshes; }, get exits() { return exits; }, input(target) { handlers.input({ target }); }, change(target) { handlers.change({ target }); }, click(dataset) { return handlers.click({ target: { closest() { return { dataset, disabled: false }; } } }); } };
 }
+
+test('exiting before Continue preserves the congratulations checkpoint on resume', () => {
+  const d = draft({ acknowledged: false }), ui = binder(d, { step: 'account-created' });
+  ui.click({ activationAction: 'exit' });
+  assert.equal(ui.exits, 1);
+  assert.equal(d.accountAcknowledged, false);
+  const resumed = JSON.parse(JSON.stringify(d));
+  assert.equal(safeActivationStep(resumed, 'fund'), 'account-created');
+  const html = renderActivation({ draft: { activation: resumed } }, { step: 'fund' });
+  assert.match(html, /data-activation-action="acknowledge-account"/);
+  assert.doesNotMatch(html, /id="activation-funding"/);
+  assert.equal(resumed.state.wallet, 0);
+  assert.equal(resumed.state.transactions.length, 0);
+  ui.cleanup();
+});
+
+test('Continue acknowledges the account once and opens Add Money without creating a top-up', () => {
+  const d = draft({ acknowledged: false }), before = JSON.stringify(d.state);
+  const ui = binder(d, { step: 'account-created' });
+  ui.click({ activationAction: 'acknowledge-account' });
+  assert.equal(d.accountAcknowledged, true);
+  assert.equal(ui.navigations.at(-1).step, 'fund');
+  assert.equal(JSON.stringify(d.state), before);
+  assert.equal(ui.error.textContent, '');
+  ui.cleanup();
+});
+
+test('copying uses only the operational number and gives success or graceful failure feedback', async () => {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  try {
+    const copied = [];
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { clipboard: { async writeText(value) { copied.push(value); } } } });
+    const d = draft({ acknowledged: false }), before = JSON.stringify(d), ui = binder(d, { step: 'account-created' });
+    await ui.click({ activationAction: 'copy-account-number' });
+    assert.deepEqual(copied, ['000000000001']);
+    assert.match(ui.copyFeedback.textContent, /copied/i);
+    assert.equal(JSON.stringify(d), before);
+    ui.cleanup();
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { clipboard: { async writeText() { throw new Error('Clipboard unavailable'); } } } });
+    const retry = binder(d, { step: 'account-created' });
+    await retry.click({ activationAction: 'copy-account-number' });
+    assert.match(retry.copyFeedback.textContent, /select|copy/i);
+    assert.equal(d.accountAcknowledged, false);
+    retry.cleanup();
+  } finally {
+    if (previous) Object.defineProperty(globalThis, 'navigator', previous);
+    else delete globalThis.navigator;
+  }
+});
+
+test('a MoMo prompt waits for a separately confirmed receipt and keeps the received screen before planning', async () => {
+  const d=draft();d.funding.amountText='100';d.funding.phone='0240000000';
+  const entry=binder(d,{step:'fund'});entry.click({activationAction:'fund'});
+  assert.equal(entry.refreshes,1);assert.equal(d.state.wallet,0);assert.equal(d.fundingAttempt.status,'pending');entry.cleanup();
+  const waiting=renderActivation({draft:{activation:d}},{step:'fund'});
+  assert.match(waiting,/Approve it/);assert.match(waiting,/0240000000/);assert.match(waiting,/I’ve approved it/);
+  assert.doesNotMatch(waiting,/data-activation-action="defer"|data-activation-action="continue-purpose"|data-activation-source=/);
+  const ui=binder(d,{step:'fund'});await ui.click({activationAction:'check-funding'});
+  assert.equal(d.state.wallet,0);assert.equal(d.state.transactions.length,0);assert.equal(d.fundingAttempt.status,'pending');
+  ui.click({activationDemoOutcome:'confirmed'});assert.equal(d.state.wallet,0,'A provider event is still checked before it is applied.');
+  await ui.click({activationAction:'check-funding'});
+  assert.equal(d.state.wallet,10000);assert.equal(d.state.transactions.length,1);assert.equal(d.step,'fund');
+  assert.match(renderActivation({draft:{activation:d}},{step:'fund'}),/Money in.*Give it a plan/s);
+  ui.cleanup();const received=binder(d,{step:'fund'});received.click({activationAction:'continue-purpose'});
+  assert.equal(received.navigations.at(-1).step,'purpose');received.cleanup();
+});
+
+test('bank instructions show only Everyday details and saying sent only checks for receipt', async () => {
+  const d=draft();assert.equal(requestActivationFunding(d,{amount:5000,source:'Bank transfer'}).ok,true);
+  const html=renderActivation({draft:{activation:d}},{step:'fund'});
+  assert.match(html,/GCB Bank/);assert.match(html,/Ama Mensah/);assert.match(html,/000000000001/);assert.match(html,/LUMO-/);assert.match(html,/I’ve sent it/);
+  assert.doesNotMatch(html,/999999999999|Savings decoy/);
+  const ui=binder(d,{step:'fund'});await ui.click({activationAction:'check-funding'});
+  assert.equal(d.state.wallet,0);assert.equal(d.fundingAttempt.status,'pending');
+  ui.click({activationDemoOutcome:'failed'});await ui.click({activationAction:'check-funding'});
+  assert.equal(d.state.wallet,0);assert.match(renderActivation({draft:{activation:d}},{step:'fund'}),/Try again/);
+  ui.cleanup();const failed=binder(d,{step:'fund'});failed.click({activationAction:'retry-funding'});
+  assert.equal(d.fundingAttempt,null);assert.equal(failed.refreshes,1);failed.cleanup();
+});
+
+test('leaving while a status check resolves prevents a late credit on the detached screen', async () => {
+  const d=draft();requestActivationFunding(d,{amount:5000,source:'Bank transfer'});
+  const ui=binder(d,{step:'fund'});ui.click({activationDemoOutcome:'confirmed'});
+  const check=ui.click({activationAction:'check-funding'});ui.cleanup();await check;
+  assert.equal(d.state.wallet,0);assert.equal(d.fundingAttempt.status,'pending');
+});
 
 test('typing a custom purpose keeps focus by updating the draft without a rerender', () => {
   const d = draft({ funded: true }); d.category = 'custom';

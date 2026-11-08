@@ -11,6 +11,28 @@ function amountIn(question) {
   return parsed.found && !parsed.invalid ? parsed.amount : null;
 }
 function action(label, section, page = 'home', rest = {}) { return { label, route: { section, page, ...rest } }; }
+const recordedDay = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+  && Number.isFinite(Date.parse(value + 'T00:00:00Z'))
+  && new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value ? value : '';
+/** Only user-recorded timing supports a guide. getSummary's fallback is not a promise. */
+function recordedHorizon(state) {
+  const checkIn = state.recovery?.active && recordedDay(state.recovery.checkInDate);
+  if (checkIn) return { date: checkIn, source: 'recovery' };
+  const end = state.budget?.created === true && recordedDay(state.budget.endDate);
+  if (end) return { date: end, source: 'plan' };
+  const expected = n(state.income?.amount) > 0 && recordedDay(state.income?.nextDate);
+  return expected ? { date: expected, source: 'income' } : { date: '', source: '' };
+}
+function horizonCopy(state, now) {
+  const horizon = recordedHorizon(state), today = now.toISOString().slice(0, 10);
+  if (!horizon.date) return 'No planning end date is recorded, so this is a current balance, not a daily spending guide.';
+  if (horizon.date < today) return horizon.source === 'income'
+    ? `Your expected income date, ${dateLabel(horizon.date)}, has passed. Refresh the timing before relying on a daily guide.`
+    : `Your ${horizon.source === 'recovery' ? 'check-in' : 'plan end'} date, ${dateLabel(horizon.date)}, has passed. Review the timing before relying on a daily guide.`;
+  return horizon.source === 'income' ? `Your recorded expected income date is ${dateLabel(horizon.date)}; that money is not included.`
+    : horizon.source === 'recovery' ? `Your recorded recovery check-in is ${dateLabel(horizon.date)}.`
+      : `Your recorded plan runs through ${dateLabel(horizon.date)}.`;
+}
 function summaryOf(state) {
   const summary = getSummary(state);
   return { ...Object.fromEntries(['available', 'planned', 'spendable', 'savings', 'cardTotal', 'transferHolds', 'pendingPaymentHolds', 'pendingCardHolds', 'pendingContributionHolds', 'total', 'outsideTotal', 'allMoneyTotal', 'expected', 'daysLeft', 'dailyAllowance'].map(key => [key, n(summary[key])])), guidanceDate: summary.guidanceDate, planEndDate: summary.planEndDate };
@@ -149,6 +171,7 @@ function paymentTransactions(state, question, now, scope = getSpendingScope(stat
 /** Local prototype guidance. Every amount is read from the current model. */
 export function getMoneyAnswer(state, question, now = new Date()) {
   const q = String(question).trim().toLowerCase();
+  const generalSpendQuestion = /^(?:what|how much)(?: money)? can i (?:spend|use)(?:(?: in| from)? lumo)?(?: now)?[.!?\s]*$/.test(q);
   if (financialInputAmbiguity(q) === 'currency') return clarifyFinancialInput('currency');
   const summary = summaryOf(state);
   const amount = amountIn(q);
@@ -266,7 +289,7 @@ export function getMoneyAnswer(state, question, now = new Date()) {
     };
   }
 
-  if (/afford|can i (?:buy|pay|spend)|should i (?:buy|pay|spend)|buy.*\d|pay.*\d|spend.*\d/.test(q)
+  if (!generalSpendQuestion && /afford|can i (?:buy|pay|spend)|should i (?:buy|pay|spend)|buy.*\d|pay.*\d|spend.*\d/.test(q)
       && !(amount === null && /today|daily|per day|each day|how much.*spend/.test(q))) {
     const ambiguity = financialInputAmbiguity(q);
     if (ambiguity) return clarifyFinancialInput(ambiguity);
@@ -301,8 +324,8 @@ export function getMoneyAnswer(state, question, now = new Date()) {
     };
   }
 
-  if (/today|daily|per day|each day|how much.*spend/.test(q)) {
-    const guideDate = summary.guidanceDate || summary.planEndDate || state.income?.nextDate;
+  if (!generalSpendQuestion && /today|daily|per day|each day|how much.*spend/.test(q)) {
+    const guideDate = recordedHorizon(state).date;
     const currentGuideDate = !!guideDate && guideDate.slice(0, 10) >= now.toISOString().slice(0, 10);
     return {
       title: currentGuideDate ? 'Here is your daily guide.' : 'Let’s refresh the timing.',
@@ -321,17 +344,18 @@ export function getMoneyAnswer(state, question, now = new Date()) {
     return allMoneyAnswer(state, summary);
   }
 
-  if (/why|spendable|left after|available|budget|plan|buffer/.test(q)) {
+  if (generalSpendQuestion || /why|spendable|left after|available|budget|plan|buffer/.test(q)) {
     const shortage = Math.max(0, summary.planned + buffer - summary.available);
+    const recordedPlan = state.budget?.created === true;
     return {
       title: shortage ? 'Your commitments need attention.' : 'Every cedi has a place.',
       paragraphs: [
         `Start with ${cash(summary.available)} available in your spending account. Your remaining planned commitments are ${cash(summary.planned)}, and your safety buffer is ${cash(buffer)}.`,
-        shortage ? `Together they exceed your available funds by ${cash(shortage)}, so your spendable amount stays at ${cash(0)}. We can review the plan or build a recovery plan.` : `That leaves ${cash(summary.spendable)} after plan. Your ${cash(summary.savings)} in Money Boxes stays separate.`,
-        items.length ? `You currently have ${items.length} budget ${items.length === 1 ? 'item' : 'items'}. Open Plan to see or change what is reserved.` : 'You have no budget items yet. Creating a plan will make this picture more useful.'
+        `${shortage ? `Together they exceed your available funds by ${cash(shortage)}, so your spendable amount stays at ${cash(0)}.` : `That leaves ${cash(summary.spendable)} after plan.`} ${horizonCopy(state, now)}`,
+        recordedPlan ? 'This uses your recorded commitments. Review Plan if an amount, date or breathing room needs changing. Expected income, unpaid incoming IOUs and Money Boxes stay separate.' : 'Your essentials are not recorded as a plan yet, so this balance alone cannot tell you what is affordable. Add them in Plan before deciding. Expected income, unpaid incoming IOUs and Money Boxes stay separate.'
       ],
-      stats: [{ label: 'Available', value: cash(summary.available) }, { label: 'Planned commitments', value: cash(summary.planned) }, { label: 'Left after plan', value: cash(summary.spendable) }],
-      actions: [action(state.budget?.created ? 'View budget' : 'Create a budget', 'plan'), ...(shortage ? [action('Make a recovery plan', 'life', 'recovery')] : [])]
+      stats: [{ label: 'Available', value: cash(summary.available) }, { label: 'Planned commitments', value: cash(summary.planned) }, { label: 'Safety buffer', value: cash(buffer) }, { label: 'Left after plan', value: cash(summary.spendable) }],
+      actions: [action(recordedPlan ? 'Review my plan' : 'Create my plan', 'plan'), ...(shortage ? [action('Make a recovery plan', 'life', 'recovery')] : [])]
     };
   }
 

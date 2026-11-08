@@ -1,0 +1,41 @@
+.setup-terms-page{--terms-base:#191a22;--terms-lime:#d4f65a;--terms-text:#f7f7f5;--terms-muted:#c2c5d1;min-height:100%;display:flex;flex-direction:column;background:var(--terms-base);color:var(--terms-text);padding:calc(15px + env(safe-area-inset-top,0px)) 23px 0;letter-spacing:0;color-scheme:dark}
+.setup-terms-page *{box-sizing:border-box}
+.setup-terms-header{display:flex;align-items:center;justify-content:space-between;gap:15px;min-height:44px;flex:none}
+.setup-terms-back,.setup-terms-header-space{width:44px;min-height:44px;flex:none}
+.setup-terms-back{display:grid;place-items:center;border:1px solid #ffffff1c;border-radius:50%;background:none;color:var(--terms-text)}
+.setup-terms-brand{font-size:1.75rem;font-weight:750;letter-spacing:-.07em;color:var(--terms-lime)}
+.setup-terms-brand::after{content:none}
+.setup-terms-main{padding:30px 0 22px;flex:1;min-width:0}
+.setup-terms-kicker{font-size:.6875rem;line-height:1.5;letter-spacing:.1em;text-transform:uppercase;color:var(--terms-muted);margin:0 0 11px}
+.setup-terms-main h1{font-size:2.25rem;line-height:1.12;font-weight:650;letter-spacing:-.05em;margin:0 0 15px;overflow-wrap:anywhere}
+.setup-terms-intro{font-size:1rem;line-height:1.55;color:#e3e5ed;margin:0 0 24px}
+.setup-terms-roles{margin:0 0 27px;padding:15px 17px;background:#d4f65a0a;border:1px solid #d4f65a25;border-radius:17px}
+.setup-terms-roles>div{display:flex;align-items:baseline;justify-content:space-between;gap:15px;padding:8px 0;flex-wrap:wrap}
+.setup-terms-roles dt{font-size:.75rem;line-height:1.5;color:var(--terms-muted)}
+.setup-terms-roles dd{font-size:.9375rem;line-height:1.5;color:var(--terms-lime);font-weight:600;margin:0}
+.setup-terms-sections>section{border-bottom:1px solid #ffffff13;padding:0 0 20px;margin:0 0 21px}
+.setup-terms-main h2{font-size:1rem;line-height:1.4;font-weight:600;letter-spacing:-.025em;margin:0 0 9px;overflow-wrap:anywhere}
+.setup-terms-sections p,.setup-terms-details p{font-size:.875rem;line-height:1.65;color:var(--terms-muted);margin:0;overflow-wrap:anywhere}
+.setup-terms-links{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-top:8px}
+.setup-terms-links a{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:var(--terms-lime);font-size:.8125rem;line-height:1.4;text-decoration:none;padding:9px 0;overflow-wrap:anywhere}
+.setup-terms-links a>svg{flex:none}
+.setup-terms-details{border-bottom:1px solid #ffffff13;margin:0 0 23px}
+.setup-terms-details summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.875rem;line-height:1.4;cursor:pointer;padding:8px 0 15px;list-style:none}
+.setup-terms-details summary::-webkit-details-marker{display:none}
+.setup-terms-details>div{padding:6px 0 21px}
+.setup-terms-details p+h2{margin-top:20px}
+.setup-terms-prototype{color:var(--terms-muted);font-size:.75rem;line-height:1.55}
+.setup-terms-prototype>strong{color:#e1e4ef;font-weight:600}
+.setup-terms-prototype>p{margin:7px 0}
+.setup-terms-prototype>small{font-size:.6875rem;color:#9ca2b4}
+.setup-terms-footer{position:sticky;bottom:0;z-index:3;background:var(--terms-base);padding:15px 0 calc(20px + env(safe-area-inset-bottom,0px));border-top:1px solid #ffffff1a;flex:none}
+.setup-terms-consent{display:flex;align-items:flex-start;gap:12px;min-height:44px;cursor:pointer;padding:4px 0 13px;color:#dce0ec;font-size:.8125rem;line-height:1.5}
+.setup-terms-consent input{flex:none;width:21px;height:21px;margin:1px 0 0;accent-color:var(--terms-lime)}
+.setup-terms-consent>span{min-width:0;overflow-wrap:anywhere}
+.setup-terms-continue{display:flex;align-items:center;justify-content:center;gap:13px;min-height:56px;width:100%;padding:15px 19px;background:var(--terms-lime);color:#171b0f;border:0;border-radius:30px;white-space:normal;font-size:.9375rem;line-height:1.4;font-weight:650;letter-spacing:0}
+.setup-terms-continue:disabled{background:#464b38;color:#b8bda9;cursor:default}
+.setup-terms-continue>svg{flex:none}
+.setup-terms-error{color:#ffb7b7;font-size:.8125rem;line-height:1.5;margin:0 0 9px;overflow-wrap:anywhere}
+.setup-terms-error:empty{display:none}
+.setup-terms-page :is(button,a,summary,input):focus-visible{outline:2px solid var(--terms-lime);outline-offset:4px}
+@media(max-width:350px){.setup-terms-page{padding-left:20px;padding-right:20px}.setup-terms-main{padding-top:23px}.setup-terms-main h1{font-size:2rem}}

@@ -17,7 +17,7 @@ const error=()=>'<p class="miq-error" role="alert" data-miq-error></p>';
 
 function toolbar(ctx){
  const off=ctx.draft.campusMotionOff===true;
- return `<header class="miq-header"><button type="button" class="miq-brand" data-miq-action="return" aria-label="${ctx.route.id?'Back to Money IQ':returnRoute(ctx)?.section==='chat'?'Back to Ask Lux':'Go Home'}">${icon('back',17)}<span class="miq-wordmark">lumo.</span></button><div class="miq-header-actions"><button type="button" class="miq-motion" data-miq-action="motion" aria-pressed="${!off}" aria-label="${off?'Turn animations on':'Pause animations'}" title="${off?'Turn animations on':'Pause animations'}">${icon('repeat',18)}</button><button type="button" class="miq-home" data-miq-action="home">${icon('home',21)}<span>Home</span></button></div></header>`;
+ return `<header class="miq-header"><button type="button" class="miq-brand" data-miq-action="return" aria-label="${ctx.route.id?'Back to Money IQ':returnRoute(ctx)?.section==='chat'?'Back to Ask Lux':'Go Home'}">${icon('back',17)}<span class="miq-wordmark">lumo</span></button><div class="miq-header-actions"><button type="button" class="miq-motion" data-miq-action="motion" aria-pressed="${!off}" aria-label="${off?'Turn animations on':'Pause animations'}" title="${off?'Turn animations on':'Pause animations'}">${icon('repeat',18)}</button><button type="button" class="miq-home" data-miq-action="home">${icon('home',21)}<span>Home</span></button></div></header>`;
 }
 function source({mode='example',period}={}){
  return `<div class="miq-source-row"><span class="miq-source-pill">${mode==='actual'?'Recorded Lumo activity':'Sample week'}</span>${period?.label?`<span class="miq-period">${esc(period.label)} · UTC</span>`:''}</div>`;

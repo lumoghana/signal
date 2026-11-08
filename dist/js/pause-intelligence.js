@@ -4,6 +4,34 @@ export { evaluatePauseHistory } from './pause-history.js';
 
 const cents = value => Number.isSafeInteger(value) ? Math.max(0, value) : 0;
 
+/** Describe coverage after the evaluated payment; never reassign a budget category. */
+export function getPauseTradeoff(state, draft = {}, evaluation = {}) {
+  const fee = draft.fee ?? evaluation.fee;
+  const unknown = { known: false, copy: 'Lumo cannot calculate the full impact from the available information.' };
+  if (!state || !Number.isSafeInteger(state.wallet) || state.wallet < 0 || !Number.isSafeInteger(state.buffer) || state.buffer < 0 || !Array.isArray(state.budget?.items) || !Number.isSafeInteger(draft.amount) || draft.amount <= 0 || !Number.isSafeInteger(fee) || fee < 0) return unknown;
+  const check = evaluatePayment(state, { ...draft, fee });
+  if (![check.afterAvailable, check.afterPlanned].every(Number.isSafeInteger) || check.afterPlanned < 0) return unknown;
+  const buffer = cents(state.buffer), afterAvailable = check.afterAvailable, afterPlanned = check.afterPlanned;
+  if (afterAvailable < 0) return { known: true, afterAvailable, afterPlanned, buffer, allowed: false, copy: `This payment and its fee exceed your available money by ${cash(-afterAvailable, { decimals: afterAvailable % 100 !== 0 })}.` };
+  const planGap = Math.max(0, afterPlanned - afterAvailable);
+  const breathingRoomCovered = Math.min(buffer, Math.max(0, afterAvailable - afterPlanned));
+  const flexible = Math.max(0, afterAvailable - afterPlanned - buffer);
+  const money = value => cash(value, { decimals: value % 100 !== 0 });
+  let copy = `After this payment, ${money(afterAvailable)} would remain in Everyday. `;
+  if (state.budget.created !== true) {
+    copy += `${money(afterPlanned)} is recorded for commitments. There is no essentials plan yet, so Lumo cannot tell whether this leaves enough for everyday costs.`;
+  } else if (planGap > 0) {
+    copy += `${money(afterPlanned)} is still planned, leaving a ${money(planGap)} plan gap${buffer > 0 ? ' and no breathing room covered' : ''}. Lumo cannot identify which planned item would be affected.`;
+  } else if (breathingRoomCovered < buffer) {
+    copy += `Your ${money(afterPlanned)} plan stays covered. Only ${money(breathingRoomCovered)} of your ${money(buffer)} breathing room would remain covered.`;
+  } else if (buffer > 0) {
+    copy += `Your ${money(afterPlanned)} plan and ${money(buffer)} breathing room stay covered; ${money(flexible)} would be left for anything else.`;
+  } else {
+    copy += `${money(afterPlanned)} is still planned, leaving ${money(flexible)} after your plan.`;
+  }
+  return { known: true, allowed: check.allowed, afterAvailable, afterPlanned, buffer, planGap, breathingRoomCovered, flexible, copy };
+}
+
 export function getPauseAlternatives(state, draft = {}, evaluation = {}) {
   const amount = cents(draft.amount), fee = cents(draft.fee ?? evaluation.fee);
   // A smaller planned payment releases less of its category allocation too.
@@ -40,6 +68,6 @@ export function bindPauseAlternatives(ctx, root, { draft = ctx.draft.payment, ev
   const safe = () => { const v = values(); if (!v.safeAmount || v.safeAmount >= draft.amount) return; draft.amount = v.safeAmount; draft.amountText = (v.safeAmount / 100).toFixed(2); draft.idempotencyKey = `payment-${crypto.randomUUID?.() || Date.now()}`; ctx.saveDraft?.(); ctx.closeSheet(); ctx.go({ section: 'pay', page: 'review' }); };
   const fund = () => { const v = values(); if (v.shortfall > 0) onFund?.(v.shortfall); };
   bind('[data-pause-safe]', safe); bind('[data-pause-fund]', fund);
-  bind('[data-pause-compare]', () => { const v = values(); ctx.sheet(`<p class="eyebrow">Your call</p><h2>See both options.</h2><div class="panel"><p>Pay ${esc(cash(v.amount))}${v.fee ? ` + ${esc(cash(v.fee))} fee` : ''}</p><p class="muted">${esc(cash(Math.max(0, v.afterAvailable)))} in Everyday · ${esc(cash(v.afterSpendable))} left after plan.</p>${v.baselineShortfall > 0 ? `<p class="muted">Your plan already has a ${esc(cash(v.baselineShortfall))} gap. ${v.additionalShortfall > 0 ? `This payment adds ${esc(cash(v.additionalShortfall))} to that gap.` : 'This payment leaves that gap unchanged.'}</p>` : ''}${v.safeAmount > 0 && v.safeAmount < v.amount ? `<hr><p>Try ${esc(cash(v.safeAmount))}</p><p class="muted">${esc(cash(v.safeAvailable))} in Everyday · ${esc(cash(v.safeSpendable))} left after plan.</p>` : ''}</div>${v.shortfall > 0 ? `<p class="muted">Adding ${esc(cash(v.shortfall))} would cover ${v.baselineShortfall > 0 ? 'the remaining plan gap after this payment' : 'this payment while protecting your current plan and keep-back'}. Only received money counts.</p>` : '<p class="muted">You can edit the amount or return to review. A PIN is still required before any payment.</p>'}<div class="stack">${v.safeAmount > 0 && v.safeAmount < v.amount ? `<button type="button" class="button" data-choice-safe>Review ${esc(cash(v.safeAmount))}</button>` : ''}${v.shortfall > 0 ? `<button type="button" class="button secondary" data-choice-fund>Add ${esc(cash(v.shortfall))}</button>` : ''}<button type="button" class="button ghost" data-choice-close>Back to my payment</button></div>`, sheet => { sheet.querySelector('[data-choice-safe]')?.addEventListener('click', safe); sheet.querySelector('[data-choice-fund]')?.addEventListener('click', fund); sheet.querySelector('[data-choice-close]')?.addEventListener('click', () => ctx.closeSheet()); }); });
+  bind('[data-pause-compare]', () => { const v = values(), tradeoff = getPauseTradeoff(ctx.state, draft, { fee: v.fee }); ctx.sheet(`<p class="eyebrow">Your call</p><h2>See both options.</h2><div class="panel"><p>Pay ${esc(cash(v.amount))}${v.fee ? ` + ${esc(cash(v.fee))} fee` : ''}</p><p class="muted">${esc(tradeoff.copy)}</p>${v.baselineShortfall > 0 ? `<p class="muted">Your plan already has a ${esc(cash(v.baselineShortfall))} gap. ${v.additionalShortfall > 0 ? `This payment adds ${esc(cash(v.additionalShortfall))} to that gap.` : 'This payment leaves that gap unchanged.'}</p>` : ''}${v.safeAmount > 0 && v.safeAmount < v.amount ? `<hr><p>Try ${esc(cash(v.safeAmount))}</p><p class="muted">${esc(cash(v.safeAvailable))} in Everyday · ${esc(cash(v.safeSpendable))} left after plan.</p>` : ''}</div>${v.shortfall > 0 ? `<p class="muted">Adding ${esc(cash(v.shortfall))} would cover ${v.baselineShortfall > 0 ? 'the remaining plan gap after this payment' : 'this payment while protecting your current plan and keep-back'}. Only received money counts.</p>` : '<p class="muted">You can edit the amount or return to review. A PIN is still required before any payment.</p>'}<div class="stack">${v.safeAmount > 0 && v.safeAmount < v.amount ? `<button type="button" class="button" data-choice-safe>Review ${esc(cash(v.safeAmount))}</button>` : ''}${v.shortfall > 0 ? `<button type="button" class="button secondary" data-choice-fund>Add ${esc(cash(v.shortfall))}</button>` : ''}<button type="button" class="button ghost" data-choice-close>Back to my payment</button></div>`, sheet => { sheet.querySelector('[data-choice-safe]')?.addEventListener('click', safe); sheet.querySelector('[data-choice-fund]')?.addEventListener('click', fund); sheet.querySelector('[data-choice-close]')?.addEventListener('click', () => ctx.closeSheet()); }); });
   return () => removers.forEach(remove => remove());
 }

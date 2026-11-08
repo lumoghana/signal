@@ -6,6 +6,7 @@ import {
   completeOnboardingStep, recordSelfieCapture, resetCameraCaptures, resetLiveness,
   beginIdentityVerification, resolveIdentityVerification, confirmIdentityDetails, setOnboardingLogin
 } from '../dist/js/onboarding-model.js';
+import { acceptSetupTerms } from '../dist/js/setup-terms-model.js';
 import { parentRoute, safeRoute, compactTrail, routeKey } from '../dist/js/navigation.js';
 const demoCredential = { version: 1, algorithm: 'PBKDF2-SHA-256', iterations: 210000, salt: 'ab'.repeat(16), verifier: 'cd'.repeat(32) };
 const signup = step => ({ section: 'onboarding', step });
@@ -13,7 +14,7 @@ const home = { section: 'home', page: 'home' };
 const okay = result => { assert.equal(result.ok, true, result.message); return result; };
 const complete = (draft, step) => okay(completeOnboardingStep(draft, step));
 function reachCard(preview = false) {
-  const draft = createOnboardingDraft({ preview }); draft.name = 'Ama';
+  const draft = createOnboardingDraft({ preview }); okay(acceptSetupTerms(draft, { accepted: true })); draft.name = 'Ama';
   complete(draft, 'name'); complete(draft, 'phone');
   draft.code = '123456'; complete(draft, 'code'); return draft;
 }
@@ -35,8 +36,8 @@ function reachPin(preview = false) {
 
 test('later browser entries cannot bypass separate name, phone, code or card pages', () => {
   const state = createEmptyState();
-  assert.deepEqual(safeRoute(signup('pin'), state), signup('name'));
-  const draft = createOnboardingDraft(); draft.name = 'Ama'; complete(draft, 'name');
+  assert.deepEqual(safeRoute(signup('pin'), state), { section: 'terms' });
+  const draft = createOnboardingDraft(); okay(acceptSetupTerms(draft, { accepted: true })); draft.name = 'Ama'; complete(draft, 'name');
   assert.deepEqual(safeRoute(signup('selfie'), state, { onboarding: draft }), signup('phone'));
   assert.deepEqual(safeRoute(signup('unknown-step'), state, { onboarding: draft }), signup('phone'));
   assert.deepEqual(safeRoute(signup('name'), state, { onboarding: draft }), signup('name'));
@@ -52,7 +53,7 @@ test('nine focused pages have distinct identities and direct previous destinatio
   assert.deepEqual(ONBOARDING_STEPS, ['name', 'phone', 'code', 'card-number', 'selfie', 'identity-review', 'login', 'pin', 'pin-confirm']);
   assert.equal(new Set(ONBOARDING_STEPS.map(step => routeKey(signup(step)))).size, ONBOARDING_STEPS.length);
   for (let index = 1; index < ONBOARDING_STEPS.length; index++) assert.deepEqual(parentRoute(signup(ONBOARDING_STEPS[index])), signup(ONBOARDING_STEPS[index - 1]));
-  assert.deepEqual(parentRoute(signup('name')), { section: 'welcome' });
+  assert.deepEqual(parentRoute(signup('name')), { section: 'terms' });
 });
 
 test('legacy combined and card-photo routes resolve to focused pages without dead screens', () => {

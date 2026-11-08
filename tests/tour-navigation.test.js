@@ -53,7 +53,7 @@ test('signed-in accounts can replay, while stale non-preview signup tours return
 
 test('stale skipped or finished tour history cannot reopen a deleted tour draft', () => {
   const state = createEmptyState(), draft = { onboarding: createOnboardingDraft() };
-  for (const step of [0, 1, 2]) assert.deepEqual(safeRoute(tour(step), state, draft), { section: 'onboarding', step: 'name' });
+  for (const step of [0, 1, 2]) assert.deepEqual(safeRoute(tour(step), state, draft), { section: 'terms' });
   assert.deepEqual(safeRoute(tour(0), state, {}), { section: 'welcome' });
   assert.deepEqual(safeRoute(tour(0), createDemoState(), {}), home);
 });
@@ -67,10 +67,10 @@ test('tour parent navigation has explicit previous scenes and replay destination
 test('unfinished account activation takes precedence over a stale tour entry', () => {
   const state = createEmptyState(), ready = createEmptyState(); ready.onboardingDone = true;
   const draft = { activation: createActivationDraft({ state: ready }), tour: createTourDraft() };
-  assert.deepEqual(safeRoute(tour(2), state, draft), { section: 'activation', step: 'fund' });
+  assert.deepEqual(safeRoute(tour(2), state, draft), { section: 'activation', step: 'account-created' });
 });
 
-test('finishing or skipping a first tour prunes its native entries and starts signup directly', () => {
+test('finishing or skipping a first tour prunes its native entries and opens the setup terms', () => {
   for (const status of ['completed', 'skipped']) {
     const state = createEmptyState(), draft = { onboarding: createOnboardingDraft(), tour: createTourDraft() };
     const h = harness(state, draft); h.router.initialise();
@@ -79,10 +79,10 @@ test('finishing or skipping a first tour prunes its native entries and starts si
     const record = { schema: 1, status, timestamp: '2026-11-01T12:00:00.000Z' };
     assert.equal(shouldOfferTour({ record, onboarding: draft.onboarding }), false);
     h.router.go({ section: 'onboarding', step: 'name' }, { finish: true }); h.flush();
-    assert.deepEqual(h.router.current, { section: 'onboarding', step: 'name' });
+    assert.deepEqual(h.router.current, { section: 'terms' });
     assert.equal(h.native.some(e => e?.route?.section === 'tour'), false);
     h.history.go(-1); h.flush(); h.history.go(1); h.flush();
-    assert.deepEqual(h.router.current, { section: 'onboarding', step: 'name' });
+    assert.deepEqual(h.router.current, { section: 'terms' });
   }
 });
 

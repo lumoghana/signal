@@ -1,6 +1,6 @@
 import {paymentFee} from './payments-parity-model.js';
 import {renderPaymentParity,bindPaymentParity,createSplitSheet,createRequestSheet} from './payments-parity-ui.js';
-import {renderPauseAlternatives,bindPauseAlternatives} from './pause-intelligence.js';
+import {renderPauseAlternatives,bindPauseAlternatives,getPauseTradeoff} from './pause-intelligence.js';
 import { esc, cash, icon, categorySymbol, pageHead, row, field, btn, empty, dateLabel } from './ui.js';
 import { getSummary, evaluatePayment, repayableIOUAmount } from './model.js';
 import qrcode from './vendor/qrcode.js';
@@ -295,9 +295,11 @@ function pause(ctx) {
   const planUse = Math.max(0, check.afterPlanned - check.afterAvailable) - Math.max(0, sum.planned - sum.available);
   const reservedFrom = planUse === 0 ? 'cushion' : planUse >= touches ? 'plan' : 'plan and cushion';
   const unchangedGap = baselineGap > 0 && touches === 0;
+  const consequence = getPauseTradeoff(ctx.state, { ...d, fee: check.fee, merchant: recipientLabel(d) }, check);
+  const context = unchangedGap ? 'This payment leaves that gap unchanged.' : baselineGap > 0 ? `Your plan already has a ${cash(baselineGap)} gap.` : touches === 0 ? check.reason : '';
   return renderPauseScreen({
     amount: d.amount, metric: touches || (unchangedGap ? baselineGap : after), kind: touches > 0 ? 'reserved' : unchangedGap ? 'existing-gap' : 'remaining', reservedFrom, recipient: recipientLabel(d),
-    reason: unchangedGap ? 'This payment leaves that gap unchanged.' : baselineGap > 0 ? `Your plan already has a ${cash(baselineGap)} gap.` : touches === 0 ? check.reason : '',
+    reason: [consequence.copy, context].filter(Boolean).join(' '),
     primary: { label: 'Edit amount', attributes: 'data-action="pay-edit-amount"' },
     secondary: { label: 'Continue payment', attributes: 'data-action="pay-pause-next" aria-busy="true"', disabled: true },
     alternatives: renderPauseAlternatives(ctx.state, d, check),
@@ -311,7 +313,7 @@ export function isCompletedPayment(tx) {
 function completedPayment(ctx, tx) {
   const delivered = !!tx.serviceId;
   return `<section class="payment-success-screen" aria-labelledby="payment-success-title">
-    <header class="payment-success-header"><span class="payment-success-brand" aria-label="Lumo">lumo<span aria-hidden="true">.</span></span><span class="payment-success-confirmed">${icon('check',15)} All done</span></header>
+    <header class="payment-success-header"><span class="payment-success-brand" aria-label="Lumo">lumo</span><span class="payment-success-confirmed">${icon('check',15)} All done</span></header>
     <div class="payment-success-main">
       <div class="payment-success-art" aria-hidden="true"><div class="payment-success-ring"></div><div class="payment-success-check">${icon('check',78)}</div>${Array.from({length:12},(_,i)=>`<i class="payment-success-spark" style="--spark-angle:${i*30}deg;--spark-delay:${(i%3)*70}ms"></i>`).join('')}</div>
       <h1 id="payment-success-title">${delivered ? 'All sorted.' : 'Sent. Sorted.'}</h1>
