@@ -35,16 +35,17 @@ test('the only editable tour information is a labelled three-figure example calc
   assert.doesNotMatch(html, /<textarea\b|contenteditable|type="(?:tel|email|password|text)"|data-action="(?:pay-|demo|p:)/);
 });
 
-test('the Pause example shows the specific cushion trade-off while keeping a choice', () => {
-  const copy = text(renderExploreScene(2));
-  assert.match(copy, /After paying GH₵300, you’d have GH₵\s*700/);
-  assert.match(copy, /GH₵650 for your plan\. GH₵50 breathing room/);
-  assert.match(copy, /GH₵50 of your GH₵100 breathing room would be used/);
-  assert.match(copy, /Food and transport stay covered/);
-  assert.match(copy, /Continue/);
+test('the simplified Pause example highlights only its truthful cushion consequence', () => {
+  const html = renderExploreScene(2), copy = text(html);
+  assert.match(copy, /This payment uses GH₵50 of your breathing room until Friday/);
+  assert.match(copy, /Sample payment · GH₵300/);
+  assert.doesNotMatch(copy, /short for food|Food and transport.*short|GH₵700|GH₵650|GH₵100/);
+  assert.match(copy, /Continue to PIN/);
   assert.match(copy, /Edit amount/);
+  assert.doesNotMatch(html, /<button\b|data-action="pay-/);
   assert.equal(EXPLORE_SAMPLE.afterPayment, EXPLORE_SAMPLE.available - EXPLORE_SAMPLE.payment);
   assert.equal(EXPLORE_SAMPLE.remainingCushion, EXPLORE_SAMPLE.afterPayment - EXPLORE_SAMPLE.planned);
+  assert.equal(EXPLORE_SAMPLE.shortfall, EXPLORE_SAMPLE.cushion - EXPLORE_SAMPLE.remainingCushion);
 });
 
 test('partner access explains support verification and an unconfirmed toll-free line without sending a request', () => {

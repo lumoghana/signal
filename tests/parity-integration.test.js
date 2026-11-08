@@ -15,7 +15,7 @@ test('account access guards financial handlers and retained records survive sign
 });
 test('durable app boundary settles funding and a funded card once, retaining actual total money',()=>{
  const data=new Map(),storage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v),removeItem:k=>data.delete(k)};
- const state=createEmptyState();state.onboardingDone=true;state.buffer=0;
+ const state=createEmptyState({phone:'0244304593'});state.onboardingDone=true;state.buffer=0;
  const controller=createPersistence({storage,empty:()=>state,validate:validStoredState,migrate:migrateState});controller.load();
  const act=(type,payload)=>{const r=commitAction({state,type,payload,apply:applyAction,persistence:controller});assert.equal(r.ok,true,r.message);return r;};
  const f=act('startFundingAttempt',{amount:20000,rail:'momo',number:'0244304593',source:'Mobile money',idempotencyKey:'funding-1'});

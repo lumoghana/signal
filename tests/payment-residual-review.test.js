@@ -16,13 +16,16 @@ function account() {
 }
 const act = (state, type, payload) => { const result = applyAction(state, type, payload); assert.equal(result.ok, true, result.message); return result; };
 
-test('Pause names an unchanged pre-existing gap instead of saying a planned payment caused it', () => {
+test('Pause names an unchanged breathing-room gap instead of saying a planned payment caused it', () => {
   const state = account(), draft = { amount: 20000, category: 'Food', recipient: { name: 'Food stall' }, rail: 'lumo' };
   const before = JSON.stringify(state), impact = evaluatePayment(state, draft);
   assert.equal(impact.baselineShortfall, 10000); assert.equal(impact.additionalShortfall, 0);
   assert.match(impact.reason, /already has a shortfall/);
   const html = renderPayments({ state, draft: { payment: draft } }, { section: 'pay', page: 'pause' });
-  assert.match(html, /Your plan is already/); assert.match(html, /GH₵100<\/strong>/);
+  const sentence = html.match(/class="pause-screen-impact"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
+  assert.equal(sentence, 'After this payment, your breathing room would still be <strong>GH₵100 short</strong>.');
+  assert.match(html, /Your GH₵400 plan stays covered/);
+  assert.match(html, /<details class="pause-screen-details"><summary>Payment details<\/summary>/);
   assert.match(html, /This payment leaves that gap unchanged/); assert.doesNotMatch(html, /This payment would use/);
   const alternatives = getPauseAlternatives(state, draft);
   assert.equal(alternatives.baselineShortfall, 10000); assert.equal(alternatives.additionalShortfall, 0);
@@ -30,13 +33,15 @@ test('Pause names an unchanged pre-existing gap instead of saying a planned paym
   assert.equal(JSON.stringify(state), before);
 });
 
-test('a new unplanned payment attributes only its added gap while retaining the prior gap', () => {
+test('an unplanned payment distinguishes its new plan gap from the existing breathing-room gap', () => {
   const state = account(), draft = { amount: 5000, category: 'Other', recipient: { name: 'Kofi' }, rail: 'lumo' };
   const impact = evaluatePayment(state, draft);
   assert.equal(impact.baselineShortfall, 10000); assert.equal(impact.additionalShortfall, 5000);
   assert.match(impact.reason, /increase the existing shortfall/);
   const html = renderPayments({ state, draft: { payment: draft } }, { section: 'pay', page: 'pause' });
-  assert.match(html, /This payment would use/); assert.match(html, /GH₵50<\/strong>/);
+  const sentence = html.match(/class="pause-screen-impact"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
+  assert.equal(sentence, 'This payment leaves you <strong>GH₵50 short</strong> for your plan.');
+  assert.match(html, /GH₵550 would remain.*GH₵600 is still planned, leaving a GH₵50 plan gap/);
   assert.match(html, /already has a GH₵100.00 gap/);
   assert.doesNotMatch(html, /GH₵150<\/strong>/, 'the whole gap is not blamed on this payment');
 });

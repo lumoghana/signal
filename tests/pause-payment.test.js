@@ -44,27 +44,43 @@ function harness(t, draft = payment()) {
   return { ctx, state, clock, nodes, routes, auth, actions, messages, counter, click(action) { nodes.get(action).listeners.click(); } };
 }
 
-function impact(html) { return html.match(/class="pause-screen-impact"[^>]*>[\s\S]*?<strong[^>]*>([^<]+)<\/strong>/)?.[1]; }
+function impact(html) { return html.match(/class="pause-screen-impact"[^>]*>([\s\S]*?)<\/h2>/)?.[1].replace(/<[^>]+>/g, ''); }
 
-test('Pause distinguishes reserved money from remaining money and honours category allocation', () => {
+test('Pause gives one precise consequence and honours category allocation and fees', () => {
   for (const example of [
-    { amount: 50000, category: 'Other', metric: 'GH₵250.5', kind: 'reserved', reservedFrom: 'plan and cushion' },
-    { amount: 50000, category: 'Food', metric: 'GH₵99.5', kind: 'remaining' },
-    { amount: 90000, category: 'Food', metric: 'GH₵300.5', kind: 'reserved', reservedFrom: 'plan and cushion' },
-    { amount: 10000, category: 'Other', metric: 'GH₵149.5', kind: 'remaining' },
-    { amount: 40025, category: 'Other', metric: 'GH₵150.75', kind: 'reserved', reservedFrom: 'plan and cushion' },
-    { amount: 25000, category: 'Other', metric: 'GH₵0.5', kind: 'reserved', reservedFrom:'cushion' },
-    { amount: 30000, category: 'Other', metric: 'GH₵50.5', kind: 'reserved', reservedFrom: 'cushion' },
-    { amount: 50000, category: 'Other', metric: 'GH₵150.5', kind: 'reserved', reservedFrom: 'plan', buffer: 0 },
+    { amount: 50000, category: 'Other', consequence: 'This payment leaves you GH₵150.50 short for your plan.' },
+    { amount: 50000, category: 'Food', consequence: 'You’d have GH₵99.50 left after your plan and breathing room.' },
+    { amount: 90000, category: 'Food', consequence: 'This payment leaves you GH₵200.50 short for your plan.' },
+    { amount: 10000, category: 'Other', consequence: 'You’d have GH₵149.50 left after your plan and breathing room.' },
+    { amount: 40025, category: 'Other', consequence: 'This payment leaves you GH₵50.75 short for your plan.' },
+    { amount: 25000, category: 'Other', consequence: 'This payment uses GH₵0.50 of your breathing room.' },
+    { amount: 30000, category: 'Other', consequence: 'This payment uses GH₵50.50 of your breathing room.' },
+    { amount: 50000, category: 'Other', consequence: 'This payment leaves you GH₵150.50 short for your plan.', buffer: 0 },
   ]) {
     const state = account();
     if (example.buffer !== undefined) state.buffer = example.buffer;
     const before = JSON.stringify(state), d = payment(example.amount, example.category);
     assert.equal(evaluatePayment(state, d).needed, true);
     const html = renderPayments({ state, draft: { payment: d } }, { section: 'pay', page: 'pause' });
-    assert.equal(impact(html), example.metric);
-    assert.ok(html.includes(example.kind === 'reserved' ? `from your ${example.reservedFrom}.` : 'left after your plan.'));
+    assert.equal(impact(html), example.consequence);
+    assert.match(html, /<details class="pause-screen-details"><summary>Payment details<\/summary>/);
+    assert.doesNotMatch(html, /<details[^>]*\bopen\b/);
+    assert.match(html, /data-action="pay-pause-next" aria-busy="true" disabled>Continue to PIN/);
+    assert.match(html, /data-action="pay-edit-amount">Edit amount/);
     assert.equal(JSON.stringify(state), before, 'rendering a decision must not debit, reserve or allocate money');
+  }
+});
+
+test('Pause distinguishes an existing plan gap from a gap increased by this payment', () => {
+  const state = account(); state.wallet = 60000;
+  for (const [category, expected] of [
+    ['Food', 'After this payment, your plan would still be GH₵50 short.'],
+    ['Other', 'Your plan’s existing gap would grow to GH₵150 after this payment.'],
+  ]) {
+    const d = { ...payment(10000, category), rail: 'lumo' }, before = JSON.stringify(state);
+    const html = renderPayments({ state, draft: { payment: d } }, { section: 'pay', page: 'pause' });
+    assert.equal(impact(html), expected);
+    assert.equal(JSON.stringify(state), before);
   }
 });
 

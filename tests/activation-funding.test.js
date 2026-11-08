@@ -133,3 +133,36 @@ test('changing the operational account cannot redirect an existing receipt into 
   assert.equal(checkActivationFunding(d, { receipt: confirmation }).ok, false);
   assert.equal(financial(d), changed); assert.equal(d.state.wallet, 0);
 });
+
+test('first MoMo funding accepts only the registered account phone, including equivalent Ghana formats', () => {
+  const d = draft();
+  d.funding.phone = '0551111111';
+  const before = JSON.stringify(d);
+  assert.equal(requestActivationFunding(d, { amount: 10000, source: 'Mobile money', phone: '0551111111' }).ok, false);
+  assert.equal(JSON.stringify(d), before, 'a foreign wallet cannot create a request or alter the account');
+  assert.equal(requestActivationFunding(d, { amount: 10000, source: 'Mobile money', phone: '+233 24 000 0000' }).ok, true);
+  assert.equal(d.fundingAttempt.phone, '0240000000');
+  assert.equal(d.funding.phone, '0240000000');
+  assert.equal(d.state.wallet, 0);
+});
+
+test('missing account phone blocks MoMo even when a valid foreign wallet is supplied, while bank transfer works', () => {
+  for (const registered of ['', 'invalid', '0340000000']) {
+    const d = draft(); d.state.profile.phone = registered;
+    const before = JSON.stringify(d);
+    assert.equal(requestActivationFunding(d, { amount: 10000, source: 'Mobile money', phone: '0240000000' }).ok, false);
+    assert.equal(JSON.stringify(d), before);
+    assert.equal(requestActivationFunding(d, { amount: 10000, source: 'Bank transfer' }).ok, true);
+    assert.equal(d.fundingAttempt.phone, '');
+  }
+});
+
+test('restoring first funding replaces a stale draft phone without rewriting historical request identity', () => {
+  const d = draft(); request(d);
+  d.funding.phone = '0551111111';
+  const original = JSON.stringify(d), attempt = structuredClone(d.fundingAttempt);
+  const restored = restoreActivationDraft(d);
+  assert.equal(restored.funding.phone, '0240000000');
+  assert.deepEqual(restored.fundingAttempt, attempt);
+  assert.equal(JSON.stringify(d), original);
+});

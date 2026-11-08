@@ -1,6 +1,6 @@
 /* Optional personal-money introduction. All amounts and replies here are examples. */
 .tour-page{--lm-bg:var(--bg);--lm-surface:var(--surface);--lm-line:var(--line);--lm-text:var(--text);--lm-muted:var(--muted);--lm-lime:var(--accent,var(--lime));display:flex;flex-direction:column;height:100%;max-height:100%;min-height:0;overflow:hidden;background:var(--lm-bg);color:var(--lm-text);font-family:inherit;letter-spacing:-.02em}
-.tour-page--pause{--lm-bg:#191a22;--lm-surface:#24252f;--lm-line:#34353f;--lm-text:#f5f5f7;--lm-muted:#b7b4ac;--lm-lime:#d4f65a;--accent:#d4f65a;color-scheme:dark}
+.tour-page--pause{--lm-bg:#f0b34e;--lm-surface:#f0b34e;--lm-line:#191a2240;--lm-text:#191a22;--lm-muted:#3e3323;--lm-lime:#191a22;--accent:#191a22;color-scheme:light}
 .tour-page button:focus-visible{outline:2px solid var(--lm-lime);outline-offset:3px}
 .tour-page .lm-head{display:flex;align-items:center;justify-content:space-between;flex:0 0 auto;min-height:80px;padding:calc(8px + env(safe-area-inset-top)) 24px 8px;gap:16px}
 .tour-page .lm-brand,.tour-page .lm-head .wordmark{font-size:32px;font-weight:850;letter-spacing:-2px;line-height:1;color:var(--lm-lime)}
@@ -86,3 +86,13 @@
 @media(max-width:350px){.tour-page .lm-head,.tour-page .lm-main,.tour-page .lm-foot{padding-left:20px;padding-right:20px}.tour-page .lm-main h1{font-size:36px}.tour-page .lm-goal{padding-left:18px;padding-right:18px}.tour-page .lm-rule{font-size:12px}.tour-page .lm-pause-lux{max-width:220px;max-height:220px}.tour-page .lm-pause-mark i{width:3px;height:21px}.tour-page .lm-answer-slot{min-height:130px}}
 @media(max-width:350px) and (max-height:650px){.tour-page .lm-main h1{font-size:32px}.tour-page .lm-pause-lux{width:164px;height:164px}}
 @media(prefers-reduced-motion:reduce){.tour-page *,.tour-page *:before,.tour-page *:after{animation:none!important;transition:none!important}}
+
+/* The introductory Pause repeats the amber payment screen without implying a live payment. */
+.tour-page--pause .lm-main{align-items:center;text-align:left;gap:28px}
+.tour-page--pause .lm-main h1{align-self:flex-start;font-size:54px;font-weight:700;line-height:1.05;letter-spacing:-.045em}
+.tour-page--pause .lm-pause-lux{width:180px;height:180px;margin:0 auto}
+.tour-page--pause .lm-main .lm-intro{font-size:21px;line-height:1.45;color:var(--lm-text);max-width:330px}
+.tour-page--pause .lm-next{background:#191a22;color:#fff8ed;border-radius:28px}
+@media(max-height:740px){.tour-page--pause .lm-main{gap:22px}.tour-page--pause .lm-main h1{font-size:48px}.tour-page--pause .lm-pause-lux{width:155px;height:155px}.tour-page--pause .lm-main .lm-intro{font-size:20px}}
+@media(max-height:650px){.tour-page--pause .lm-main{gap:16px}.tour-page--pause .lm-main h1{font-size:42px}.tour-page--pause .lm-pause-lux{width:120px;height:120px}.tour-page--pause .lm-main .lm-intro{font-size:18px}}
+.tour-page--pause .lm-pause-lux{transform:scale(1.5)}

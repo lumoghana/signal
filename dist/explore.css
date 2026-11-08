@@ -253,3 +253,21 @@
 }
 
 @media(max-height:620px){.explore-partner-ui .explore-ui-note{margin-top:7px;margin-bottom:6px}}
+
+/* The sample mirrors the amber Pause screen: one headline, Lux, one consequence. */
+.lumo-explore .explore-pause-ui{display:flex;flex-direction:column;align-items:center;background:#f0b34e;color:#191a22;text-align:left;padding:16px 20px 14px;border-color:transparent;box-shadow:none;gap:0;min-height:350px}
+.lumo-explore .explore-pause-ui .explore-ui-top{margin:0 0 18px;color:#191a22;font-size:.6875rem}
+.lumo-explore .explore-pause-ui .explore-ui-top-icon{display:none}
+.lumo-explore .explore-pause-title{align-self:flex-start;color:#191a22;font-size:2.25rem;font-weight:700;margin:0;letter-spacing:-.045em;line-height:1.05}
+.lumo-explore .explore-pause-lux{width:100px;height:100px;margin:15px auto 12px;animation:none}
+.lumo-explore .explore-pause-impact{width:100%;padding:0;margin:0;min-width:0}
+.lumo-explore .explore-pause-impact>p{color:#191a22;font-size:1rem;line-height:1.4;text-wrap:pretty;margin:0}
+.lumo-explore .explore-pause-impact strong{font-weight:750}
+.lumo-explore .explore-pause-impact::before,.lumo-explore .explore-pause-impact .explore-focus-dot{display:none}
+.lumo-explore .explore-pause-context{display:block;font-size:.5625rem;color:#45351d;line-height:1.4;margin:15px 0 8px;align-self:flex-start}
+.lumo-explore .explore-pause-choices{display:flex;flex-direction:column;gap:1px;margin:0;font-size:.6875rem}
+.lumo-explore .explore-pause-choices>span{width:100%;padding:9px 8px;text-align:center;flex:0 0 auto;color:#191a22}
+.lumo-explore .explore-pause-choices>.explore-choice-primary{background:#191a22;color:#fff8ed;border-radius:20px;font-weight:600}
+@media(max-height:740px){.lumo-explore .explore-pause-ui{min-height:300px;padding:13px 18px 11px}.lumo-explore .explore-pause-ui .explore-ui-top{margin-bottom:12px}.lumo-explore .explore-pause-title{font-size:2rem}.lumo-explore .explore-pause-lux{width:80px;height:80px;margin-top:10px;margin-bottom:10px}.lumo-explore .explore-pause-impact>p{font-size:.9375rem}.lumo-explore .explore-pause-context{margin-top:11px}}
+@media(max-height:650px){.lumo-explore .explore-pause-ui{min-height:285px}.lumo-explore .explore-pause-lux{width:68px;height:68px;margin:8px auto}.lumo-explore .explore-pause-impact>p{font-size:.875rem}.lumo-explore .explore-pause-title{font-size:1.875rem}.lumo-explore .explore-pause-context{margin-top:9px}.lumo-explore .explore-pause-choices>span{padding-top:8px;padding-bottom:8px}}
+.lumo-explore .explore-pause-lux{transform:scale(1.5)}

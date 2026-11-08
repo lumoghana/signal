@@ -19,7 +19,7 @@ export function calculateExploreAnswer({ available, planned, cushion } = {}) {
 export const EXPLORE_SCENES = Object.freeze([
   { id: 'home', name: 'Your money', title: 'More than a balance.', copy: 'Know what’s left after your plan and breathing room.', duration: 4500 },
   { id: 'plan', name: 'Plan', title: 'Make room for real life.', copy: 'Keep food, transport and upcoming commitments in view.', duration: 4500 },
-  { id: 'pause', name: 'Pause Moment', title: 'A moment. A clearer choice.', copy: 'Understand a payment’s impact before you decide.', duration: 5500 },
+  { id: 'pause', name: 'Pause Moment', title: 'Your Pause Moment.', copy: 'See the impact before you decide.', duration: 5500 },
   { id: 'chat', name: 'Ask Lux', title: 'Chat with your money.', copy: 'Ask Lux about your spending, plans and goals.', duration: 5500 },
   { id: 'box', name: 'Money Boxes & Savings Hacks', title: 'Small moves. Real goals.', copy: 'Give your goal a Money Box. A Savings Hack helps it grow.', duration: 6000 },
   { id: 'partner', name: 'Accountability partner', title: 'A little backup for your goal.', copy: 'Choose someone you trust to help you stick with it.', duration: 5000 },

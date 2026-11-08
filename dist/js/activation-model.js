@@ -1,4 +1,5 @@
 import { applyAction, budgetCategoryKey } from './model.js';
+import { accountFundingPhone, normalizeFundingPhone } from './funding-phone.js';
 
 export const ACTIVATION_CATEGORIES = Object.freeze([
   { name: 'Food & groceries', emoji: '🍲' },
@@ -47,7 +48,7 @@ export function createActivationDraft({ state, preview = false } = {}) {
   // One persisted example belongs to the simulated operational record. Never
   // manufacture a live number, borrow the Savings number, or change the source.
   initializeExampleNumber(isolatedState);
-  return { schema: 1, state: isolatedState, preview: !!preview, step: 'account-created', accountAcknowledged: false, funding: { source: 'Mobile money', amountText: '', phone: isolatedState.profile?.phone || '' }, fundingAttempt: null, fundingHistory: [],
+  return { schema: 1, state: isolatedState, preview: !!preview, step: 'account-created', accountAcknowledged: false, funding: { source: 'Mobile money', amountText: '', phone: accountFundingPhone(isolatedState) }, fundingAttempt: null, fundingHistory: [],
     keepBackText: '0', items: [], category: '', categoryName: '', amountText: '', due: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
     error: '', funded: false, budgetSaved: false, fundingKey: uid(), fundingTransactionId: '', completed: false };
 }
@@ -70,6 +71,7 @@ export function restoreActivationDraft(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input) || input.schema !== 1 || input.state?.onboardingDone !== true) return null;
   const restored = structuredClone(input);
   initializeExampleNumber(restored.state);
+  if (restored.funding) restored.funding.phone = accountFundingPhone(restored.state);
   return restored;
 }
 
@@ -102,11 +104,7 @@ export function activationFundingStatus(d) {
   return ['pending', 'failed', 'expired'].includes(d?.fundingAttempt?.status) ? d.fundingAttempt.status : 'idle';
 }
 
-export function normalizeActivationMobile(value) {
-  const digits = String(value || '').trim().replace(/[\s()+-]/g, '');
-  const local = digits.startsWith('233') ? '0' + digits.slice(3) : digits;
-  return /^0[25]\d{8}$/.test(local) ? local : '';
-}
+export const normalizeActivationMobile = normalizeFundingPhone;
 
 /** Creating a request never credits money or permits planning. */
 export function requestActivationFunding(d, { amount, source, phone, now = Date.now() } = {}) {
@@ -115,8 +113,9 @@ export function requestActivationFunding(d, { amount, source, phone, now = Date.
   if (funded(d)) return { ...good('Your money is already here.'), status: 'confirmed' };
   if (!positive(amount)) return fail('Choose an amount above zero to start with.');
   if (!['Mobile money', 'Bank transfer'].includes(source)) return fail('Choose mobile money or a bank transfer.');
-  const mobile = source === 'Mobile money' ? normalizeActivationMobile(phone) : '';
-  if (source === 'Mobile money' && !mobile) return fail('Enter a valid Ghana mobile money number.');
+  const mobile = source === 'Mobile money' ? accountFundingPhone(d.state) : '';
+  if (source === 'Mobile money' && !mobile) return fail('Your registered mobile number must be confirmed before adding money from MoMo.');
+  if (source === 'Mobile money' && phone !== undefined && normalizeFundingPhone(phone) !== mobile) return fail('MoMo top-ups can only use your registered mobile number.');
   const current = d.fundingAttempt;
   if (current?.status === 'pending') {
     if (current.amount === amount && current.source === source && current.phone === mobile && current.accountNumber === activationEverydayAccountNumber(d)) return { ...good('This request is already waiting for confirmation.'), status: 'pending', attemptId: current.id, alreadyPending: true };
@@ -125,7 +124,7 @@ export function requestActivationFunding(d, { amount, source, phone, now = Date.
   if (current) return fail('Review this funding result before trying again.');
   const id = uid(), createdAt = Number.isFinite(now) ? now : Date.now();
   d.fundingAttempt = { id, status: 'pending', amount, source, rail: source === 'Mobile money' ? 'momo' : 'bank', accountNumber: activationEverydayAccountNumber(d), phone: mobile, reference: 'LUMO-' + id.replace(/[^a-z0-9]/gi, '').slice(-10).toUpperCase(), createdAt, lastCheckedAt: null, receipt: null, demoReceipt: null };
-  d.funding = { ...d.funding, source, phone: mobile || d.funding?.phone || '', amountText: (amount / 100).toFixed(2) };
+  d.funding = { ...d.funding, source, phone: accountFundingPhone(d.state), amountText: (amount / 100).toFixed(2) };
   d.step = 'fund'; d.error = '';
   return { ...good('Waiting for the money to reach your Everyday account.'), status: 'pending', attemptId: id };
 }

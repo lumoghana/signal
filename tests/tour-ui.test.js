@@ -72,7 +72,7 @@ test('all three benefits expose Skip, Back and a way onward before any sample in
 
 test('the first benefit introduces Pause without becoming the real payment approval screen', () => {
   const h = harness({ step: 0, bind: false }), html = h.render();
-  assert.match(html, /lux-pause-2d\.webp/);
+  assert.match(html, /lux-pause-worried\.png/);
   assert.match(html, /pause/i);
   assert.doesNotMatch(html, /class="pause-screen|data-action="pay-|data-tour-demo="smaller-payment"/);
   assert.equal(h.d.paymentTried, false);

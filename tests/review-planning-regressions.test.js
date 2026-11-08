@@ -78,7 +78,7 @@ test('overdue goals invite recovery instead of claiming an impossible daily savi
 });
 
 test('activation permits an optional keep-back and a verified unfunded waiting account',()=>{
-  const s=createEmptyState();s.onboardingDone=true;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];const d=createActivationDraft({state:s});assert.equal(acknowledgeCreatedAccount(d).ok,true);
+  const s=createEmptyState({phone:'0240000000'});s.onboardingDone=true;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];const d=createActivationDraft({state:s});assert.equal(acknowledgeCreatedAccount(d).ok,true);
   const waiting=deferActivationFunding(d);assert.equal(waiting.ok,true);assert.equal(waiting.state.wallet,0);assert.equal(waiting.state.activation.status,'waiting');assert.equal(waiting.state.transactions.length,0);
   const d2=createActivationDraft({state:s});assert.equal(acknowledgeCreatedAccount(d2).ok,true);assert.equal(confirmFunding(d2,{amount:10000,source:'Mobile money'}).ok,true);assert.equal(addActivationBudgetItem(d2,{name:'Food',amount:6000}).ok,true);
   assert.equal(saveActivationBudget(d2,{buffer:5000}).ok,false);assert.equal(saveActivationBudget(d2,{buffer:1000}).ok,true);assert.equal(getSummary(d2.state).spendable,3000);assert.equal(completeActivation(d2).ok,true);
@@ -93,7 +93,7 @@ test('personal totals retain pending payment, card and contribution holds once',
 
 
 test('a deferred account progresses only on confirmed funds and a real plan, including reload',()=>{
-  const s=createEmptyState();s.onboardingDone=true;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];const setup=createActivationDraft({state:s});assert.equal(acknowledgeCreatedAccount(setup).ok,true);let account=deferActivationFunding(setup).state;
+  const s=createEmptyState({phone:'0241234567'});s.onboardingDone=true;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];const setup=createActivationDraft({state:s});assert.equal(acknowledgeCreatedAccount(setup).ok,true);let account=deferActivationFunding(setup).state;
   const attempt=run(account,'startFundingAttempt',{amount:10000,rail:'momo',number:'0241234567'});
   assert.equal(account.activation.status,'waiting');run(account,'resolveFundingAttempt',{id:attempt.id,status:'failed'});assert.equal(account.activation.status,'waiting');
   run(account,'fund',{amount:10000,source:'Allowance'});assert.equal(account.activation.status,'needs-plan');

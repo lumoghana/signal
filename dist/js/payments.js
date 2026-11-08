@@ -5,6 +5,8 @@ import { esc, cash, icon, categorySymbol, pageHead, row, field, btn, empty, date
 import { getSummary, evaluatePayment, repayableIOUAmount } from './model.js';
 import qrcode from './vendor/qrcode.js';
 import { renderPauseScreen } from './pause-view.js';
+import { getPauseConsequence } from './pause-consequence.js';
+import { accountFundingPhone } from './funding-phone.js';
 import { renderPaymentsHub, bindPaymentsHub } from './payments-hub.js';
 import { renderPaymentService, bindPaymentService } from './payment-services.js';
 import { getPaymentService, prepareServicePayment, getServiceHubTab, isCampusCodeService, getTopUpShortcuts } from './payment-catalog.js';
@@ -299,9 +301,10 @@ function pause(ctx) {
   const context = unchangedGap ? 'This payment leaves that gap unchanged.' : baselineGap > 0 ? `Your plan already has a ${cash(baselineGap)} gap.` : touches === 0 ? check.reason : '';
   return renderPauseScreen({
     amount: d.amount, metric: touches || (unchangedGap ? baselineGap : after), kind: touches > 0 ? 'reserved' : unchangedGap ? 'existing-gap' : 'remaining', reservedFrom, recipient: recipientLabel(d),
+    consequence: getPauseConsequence(ctx.state, { ...d, fee: check.fee, merchant: recipientLabel(d) }, check),
     reason: [consequence.copy, context].filter(Boolean).join(' '),
-    primary: { label: 'Edit amount', attributes: 'data-action="pay-edit-amount"' },
-    secondary: { label: 'Continue payment', attributes: 'data-action="pay-pause-next" aria-busy="true"', disabled: true },
+    primary: { label: 'Continue to PIN', attributes: 'data-action="pay-pause-next" aria-busy="true"', disabled: true },
+    secondary: { label: 'Edit amount', attributes: 'data-action="pay-edit-amount"' },
     alternatives: renderPauseAlternatives(ctx.state, d, check),
     headerLeft: { label: 'Review', attributes: 'data-action="back"' },
     headerRight: { label: 'Cancel', attributes: 'data-action="pay-cancel"' },
@@ -604,20 +607,20 @@ function trackCollection(ctx) {
 
 export function openFunding(ctx, restored = null) {
   const current = ctx.route || { section: 'home', page: 'home' };
-  const f = restored || { source: 'MTN MoMo', number: String(ctx.state.profile?.phone || '0240000000').replace(/\s/g,''), amountText: '', idempotencyKey: nonce('fund'), returnTo: { ...current } };
-  f.number ||= String(ctx.state.profile?.phone || '0240000000').replace(/\s/g,'');
+  const f = restored || { source: 'MTN MoMo', number: accountFundingPhone(ctx.state), amountText: '', idempotencyKey: nonce('fund'), returnTo: { ...current } };
+  f.number = accountFundingPhone(ctx.state);
   ctx.draft.funding = f; remember(ctx);
   const bank=f.source==='Bank transfer',receiving=`Lumo demo receiving details\nBank: GCB Bank · simulation\nAccount name: ${ctx.state.profile?.name||'Lumo student'} · demo\nAccount number: 000005001118\nReference: LUMO-DEMO\nDo not send real money to these sample details.`;
-  ctx.sheet(`<div class="content funding-sheet"><p class="eyebrow">Add money</p><h2 class="large-question">A little fuel<br>for your plans.</h2><div class="chips"><button class="chip ${!bank?'selected':''}" data-fund-source="MTN MoMo">${icon('phone',17)} Mobile money</button><button class="chip ${bank?'selected':''}" data-fund-source="Bank transfer">${icon('bank',17)} Bank transfer</button></div>${bank?`<div class="panel">${row({title:'Bank',right:'GCB Bank · demo'})}${row({title:'Account name',sub:esc(ctx.state.profile?.name||'Lumo student')+' · demo'})}${row({title:'Sample account',right:'000005001118'})}${row({title:'Reference',right:'LUMO-DEMO'})}</div><p class="muted small">Sample receiving details only. Do not transfer real money to them.</p><div class="inline-actions">${btn('Copy details','fund-copy',{secondary:true})}${btn('Share details','fund-share',{secondary:true})}</div>`:field({label:'Your own mobile-money number',name:'fundNumber',type:'tel',value:f.number,placeholder:'024 000 0000'})}${field({label:bank?'Amount to track (GH₵)':'Top-up amount (GH₵)',name:'fundAmount',type:'number',value:f.amountText,min:'0.01',placeholder:'e.g. 100'})}<p class="muted small">${bank?'Track the transfer, then wait for its confirmed result.':'Review your own wallet and amount. A top-up stays pending until confirmation.'} This is a simulation. No prompt, bank debit or real transfer is sent.</p><p class="error" id="fund-error" role="alert" hidden></p><div class="sheet-actions">${btn(bank?'Track this transfer':'Review top-up','fund-continue')}<button class="button ghost" data-action="fund-history">View top-up history</button></div></div>`,el=>{
-    const capture=()=>{f.amountText=el.querySelector('[name="fundAmount"]').value;const number=el.querySelector('[name="fundNumber"]');if(number)f.number=number.value;remember(ctx);};
+  ctx.sheet(`<div class="content funding-sheet"><p class="eyebrow">Add money</p><h2 class="large-question">A little fuel<br>for your plans.</h2><div class="chips"><button class="chip ${!bank?'selected':''}" data-fund-source="MTN MoMo">${icon('phone',17)} Mobile money</button><button class="chip ${bank?'selected':''}" data-fund-source="Bank transfer">${icon('bank',17)} Bank transfer</button></div>${bank?`<div class="panel">${row({title:'Bank',right:'GCB Bank · demo'})}${row({title:'Account name',sub:esc(ctx.state.profile?.name||'Lumo student')+' · demo'})}${row({title:'Sample account',right:'000005001118'})}${row({title:'Reference',right:'LUMO-DEMO'})}</div><p class="muted small">Sample receiving details only. Do not transfer real money to them.</p><div class="inline-actions">${btn('Copy details','fund-copy',{secondary:true})}${btn('Share details','fund-share',{secondary:true})}</div>`:`<label class="field"><span>Your MoMo number</span><input class="input" name="fundNumber" type="tel" value="${esc(f.number)}" readonly aria-readonly="true" aria-describedby="fund-number-note"></label><p class="muted small" id="fund-number-note">Your registered Lumo number. You can only add money from this MoMo wallet.</p>`}${field({label:bank?'Amount to track (GH₵)':'Top-up amount (GH₵)',name:'fundAmount',type:'number',value:f.amountText,min:'0.01',placeholder:'e.g. 100'})}<p class="muted small">${bank?'Track the transfer, then wait for its confirmed result.':'Review your own wallet and amount. A top-up stays pending until confirmation.'} This is a simulation. No prompt, bank debit or real transfer is sent.</p><p class="error" id="fund-error" role="alert" hidden></p><div class="sheet-actions">${btn(bank?'Track this transfer':'Review top-up','fund-continue')}<button class="button ghost" data-action="fund-history">View top-up history</button></div></div>`,el=>{
+    const capture=()=>{f.amountText=el.querySelector('[name="fundAmount"]').value;f.number=accountFundingPhone(ctx.state);remember(ctx);};
     el.querySelectorAll('[data-fund-source]').forEach(b=>b.addEventListener('click',()=>{capture();f.source=b.dataset.fundSource;openFunding(ctx,f);}));
-    el.querySelector('[name="fundAmount"]').addEventListener('input',capture);el.querySelector('[name="fundNumber"]')?.addEventListener('input',capture);
+    el.querySelector('[name="fundAmount"]').addEventListener('input',capture);
     el.querySelector('[data-action="fund-copy"]')?.addEventListener('click',()=>copyText(ctx,receiving));el.querySelector('[data-action="fund-share"]')?.addEventListener('click',()=>shareText(ctx,receiving,'Lumo demo receiving details'));
     el.querySelector('[data-action="fund-history"]').onclick=()=>{ctx.closeSheet();ctx.go(payRoute('funding-detail',{backTo:f.returnTo}));};
     el.querySelector('[data-action="fund-continue"]').onclick=()=>{
       capture();const value=f.amountText,amount=pence(value),error=el.querySelector('#fund-error');
       if(!/^\d+(?:\.\d{1,2})?$/.test(value)||!Number.isSafeInteger(amount)||amount<=0||amount>100000000){error.textContent='Use GH₵0.01 to GH₵1,000,000, with up to two decimal places.';error.hidden=false;return;}
-      const number=f.number.replace(/\s/g,'');if(!bank&&!/^0\d{9}$/.test(number)){error.textContent='Use your own 10-digit Ghanaian mobile number.';error.hidden=false;return;}
+      const number=f.number.replace(/\s/g,'');if(!bank&&!/^0\d{9}$/.test(number)){error.textContent='Your registered Lumo number is missing or invalid. Check your account details before adding money.';error.hidden=false;return;}
       ctx.closeSheet();ctx.auth({title:bank?`Track ${cash(amount)} bank transfer?`:`Request ${cash(amount)} from your own wallet?`,onCancel:()=>openFunding(ctx,f),onSuccess:()=>{
         const result=ctx.act('startFundingAttempt',{amount,rail:bank?'bank':'momo',number,source:f.source,idempotencyKey:f.idempotencyKey});if(!result.ok)return ctx.toast(result.message);
         ctx.draft.fundingReturnTo=f.returnTo;delete ctx.draft.funding;finish(ctx,payRoute('funding-detail',{id:result.id,backTo:f.returnTo}));

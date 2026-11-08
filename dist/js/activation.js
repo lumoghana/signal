@@ -1,5 +1,6 @@
 import { esc, cash, icon } from './ui.js';
 import { budgetCategoryKey } from './model.js';
+import { accountFundingPhone } from './funding-phone.js';
 import { bindActivationConfetti } from './activation-confetti.js';
 import { renderActivationFunding } from './activation-funding-view.js';
 import { readDemoActivationFundingReceipt, simulateActivationFundingReceipt } from './activation-funding-demo.js';
@@ -76,9 +77,11 @@ export function bindActivation(ctx, route) {
   const capture = () => {
     if (!current()) return;
     root.querySelectorAll('[data-activation-field]').forEach(input => {
-      if (['funding.amountText', 'funding.phone'].includes(input.dataset.activationField)) d.funding[input.dataset.activationField.slice(8)] = input.value;
+      if (input.dataset.activationField === 'funding.phone') return;
+      if (input.dataset.activationField === 'funding.amountText') d.funding.amountText = input.value;
       else d[input.dataset.activationField] = input.value;
     });
+    d.funding.phone = accountFundingPhone(d.state);
     ctx.saveDraft?.();
   };
   ctx.setCapture?.(capture);

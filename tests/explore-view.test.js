@@ -59,7 +59,7 @@ test('Pause and Ask Lux use the same sample money without presenting a live paym
   money(pause, '300');
   money(pause, '50');
   assert.match(text(pause), /before you decide/i);
-  assert.match(pause, /lux-pause-2d\.webp/);
+  assert.match(pause, /lux-pause-worried\.png/);
   assert.match(text(chat), /What can I spend\?/i);
   money(chat, '250');
   assert.match(text(chat), /Based on your plan, you have GH₵250 left until Friday\./);

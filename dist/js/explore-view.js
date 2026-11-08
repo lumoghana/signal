@@ -26,13 +26,12 @@ function plan() {
 }
 
 function pause() {
-  return `<div class="explore-app-ui explore-pause-ui">${top('Pause Moment')}
-    <div class="explore-pause-title"><span aria-hidden="true"><i></i><i></i></span>Pause.</div>
-    <img src="/assets/lux-pause-2d.webp" width="220" height="220" alt="Lux holding up a hand to pause" class="explore-pause-lux" decoding="async">
-    <div class="explore-pause-impact explore-focus"><p>After paying ${money(sample.payment)}, you’d have</p>${amount(sample.afterPayment)}<p>${money(sample.planned)} for your plan.<br>${money(sample.remainingCushion)} breathing room.</p><span class="explore-focus-dot" aria-hidden="true"></span></div>
-    <p class="explore-tradeoff-note">${money(sample.shortfall)} of your ${money(sample.cushion)} breathing room would be used. Food and transport stay covered.</p>
+  return `<div class="explore-app-ui explore-pause-ui">${top('Lumo Pause Moment')}
+    <div class="explore-pause-title">Pause.</div>
+    <img src="/assets/lux-pause-worried.png" width="180" height="180" alt="A worried Lux raising a hand to pause" class="explore-pause-lux" decoding="async">
+    <div class="explore-pause-impact explore-focus"><p>This payment uses <strong>${money(sample.shortfall)}</strong> of your breathing room until ${sample.periodLabel}.</p><span class="explore-focus-dot" aria-hidden="true"></span></div>
     <div class="explore-pause-context">Sample payment · ${money(sample.payment)}</div>
-    <div class="explore-pause-choices" aria-label="Preview of your choices"><span class="explore-choice-primary">Continue</span><span>Edit amount</span></div>
+    <div class="explore-pause-choices" aria-label="Preview of your choices"><span class="explore-choice-primary">Continue to PIN</span><span>Edit amount</span></div>
   </div>`;
 }
 

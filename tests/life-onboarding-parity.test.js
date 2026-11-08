@@ -13,7 +13,7 @@ function faceReady(){const d=codeReady();updateOnboardingField(d,'code','123456'
 function ctx(state=createDemoState()){return {state,draft:{},route:{section:'life'},$:()=>null};}
 
 test('first signup budget duration controls daily guide and never invents income',()=>{
-  const s=createEmptyState();s.onboardingDone=true;s.buffer=0;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];
+  const s=createEmptyState({phone:'0240000000'});s.onboardingDone=true;s.buffer=0;s.accounts=[{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];
   const d=createActivationDraft({state:s});ok(acknowledgeCreatedAccount(d));ok(confirmFunding(d,{amount:10000,source:'Mobile money'}));ok(addActivationBudgetItem(d,{name:'Food',amount:3000}));
   const expectedDate=d.state.income.nextDate;const due=new Date(Date.now()+30*86400000).toISOString().slice(0,10);ok(saveActivationBudget(d,{due}));
   assert.equal(d.state.income.nextDate,expectedDate);assert.equal(d.state.budget.endDate,due);assert.equal(d.state.income.amount,0);assert.equal(getSummary(d.state).daysLeft,30);assert.equal(getSummary(d.state).dailyAllowance,233);assert.equal(d.state.wallet,10000);

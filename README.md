@@ -17,7 +17,7 @@ Run `npm test` for financial, navigation, onboarding and camera lifecycle tests.
 - Collect with an actual encoded request QR, shareable demo payment URLs and expected-money tracking.
 - Complete incoming/outgoing IOU records, partial settlements, edits, cancellation and reminder text.
 - All Your Money includes manually recorded cash, bank and MoMo balances, with named accounts, update times, editing and removal. Guided allowance recovery, Money Story and state-grounded local Money Chat with three mini-lessons.
-- Lux is a lime-loop 2D companion throughout the app, with a black inner face, ivory features and a distinctive upper-right cut. The Pause Moment uses Lux’s raised right hand and calm, attentive expression. Transparent assets support both app themes; existing payment decisions, timing and controls are unchanged.
+- Lux is a lime-loop 2D companion throughout the app, with a black inner face, ivory features and a distinctive upper-right cut. The Pause Moment uses an amber screen, coral-orange worried Lux and one concise payment consequence. The same visual appears in Explore Lumo before signup and the signup tour. Full calculations remain in optional Payment details; payment rules, the three-second pause and PIN authentication are preserved.
 - Group collections, member invitations/roles, contributions, reserved payouts, distinct approval thresholds, cancellation and final payout.
 
 ## Prototype boundary

@@ -53,7 +53,9 @@ test('a repeated-recipient Pause explains the actual trigger while retaining the
   const check = evaluatePayment(state, draft), before = JSON.stringify(state);
   assert.equal(check.historySignals[0].id, 'repeat-recipient'); assert.equal(check.needed, true);
   const html = renderPayments({ state, draft: { payment: draft } }, { section: 'pay', page: 'pause' });
-  assert.ok(html.includes(check.reason)); assert.match(html, /Continue payment/);
+  assert.ok(html.includes(check.reason));
+  assert.match(html, /<details class="pause-screen-details"><summary>Payment details<\/summary>/);
+  assert.match(html, /data-action="pay-pause-next" aria-busy="true" disabled>Continue to PIN/);
   assert.equal(JSON.stringify(state), before);
 });
 

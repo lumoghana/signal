@@ -6,7 +6,7 @@ import { renderActivation, bindActivation } from '../dist/js/activation.js';
 import { confirmFunding } from './helpers/activation-funding.js';
 
 function draft({ funded = false, acknowledged = true } = {}) {
-  const state = createEmptyState({ name: 'Ama' }); state.onboardingDone = true;
+  const state = createEmptyState({ name: 'Ama', phone: '0240000000' }); state.onboardingDone = true;
   state.accounts = [
     { type: 'operational', holderName: 'Ama Mensah', status: 'simulated-ready', reference: 'DEMO-OPERATIONAL' },
     { type: 'savings', holderName: 'Savings decoy', accountNumber: '999999999999', status: 'simulated-ready' },
@@ -356,4 +356,23 @@ test('a keep-back edit cannot overallocate first money or complete without savin
  const d=readyDraft(),field={dataset:{activationField:'keepBackText'},value:'90'},ui=revisitPurpose(d,[field]);
  ui.input(field);assertNeedsSave(d);ui.click({activationAction:'save-budget'});
  assert.match(ui.error.textContent,/within the money/);assert.equal(d.state.buffer,0);assert.equal(d.budgetSaved,false);ui.cleanup();
+});
+
+test('first top-up displays the account phone read-only and cannot capture an injected phone field', () => {
+  const d = draft();
+  d.funding.phone = '0551111111';
+  const html = renderActivation({ draft: { activation: d } }, { step: 'fund' });
+  assert.match(html, /Your registered MoMo number/);
+  assert.match(html, /id="activation-momo-phone" value="0240000000" readonly aria-readonly="true"/);
+  assert.doesNotMatch(html, /0551111111|data-activation-field="funding.phone"/);
+  const fields = [
+    { dataset: { activationField: 'funding.phone' }, value: '0552222222' },
+    { dataset: { activationField: 'funding.amountText' }, value: '100' },
+  ];
+  const ui = binder(d, { step: 'fund', fields });
+  ui.click({ activationAction: 'fund' });
+  assert.equal(d.funding.phone, '0240000000');
+  assert.equal(d.fundingAttempt.phone, '0240000000');
+  assert.equal(d.state.wallet, 0);
+  ui.cleanup();
 });

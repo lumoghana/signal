@@ -8,7 +8,7 @@ import { safeRoute, parentRoute, compactTrail, routeKey } from '../dist/js/navig
 const okay = result => { assert.equal(result.ok, true, result.message); return result; };
 const activation = step => ({ section: 'activation', step });
 const home = { section: 'home', page: 'home' };
-const newAccount = () => Object.assign(createEmptyState({ name: 'Ama' }), { onboardingDone: true, accounts: [
+const newAccount = () => Object.assign(createEmptyState({ name: 'Ama', phone: '0240000000' }), { onboardingDone: true, accounts: [
   { type: 'operational', holderName: 'Ama Mensah', status: 'simulated-ready', reference: 'DEMO-OPERATIONAL' },
   { type: 'savings', holderName: 'Savings decoy', accountNumber: '999999999999', status: 'simulated-ready' },
 ] });

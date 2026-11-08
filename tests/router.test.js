@@ -323,7 +323,7 @@ test('finishing account creation, funding and budget removes activation pages fr
   const draft = {};
   const h = harness({ initialRoute: { section: 'welcome' }, normalizer: r => safeRoute(r, state, draft) });
   h.router.initialise();
-  const account = createEmptyState(); account.onboardingDone = true;
+  const account = createEmptyState({ phone: '0240000000' }); account.onboardingDone = true;
   account.accounts = [{id:'demo-operational',name:'Everyday account',type:'operational',status:'simulated-ready',reference:'DEMO-OPERATIONAL'}];
   draft.activation = createActivationDraft({ state: account });
   h.router.go({ section: 'activation', step: 'account-created' }, { finish: true }); h.flush();

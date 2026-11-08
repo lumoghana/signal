@@ -1,3 +1,4 @@
+import { accountFundingPhone, normalizeFundingPhone } from './funding-phone.js';
 /** Browser-local payment demonstrations. Integer pesewas; no provider is connected. */
 export const PAYMENT_PARITY_SCHEMA = 1;
 export const paymentFee = rail => rail === 'momo' ? 50 : rail === 'bank' ? 100 : 0;
@@ -127,13 +128,14 @@ function perform(s,type,p,h){
   }
   if(type==='startFundingAttempt'){
     if(!positive(p.amount)||!['momo','bank'].includes(p.rail))return fail('Choose mobile money or bank and a valid amount.');
-    if(p.rail==='momo'&&!/^0\d{9}$/.test(clean(p.number).replace(/\s/g,'')))return fail('Use your 10-digit Ghanaian mobile number.');
-    const f={id:uid('funding'),reference:uid('fund'),amount:p.amount,rail:p.rail,number:p.rail==='momo'?clean(p.number).replace(/\s/g,''):'',source:clean(p.source,60)||(p.rail==='bank'?'Bank transfer':'Mobile money'),status:'pending',createdAt:now(),history:[]};s.fundingAttempts.unshift(f);note(f,'requested');return ok('Waiting for confirmation. Nothing has been credited.',{id:f.id,funding:f});
+    const ownPhone=accountFundingPhone(s);
+    if(p.rail==='momo'&&(!ownPhone||normalizeFundingPhone(p.number)!==ownPhone))return fail('MoMo top-ups must use your registered Lumo number.');
+    const f={id:uid('funding'),reference:uid('fund'),amount:p.amount,rail:p.rail,number:p.rail==='momo'?ownPhone:'',source:clean(p.source,60)||(p.rail==='bank'?'Bank transfer':'Mobile money'),status:'pending',createdAt:now(),history:[]};s.fundingAttempts.unshift(f);note(f,'requested');return ok('Waiting for confirmation. Nothing has been credited.',{id:f.id,funding:f});
   }
   if(['resolveFundingAttempt','checkFundingAttempt','retryFundingAttempt'].includes(type)){
     const f=s.fundingAttempts.find(f=>f.id===(p.fundingId||p.id));if(!f)return fail('Funding reference not found.');
     if(type==='checkFundingAttempt'){f.lastCheckedAt=now();return ok(f.status==='pending'?'Still awaiting confirmation. Your balance is unchanged.':`This funding is ${f.status}.`,{id:f.id,funding:f});}
-    if(type==='retryFundingAttempt'){if(!['failed','expired'].includes(f.status))return fail('Only declined or expired funding can be tried again.');const retry={...copy(f),id:uid('funding'),reference:uid('fund'),status:'pending',createdAt:now(),history:[],retryOf:f.id};s.fundingAttempts.unshift(retry);note(retry,'retry-requested');return ok('New attempt started. The previous reference stays recorded.',{id:retry.id,funding:retry});}
+    if(type==='retryFundingAttempt'){if(!['failed','expired'].includes(f.status))return fail('Only declined or expired funding can be tried again.');const ownPhone=accountFundingPhone(s);if(f.rail==='momo'&&!ownPhone)return fail('Check your registered Lumo number before retrying.');const retry={...copy(f),number:f.rail==='momo'?ownPhone:'',id:uid('funding'),reference:uid('fund'),status:'pending',createdAt:now(),history:[],retryOf:f.id};s.fundingAttempts.unshift(retry);note(retry,'retry-requested');return ok('New attempt started. The previous reference stays recorded.',{id:retry.id,funding:retry});}
     if(f.status!=='pending')return ok('This reference already has its final result.',{id:f.id,funding:f,duplicate:true});if(!['success','failed','expired'].includes(p.status))return fail('Choose confirmed, declined or expired.');
     f.status=p.status;f.resolvedAt=now();note(f,p.status);if(p.status==='success'){
       const received=receiveFunds(s,h,{type:'income',amount:f.amount,direction:'in',merchant:f.source,rail:f.rail,category:'Money added',note:`Confirmed funding ${f.reference}`,fundingId:f.id,reference:f.reference,emoji:'↙'});if(!received.ok){f.status='pending';return received;}const t=received.transaction;f.transactionId=t.id;return ok('Money confirmed and added once.',{id:f.id,transaction:t,funding:f});

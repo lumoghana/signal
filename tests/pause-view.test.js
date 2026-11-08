@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import { renderPauseScreen } from '../dist/js/pause-view.js';
 
 test('Pause retains exact pesewas while whole-cedi examples stay concise', () => {
-  const html = renderPauseScreen({ metric: 15025, amount: 50099, reservedFrom: 'plan', recipient: 'Ama' });
+  const html = renderPauseScreen({ metric: 15025, amount: 50099, reservedFrom: 'plan', recipient: 'Ama', reason: 'A precise comparison is available here.' });
   assert.match(html, /<strong[^>]*>GH₵150\.25<\/strong>/);
-  assert.match(html, /Sending · GH₵500\.99 to Ama/);
+  assert.match(html, /<details class="pause-screen-details"><summary>Payment details<\/summary><p class="pause-screen-context">Sending · GH₵500\.99 to Ama<\/p>/);
+  assert.doesNotMatch(html, /<details[^>]*\bopen\b/);
   assert.match(renderPauseScreen({ metric: 15000, amount: 50000 }), /<strong[^>]*>GH₵150<\/strong>/);
 });
 
@@ -29,4 +30,17 @@ test('display strings cannot inject markup and the sample does not imply a real 
   assert.match(html, /Sample payment · GH₵500/);
   assert.match(html, /SAMPLE MONEY/);
   assert.doesNotMatch(html, /class="pause-screen-secondary"/);
+});
+
+
+test('the main Pause presents one consequence and escapes every part of the supplied sentence', () => {
+  const html = renderPauseScreen({ metric: 99999, reason: 'Full comparison', consequence: {
+    before: 'This payment leaves <script>', strong: 'GH₵30 short <img src=x>', after: ' for your plan & costs.',
+  } });
+  const main = html.match(/<h2 class="pause-screen-impact"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
+  assert.equal(main, 'This payment leaves &lt;script&gt;<strong>GH₵30 short &lt;img src=x&gt;</strong> for your plan &amp; costs.');
+  assert.doesNotMatch(main, /999|Full comparison/);
+  assert.equal((main.match(/<strong>/g) || []).length, 1);
+  assert.match(html, /<h1 class="pause-screen-title">Pause\.<\/h1>/);
+  assert.match(html, /lux-pause-worried\.png/);
 });
