@@ -1,0 +1,2 @@
+/** An asynchronous response may commit UI state only in its original account generation. */
+export function createScopeGate(){let generation=0;return {invalidate(){generation++;},capture(owner){return Object.freeze({generation,owner});},valid(ticket,owner){return !!ticket&&ticket.generation===generation&&ticket.owner===owner;},assert(ticket,owner){if(!this.valid(ticket,owner)){const error=new Error('The signed-in account changed.');error.code='SESSION_CHANGED';throw error;}}};}

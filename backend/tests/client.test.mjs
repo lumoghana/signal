@@ -264,6 +264,29 @@ test('pending survives sign-out and is isolated by verified immutable account id
   assert.equal(h.storage.map.size, 1);
 });
 
+test('an old delayed logout cannot clear a newer signed-in account from host session storage', async () => {
+  for (const logoutFails of [false, true]) {
+    let release;
+    const changes = [];
+    const client = createLumoClient({ url: ORIGIN, publishableKey: KEY, pendingStorage: memory(),
+      onSessionChange: value => changes.push(value), fetch: async (url, init) => {
+        if (url.includes('grant_type=password')) return json(session(JSON.parse(init.body).email === 'a@example.invalid' ? USER : OTHER));
+        assert.ok(url.includes('/logout?scope=local'));
+        await new Promise(resolve => release = resolve);
+        if (logoutFails) throw new Error('interrupted old logout');
+        return new Response(null, { status: 204 });
+      } });
+    await client.signIn('a@example.invalid', 'synthetic-password');
+    const logout = client.signOut();
+    const completed = logoutFails ? assert.rejects(() => logout, errorCode('NETWORK_ERROR')) : logout;
+    while (!release) await new Promise(resolve => setTimeout(resolve, 0));
+    await client.signIn('b@example.invalid', 'synthetic-password');
+    release(); await completed;
+    assert.equal(client.user.id, OTHER);
+    assert.deepEqual(changes.map(value => value?.user.id || null), [USER, OTHER]);
+  }
+});
+
 test('account switches during journal clearing cannot return the old-account receipt', async () => {
   let client;
   const storage = memory(), remove = storage.removeItem;

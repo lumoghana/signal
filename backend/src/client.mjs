@@ -204,10 +204,15 @@ export class LumoClient {
   }
   async signOut() {
     const original = this._session;
-    ++this._authGeneration;
+    const generation = ++this._authGeneration;
     this._session = null;
     try { if (original) await this._raw('/auth/v1/logout?scope=local', { token: original.access_token }); }
-    finally { try { await this.onSessionChange(null); } catch { throw error('STORAGE_ERROR'); } }
+    finally {
+      // A later sign-in owns host session storage. This old logout must never clear it.
+      if (generation === this._authGeneration) {
+        try { await this.onSessionChange(null); } catch { throw error('STORAGE_ERROR'); }
+      }
+    }
     // Pending references deliberately remain for the same account after sign-in.
   }
   _owner() { if (!this._session) throw error('SIGN_IN_REQUIRED'); return this._session.user.id; }

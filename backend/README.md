@@ -10,7 +10,7 @@ The first migration provides account setup, exact-handle recipient lookup, expli
 
 All commands validate a live Supabase Auth session. Money moves verify the server-held transaction PIN and apply PIN throttling. The backend binds retry references to the signed-in user, command and original payload. `attempt.lookup` recovers committed or definitively rejected operations without storing a PIN on the device.
 
-This package is a backend foundation, not an automatic replacement for the existing apps' local ledgers. Consumer Android/web and merchant releases must explicitly adopt this client/contract. Existing local demo balances must not be imported as shared funding. Staff delegation, Money Boxes, budgets, groups, IOUs, push delivery, account recovery and operations screens need their own integration work before full feature parity is claimed.
+The connected consumer web, merchant web and Android 2.5.0 pilot adopt this contract through a separate connected experience. The existing full local prototypes retain their own preview data. Existing local demo balances must not be imported as shared funding. Staff delegation, Money Boxes, budgets, groups, IOUs, push delivery, account recovery and operations screens need their own integration work before full feature parity is claimed.
 
 ## Client
 

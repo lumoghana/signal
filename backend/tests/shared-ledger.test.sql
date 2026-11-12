@@ -33,6 +33,7 @@ begin
  (b,'authenticated','authenticated','lumo-fixture-b-'||suffix||'@example.invalid',now(),now(),now()),
  (m,'authenticated','authenticated','lumo-fixture-m-'||suffix||'@example.invalid',now(),now(),now()),
  (outsider,'authenticated','authenticated','lumo-fixture-x-'||suffix||'@example.invalid',now(),now(),now());
+ update auth.users set raw_app_meta_data='{"lumo_pilot":true,"contact_verified":false}'::jsonb where id in (a,b,m,outsider);
  insert into auth.sessions(id,user_id,created_at,updated_at)values(sa,a,now(),now()),(sb,b,now(),now()),(sm,m,now(),now()),(so,outsider,now(),now());
  perform pg_temp.assert_true(not has_function_privilege('anon','public.lumo_rpc(text,jsonb)','EXECUTE'),'anonymous RPC forbidden');
  perform pg_temp.assert_true(has_function_privilege('authenticated','public.lumo_rpc(text,jsonb)','EXECUTE'),'signed-in RPC entry allowed');
@@ -103,6 +104,7 @@ begin
  perform set_config('request.jwt.claims',jsonb_build_object('sub',m,'role','authenticated','session_id',sm)::text,true);
  r:=pg_temp.call('merchant.get');perform pg_temp.assert_true((r#>>'{merchants,0,balance}')::bigint=3000 and (r#>>'{merchants,0,shops,0,netCollected}')::bigint=3000 and r#>>'{merchants,0,activity,0,reference}' in (fixed_payment#>>'{receipt,reference}',static_payment#>>'{receipt,reference}'),'merchant matching receipts and aggregated balance');
  r:=pg_temp.call('payment.refund',jsonb_build_object('paymentId',fixed_payment#>>'{receipt,id}','amount',2000,'pin',pin,'attemptId','fixture-refund-fixed-'||suffix));original:=r;perform pg_temp.assert_true((r->>'ok')::boolean and r#>>'{receipt,payeeAccountId}'=account_b::text,'refund returns to original B account');
+ r:=pg_temp.call('merchant.get');perform pg_temp.assert_true((select (entry->>'refundableAmount')::bigint=0 from jsonb_array_elements(r#>'{merchants,0,activity}') entry where entry->>'id'=fixed_payment#>>'{receipt,id}'),'fully refunded payment has server-authoritative zero remaining refund');
  r:=pg_temp.call('payment.refund',jsonb_build_object('paymentId',fixed_payment#>>'{receipt,id}','amount',2000,'pin',pin,'attemptId','fixture-refund-fixed-'||suffix));perform pg_temp.assert_true((r->>'replayed')::boolean and r#>>'{receipt,id}'=original#>>'{receipt,id}','refund replay once');
  r:=pg_temp.call('payment.refund',jsonb_build_object('paymentId',fixed_payment#>>'{receipt,id}','amount',1,'pin',pin,'attemptId','fixture-over-refund-'||suffix));perform pg_temp.assert_true(r->>'code'='REFUND_EXCEEDS_PAYMENT','cumulative refund cap');
  r:=pg_temp.call('payment.refund',jsonb_build_object('paymentId',static_payment#>>'{receipt,id}','amount',500,'pin',pin,'attemptId','fixture-partial-refund-'||suffix));perform pg_temp.assert_true((r->>'ok')::boolean,'partial refund posts');
