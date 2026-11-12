@@ -1,6 +1,6 @@
 # Lumo Signal web export
 
-This repository contains the user-approved Lumo live build, version 64, exported into the Signal repository root. Earlier Signal/Monochrome implementations remain in Git history. Do not restore their obsolete entry registry, bundler, scripts or UI adapters into the current app.
+This repository contains the user-approved Lumo live build, version 66, exported into the Signal repository root. Earlier Signal/Monochrome implementations remain in Git history. Do not restore their obsolete entry registry, bundler, scripts or UI adapters into the current app.
 
 ## Target and scope
 

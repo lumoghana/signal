@@ -1,7 +1,7 @@
 const noop = () => {};
-const DURATION_MS = 4400;
+const DURATION_MS = 2300;
 const MAX_PARTICLES = 128;
-const COLORS = ['#111218', '#34431a', '#5b6b2a'];
+const COLORS = ['#111218', '#34431a', '#f05c39', '#fffdf2'];
 
 /** A single arrival celebration. Animation never changes the account or setup. */
 export function bindActivationConfetti(root) {

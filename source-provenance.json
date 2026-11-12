@@ -3,9 +3,9 @@
   "product": "Lumo",
   "repository": "lumoghana/signal",
   "approved_live_url": "https://lumo-new-experience.oness15.chatgpt.site/",
-  "site_version": 64,
-  "source_commit": "cb83c2a260a9b8dcc8ca65b98c412349270e1d12",
-  "source_date": "2026-11-08",
+  "site_version": 66,
+  "source_commit": "ac79d2622925e96bf72316b76295f0ab7330a3ca",
+  "source_date": "2026-11-09",
   "export_target": "GitHub / Vercel",
   "static_directory": "dist",
   "asset_manifest": "dist-sha256.json",
@@ -14,10 +14,10 @@
   "android": "Delivered separately; no Android binaries or signing material included.",
   "validation": {
     "automated_tests": {
-      "passed": 1288,
+      "passed": 1305,
       "failed": 0
     },
-    "approved_dist_file_count": 145,
+    "approved_dist_file_count": 148,
     "approved_dist_byte_parity": true,
     "offline_rebuild_preserved_dist": true
   }

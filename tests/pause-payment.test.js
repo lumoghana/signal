@@ -46,7 +46,9 @@ function harness(t, draft = payment()) {
 
 function impact(html) { return html.match(/class="pause-screen-impact"[^>]*>([\s\S]*?)<\/h2>/)?.[1].replace(/<[^>]+>/g, ''); }
 
-test('Pause gives one precise consequence and honours category allocation and fees', () => {
+test('Pause gives one precise consequence and honours category allocation and fees', t => {
+  // Keep this financial-impact case separate from the late-night history trigger.
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-09T12:00:00Z') });
   for (const example of [
     { amount: 50000, category: 'Other', consequence: 'This payment leaves you GH₵150.50 short for your plan.' },
     { amount: 50000, category: 'Food', consequence: 'You’d have GH₵99.50 left after your plan and breathing room.' },

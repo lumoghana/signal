@@ -106,19 +106,63 @@ test('purpose controls reveal the selected category and used categories cannot b
   assert.match(added, /GH₵70\.00/);
 });
 
-function binder(d, { step = 'purpose', fields = [] } = {}) {
+function binder(d, { step = 'purpose', fields = [], entering = false, selectors = {} } = {}) {
   const handlers = {}, navigations = [], error = { textContent: '' }, copyFeedback = { textContent: '' };
-  let refreshes = 0, exits = 0, captureCurrent = null;
+  let refreshes = 0, exits = 0, saves = 0, captureCurrent = null;
   const root = {
     isConnected: true,
+    classList: { contains(name) { return name === 'activation-enter' && entering; } },
     querySelectorAll(selector) { return selector === '[data-activation-field]' ? fields : []; },
-    querySelector(selector) { return selector === '.activation-error' ? error : selector === '[data-activation-copy-feedback]' ? copyFeedback : null; },
+    querySelector(selector) { return selector === '.activation-error' ? error : selector === '[data-activation-copy-feedback]' ? copyFeedback : selectors[selector] || null; },
     addEventListener(name, handler) { handlers[name] = handler; }, removeEventListener() {},
   };
-  const ctx = { draft: { activation: d }, $: () => root, setCapture(callback) { captureCurrent = callback; }, saveDraft() {}, refresh() { captureCurrent?.(); refreshes++; }, go(route) { captureCurrent?.(); navigations.push(route); }, exitActivation() { captureCurrent?.(); exits++; } };
+  const ctx = { draft: { activation: d }, $: () => root, setCapture(callback) { captureCurrent = callback; }, saveDraft() { saves++; }, refresh() { captureCurrent?.(); refreshes++; }, go(route) { captureCurrent?.(); navigations.push(route); }, exitActivation() { captureCurrent?.(); exits++; } };
   const cleanup = bindActivation(ctx, { step });
-  return { error, copyFeedback, navigations, cleanup, get refreshes() { return refreshes; }, get exits() { return exits; }, input(target) { handlers.input({ target }); }, change(target) { handlers.change({ target }); }, click(dataset) { return handlers.click({ target: { closest() { return { dataset, disabled: false }; } } }); } };
+  return { error, copyFeedback, navigations, cleanup, get refreshes() { return refreshes; }, get exits() { return exits; }, get saves() { return saves; }, input(target) { handlers.input({ target }); }, change(target) { handlers.change({ target }); }, click(dataset) { return handlers.click({ target: { closest() { return { dataset, disabled: false }; } } }); } };
 }
+
+test('account celebration is recorded when bound and cannot replay after Back or saved-draft restore', () => {
+  const d = draft({ acknowledged: false }), before = JSON.stringify(d);
+  const first = renderActivation({ draft: { activation: d } }, { step: 'account-created' });
+  assert.match(first, /activation-step-account-created activation-enter/);
+  assert.equal(JSON.stringify(d), before, 'Rendering does not record or consume the celebration.');
+  const stateBefore = JSON.stringify(d.state);
+  const arrival = binder(d, { step: 'account-created', entering: true });
+  assert.equal(d.accountCelebrated, true);
+  assert.equal(arrival.saves, 1);
+  assert.equal(JSON.stringify(d.state), stateBefore);
+  assert.equal(d.accountAcknowledged, false);
+  assert.doesNotMatch(renderActivation({ draft: { activation: d } }, { step: 'account-created' }), /activation-step-account-created activation-enter/);
+  arrival.click({ activationAction: 'acknowledge-account' });
+  arrival.cleanup();
+  renderActivation({ draft: { activation: d } }, { step: 'fund' });
+  const funding = binder(d, { step: 'fund' });
+  funding.click({ activationAction: 'back' });
+  funding.cleanup();
+  assert.equal(d.step, 'account-created');
+  assert.doesNotMatch(renderActivation({ draft: { activation: d } }, { step: 'account-created' }), /activation-step-account-created activation-enter/);
+  const restored = restoreActivationDraft(JSON.parse(JSON.stringify(d)));
+  assert.equal(restored.accountCelebrated, true);
+  assert.doesNotMatch(renderActivation({ draft: { activation: restored } }, { step: 'account-created' }), /activation-step-account-created activation-enter/);
+  const resumed = binder(restored, { step: 'account-created', entering: false });
+  assert.equal(resumed.saves, 0, 'Restoring a celebrated account does not consume another celebration.');
+  resumed.cleanup();
+  const fresh = draft({ acknowledged: false });
+  assert.match(renderActivation({ draft: { activation: fresh } }, { step: 'account-created' }), /activation-step-account-created activation-enter/);
+  const freshArrival = binder(fresh, { step: 'account-created', entering: true });
+  assert.equal(fresh.accountCelebrated, true);
+  assert.equal(freshArrival.saves, 1);
+  freshArrival.cleanup();
+});
+
+test('an unconfirmed account does not consume the first celebration', () => {
+  const d = draft({ acknowledged: false });
+  d.state.accounts = [];
+  const ui = binder(d, { step: 'account-created', entering: true });
+  assert.notEqual(d.accountCelebrated, true);
+  assert.equal(ui.saves, 0);
+  ui.cleanup();
+});
 
 test('exiting before Continue preserves the congratulations checkpoint on resume', () => {
   const d = draft({ acknowledged: false }), ui = binder(d, { step: 'account-created' });
@@ -217,9 +261,18 @@ test('typing a custom purpose keeps focus by updating the draft without a rerend
   ui.cleanup();
 });
 
-test('save includes the visible allocation, then reaches the funded and budgeted summary', () => {
+test('adding the visible allocation then completing the budget reaches the funded summary', () => {
   const d = draft({ funded: true }); d.category = 'Transport'; d.amountText = '30';
-  const ui = binder(d, { fields: [{ dataset: { activationField: 'amountText' }, value: '30' }] });
+  const entry = binder(d, { fields: [{ dataset: { activationField: 'amountText' }, value: '30' }] });
+  entry.click({ activationAction: 'add-item' });
+  assert.equal(entry.error.textContent, '');
+  assert.equal(d.items.length, 1);
+  assert.equal(d.state.budget.created, false, 'Adding an essential does not complete the budget.');
+  assert.equal(entry.navigations.length, 0);
+  assert.equal(d.category, '');
+  assert.equal(d.amountText, '');
+  entry.cleanup();
+  const ui = binder(d);
   ui.click({ activationAction: 'save-budget' });
   assert.equal(ui.error.textContent, '');
   assert.equal(d.state.budget.items[0].name, 'Transport');
@@ -234,17 +287,98 @@ test('save includes the visible allocation, then reaches the funded and budgeted
   ui.cleanup();
 });
 
-test('a duplicate pending allocation displays an error and cannot save or navigate forward', () => {
+test('adding a duplicate pending allocation displays an error and cannot save or navigate forward', () => {
   const d = draft({ funded: true });
   assert.equal(addActivationBudgetItem(d, { name: 'Transport', amount: 3000 }).ok, true);
   d.category = 'custom'; d.categoryName = '  TRANSPORT  '; d.amountText = '10';
   const ui = binder(d);
-  ui.click({ activationAction: 'save-budget' });
+  ui.click({ activationAction: 'add-item' });
   assert.match(ui.error.textContent, /already in your budget/);
   assert.equal(ui.navigations.length, 0);
   assert.equal(d.items.length, 1);
   assert.equal(d.state.budget.created, false);
+  ui.click({ activationAction: 'save-budget' });
+  assert.match(ui.error.textContent, /Add this essential first/);
+  assert.equal(ui.navigations.length, 0);
+  assert.equal(d.items.length, 1);
+  assert.equal(d.state.budget.created, false);
   ui.cleanup();
+});
+
+test('first budget keeps Add this essential and Complete budget as separate footer actions', () => {
+  const d = draft({ funded: true });
+  const controls = () => {
+    const html = renderActivation({ draft: { activation: d } }, { step: 'purpose' });
+    const footer = html.match(/<footer class="activation-footer">([\s\S]*?)<\/footer>/)?.[1] || '';
+    const button = action => footer.match(new RegExp(`<button\\b[^>]*data-activation-action="${action}"[^>]*>`))?.[0] || '';
+    assert.match(footer, /class="activation-budget-actions"/);
+    assert.match(footer, /class="activation-add-essential"/);
+    assert.match(footer, /data-activation-action="save-budget"[^>]*>Complete budget<\/button>/);
+    assert.ok(footer.indexOf('class="activation-add-essential"') < footer.indexOf('data-activation-action="save-budget"'));
+    assert.equal((html.match(/data-activation-action="(?:add-item|choose-item)"/g) || []).length, 1, 'Add stays in the persistent footer rather than the scrolling form.');
+    return { add: button('add-item'), choose: button('choose-item'), complete: button('save-budget'), footer };
+  };
+  let actions = controls();
+  assert.match(actions.add, /\bdisabled\b/);
+  assert.match(actions.footer, /Add this essential<\/button>/);
+  assert.match(actions.complete, /\bdisabled\b/);
+  d.category = 'Transport'; d.amountText = '30';
+  actions = controls();
+  assert.doesNotMatch(actions.add, /\bdisabled\b/);
+  assert.match(actions.complete, /\bdisabled\b/, 'The visible essential must be added explicitly before completion.');
+  const ui = binder(d);
+  ui.click({ activationAction: 'add-item' });
+  actions = controls();
+  assert.equal(actions.add, '');
+  assert.match(actions.choose, /data-activation-action="choose-item"/);
+  assert.doesNotMatch(actions.choose, /\bdisabled\b/);
+  assert.match(actions.footer, /Add another essential<\/button>/);
+  assert.doesNotMatch(actions.complete, /\bdisabled\b/);
+  assert.match(actions.footer, /1 essential added/);
+  ui.cleanup();
+});
+
+test('Add another essential reveals and focuses the category picker without mutating the plan', () => {
+  const d = draft({ funded: true });
+  assert.equal(addActivationBudgetItem(d, { name: 'Transport', amount: 3000 }).ok, true);
+  const scrolls = [], focuses = [];
+  const ui = binder(d, { selectors: {
+    '.activation-categories': { scrollIntoView(options) { scrolls.push(options); } },
+    '[data-activation-category]:not(:disabled)': { focus(options) { focuses.push(options); } },
+  } });
+  const before = JSON.stringify(d);
+  ui.click({ activationAction: 'choose-item' });
+  assert.deepEqual(scrolls, [{ block: 'start', behavior: 'auto' }]);
+  assert.deepEqual(focuses, [{ preventScroll: true }]);
+  assert.equal(JSON.stringify(d), before);
+  assert.equal(ui.saves, 0);
+  assert.equal(ui.refreshes, 0);
+  assert.equal(ui.navigations.length, 0);
+  d.category = 'Data & airtime'; d.amountText = '20';
+  const pending = JSON.stringify(d);
+  ui.click({ activationAction: 'choose-item' });
+  assert.equal(scrolls.length, 1, 'An old action cannot discard or bypass an essential being entered.');
+  assert.equal(JSON.stringify(d), pending);
+  ui.cleanup();
+});
+
+test('Complete budget cannot silently add a pending essential or change confirmed money', () => {
+  for (const hasAddedItem of [false, true]) {
+    const d = draft({ funded: true });
+    if (hasAddedItem) assert.equal(addActivationBudgetItem(d, { name: 'Transport', amount: 3000 }).ok, true);
+    d.category = 'Data & airtime'; d.amountText = '20';
+    const beforeItems = JSON.stringify(d.items), beforeState = JSON.stringify(d.state);
+    const ui = binder(d);
+    ui.click({ activationAction: 'save-budget' });
+    assert.match(ui.error.textContent, /Add this essential first/);
+    assert.equal(JSON.stringify(d.items), beforeItems);
+    assert.equal(JSON.stringify(d.state), beforeState);
+    assert.equal(d.category, 'Data & airtime');
+    assert.equal(d.amountText, '20');
+    assert.equal(d.budgetSaved, false);
+    assert.equal(ui.navigations.length, 0);
+    ui.cleanup();
+  }
 });
 
 test('saved allocations can be revisited without accidentally funding the account again', () => {
@@ -345,12 +479,15 @@ test('an unfunded account offers an honest wait route but a confirmed top-up kee
 });
 test('optional keep-back is saved separately and shown in the free-money summary',()=>{
  const d=draft({funded:true});d.category='Transport';d.amountText='30';
+ const originalBuffer=d.state.buffer;
  const field={dataset:{activationField:'keepBackText'},value:'10'};
  const ui=binder(d,{fields:[field]});
  assert.match(renderActivation({draft:{activation:d}},{step:'purpose'}),/Keep a little back · optional/);
- ui.click({activationAction:'save-budget'});
- assert.equal(ui.error.textContent,'');assert.equal(d.state.buffer,1000);assert.equal(d.state.wallet,10000);
- const html=renderActivation({draft:{activation:d}},{step:'ready'});assert.match(html,/Kept back/);assert.match(html,/GH₵60\.00/);ui.cleanup();
+ ui.click({activationAction:'add-item'});
+ assert.equal(ui.error.textContent,'');assert.equal(d.items.length,1);assert.equal(d.state.buffer,originalBuffer);ui.cleanup();
+ const complete=binder(d);complete.click({activationAction:'save-budget'});
+ assert.equal(complete.error.textContent,'');assert.equal(d.state.buffer,1000);assert.equal(d.state.wallet,10000);
+ const html=renderActivation({draft:{activation:d}},{step:'ready'});assert.match(html,/Kept back/);assert.match(html,/GH₵60\.00/);complete.cleanup();
 });
 test('a keep-back edit cannot overallocate first money or complete without saving',()=>{
  const d=readyDraft(),field={dataset:{activationField:'keepBackText'},value:'90'},ui=revisitPurpose(d,[field]);

@@ -14,6 +14,7 @@ const parseAmount = value => /^\d+(\.\d{0,2})?$/.test(String(value ?? '').trim()
 const planned = items => (items || []).reduce((sum, item) => sum + Math.max(0, item.amount - (item.spent || 0)), 0);
 const routeFor = step => ({ section: 'activation', step });
 const amountField = (value, id, label, field = id === 'activation-funding' ? 'funding.amountText' : 'amountText') => `<label class="activation-money" for="${id}"><span>${esc(label)}</span><div><span aria-hidden="true">GH₵</span><input id="${id}" data-activation-field="${field}" aria-label="${esc(label)} in Ghana cedis" inputmode="decimal" autocomplete="off" placeholder="0.00" value="${esc(value)}" maxlength="12"></div></label>`;
+const pendingEssential = d => !!(String(d.category || '').trim() || String(d.categoryName || '').trim() || String(d.amountText || '').trim());
 const usedCategory = (d, name) => d.items.some(item => budgetCategoryKey(item.name) === budgetCategoryKey(name));
 const copyIcon = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg>';
 function everydayDetails(d) {
@@ -31,7 +32,7 @@ function renderAccountArrival(d, entering) {
   return `<section class="activation-page activation-step-account-created${entering ? ' activation-enter' : ''}" aria-label="Your GCB Everyday account">
     ${confirmed ? '<canvas class="activation-arrival-confetti" data-activation-confetti aria-hidden="true"></canvas>' : ''}
     <header class="activation-arrival-header"><span class="activation-arrival-wordmark" aria-label="Lumo">lumo</span><button class="icon-button" type="button" data-activation-action="exit" aria-label="Exit setup">${icon('close', 20)}</button></header>
-    <main class="activation-arrival-story"><p class="activation-arrival-greeting">${greeting}</p><h1>${title}</h1><p class="activation-arrival-promise">${promise}</p></main>
+    <main class="activation-arrival-story"><div class="activation-first-win"><img src="/assets/lux-pause-2d.webp" width="96" height="96" alt="Lux waves to welcome you"><span>FIRST WIN. UNLOCKED.</span></div><p class="activation-arrival-greeting">${greeting}</p><h1>${title}</h1><p class="activation-arrival-promise">${promise}</p></main>
     <footer class="activation-footer activation-arrival-footer"><div class="activation-arrival-account"><p class="activation-arrival-account-label">Everyday account${details.example ? '<span>Sample account</span>' : ''}</p><div class="activation-account-number-row">${confirmed ? `<output class="activation-account-number" data-activation-account-number tabindex="-1" aria-label="${details.example ? 'Example ' : ''}Everyday account number ${esc(details.number)}">${esc(details.number)}</output><button type="button" class="activation-copy-number" data-activation-action="copy-account-number" aria-label="Copy ${details.example ? 'example ' : ''}account number">${copyIcon}</button>` : '<span class="activation-account-unavailable">Account number not available yet</span>'}</div><p class="activation-arrival-bank">${details.holder ? `${esc(details.holder)} · ` : ''}Powered by GCB Bank</p><p class="activation-copy-feedback" data-activation-copy-feedback role="status" aria-live="polite"></p></div><p class="error activation-error" role="alert">${esc(d.error || '')}</p><button class="button" type="button" data-activation-action="acknowledge-account"${confirmed ? '' : ' disabled'}><span>Add money</span><span aria-hidden="true">→</span></button>${boundary ? `<p class="activation-account-demo-boundary">${boundary}</p>` : ''}</footer>
   </section>`;
 }
@@ -43,7 +44,7 @@ export function renderActivation(ctx, route) {
   const arrivalKey = step + (step === 'fund' && d.state.wallet > 0 ? ':funded' : '');
   const entering = renderedActivationSteps.get(d) !== arrivalKey;
   renderedActivationSteps.set(d, arrivalKey);
-  if (step === 'account-created') return renderAccountArrival(d, entering);
+  if (step === 'account-created') return renderAccountArrival(d, entering && !d.accountCelebrated);
   let body = '', title = '', description = '', primary = '', action = '', fundingStage = null;
   if (step === 'fund') {
     fundingStage = renderActivationFunding(d, amountField);
@@ -53,8 +54,8 @@ export function renderActivation(ctx, route) {
     description = 'Food, data, transport. Start with what this money needs to cover.';
     const allocated = planned(d.items), buffer = parseAmount(d.keepBackText || '0'), left = Math.max(0, d.state.wallet - allocated - (Number.isFinite(buffer) ? buffer : 0));
     const custom = d.category === 'custom' || !!d.categoryName, hasSelection = !!(d.category || d.categoryName);
-    body = `<div class="activation-balance"><span>Ready to plan</span><strong>${cash(left)}</strong>${allocated ? `<small>${cash(allocated)} already given a purpose</small>` : ''}</div><div class="activation-categories" aria-label="Choose a budget category">${ACTIVATION_CATEGORIES.map(c => `<button type="button" data-activation-category="${esc(c.name)}" aria-pressed="${d.category === c.name}" ${usedCategory(d, c.name) ? 'disabled' : ''}><span>${esc(c.emoji)}</span>${esc(c.name)}${usedCategory(d, c.name) ? icon('check', 14) : ''}</button>`).join('')}<button type="button" data-activation-category="custom" aria-pressed="${custom}"><span>✨</span>Something else</button></div>${custom ? `<label class="activation-label" for="activation-category-name">Name your essential<input class="input" id="activation-category-name" data-activation-field="categoryName" value="${esc(d.categoryName)}" placeholder="What matters to you?" maxlength="40" autocomplete="off"></label>` : ''}${hasSelection ? `${amountField(d.amountText, 'activation-allocation', `How much for ${custom ? 'this essential' : d.category}?`)}<div class="activation-purpose-tools"><button type="button" class="activation-text-button" data-activation-action="add-item">${icon('plus', 16)} Add this essential</button></div>` : ''}${d.items.length ? `<div class="activation-plan-list" aria-label="Your budget so far">${d.items.map((item, itemIndex) => `<div><span class="activation-item-name"><span>${esc(item.emoji || '📌')}</span>${esc(item.name)}</span><strong>${cash(item.amount)}</strong><button type="button" class="icon-button" data-activation-remove="${itemIndex}" aria-label="Remove ${esc(item.name)}">${icon('close', 15)}</button></div>`).join('')}</div>` : ''}<details class="activation-optional" ${d.keepBackText ? 'open' : ''}><summary>A little cushion<span>Optional</span></summary>${amountField(d.keepBackText || '', 'activation-keep-back', 'Keep a little back · optional', 'keepBackText')}<p class="activation-demo-note">For the unexpected. It stays in Everyday, outside your flexible money.</p></details><label class="activation-label activation-date" for="activation-due">This money needs to last until<input class="input" id="activation-due" type="date" data-activation-field="due" min="${new Date().toISOString().slice(0, 10)}" value="${esc(d.due)}"></label>`;
-    primary = 'Save my budget'; action = 'save-budget';
+    body = `<div class="activation-balance"><span>Ready to plan</span><strong>${cash(left)}</strong>${allocated ? `<small>${cash(allocated)} already given a purpose</small>` : ''}</div><div class="activation-categories" aria-label="Choose a budget category">${ACTIVATION_CATEGORIES.map(c => `<button type="button" data-activation-category="${esc(c.name)}" aria-pressed="${d.category === c.name}" ${usedCategory(d, c.name) ? 'disabled' : ''}><span>${esc(c.emoji)}</span>${esc(c.name)}${usedCategory(d, c.name) ? icon('check', 14) : ''}</button>`).join('')}<button type="button" data-activation-category="custom" aria-pressed="${custom}"><span>✨</span>Something else</button></div>${custom ? `<label class="activation-label" for="activation-category-name">Name your essential<input class="input" id="activation-category-name" data-activation-field="categoryName" value="${esc(d.categoryName)}" placeholder="What matters to you?" maxlength="40" autocomplete="off"></label>` : ''}${hasSelection ? `${amountField(d.amountText, 'activation-allocation', `How much for ${custom ? 'this essential' : d.category}?`)}<div class="activation-purpose-tools"><button type="button" class="activation-text-button" data-activation-action="clear-item">Cancel this item</button></div>` : ''}${d.items.length ? `<div class="activation-plan-list" aria-label="Your budget so far">${d.items.map((item, itemIndex) => `<div><span class="activation-item-name"><span>${esc(item.emoji || '📌')}</span>${esc(item.name)}</span><strong>${cash(item.amount)}</strong><button type="button" class="icon-button" data-activation-remove="${itemIndex}" aria-label="Remove ${esc(item.name)}">${icon('close', 15)}</button></div>`).join('')}</div>` : ''}<details class="activation-optional" ${d.keepBackText ? 'open' : ''}><summary>A little cushion<span>Optional</span></summary>${amountField(d.keepBackText || '', 'activation-keep-back', 'Keep a little back · optional', 'keepBackText')}<p class="activation-demo-note">For the unexpected. It stays in Everyday, outside your flexible money.</p></details><label class="activation-label activation-date" for="activation-due">This money needs to last until<input class="input" id="activation-due" type="date" data-activation-field="due" min="${new Date().toISOString().slice(0, 10)}" value="${esc(d.due)}"></label>`;
+    primary = 'Complete budget'; action = 'save-budget';
   } else {
     title = 'You’re ready.';
     description = 'You’ve put money in and given it a plan. That’s your first win.';
@@ -62,7 +63,8 @@ export function renderActivation(ctx, route) {
     body = `<div class="activation-win" aria-hidden="true">${icon('check', 47)}<span>FIRST MOVE. MADE.</span></div><dl class="activation-summary"><div><dt>Money added</dt><dd>${cash(d.state.wallet)}</dd></div><div><dt>Given a purpose</dt><dd>${cash(totalPlanned)}</dd></div>${buffer ? `<div><dt>Kept back</dt><dd>${cash(buffer)}</dd></div>` : ''}<div><dt>Free for what’s next</dt><dd>${cash(Math.max(0, d.state.wallet - totalPlanned - buffer))}</dd></div></dl><p class="activation-demo-note">Your budget keeps the essentials in view. Your money stays in your Everyday account.</p>`;
     primary = 'Meet my Lumo'; action = 'complete';
   }
-  return `<section class="activation-page activation-step-${step}${fundingStage ? ` activation-funding-${fundingStage.status}` : ''}${entering ? ' activation-enter' : ''}" aria-label="Your first Lumo money move"><header class="activation-header">${index > 0 ? `<button class="icon-button" type="button" data-activation-action="back" aria-label="Previous setup step">${icon('back', 21)}</button>` : '<span class="activation-header-spacer"></span>'}<div><span>${labels[index]}</span><small>${index + 1} of 4</small></div><button class="icon-button" type="button" data-activation-action="exit" aria-label="Exit setup">${icon('close', 20)}</button></header><div class="activation-progress" aria-label="Money setup progress">${labels.map((label, i) => `<span class="${i <= index ? 'done' : ''}" title="${label}"></span>`).join('')}</div><main class="activation-main"><span class="activation-kicker">${d.preview ? 'SIGNUP PREVIEW' : ''}</span><h1>${title}</h1><p class="activation-description">${description}</p><form id="activation-form" novalidate>${body}<p class="error activation-error" role="alert">${esc(d.error || '')}</p></form></main><footer class="activation-footer"><button class="button" type="button" data-activation-action="${action}">${primary}</button>${step === 'fund' && activationFundingStatus(d) === 'idle' && d.state.wallet === 0 ? '<button type="button" class="activation-text-button activation-defer" data-activation-action="defer">Waiting for my money</button><small>Your verified account can wait. Add money and plan when it arrives.</small>' : ''}</footer></section>`;
+  const chooseEssential = step === 'purpose' && d.items.length > 0 && !pendingEssential(d);
+  return `<section class="activation-page activation-step-${step}${fundingStage ? ` activation-funding-${fundingStage.status}` : ''}${entering ? ' activation-enter' : ''}" aria-label="Your first Lumo money move"><header class="activation-header">${index > 0 ? `<button class="icon-button" type="button" data-activation-action="back" aria-label="Previous setup step">${icon('back', 21)}</button>` : '<span class="activation-header-spacer"></span>'}<div><span>${labels[index]}</span><small>${index + 1} of 4</small></div><button class="icon-button" type="button" data-activation-action="exit" aria-label="Exit setup">${icon('close', 20)}</button></header><div class="activation-progress" aria-label="Money setup progress">${labels.map((label, i) => `<span class="${i <= index ? 'done' : ''}" title="${label}"></span>`).join('')}</div><main class="activation-main"><span class="activation-kicker">${d.preview ? 'SIGNUP PREVIEW' : ''}</span><h1>${title}</h1><p class="activation-description">${description}</p><form id="activation-form" novalidate>${body}<p class="error activation-error" role="alert">${esc(d.error || '')}</p></form></main><footer class="activation-footer">${step === 'purpose' ? `<div class="activation-budget-actions"><p>${d.items.length ? `${d.items.length} ${d.items.length === 1 ? 'essential' : 'essentials'} added. Add more, or complete your budget.` : 'Add your essentials one at a time. Complete your budget when you’re done.'}</p><button type="button" class="activation-add-essential" data-activation-action="${chooseEssential ? 'choose-item' : 'add-item'}" ${!chooseEssential && (!(d.category || d.categoryName) || !(parseAmount(d.amountText) > 0)) ? 'disabled' : ''}>${icon('plus', 18)} ${chooseEssential ? 'Add another essential' : 'Add this essential'}</button></div>` : ''}<button class="button" type="button" data-activation-action="${action}" ${step === 'purpose' && (!d.items.length || pendingEssential(d)) ? 'disabled' : ''}>${primary}</button>${step === 'fund' && activationFundingStatus(d) === 'idle' && d.state.wallet === 0 ? '<button type="button" class="activation-text-button activation-defer" data-activation-action="defer">Waiting for my money</button><small>Your verified account can wait. Add money and plan when it arrives.</small>' : ''}</footer></section>`;
 }
 
 export function bindActivation(ctx, route) {
@@ -70,7 +72,9 @@ export function bindActivation(ctx, route) {
   if (!root || !d) return () => {};
   let alive = true, busy = false;
   const step = safeActivationStep(d, route.step);
-  const stopConfetti = step === 'account-created' ? bindActivationConfetti(root) : () => {};
+  const celebrateAccount = step === 'account-created' && !d.accountCelebrated && !!activationEverydayAccountNumber(d) && root.classList?.contains('activation-enter');
+  const stopConfetti = celebrateAccount ? bindActivationConfetti(root) : () => {};
+  if (celebrateAccount) { d.accountCelebrated = true; ctx.saveDraft?.(); }
   const current = () => alive && root.isConnected && ctx.draft.activation === d;
   const fundingDocument = root.ownerDocument || globalThis.document;
   let fundingTimer = 0, checkingFunding = false;
@@ -145,9 +149,18 @@ export function bindActivation(ctx, route) {
     d.category = ''; d.categoryName = ''; d.amountText = ''; d.error = '';
     return true;
   };
+  const syncPurposeActions = () => {
+    if (step !== 'purpose') return;
+    const add = root.querySelector('[data-activation-action="add-item"]');
+    const choose = root.querySelector('[data-activation-action="choose-item"]');
+    const complete = root.querySelector('[data-activation-action="save-budget"]');
+    if (add) add.disabled = !(d.category || String(d.categoryName || '').trim()) || !(parseAmount(d.amountText) > 0);
+    if (choose) choose.disabled = !d.items.length || pendingEssential(d);
+    if (complete) complete.disabled = !d.items.length || pendingEssential(d);
+  };
   const input = event => {
     capture();
-    if (step === 'purpose') { d.budgetSaved = false; d.step = 'purpose'; ctx.saveDraft?.(); }
+    if (step === 'purpose') { d.budgetSaved = false; d.step = 'purpose'; ctx.saveDraft?.(); syncPurposeActions(); }
     if (event.target.dataset.activationField === 'categoryName' && event.target.value) {
       d.category = 'custom';
       root.querySelectorAll('[data-activation-category]').forEach(button => button.setAttribute('aria-pressed', 'false'));
@@ -156,6 +169,12 @@ export function bindActivation(ctx, route) {
   const click = event => {
     const button = event.target.closest('button');
     if (!current() || !button || button.disabled || busy) return;
+    if (button.dataset.activationAction === 'choose-item') {
+      if (step !== 'purpose' || !d.items.length || pendingEssential(d)) return;
+      root.querySelector('.activation-categories')?.scrollIntoView({ block: 'start', behavior: 'auto' });
+      root.querySelector('[data-activation-category]:not(:disabled)')?.focus({ preventScroll: true });
+      return;
+    }
     capture();
     if (button.dataset.activationSource) { if (activationFundingStatus(d) !== 'idle') return; d.funding.source = button.dataset.activationSource; return refresh(); }
     if (button.dataset.activationAmount) { if (activationFundingStatus(d) !== 'idle') return; d.funding.amountText = (Number(button.dataset.activationAmount) / 100).toFixed(2); return refresh(); }
@@ -189,15 +208,16 @@ export function bindActivation(ctx, route) {
       return refresh();
     }
     if (action === 'add-item') { if (addItem()) refresh(); return; }
+    if (action === 'clear-item') { d.category = ''; d.categoryName = ''; d.amountText = ''; d.error = ''; return refresh(); }
     if (action === 'save-budget') {
-      if ((d.category || d.categoryName || d.amountText) && !addItem()) return;
+      if (pendingEssential(d)) return error('Add this essential first, or cancel the item before completing your budget.');
       const result = saveActivationBudget(d, { items: d.items, due: d.due, buffer: parseAmount(d.keepBackText || '0') });
       if (!result.ok) return error(result.message);
       return go('ready');
     }
     if (action === 'complete') { busy = true; button.disabled = true; ctx.completeActivation(); }
   };
-  const submit = event => { event.preventDefault(); root.querySelector('.activation-footer .button')?.click(); };
+  const submit = event => { event.preventDefault(); (step === 'purpose' && pendingEssential(d) ? root.querySelector('[data-activation-action="add-item"]') : root.querySelector('.activation-footer .button'))?.click(); };
   root.addEventListener('input', input); root.addEventListener('change', input); root.addEventListener('click', click);
   root.querySelector('form')?.addEventListener('submit', submit);
   return () => { alive = false; clearTimeout(fundingTimer); fundingDocument?.removeEventListener?.('visibilitychange', fundingVisibility); stopConfetti(); ctx.setCapture?.(null); root.removeEventListener('input', input); root.removeEventListener('change', input); root.removeEventListener('click', click); root.querySelector('form')?.removeEventListener('submit', submit); };

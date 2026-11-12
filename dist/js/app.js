@@ -1,3 +1,4 @@
+import { installExperienceClarity } from './experience-clarity.js';
 import {appearanceRow,openAppearance} from './appearance-ui.js';
 import {createDemoState,createEmptyState,getSummary,applyAction,migrateState,validStoredState,STORAGE_KEY} from './model.js';
 import {esc,cash,icon,categorySymbol,pageHead,row,field,btn,empty,progress,dateLabel} from './ui.js';
@@ -290,3 +291,5 @@ function checkDueSavingRules(){
 checkDueSavingRules();
 window.addEventListener('focus',checkDueSavingRules);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkDueSavingRules();});
+
+installExperienceClarity();

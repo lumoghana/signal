@@ -1,0 +1,18 @@
+/* Keep building the list separate from completing the whole budget. */
+.planning-page.planning-budget-review{display:flex;flex-direction:column;height:100%;max-height:100%;min-height:0;padding-bottom:0;overflow:hidden}
+.app[data-flow] .planning-page.planning-budget-review{min-height:0;padding-bottom:0}
+.planning-budget-review>.page-head{flex:0 0 auto}
+.planning-budget-review>.content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;padding-bottom:22px;scroll-padding-block:16px}
+.app .planning-page.planning-budget-review>.planning-budget-actions{position:relative;inset:auto;flex:0 0 auto;display:flex;flex-direction:column;gap:9px;margin:0;padding:12px 0 max(14px,env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
+.planning-budget-review .budget-list-count{font-size:14px;line-height:1.45;color:var(--muted);margin:-9px 0 18px}
+.planning-budget-actions>.budget-actions-help{font-size:12px;line-height:1.45;color:var(--muted);margin:0 0 2px}
+.planning-page .planning-budget-actions>.button.planning-add-essential{background:transparent;border:1.5px solid var(--accent,var(--lime));color:var(--text);font-weight:550}
+
+/* These remain native select controls, with an unmistakable choice affordance. */
+.planning-sheet .planning-rule-label{display:flex;flex-direction:column;gap:8px}
+.planning-rule-choice{position:relative;display:block;width:100%;min-width:0}
+.planning-sheet .planning-rule-choice>select{appearance:none;-webkit-appearance:none;display:block;width:100%;min-height:56px;padding:14px 48px 14px 15px;border:1.5px solid var(--accent,var(--lime));border-radius:var(--ui-control-radius,14px);background:var(--surface-2);color:var(--text);font-weight:550;cursor:pointer}
+.planning-rule-choice:focus-within>select{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent,var(--lime)) 18%,transparent)}
+.planning-rule-chevron{position:absolute;right:16px;top:50%;display:flex;align-items:center;justify-content:center;color:var(--accent,var(--lime));transform:translateY(-50%) rotate(90deg);pointer-events:none}
+.planning-sheet .planning-rule-help{font-size:12px;line-height:1.45;color:var(--muted)}
+@media(max-height:600px){.app .planning-page.planning-budget-review>.planning-budget-actions{gap:7px;padding-top:9px;padding-bottom:10px}.planning-budget-actions>.button{min-height:46px}}
