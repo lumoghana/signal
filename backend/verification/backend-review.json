@@ -1,0 +1,59 @@
+{
+  "projectId": "iwutbrljiiodamtyoorg",
+  "checkedAt": "2026-11-12T22:00:35.928768+00:00",
+  "sandbox": true,
+  "bankConnected": false,
+  "databaseChecks": 67,
+  "clientTests": 27,
+  "publicHttpBoundaryChecks": 4,
+  "consumerBaselineTests": 1305,
+  "databaseFlow": {
+    "funding": 10000,
+    "transferAtoB": 5000,
+    "fixedMerchantPaymentFromB": 2000,
+    "staticMerchantPaymentFromA": 1000,
+    "refundTotal": 2500,
+    "postCloseMerchantPayment": 300,
+    "finalTransferAtoB": 100,
+    "finalBalances": {
+      "consumerA": 4100,
+      "consumerB": 5100,
+      "merchant": 800
+    },
+    "unit": "integer pesewas"
+  },
+  "databaseFixtureRole": "authenticated, real hosted public.lumo_rpc; synthetic Auth rows and claims inside rollback",
+  "fixturesRolledBack": true,
+  "remainingFixtureProfiles": 0,
+  "remainingFixtureJournals": 0,
+  "remainingFixtureAuthUsers": 0,
+  "sourceSecurityReview": "No outstanding material issues in assigned account, ledger, authorization, replay, receipt and client journal scope",
+  "securityAdvisors": {
+    "error": 0,
+    "warning": 0,
+    "info": 9,
+    "infoReason": "Private tables intentionally deny all direct client access; RLS has no permissive policies",
+    "remediationReference": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+  },
+  "migrations": [
+    {
+      "file": "20261112215314_lumo_shared_test_money.sql",
+      "sha256": "1581a662e1eca3f442c23945d053fb726d26d009a18f8f574f59b9bb155b533c"
+    },
+    {
+      "file": "20261112215654_lumo_fixed_request_lock_expiry.sql",
+      "sha256": "b64908a49bd6894549dd3412f82dc7997641449f15bb847b33de760dc9b6ab72"
+    },
+    {
+      "file": "20261112215856_lumo_handle_scope_fix.sql",
+      "sha256": "8a8d5c2bbb0137cb8dd2df88914b3d0c5a54a3792001ad15de5e8ea467d578c6"
+    }
+  ],
+  "verificationLimits": [
+    "Auth HTTP login with controlled tester accounts not yet exercised",
+    "Simultaneous multi-connection spending not runtime-tested; locking source-reviewed",
+    "No physical handset scan or updated APK verification",
+    "Existing consumer and merchant apps not yet switched to this backend",
+    "Cashier roles, push delivery, wider planning/group journeys and operations UI remain integration scope"
+  ]
+}

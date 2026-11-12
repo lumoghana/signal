@@ -1,0 +1,40 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> lumo-shared-backend@0.1.0 test
+> node --test tests/*.test.mjs
+
+✔ client only accepts HTTPS origins and publishable or legacy anon keys (2.482558ms)
+✔ sign-in uses Auth and gives host a session without persisting passwords or PINs (5.648593ms)
+✔ restored sessions must be verified by Auth user endpoint and cannot trust an edited cached owner (1.217318ms)
+✔ concurrent 401 responses share one refresh and repeat the unchanged RPC body once (8.974848ms)
+✔ money command saves its reference before POST, removes credentials from journal and verifies receipt (2.888968ms)
+✔ lost committed response is retained and blocks another money move (1.250027ms)
+✔ lookup recovers exact committed receipt without requesting or storing PIN again (1.545571ms)
+✔ lookup absent attempt does not clear a potentially in-flight POST (1.494765ms)
+✔ retry uses original recipient amount and attempt with newly entered PIN (1.330088ms)
+✔ receipt attempt, type, target handle, money and actor mismatches keep the original request (5.514992ms)
+✔ only a definitive rejection bound to the exact saved attempt clears pending (1.762848ms)
+✔ static and fixed merchant receipts must match original shop and request (1.594635ms)
+✔ test funding requires explicit confirmation and validates credit into the current account (0.501433ms)
+✔ refund receipt must identify the original payment (0.457147ms)
+✔ corrupt saved journal fails closed before another POST (0.527662ms)
+✔ failed durable write prevents a payment POST and retains an unresolved marker (0.873021ms)
+✔ failure to clear committed receipt keeps pending until safe recovery succeeds (0.974664ms)
+✔ concurrent taps send only one money request (5.16694ms)
+✔ mutable caller payload is captured before asynchronous journal access (0.546451ms)
+✔ pending survives sign-out and is isolated by verified immutable account identity (0.656466ms)
+✔ account switches during journal clearing cannot return the old-account receipt (0.557477ms)
+✔ an RPC with an unverified response envelope never clears a pending request (1.235786ms)
+✔ handles are normalised and unsupported PINs and handles never reach the server (0.895585ms)
+✔ recovery cannot replace the verified account with malformed or another-user fresh account data (3.219495ms)
+✔ two clients sharing asynchronous storage cannot overwrite an unresolved money request (8.44331ms)
+✔ missing or failed cross-context lock providers fail closed before any money POST (1.967936ms)
+✔ injected exclusive lease covers storage, original POST, retry and PIN-free recovery (2.029107ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 186.117506

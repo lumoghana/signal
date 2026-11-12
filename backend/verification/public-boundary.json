@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-11-12T21:56:41.069Z",
+  "projectId": "iwutbrljiiodamtyoorg",
+  "checks": [
+    {
+      "name": "anonymous RPC cannot access an account",
+      "status": 401,
+      "passed": true
+    },
+    {
+      "name": "private profiles have no public table endpoint",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "name": "private accounts have no public table endpoint",
+      "status": 404,
+      "passed": true
+    },
+    {
+      "name": "private schema cannot be selected through the Data API",
+      "status": 406,
+      "passed": true
+    }
+  ]
+}

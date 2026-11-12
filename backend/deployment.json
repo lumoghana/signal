@@ -1,0 +1,11 @@
+{
+  "projectId": "iwutbrljiiodamtyoorg",
+  "projectName": "Lumo",
+  "supabaseUrl": "https://iwutbrljiiodamtyoorg.supabase.co",
+  "rpc": "/rest/v1/rpc/lumo_rpc",
+  "protocolVersion": 1,
+  "currency": "GHS",
+  "amountUnit": "pesewa",
+  "sandbox": true,
+  "bankConnected": false
+}
