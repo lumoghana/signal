@@ -205,3 +205,12 @@ test('a confirmed reply keeps its original attempt until journal cleanup is dura
   const payload={amount:100},first=await h.service.action('fund',payload,{pin:'1234'});assert.equal(first.ok,false);assert.equal(first.unknown,true);assert.equal(first.code,'JOURNAL_UNAVAILABLE');
   failClear=false;const next=await h.service.action('fund',payload,{pin:'1234'});assert.equal(next.ok,true);assert.equal(actions(h)[0].body.attemptId,actions(h)[1].body.attemptId);assert.equal(h.storage.getItem('lumo-approved-pending-v1'),'{}');
 });
+
+test('an account switch while cleanup waits for its lease preserves the original confirmed attempt',async()=>{
+  const storage=memory(),calls=[];let releaseCleanup,leases=0;
+  const lockManager={request(name,options,work){if(++leases===2)return new Promise(resolve=>{releaseCleanup=()=>resolve(work());});return Promise.resolve().then(work);}};
+  const service=makeService({storage,modeStorage:memory(),lockManager,fetch:async(url,options)=>{const body=JSON.parse(options.body);calls.push(body);return response(body.action==='login'?(body.handle==='kojo.test'?otherSigned:signed):{ok:true,result:{ok:true,id:'confirmed-once'}});}});
+  await service.login('ama.test','test-password');const action=service.action('fund',{amount:100},{pin:'1234'});await tick();assert.equal(typeof releaseCleanup,'function');
+  const original=calls.find(body=>body.action==='action').attemptId;await service.login('kojo.test','different-test-password');releaseCleanup();const result=await action;
+  assert.equal(result.code,'ACCOUNT_CHANGED');assert.equal(result.unknown,true);assert.ok(Object.values(JSON.parse(storage.getItem('lumo-approved-pending-v1'))).includes(original));assert.equal(service.user.id,otherSigned.session.user.id);
+});

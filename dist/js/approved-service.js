@@ -174,7 +174,11 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
         let data = await request({ action: 'action', type, payload: clean, attemptId, ...(pin ? { pin } : {}) }, { owner, epoch });
         if (!current(owner, epoch)) return { ...accountChanged(), attemptId };
         if (!data.ok && !finalRejections.has(data.code)) data = { ...data, unknown: true };
-        if (!data.unknown && !reference && !await withJournalLock(() => updatePending(pending => { if (pending[signature] === attemptId) delete pending[signature]; }))) return failure('The service replied, but Lumo could not safely save the result. Keep this request reference and check it again.', 'JOURNAL_UNAVAILABLE', { unknown: true, attemptId });
+        if (!data.unknown && !reference) {
+          const cleared = await withJournalLock(() => current(owner, epoch) && updatePending(pending => { if (pending[signature] === attemptId) delete pending[signature]; }));
+          if (!current(owner, epoch)) return { ...accountChanged(), attemptId };
+          if (!cleared) return failure('The service replied, but Lumo could not safely save the result. Keep this request reference and check it again.', 'JOURNAL_UNAVAILABLE', { unknown: true, attemptId });
+        }
         if (!current(owner, epoch)) return { ...accountChanged(), attemptId };
         if (!data.ok) return { ...data.result, ...data, attemptId, ok: false, message: data.message || data.result?.message || 'That change could not be completed.' };
         return { ...data.result, ok: data.result?.ok !== false, state: data.state, revision: data.revision, receipts: data.receipts, account: data.account };
