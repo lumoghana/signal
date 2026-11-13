@@ -57,7 +57,7 @@ const migrationFields={
  transactions:'id shopId staffId shiftId payer amount status createdAt confirmedAt reference method requestId attemptId assignedAt studentWalletId sandbox staffName recordedTradingDay recordedCutoff tradingDay tradingCutoff allocationSourceTradingDay allocationSourceCutoff allocationReceiptTradingDay priorPeriodAllocation',
  requests:'id shopId staffId shiftId amount description createdAt expiresAt status staffName createdByRole createdByUserId attemptId',
  closings:'id shopId createdAt businessDay businessDate cutoff automatic zeroSales priorPeriodRefunds priorPeriodAllocations adjustmentNote periodStartedAt transactionIds refundIds gross refunds net count pending by',
- refunds:'id transactionId shopId staffId shiftId amount status createdAt paidAt approvedAt priorPeriod reason payer by attemptId sourceStaffId sourceShiftId requestedStaffId requestedShiftId requestedBy performedBy performedRole performedUserId legacyPerformer tradingDay tradingCutoff',
+ refunds:'id transactionId shopId staffId shiftId amount status createdAt paidAt approvedAt decidedAt decidedBy priorPeriod reason payer by attemptId sourceStaffId sourceShiftId requestedStaffId requestedShiftId requestedBy performedBy performedRole performedUserId legacyPerformer tradingDay tradingCutoff',
  settlements:'id amount fee createdAt status destination reference completedAt attemptId',
  tickets:'id subject message transactionId paymentReference shopId status createdAt updatedAt responses resolvedAt',
  shifts:'id shopId staffId staffName performedBy startedAt status transactionIds refundIds gross refunds net by endedAt note tradingDay tradingCutoff lateConfirmedCount',

@@ -8,6 +8,7 @@ const transportURL=new URL('../dist/connected-service.js',import.meta.url).href;
 registerHooks({load(url,context,nextLoad){
  if(url!==transportURL)return nextLoad(url,context);
  return {format:'module',shortCircuit:true,source:`
+  export const MERCHANT_CAPABILITIES=Object.freeze({passwordChange:true,passwordRecovery:true,usernameRecovery:true,staffReset:true,ownershipTransfer:true,settlement:true,simulation:true,customerWallet:true});
   export const CONNECTED_CONSUMER_ORIGIN='https://lumo-connected-pilot.vercel.app';
   export function merchantFetch(path,options={}){
    // The legacy owner-only password endpoint predates the named refund purpose.

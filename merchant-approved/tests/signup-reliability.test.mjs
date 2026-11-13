@@ -54,3 +54,9 @@ test('uncertain sign-in passes the original username and successful matching sig
 test('a previously used browser can start another explicit signup without overwriting saved server records',async()=>{
  const {signup}=setup(undefined,new Storage(),{hasRegistration:()=>true});assert.match(signup.render(),/Create a different merchant account/);signup.handleClick('signup-begin',{});assert.match(signup.render(),/Mobile number/);
 });
+
+
+test('owner names over the creation limit are corrected at the business step',async()=>{
+ const {signup,calls}=setup();signup.handleClick('signup-begin',{});await signup.handleSubmit(form({phone:'0245550100'}));await signup.handleSubmit(form({otp:'123456'}));await signup.handleSubmit(form({username:'length.owner',password:'OwnerLength123',confirmation:'OwnerLength123'}));
+ assert.match(signup.render(),/name="ownerName"[^>]*maxlength="60"/);await signup.handleSubmit(form({name:'Test Counter',ownerName:'A'.repeat(61),businessType:'sole-trader'}));assert.match(signup.render(),/up to 60 characters/);assert.match(signup.render(),/Let’s meet/);assert.equal(calls.length,0);
+});

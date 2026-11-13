@@ -44,6 +44,7 @@ export function getMonthlyInsights(state = {}, selectedMonth, now = new Date()) 
   const spendingCost = tx => Math.max(0,tx.amount-(tx.type==='card-purchase'?asMoney(tx.refunded):0))+asMoney(tx.fee);
   const spending = selected.filter(isSpending);
   const spent = spending.reduce((total, tx) => total + spendingCost(tx), 0);
+  const merchantRefunds = selected.filter(tx => tx.type === 'refund' && tx.direction === 'in' && tx.status === 'success').reduce((total, tx) => total + tx.amount, 0);
   const moneyIn = selected.filter(tx => tx.type === 'income' && tx.direction === 'in' && tx.status === 'success' && tx.rail !== 'internal').reduce((total, tx) => total + tx.amount, 0);
   const held = selected.filter(tx => ['payment','card-purchase'].includes(tx.type) && tx.direction === 'out' && tx.status === 'pending' && tx.rail !== 'internal').reduce((total, tx) => total + tx.amount+asMoney(tx.fee), 0);
   const previousSpent = transactions.filter(tx => inPeriod(tx, previousMonth, previousLastDay) && isSpending(tx)).reduce((total, tx) => total + spendingCost(tx), 0);
@@ -71,7 +72,7 @@ export function getMonthlyInsights(state = {}, selectedMonth, now = new Date()) 
     period: isCurrent ? 'vs the same days last month' : 'vs last month',
   };
   const noticed = !comparison.available ? 'Your first month is taking shape.' : comparison.percent === 0 ? 'Your spending is about the same as last month.' : `You’ve spent ${comparison.percent}% ${comparison.direction} ${isCurrent ? 'than at this point last month' : 'than the month before'}.`;
-  return { month, label: monthLabel(month), shortLabel: monthLabel(month, true), isCurrent, spent, moneyIn, moneyOut: spent, held, planTotal, planRemaining, planUsed, planDates, planPercent, ringPercent: planPercent === null ? 0 : Math.min(100, planPercent), previousSpent, comparison, categories, noticed };
+  return { month, label: monthLabel(month), shortLabel: monthLabel(month, true), isCurrent, spent, merchantRefunds, moneyIn, moneyOut: spent, held, planTotal, planRemaining, planUsed, planDates, planPercent, ringPercent: planPercent === null ? 0 : Math.min(100, planPercent), previousSpent, comparison, categories, noticed };
 }
 
 
@@ -97,8 +98,8 @@ export function renderInsights(ctx, route = {}) {
     <header class="insights-ref-heading${planView ? ' insights-ref-heading--plan' : ''}"><div><h1>Insights</h1><p>${planView ? `Current plan${plan.planDates ? ` · ${esc(plan.planDates)}` : ''}` : 'Spending, month by month.'}</p></div>${planView ? '' : `<button type="button" class="insights-ref-month" data-insights-action="month" aria-label="Choose month, ${esc(insights.label)}">${icon('calendar', 17)}<span>${esc(insights.shortLabel)}</span><span class="insights-ref-down">${icon('chevron', 13)}</span></button>`}</header>
     <nav class="insights-ref-views" aria-label="Insight views"><button type="button" data-insights-action="view-month" aria-pressed="${!planView}">${insights.isCurrent ? 'This month' : esc(insights.shortLabel)}</button><button type="button" data-insights-action="view-plan" aria-pressed="${planView}">This plan</button></nav>
     ${planView ? planContent : `
-    <div class="insights-ref-summary"><div class="insights-ref-spending"><p>${insights.isCurrent ? 'Spent this month' : 'Spent in ' + esc(insights.shortLabel)}</p><strong class="insights-ref-total">${money(insights.spent)}</strong><p class="insights-ref-comparison">${comparison}</p></div>
-      <div class="insights-ref-statistics"><div><span>Money in</span><strong>${money(insights.moneyIn)}</strong></div><div><span>Money out</span><strong>${money(insights.moneyOut)}</strong></div></div>${insights.held && !hidden ? `<p class="insights-ref-hold-note">${cash(insights.held)} pending, excluded from spending.</p>` : ''}
+    <div class="insights-ref-summary"><div class="insights-ref-spending"><p>${insights.merchantRefunds ? 'Payments before merchant refunds' : insights.isCurrent ? 'Spent this month' : 'Spent in ' + esc(insights.shortLabel)}</p><strong class="insights-ref-total">${money(insights.spent)}</strong><p class="insights-ref-comparison">${comparison}</p></div>
+      <div class="insights-ref-statistics"><div><span>Money in</span><strong>${money(insights.moneyIn)}</strong></div><div><span>Money out</span><strong>${money(insights.moneyOut)}</strong></div></div>${insights.merchantRefunds && !hidden ? `<p class="insights-ref-hold-note">${cash(insights.merchantRefunds)} in merchant refunds arrived ${insights.isCurrent ? 'this month' : 'in ' + esc(insights.shortLabel)}. They appear separately in Activity; card refunds already reduce card purchases.</p>` : ''}${insights.held && !hidden ? `<p class="insights-ref-hold-note">${cash(insights.held)} pending, excluded from spending.</p>` : ''}
     </div>
     <div class="insights-ref-category-heading"><h2>Where your money went</h2>${insights.categories.length ? `<button type="button" data-insights-action="categories">See all ${icon('arrow', 17)}</button>` : ''}</div>
     <div class="insights-ref-categories">${insights.categories.length ? categoryRows(insights.categories.slice(0, 4), hidden) : '<div class="insights-ref-empty">No completed payments this month.<br>Your spending will appear here.</div>'}</div>

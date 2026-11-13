@@ -1,3 +1,4 @@
+import {savingsAutomaticWork} from './domain/savings-parity-model.js';
 import {partnerRespond,publicPartnerInbox} from './partners.mjs';
 import {actionFingerprint,buildState,clone,envelope,prepareMutation,sha256,canonicalJson} from './engine.mjs';
 const HANDLE=/^[a-z0-9][a-z0-9._-]{2,29}$/;
@@ -6,7 +7,7 @@ const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const phone=value=>String(value||'').replace(/[\s()-]/g,'').replace(/^\+233/,'0');
 const failure=(code,message,status=400)=>Object.assign(new Error(message||code),{code,status});
 const messages={AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
-Object.assign(messages,{EXISTING_ACCOUNT:'This account already exists. Sign in instead. If its legacy test PIN needs repair, choose Repair test PIN after signing in.',PIN_REPAIR_UNAVAILABLE:'This one-time repair is available only to eligible legacy test accounts. Your existing PIN is unchanged.',PIN_REPAIR_EXPIRED:'This PIN repair check expired or was already used. Start a fresh password check.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.'});
+Object.assign(messages,{ACCOUNT_CLOSED:'This Lumo account is closed. Its records remain available to view and export.',CLOSURE_REVIEW_CHANGED:'The group returns changed. Open the current amounts and approve them again.',CLOSURE_BLOCKED:'Leave or close your open groups, resolve contribution returns and move remaining funds before closing Lumo.',REPORT_UNAVAILABLE:'This report could not be saved. Open the current member message and try again.',EXISTING_ACCOUNT:'This account already exists. Sign in instead. If its legacy test PIN needs repair, choose Repair test PIN after signing in.',PIN_REPAIR_UNAVAILABLE:'This one-time repair is available only to eligible legacy test accounts. Your existing PIN is unchanged.',PIN_REPAIR_EXPIRED:'This PIN repair check expired or was already used. Start a fresh password check.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.'});
 const b64url=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unbase64=value=>{if(typeof value!=='string'||!/^[A-Za-z0-9_+/-]+={0,2}$/.test(value)||value.length>8192)throw failure('DEVICE_PROOF_INVALID');return Uint8Array.from(atob(value.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));};
 const jwtClaims=token=>{try{return JSON.parse(new TextDecoder().decode(unbase64(token.split('.')[1])));}catch{throw failure('AUTH_REQUIRED',null,401);}};
@@ -51,7 +52,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    service:(command,payload={})=>service(command,{...payload,...identityPayload}),
    repair:(command,payload={})=>serviceRpc('lumo_approved_pin_repair',{p_command:command,p_payload:{...payload,...identityPayload}}),
    resolve:query=>service('resolve',{...identityPayload,query:String(query||'')}),
-   quote:async payload=>{const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true};},
+   quote:async payload=>{if(!payload.shopId&&payload.query){const lookup=await serviceRpc('lumo_approved_merchant_lookup',{p_query:payload.query});if(!lookup?.ok)return lookup;payload={...payload,shopId:lookup.shopId};}const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true};},
    rpc:async(command,payload={})=>(await upstream('/rest/v1/rpc/lumo_rpc',{p_command:command,p_payload:payload},{token:identity.accessToken})).data,
   };
  }
@@ -93,13 +94,12 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  }
  async function runAutomatic(repo,snapshot){
   for(let n=0;n<4;n++){
-   const state=buildState(snapshot),seen=new Set(state._sharedIncomeSeen||[]),today=new Date().toISOString().slice(0,10);
-   const due=(state.boxes||[]).filter(b=>b.hack?.type==='scheduled'&&b.hack.nextRun<=today).map(b=>[b.id,b.hack.nextRun]);
-   const income=state.transactions.filter(t=>t.type==='income'&&t.direction==='in'&&t.status==='success'&&t.ledgerJournalId&&!seen.has(t.ledgerJournalId)).map(t=>t.ledgerJournalId);
+   const state=buildState(snapshot),{due,income}=savingsAutomaticWork(state);
+   if(state.account?.status==='closed')return snapshot;
    if(!due.length&&!income.length)return snapshot;
    const attemptId='automatic-'+(await sha256(canonicalJson({due,income}),cryptoApi)).slice(0,48),fingerprint=await actionFingerprint('runAutomaticSavings',{},attemptId);
    const prepared=await prepareMutation(snapshot,'runAutomaticSavings',{},attemptId,repo);if(!prepared.ok)return snapshot;
-   const committed=await repo.service('commit',{attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:prepared.expectedWallet,state:prepared.durableState,groups:prepared.groups,boxes:prepared.boxes,intents:prepared.intents,requests:prepared.requests,partners:prepared.partners,requiresAuth:false,result:prepared.result});
+   const committed=await repo.service('commit',{attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:prepared.expectedWallet,state:prepared.durableState,groups:prepared.groups,boxes:prepared.boxes,intents:prepared.intents,requests:prepared.requests,privateReports:prepared.privateReports,closeAccount:prepared.closeAccount,partners:prepared.partners,requiresAuth:false,result:prepared.result});
    if(committed.code==='REVISION_CONFLICT'){snapshot=requireOk(await repo.service('load'));continue;}requireOk(committed);return committed.snapshot;
   }return requireOk(await repo.service('load'));
  }
@@ -175,7 +175,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
     const snapshot=await runAutomatic(repo,requireOk(await repo.service('load')));
     const prepared=await prepareMutation(snapshot,body.type,body.payload,body.attemptId,repo);
     if(!prepared.ok)return respond({...envelope(snapshot),ok:false,code:'DOMAIN_REJECTED',message:prepared.result.message,result:prepared.result});
-    const committed=await repo.service('commit',{attemptId:body.attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:prepared.expectedWallet,state:prepared.durableState,groups:prepared.groups,boxes:prepared.boxes,intents:prepared.intents,requiresAuth:prepared.requiresAuth,requests:prepared.requests,partners:prepared.partners,profileChange:prepared.profileChange,result:prepared.result,pin:body.pin,...(verifiedChallengeId?{verifiedChallengeId}:{})});
+    const committed=await repo.service('commit',{attemptId:body.attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:prepared.expectedWallet,state:prepared.durableState,groups:prepared.groups,boxes:prepared.boxes,intents:prepared.intents,requiresAuth:prepared.requiresAuth,requests:prepared.requests,privateReports:prepared.privateReports,closeAccount:prepared.closeAccount,partners:prepared.partners,profileChange:prepared.profileChange,result:prepared.result,pin:body.pin,...(verifiedChallengeId?{verifiedChallengeId}:{})});
     if(committed.code==='REVISION_CONFLICT')continue;
     requireOk(committed);return respond(envelope(committed.snapshot,committed.result,{postedReceipts:committed.receipts||[],replayed:committed.replayed===true}));
    }

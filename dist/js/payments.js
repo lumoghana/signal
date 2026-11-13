@@ -1,4 +1,6 @@
-import {encodeSharedQr} from './approved-qr.js';
+import {encodeSharedQrLink} from './approved-qr.js';
+import {parseQrPayload} from './qr-decoder.js';
+import {recoveryPending} from './payment-recovery.js';
 import {runActionFlow} from './approved-flow.js';
 import {paymentFee} from './payments-parity-model.js';
 import {renderPaymentParity,bindPaymentParity,createSplitSheet,createRequestSheet} from './payments-parity-ui.js';
@@ -30,6 +32,13 @@ const pence = value => Math.round(Number(String(value ?? '').replace(/,/g, '')) 
 const amountInput = value => value ? (value / 100).toFixed(2).replace(/\.00$/, '') : '';
 const nonce = prefix => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 const payRoute = (page, more = {}) => ({ section: 'pay', page, ...more });
+const paymentSubmissions=new WeakSet();
+export const hasUnresolvedPayment=recoveryPending;
+function originalPaymentFirst(ctx){
+  if(!hasUnresolvedPayment(ctx.draft.payment))return false;
+  ctx.toast('Check the original payment before starting another. Its result is not confirmed.');
+  ctx.go(payRoute('review'));return true;
+}
 
 function draft(ctx) {
   if (!ctx.draft.payment) ctx.draft.payment = { rail: 'lumo', recipient: null, amount: 0, category: 'Other', note: '', idempotencyKey: nonce('payment') };
@@ -84,6 +93,7 @@ function capturePayment(ctx, route) {
 function resumePayment(ctx) {
   const d = ctx.draft.payment;
   if (!pendingPayment(ctx)) return startPayment(ctx);
+  if(hasUnresolvedPayment(d)){ctx.closeSheet();ctx.go(payRoute('review'));return;}
   let target = d.serviceId ? (d.lastRoute?.page === 'pause' ? payRoute('pause', { backTo: paymentReviewRoute(d) }) : paymentReviewRoute(d)) : d.lastRoute && !d.lastRoute.edit && ['recipient','recipient-confirm','conversation','amount','review','pause'].includes(d.lastRoute.page)
     ? { ...d.lastRoute } : d.recipient && d.amount > 0 ? paymentReviewRoute(d) : payRoute(d.recipient ? 'amount' : 'recipient');
   if (['momo', 'bank'].includes(d.rail)) {
@@ -95,6 +105,8 @@ function resumePayment(ctx) {
   ctx.setCapture?.(null); ctx.closeSheet(); ctx.go(target);
 }
 function startPayment(ctx, person = null, rail = 'lumo', force = false, origin = null) {
+  if(originalPaymentFirst(ctx))return;
+  if(ctx.connected&&['momo','bank'].includes(rail)){ctx.toast('This provider is not connected. Choose a Lumo person or scan a connected merchant.');return;}
   const fresh = () => {
     ctx.setCapture?.(null); const d=resetDraft(ctx, person, rail);if(origin)d.flowOrigin=origin;remember(ctx);
     const conversation = person && rail === 'lumo';
@@ -110,6 +122,8 @@ function startPayment(ctx, person = null, rail = 'lumo', force = false, origin =
 }
 /** Start a repayment draft, never a transfer. The recipient is chosen and verified next. */
 export function prepareIOURepayment(ctx, record, amount, rail = 'lumo') {
+  if(originalPaymentFirst(ctx))return false;
+  if(ctx.connected&&rail!=='lumo'){ctx.toast('Mobile money is not connected. Choose a Lumo person, or record a repayment already made outside Lumo.');return false;}
   const iou = ctx.state.ious?.find(item => item.id === record?.id && item.type === 'owedByMe' && item.status === 'open');
   if (!iou || !['lumo','momo'].includes(rail) || !Number.isSafeInteger(amount) || amount <= 0 || amount > repayableIOUAmount(ctx.state, iou)) { ctx.toast('Check the IOU and any repayment still waiting for confirmation.'); return false; }
   const origin = { section: 'life', page: 'iou-detail', id: iou.id };
@@ -157,6 +171,7 @@ function paymentContext(ctx) {
   child.paymentContacts = ctx.connected ? [] : CONTACTS;
   child.topUpShortcuts = id => getTopUpShortcuts(ctx.state, id);
   child.startPayment = (person = null, rail = 'lumo') => startPayment(ctx, person, rail);
+  child.canStartPayment = () => !originalPaymentFirst(ctx);
   child.resumePayment = () => resumePayment(ctx);
   child.openFunding = () => openFunding(ctx);
   child.confirmAccountRecipient = () => {
@@ -177,23 +192,38 @@ function paymentContext(ctx) {
   child.qrCodeMarkup = () => { ensureRequest(); return paymentCode(ctx); };
   child.openQrPayment = parsed => openQrPayment(ctx, parsed);
   child.findQrPerson = () => startPayment(ctx, null, 'lumo', false, { ...ctx.route });
-  child.openQrMerchant = id => { if(ctx.connected)return openSharedMerchant(ctx,id);const service=getPaymentService(id);if(isCampusCodeService(service))ctx.go(payRoute('service',{id,backTo:payRoute('home',{hubTab:getServiceHubTab(service)})})); };
+  child.openQrMerchant = (id,options) => { if(ctx.connected)return openSharedMerchant(ctx,id,options);const service=getPaymentService(id);if(isCampusCodeService(service))ctx.go(payRoute('service',{id,backTo:payRoute('home',{hubTab:getServiceHubTab(service)})})); };
   child.enterMerchantCode = () => openMerchantCodeSheet(child);
-  child.editQrRequest = () => { ensureRequest(); collectAmountSheet(ctx); };
-  child.shareQrCode = () => shareText(ctx, collectLink(ctx), 'Pay me with Lumo');
-  child.copyQrCode = () => copyText(ctx, collectLink(ctx));
+  child.editQrRequest = () => { if(ctx.connected){createRequestSheet(ctx);return;}ensureRequest(); collectAmountSheet(ctx); };
+  child.shareQrCode = () => {const link=collectLink(ctx);return link?shareText(ctx,link,'Pay me with Lumo'):ctx.toast('Reconnect to open your signed-in code.');};
+  child.copyQrCode = () => {const link=collectLink(ctx);return link?copyText(ctx,link):ctx.toast('Reconnect to open your signed-in code.');};
   return child;
 }
- function openSharedMerchant(ctx,input){return runActionFlow(function*(){
+export function openSharedMerchant(ctx,input,{isCurrent=()=>true}={}){return runActionFlow(function*(){
+  if(originalPaymentFirst(ctx))return {ok:false,message:'Check your original payment first.'};
+  const origin=ctx.route,previous=ctx.draft.payment,version=ctx.shared.authVersion;
+  const unchanged=()=>ctx.route===origin&&ctx.draft.payment===previous&&ctx.shared.authVersion===version;
+  const current=()=>isCurrent()&&unchanged();
   const value=typeof input==='string'?{query:input}:input||{};
   const quote=(yield ctx.shared.quote(value.shopId?{shopId:value.shopId,...(value.requestId?{requestId:value.requestId}:{}),...(value.testKey?{testKey:value.testKey}:{})}:{query:value.query}));
-  if(!quote.ok||!quote.shop?.id){ctx.toast(quote.message||'This merchant is unavailable. Check their code and try again.');return;}
-  const name=quote.merchant?.name||quote.shop.name||'Lumo merchant',origin={...ctx.route};
-  const d=resetDraft(ctx,{id:quote.shop.id,name,emoji:name.charAt(0)},'merchant');
-  Object.assign(d,{shopId:quote.shop.id,...(quote.request?.id?{requestId:quote.request.id}:{}),...(value.testKey?{testKey:value.testKey}:{}),amount:quote.request?.amount||0,amountText:quote.request?.amount?amountInput(quote.request.amount):'',flowOrigin:origin,amountBackTo:origin,note:quote.request?.note||''});
-  remember(ctx);ctx.go(payRoute(d.amount?'review':'amount',{backTo:origin}));
+  if(!current())return {ok:false,cancelled:true};
+  if(!quote.ok||!quote.shop?.id){const message=quote.message||'This merchant is unavailable. Check their code and try again.';ctx.toast(message);return {ok:false,message};}
+  const name=quote.merchant?.name||quote.shop.name||'Lumo merchant';
+  const adopt=(fromChoice=false)=>{
+    if(!(fromChoice?unchanged():current()))return;
+    const d=resetDraft(ctx,{id:quote.shop.id,name,emoji:name.charAt(0)},'merchant');
+    Object.assign(d,{shopId:quote.shop.id,shopName:quote.shop.name||'',shopCode:quote.shop.code||'',shopArea:quote.shop.area||'',...(quote.request?.id?{requestId:quote.request.id}:{}),...(value.testKey?{testKey:value.testKey}:{}),amount:quote.request?.amount||0,amountText:quote.request?.amount?amountInput(quote.request.amount):'',flowOrigin:{...origin},amountBackTo:{...origin},note:quote.request?.note||''});
+    remember(ctx);ctx.go(payRoute(d.amount?'review':'amount',{backTo:{...origin}}));
+  };
+  if(pendingPayment(ctx)){
+    let choosing=true;
+    ctx.sheet(`<h2>Use this merchant payment?</h2><p>Your unfinished payment is saved. Choose which one to continue.</p><div class="stack">${btn('Use this merchant','merchant-use-payment')}${btn('Continue saved payment','merchant-resume-payment',{secondary:true})}</div>`,el=>{el.querySelector('[data-action="merchant-use-payment"]').onclick=()=>{if(!choosing||!unchanged())return;choosing=false;ctx.closeSheet();adopt(true);};el.querySelector('[data-action="merchant-resume-payment"]').onclick=()=>{if(!choosing||!unchanged())return;choosing=false;resumePayment(ctx);};},{onDispose:()=>{choosing=false;},onClose:()=>ctx.refresh()});
+    return {ok:true,choosing:true};
+  }
+  adopt();return {ok:true};
 });}
 function openQrPayment(ctx, parsed) {
+  if(originalPaymentFirst(ctx))return;
   if(parsed?.type !== 'person' || typeof parsed.name !== 'string' || !parsed.name.trim() || parsed.name.length > 60 || !Number.isSafeInteger(parsed.amount) || parsed.amount < 0 || parsed.amount > 100000000) { ctx.toast('This QR code does not contain a valid Lumo payment.');return; }
   const origin = { ...ctx.route }, adopt = () => {
     ctx.setCapture?.(null);
@@ -212,6 +242,8 @@ function openQrPayment(ctx, parsed) {
 }
 function paymentHubOrigin(d) { if((d?.requestId||d?.iouId)&&d.flowOrigin)return d.flowOrigin; return ['campus','bills'].includes(d?.hubTab) ? payRoute('home', { hubTab: d.hubTab }) : payRoute('home'); }
 function startServicePayment(ctx, prepared) {
+  if(originalPaymentFirst(ctx))return {ok:false,message:'Check your original payment first.'};
+  if(ctx.connected){ctx.toast('This provider is not connected. Use a Lumo person or a connected merchant.');return {ok:false,message:'This provider is not connected.'};}
   const checked = prepareServicePayment(prepared?.service?.id, prepared?.serviceFields || prepared?.fields);
   if (!checked.ok) return checked;
   const p = checked.payment, origin = payRoute('home', { hubTab: getServiceHubTab(p.service) });
@@ -291,11 +323,12 @@ function review(ctx) {
   return `<div class="page pay-review${d.serviceId ? ' service-payment-review' : ''}">${taskHead('Review payment')}
     <div class="content"><h1 class="large-question">${d.serviceId ? 'Ready to go?' : 'All looking right?'}</h1>
     <div class="review-person">${recipientAvatar(d.recipient, 'large')}<div><strong>${esc(recipientLabel(d))}</strong><p class="muted">${esc(destinationLabel(d))}${!d.serviceId && d.recipient?.number ? ` · ${esc(d.recipient.number)}` : ''}</p></div></div>
+    ${d.rail==='merchant'?`<div class="panel">${row({title:'Receiving shop',right:esc(d.shopName||'Connected merchant')})}${d.shopCode?row({title:'Merchant code',right:esc(d.shopCode)}):''}${d.shopArea?row({title:'Location',right:esc(d.shopArea)}):''}${d.requestId?row({title:'Payment request',sub:'The merchant confirmed this exact amount',right:cash(d.amount)}):''}</div>`:''}
     <div class="panel review-summary">${row({ emoji: icon('send'), title: 'You’re sending', right: cash(d.amount) })}${row({ emoji: icon('check'), title: 'Demo fee', right: cash(fee) })}${row({ emoji: icon('wallet'), title: 'Total', right: cash(total), className: 'total-row' })}</div>
     ${d.iouId ? `<p class="notice">Towards your IOU with ${esc(ctx.state.ious?.find(item => item.id === d.iouId)?.name || d.iouName || 'this person')}. Only confirmed money reduces what you owe.</p>` : ''}
     ${d.note && !d.serviceId ? `<p class="payment-note">“${esc(d.note)}”</p>` : ''}
     ${!canPay ? `<div class="notice error">${icon('lock', 19)}<span>You need ${cash(total - ctx.state.wallet)} more to make this payment.</span></div>` : ''}
-    ${d.serviceId ? `<div class="panel service-review-details">${d.billerName ? row({title:'Biller',right:esc(d.billerName)}) : ''}${d.reference ? row({title:d.rail==='airtime'||d.rail==='data'?'Mobile number':'Payment reference',right:esc(d.reference)}) : ''}${d.bundleName ? row({title:'Demo bundle',right:esc(d.bundleName)}) : ''}</div><button class="button ghost" data-action="pay-edit-amount">Edit details</button>` : `<details class="payment-review-options"><summary>Edit payment details</summary><div class="inline-actions"><button class="button ghost" data-action="pay-edit-amount">Edit amount</button><button class="button ghost" data-action="pay-edit-recipient">Change recipient</button></div><button class="text-button" data-action="pay-save-favourite">Save as favourite</button></details>`}<details class="parity-demo"><summary>Payment simulation</summary><p class="muted small">No provider is connected. A pending result keeps money held until separately confirmed. Fees are sample pricing.</p><label class="field"><span>Sample result</span><select class="input" id="payment-outcome"><option value="success" ${d.outcome!=='pending'&&d.outcome!=='failed'?'selected':''}>Confirmed</option><option value="pending" ${d.outcome==='pending'?'selected':''}>Pending</option><option value="failed" ${d.outcome==='failed'?'selected':''}>Failed</option></select></label></details><p class="error" id="payment-error" role="alert" hidden></p></div>
+    ${d.serviceId ? `<div class="panel service-review-details">${d.billerName ? row({title:'Biller',right:esc(d.billerName)}) : ''}${d.reference ? row({title:d.rail==='airtime'||d.rail==='data'?'Mobile number':'Payment reference',right:esc(d.reference)}) : ''}${d.bundleName ? row({title:'Demo bundle',right:esc(d.bundleName)}) : ''}</div><button class="button ghost" data-action="pay-edit-amount">Edit details</button>` : d.rail==='merchant'?`<p class="muted small">${d.requestId?'The merchant sets this request amount. Start a different payment to change the receiving shop.':'Check the receiving shop above.'}</p>${d.requestId?'':'<button class="button ghost" data-action="pay-edit-amount">Edit amount</button>'}` : `<details class="payment-review-options"><summary>Edit payment details</summary><div class="inline-actions"><button class="button ghost" data-action="pay-edit-amount">Edit amount</button><button class="button ghost" data-action="pay-edit-recipient">Change recipient</button></div><button class="text-button" data-action="pay-save-favourite">Save as favourite</button></details>`}<details class="parity-demo"><summary>Payment simulation</summary><p class="muted small">No provider is connected. A pending result keeps money held until separately confirmed. Fees are sample pricing.</p><label class="field"><span>Sample result</span><select class="input" id="payment-outcome"><option value="success" ${d.outcome!=='pending'&&d.outcome!=='failed'?'selected':''}>Confirmed</option><option value="pending" ${d.outcome==='pending'?'selected':''}>Pending</option><option value="failed" ${d.outcome==='failed'?'selected':''}>Failed</option></select></label></details><p class="error" id="payment-error" role="alert" hidden></p></div>
     <div class="bottom-action">${btn(canPay ? 'Continue' : 'Add money', canPay ? 'pay-review-next' : 'pay-fund')}</div>
   </div>`;
 }
@@ -378,8 +411,9 @@ export function paymentReceiptText(tx) {
 function paymentOutcomeControls(tx){if(tx.type!=='payment')return '';return tx.status==='pending'?'<details class="parity-demo"><summary>Provider simulation</summary><p class="muted small">A check leaves the payment pending. Choose a confirmed provider outcome here.</p><button class="button secondary" data-action="pay-simulate-success">Confirm payment</button><button class="button secondary" data-action="pay-simulate-failed">Fail payment and release hold</button></details>':tx.status==='success'?'<details class="parity-demo"><summary>Reversal simulation</summary><p class="muted small">Return this confirmed payment once. Separate saving transfers stay saved.</p><button class="button secondary" data-action="pay-simulate-reversed">Simulate reversal</button></details>':'';}
 function serviceDeliveryControls(tx){if(!tx.serviceId||tx.status!=='success')return '';const delivery=tx.delivery||{status:'pending'};return `<div class="panel service-delivery"><h2>${delivery.status === 'failed' ? 'Let’s sort this out.' : 'Service delivery'}</h2><p>${esc({pending:'Waiting for the provider.',delivered:'Demo service delivered.',failed:'Delivery failed. Your payment remains recorded.'}[delivery.status]||delivery.status)}</p>${delivery.status==='failed'?'<button class="button secondary" data-action="pay-help">Get help with this payment</button><p class="muted small">Don’t pay again while we check. Your payment has not been refunded.</p>':''}${delivery.token?`<p class="muted small">Sample ECG token</p><strong>${esc(delivery.token)}</strong>`:''}<button class="button ghost" data-action="pay-delivery-check">Check delivery</button>${delivery.status!=='delivered'?'<details class="parity-demo"><summary>Delivery simulation</summary><button class="button secondary" data-action="pay-delivery-success">Confirm delivery</button><button class="button secondary" data-action="pay-delivery-failed">Fail delivery</button></details>':''}<p class="muted small">No real electricity token, airtime or bundle is issued.</p></div>`;}
 function paymentCode(ctx) {
+  const link=collectLink(ctx);if(!link)return '<p role="status">Reconnect to show your signed-in Lumo code.</p>';
   const code = qrcode(0, 'M');
-  code.addData(collectLink(ctx), 'Byte');
+  code.addData(link, 'Byte');
   code.make();
   return code.createSvgTag({ cellSize: 4, margin: 16, scalable: true, title: 'Your Lumo payment code', alt: 'Scan with a phone camera to open your Lumo payment request.' });
 }
@@ -387,9 +421,9 @@ function collect(ctx) {
   ctx.draft.collect ||= { amount: 0, note: '', from: '', idempotencyKey: nonce('collect') };
   const c = ctx.draft.collect;
   const name = ctx.state.profile?.name || 'Ama';
-  const handle = `@${name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) || 'ama'}`;
-  return `<div class="page collect-page">${pageHead('Collect')}<div class="content"><h1 class="large-question">Your money.<br>Your way back.</h1><div class="personal-code">${paymentCode(ctx)}</div><p class="code-name">${esc(name)} <span class="accent">${esc(handle)}</span></p><p class="muted small code-caption">Scan with a phone camera to open this demo payment request.</p>
-    <button class="row panel" data-action="collect-amount"><span class="row-icon">${icon('plus')}</span><span class="row-copy"><span class="row-title">${c.amount ? cash(c.amount) : 'Add an amount'}</span><span class="row-sub">${c.note ? esc(c.note) : 'Let them know what it’s for'}</span></span>${icon('chevron')}</button>
+  const handle = ctx.connected?'@'+(ctx.shared?.account?.handle||''): `@${name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16) || 'ama'}`;
+  return `<div class="page collect-page">${pageHead('Collect')}<div class="content"><h1 class="large-question">Your money.<br>Your way back.</h1><div class="personal-code">${paymentCode(ctx)}</div><p class="code-name">${esc(name)} <span class="accent">${esc(handle)}</span></p><p class="muted small code-caption">${ctx.connected?'Your personal code has no amount. The sender chooses an amount, reviews your identity and confirms.':'Scan with a phone camera to open this demo payment request.'}</p>
+    ${ctx.connected?'':`<button class="row panel" data-action="collect-amount"><span class="row-icon">${icon('plus')}</span><span class="row-copy"><span class="row-title">${c.amount ? cash(c.amount) : 'Add an amount'}</span><span class="row-sub">${c.note ? esc(c.note) : 'Let them know what it’s for'}</span></span>${icon('chevron')}</button>`}
     <button class="button secondary" data-action="collect-request">Ask one person</button><button class="button ghost" data-action="collect-requests">View sent and received requests</button><button class="button ghost" data-action="collect-track">Track money someone owes you ${icon('arrow', 17)}</button><p class="muted small">A request is expected money. Your balance changes only when money arrives.</p></div><div class="bottom-action">${btn(`${icon('share', 18)} Share payment link`, 'collect-share')}<button class="button ghost" data-action="collect-copy">Copy link</button></div></div>`;
 }
 function fundingStatus(ctx, route) {
@@ -398,6 +432,11 @@ function fundingStatus(ctx, route) {
 }
 
 export function renderPayments(ctx, route) {
+  if(hasUnresolvedPayment(ctx.draft.payment)&&['recipient','recipient-confirm','conversation','amount','review','pause','status'].includes(route.page))return unresolvedPaymentView(ctx);
+  if(ctx.connected&&route.page==='service'){
+    const service=getPaymentService(route.id);
+    return `<section class="page">${pageHead(service?.name||'Payment service')}<h1 class="large-question">${service?.type==='campus'?'Use the merchant’s connected code.':'This provider is not connected.'}</h1><p class="muted">${service?.type==='campus'?'This is a sample campus listing. Scan the shop’s Lumo QR or enter its merchant code to check the receiving shop and amount.':'Top-ups and bills cannot complete in this shared test. No payment details have been submitted.'}</p><div class="bottom-action">${btn('Scan a merchant QR','provider-scan')}${btn('Back to Payments','provider-back',{secondary:true})}</div></section>`;
+  }
   switch (route.page || 'home') {
     case 'requests': case 'request-detail': case 'splits': case 'split-detail': case 'funding-detail': return renderPaymentParity(paymentContext(ctx), route);
     case 'service': return renderPaymentService(paymentContext(ctx), route);
@@ -417,6 +456,42 @@ export function renderPayments(ctx, route) {
   }
 }
 
+function unresolvedPaymentView(ctx){
+  const d=ctx.draft.payment,submitted=d.submittedPayload||d;
+  if(ctx.connected&&d.submissionOwnerId!==ctx.shared?.user?.id)return `<section class="page">${pageHead('Original payment',{back:false})}<h1 class="large-question">Use the original account.</h1><p>This saved request cannot be checked from this account. Sign in to the account that reviewed it. No payment has been submitted from this account.</p><div class="bottom-action">${btn('Back to Payments','pay-unknown-leave')}</div></section>`;
+  return `<section class="page payment-status">${pageHead('Checking your payment',{back:false})}<div class="content status-content"><div class="status-orbit">${icon('clock',42)}</div><h1 class="large-question">Let’s check the original.</h1><p class="amount amount-xl">${cash(submitted.amount)}</p><p>To ${esc(submitted.merchant||recipientLabel(submitted))}</p><div class="notice" role="status">The result is not confirmed. This payment may already have completed. Check this original request before making another payment.</div><p class="transaction-reference">Reference ${esc(d.submissionAttemptId||submitted.idempotencyKey||d.idempotencyKey)}</p><p class="error" id="payment-error" role="alert"></p></div><div class="bottom-action">${btn('Check original payment','pay-check-original',{disabled:paymentSubmissions.has(d)})}${btn('Back to Payments','pay-unknown-leave',{secondary:true})}</div></section>`;
+}
+
+function submitReviewedPayment(ctx,d){return runActionFlow(function*(){
+  if(d.completed||ctx.draft.payment!==d||paymentSubmissions.has(d))return;
+  const owner=ctx.shared?.user?.id,version=ctx.shared?.authVersion;
+  if(ctx.connected&&hasUnresolvedPayment(d)&&d.submissionOwnerId!==owner){ctx.toast('Sign in to the original account to check this request.');ctx.refresh?.();return;}
+  const wasUnresolved=hasUnresolvedPayment(d);
+  const payload=d.submittedPayload||{...d,fee:paymentFee(d.rail),merchant:recipientLabel(d),status:d.outcome||'success'};
+  for(const key of ['submittedPayload','submissionState','submissionAttemptId','submissionOwnerId','lastSubmissionError'])delete payload[key];
+  d.submittedPayload=structuredClone(payload);d.submissionState='submitting';if(ctx.connected)d.submissionOwnerId=owner;
+  if(ctx.connected&&ctx.savePaymentRecovery?.(d)===false){
+    if(wasUnresolved)d.submissionState='unknown';else{delete d.submissionState;delete d.submittedPayload;delete d.submissionOwnerId;}
+    remember(ctx);ctx.toast('Lumo could not safely save this request for recovery. No new request was sent. Try again when browser saving is available.');return;
+  }
+  remember(ctx);paymentSubmissions.add(d);
+  if(ctx.connected)ctx.refresh?.();
+  let result;
+  try{result=(yield (ctx.actAsync||ctx.act).call(ctx,'payment',structuredClone(d.submittedPayload)));}
+  catch{result={ok:false,unknown:true,message:'The result is not confirmed. Check this original payment again.'};}
+  finally{paymentSubmissions.delete(d);}
+  if(ctx.draft.payment!==d||ctx.shared?.user?.id!==owner||ctx.shared?.authVersion!==version)return;
+  if(!result.ok){
+    if(result.unknown){d.submissionState='unknown';d.submissionAttemptId=result.attemptId||d.submissionAttemptId;d.lastSubmissionError=result.message;}
+    else{delete d.submissionState;delete d.submittedPayload;delete d.submissionAttemptId;delete d.submissionOwnerId;d.idempotencyKey=nonce('payment');}
+    remember(ctx);ctx.toast(result.message||'We couldn’t complete that payment.');ctx.go(paymentReviewRoute(d));return;
+  }
+  const tx=result.transaction||getTransaction(ctx,result.id);
+  if(!tx){d.submissionState='unknown';remember(ctx);ctx.toast('The service replied, but the receipt is not available yet. Check the original payment.');ctx.go(paymentReviewRoute(d));return;}
+  ctx.draft.lastPayment=tx;d.completed=true;d.lastTransactionId=tx.id||result.id;delete d.submissionState;delete d.submittedPayload;delete d.submissionAttemptId;delete d.submissionOwnerId;remember(ctx);
+  if(ctx.route?.section==='pay')finish(ctx,payRoute('status',{id:tx.id||result.id,backTo:payRoute('home')}));else ctx.toast('Your original payment result is available in Activity.');
+});}
+
 function noteSheet(ctx) {
   const d = draft(ctx);
   ctx.sheet(`<div class="content"><p class="eyebrow">A little context</p><h2 class="large-question">What’s the<br>story?</h2>${field({ label: 'Payment note', name: 'paymentNote', value: d.noteDraft ?? d.note, placeholder: 'e.g. Thanks for lunch 🙌' })}<div class="sheet-actions">${btn('Save note', 'save-note')}</div></div>`, el => {
@@ -426,25 +501,30 @@ function noteSheet(ctx) {
 }
  function authenticatePayment(ctx) {return runActionFlow(function*(){
   const d = draft(ctx);
+  if(hasUnresolvedPayment(d)){ctx.go(payRoute('review'));return;}
+  const origin=ctx.route,version=ctx.shared?.authVersion;
   if(ctx.connected){
     if(!['lumo','merchant'].includes(d.rail)){ctx.toast('This provider is not connected. Use a registered Lumo account or a connected merchant.');return;}
     if(d.rail==='lumo'&&d.requestId){const request=ctx.state.moneyRequests?.find(item=>item.id===d.requestId&&item.direction==='incoming');if(!request){ctx.toast('This request is no longer available.');return;}d.recipient={id:request.senderUserId,name:request.name,emoji:request.name.charAt(0)};}
-    else if(d.rail==='lumo'){const found=(yield ctx.shared.resolve(d.recipient?.handle||d.recipient?.number||d.recipient?.name));if(!found.ok){ctx.toast(found.message);ctx.go(payRoute('recipient'));return;}d.recipient={...found.recipient,number:'@'+found.recipient.handle,emoji:found.recipient.name.charAt(0)};}
+    else if(d.rail==='lumo'){const found=(yield ctx.shared.resolve(d.recipient?.handle||d.recipient?.number||d.recipient?.name));if(ctx.route!==origin||ctx.draft.payment!==d||ctx.shared?.authVersion!==version)return;if(!found.ok){ctx.toast(found.message);ctx.go(payRoute('recipient'));return;}d.recipient={...found.recipient,number:'@'+found.recipient.handle,emoji:found.recipient.name.charAt(0)};}
   }
   if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
   ctx.auth({ title: d.serviceId ? `Pay ${cash(d.amount)} for ${recipientLabel(d)}` : `Send ${cash(d.amount)} to ${recipientLabel(d).split(' ')[0]}`, onCancel: () => { ctx.refresh(); }, onSuccess: () => {return runActionFlow(function*(){
     if (d.completed || ctx.draft.payment !== d) return;
     if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
-    const result = (yield (ctx.actAsync||ctx.act).call(ctx,'payment', { ...d, fee:paymentFee(d.rail), merchant: recipientLabel(d), status: d.outcome || 'success' }));
-    if (!result.ok) { ctx.toast(result.message || 'We couldn’t complete that payment.'); ctx.go(paymentReviewRoute(d)); return; }
-    const tx = result.transaction || getTransaction(ctx, result.id) || ctx.state.transactions[0];
-    ctx.draft.lastPayment = tx;
-    d.completed = true; d.lastTransactionId = tx?.id || result.id; remember(ctx);
-    finish(ctx, payRoute('status', { id: tx?.id || result.id, backTo: payRoute('home') }));
+    (yield submitReviewedPayment(ctx,d));
   });} });
 });}
 
 export function bindPayments(ctx, route) {
+  if(hasUnresolvedPayment(ctx.draft.payment)&&['recipient','recipient-confirm','conversation','amount','review','pause','status'].includes(route.page)){
+    on(ctx,'pay-check-original',()=>{const d=ctx.draft.payment;if(paymentSubmissions.has(d))return;if(ctx.connected&&d.submissionOwnerId!==ctx.shared?.user?.id){ctx.toast('Sign in to the original account to check this request.');return;}ctx.auth({title:'Check your original payment',onCancel:()=>ctx.refresh(),onSuccess:()=>submitReviewedPayment(ctx,d)});});
+    on(ctx,'pay-unknown-leave',()=>{remember(ctx);ctx.go(payRoute('home'));});return;
+  }
+  if(ctx.connected&&route.page==='service'){
+    on(ctx,'provider-scan',()=>ctx.go(payRoute('scan',{backTo:payRoute('home',{hubTab:'campus'})})));
+    on(ctx,'provider-back',()=>ctx.go(payRoute('home',{hubTab:getServiceHubTab(getPaymentService(route.id))})));return;
+  }
   if (['requests','request-detail','splits','split-detail','funding-detail'].includes(route.page)) return bindPaymentParity(paymentContext(ctx), route);
   if (!route.page || route.page === 'home') return bindPaymentsHub(paymentContext(ctx), route);
   if (route.page === 'scan') return bindQrScreen(paymentContext(ctx), route);
@@ -455,7 +535,7 @@ export function bindPayments(ctx, route) {
   on(ctx, 'pay-campus-home', () => ctx.go(payRoute('home', {hubTab:'campus'})));
   on(ctx, 'pay-resume', () => resumePayment(ctx));
   on(ctx, 'pay-cancel-edit', () => { const d=draft(ctx), backup=ctx.draft.paymentEditBackup; if(backup)restorePaymentEdit(d,backup); delete ctx.draft.paymentEditBackup; ctx.setCapture?.(null); ctx.go(payRoute('review',{backTo:payRoute('amount',{backTo:amountParent(d)})}),{replace:true}); });
-  on(ctx, 'pay-cancel', () => { capturePayment(ctx, route); ctx.go(paymentHubOrigin(ctx.draft.payment), { replace: true }); ctx.toast('Payment saved for later. No money moved.'); });
+  on(ctx, 'pay-cancel', () => { capturePayment(ctx, route); const unresolved=hasUnresolvedPayment(ctx.draft.payment);ctx.go(paymentHubOrigin(ctx.draft.payment), { replace: true }); ctx.toast(unresolved?'Your original payment is saved. Its result still needs confirmation.':'Payment saved for later. No money moved.'); });
   on(ctx, 'pay-collect', () => ctx.go(payRoute('collect')));
   on(ctx, 'pay-scan', () => ctx.go(payRoute('scan')));
   on(ctx, 'pay-fund', () => openFunding(ctx));
@@ -514,10 +594,10 @@ export function bindPayments(ctx, route) {
       ctx.go(payRoute('review', { backTo: payRoute('amount', { backTo: amountParent(d) }) }), { replace: !!route.edit });
     });
   }
-  if (route.page === 'review' || route.page === 'pause') on(ctx, 'pay-edit-amount', () => { if(draft(ctx).serviceId)return editServicePayment(ctx);beginPaymentEdit(ctx); ctx.go(payRoute('amount', { edit: true, backTo: payRoute('review', { backTo: payRoute('amount', { backTo: amountParent(draft(ctx)) }) }) }), { replace: true }); });
+  if (route.page === 'review' || route.page === 'pause') on(ctx, 'pay-edit-amount', () => { if(draft(ctx).rail==='merchant'&&draft(ctx).requestId){ctx.toast('The merchant sets this exact request amount.');return;}if(draft(ctx).serviceId)return editServicePayment(ctx);beginPaymentEdit(ctx); ctx.go(payRoute('amount', { edit: true, backTo: payRoute('review', { backTo: payRoute('amount', { backTo: amountParent(draft(ctx)) }) }) }), { replace: true }); });
   if (route.page === 'review') ctx.$('#payment-outcome')?.addEventListener('change', e => { draft(ctx).outcome=e.target.value; remember(ctx); });
   if (route.page === 'review') on(ctx, 'pay-save-favourite', () => {return runActionFlow(function*(){ const d=draft(ctx), result=(yield (ctx.actAsync||ctx.act).call(ctx,'savePaymentFavorite',{rail:d.rail,recipient:d.recipient}));ctx.toast(result.ok?'Saved to Favourites.':result.message); });});
-  if (route.page === 'review') on(ctx, 'pay-edit-recipient', () => { beginPaymentEdit(ctx); ctx.go(payRoute('recipient', { edit: true, backTo: payRoute('review') }), { replace: true }); });
+  if (route.page === 'review') on(ctx, 'pay-edit-recipient', () => { if(draft(ctx).rail==='merchant'){ctx.toast('Start a different payment to choose another receiving shop.');return;}beginPaymentEdit(ctx); ctx.go(payRoute('recipient', { edit: true, backTo: payRoute('review') }), { replace: true }); });
   if (route.page === 'review') on(ctx, 'pay-review-next', () => {
     const d = draft(ctx);
     if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
@@ -580,6 +660,7 @@ export function bindPayments(ctx, route) {
 }
 
 function collectAmountSheet(ctx) {
+  if(ctx.connected)return createRequestSheet(ctx);
   const c = ctx.draft.collect;
   ctx.sheet(`<div class="content"><p class="eyebrow">Collect</p><h2 class="large-question">What’s coming<br>your way?</h2>${field({ label: 'Amount (GH₵)', name: 'collectAmount', type: 'number', min: '0.01', value: amountInput(c.amount), placeholder: 'e.g. 50' })}${field({ label: 'A note, if you like', name: 'collectNote', value: c.note, placeholder: 'e.g. Our lunch split' })}<p class="error" id="collect-error" role="alert" hidden></p><div class="sheet-actions">${btn('Update request', 'collect-save')}</div></div>`, el => {
     el.querySelector('[data-action="collect-save"]').addEventListener('click', () => {
@@ -591,7 +672,7 @@ function collectAmountSheet(ctx) {
   });
 }
 function collectLink(ctx) {
-  if(ctx.connected&&ctx.shared.account?.handle)return encodeSharedQr({kind:'person',handle:ctx.shared.account.handle});
+  if(ctx.connected)return ctx.shared?.account?.handle?encodeSharedQrLink({kind:'person',handle:ctx.shared.account.handle}):'';
   const c = ctx.draft.collect || {};
   const url = new URL(window.location.origin + window.location.pathname);
   url.searchParams.set('payTo', ctx.state.profile?.name || 'Ama');
@@ -650,12 +731,24 @@ export function openFunding(ctx, restored = null) {
 
 export function readPaymentLink(ctx) {
   const params = new URLSearchParams(window.location.search);
+  if(params.has('lumoCode')||params.has('pay')){
+    const raw=new URL(window.location.pathname+window.location.search,window.location.origin).href;
+    const parsed=parseQrPayload(raw,{origin:window.location.origin});
+    if(!parsed.ok){ctx.toast(parsed.message);return null;}
+    if(!ctx.connected||!ctx.shared?.signedIn){ctx.toast('Sign in to your shared Lumo account to review this payment.');return null;}
+    const version=ctx.shared.authVersion;
+    try{history.replaceState(history.state,'',window.location.pathname);}catch{}
+    if(hasUnresolvedPayment(ctx.draft.payment))return payRoute('review');
+    queueMicrotask(()=>{if(!ctx.connected||!ctx.shared?.signedIn||ctx.shared.authVersion!==version)return;if(parsed.payment.type==='merchant')void openSharedMerchant(ctx,parsed.payment);else openQrPayment(ctx,parsed.payment);});
+    return payRoute('home');
+  }
   const name = params.get('payTo');
   if (!name) return null;
+  if(ctx.connected){ctx.toast('Ask for a fresh shared Lumo code or open your addressed request in Payments.');return null;}
   const d = resetDraft(ctx, { name: name.slice(0, 60), number: `@${name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 16)}`, emoji: name.charAt(0).toUpperCase() });
   const requested = Number(params.get('amount'));
   d.amount = Number.isSafeInteger(requested) && requested > 0 && requested <= 100000000 ? requested : 0;
   d.note = (params.get('note') || '').slice(0, 140);
-  try { history.replaceState(null, '', window.location.pathname); } catch {}
+  try { history.replaceState(history.state, '', window.location.pathname); } catch {}
   return payRoute(d.amount ? 'review' : 'amount');
 }

@@ -18,7 +18,7 @@ globalThis.fetch=rawFetch;
 let sequence=0;
 async function browserReload(){
  const sharedURL=new URL('../dist/shared.js?checkpoint='+ ++sequence,import.meta.url).href,storeURL=new URL('../dist/store.js',import.meta.url).href;
- const source=readFileSync(new URL('../dist/account.js',import.meta.url),'utf8').replace("'./shared.js'",JSON.stringify(sharedURL)).replace("'./store.js'",JSON.stringify(storeURL));
+ const source=readFileSync(new URL('../dist/account.js',import.meta.url),'utf8').replace("'./shared.js'",JSON.stringify(sharedURL)).replace("'./store.js'",JSON.stringify(storeURL)).replace("'./connected-service.js'",JSON.stringify(new URL('../dist/connected-service.js',import.meta.url).href));
  const shared=await import(sharedURL),auth=await import('data:text/javascript;charset=utf-8,'+encodeURIComponent(source)+'#checkpoint='+sequence);return {shared,auth};
 }
 const form=values=>({values});

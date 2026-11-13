@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.lumo.nativeapp.test",
+      "sha256_cert_fingerprints": ["64:F2:30:1A:A4:B5:5D:B9:4C:27:48:D6:7B:F6:6B:56:BD:A7:56:9F:52:84:55:96:9C:57:5B:86:03:33:8A:6C"]
+    }
+  }
+]

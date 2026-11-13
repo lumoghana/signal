@@ -9,4 +9,4 @@ for(const entry of await readdir(source,{withFileTypes:true})){
 // Keep this static export independent of the original Site's Worker/deployment identity.
 await rm(path.join(destination,'.openai'),{recursive:true,force:true});
 await rm(path.join(destination,'server'),{recursive:true,force:true});
-console.log('Prepared approved merchant v7 at /merchant/.');
+console.log('Prepared approved merchant export at /merchant/.');

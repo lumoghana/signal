@@ -112,3 +112,9 @@
 .chat-page .chat-home{color:var(--text)}
 .chat-options-sheet .chat-demo-detail{font-size:12px!important}
 @media(max-width:350px){.chat-page .chat-suggestions button{gap:6px;padding:10px;font-size:14px}.chat-page .chat-suggestions button>span:first-child{font-size:18px;flex-basis:20px}}
+
+/* Explainable money cards, within the approved conversation layout. */
+.chat-basis{font-size:12px;color:var(--muted);margin:12px 0 6px;line-height:1.55}
+.chat-basis summary{cursor:pointer;display:flex;align-items:center;gap:7px;min-height:36px}
+.chat-basis p{font-size:12px!important;margin:8px 0!important;overflow-wrap:anywhere}
+.chat-response-card{overflow-wrap:anywhere}

@@ -486,6 +486,7 @@ export function reduceBusiness(snapshot, type, payload = {}, actor = {role: 'own
       entity = next.refunds.find(entry => entry.id === payload.id);
       if (!entity) throw new Error('Refund request not found.');
       if (entity.status !== 'requested') return unchanged(entity);
+      entity.decidedAt = timestamp(); entity.decidedBy = performer(next,actor,entity.shopId).performedBy;
       if (payload.approve) {
         if (entity.amount > ledger(next).available + entity.amount) throw new Error('There are not enough available funds for this refund.');
         entity.status = 'paid';
@@ -539,7 +540,7 @@ export function reduceBusiness(snapshot, type, payload = {}, actor = {role: 'own
         if (linkedTransaction && actor.role !== 'owner') shopAccess(next, actor, linkedTransaction.shopId);
         if (linkedTransaction) paymentReference = linkedTransaction.reference;
       }
-      entity = { id: id('ticket'), subject: requireText(payload.subject, 'Subject', 100), message: requireText(payload.message, 'Message', 1500), transactionId: linkedTransaction?.id || paymentReference, paymentReference, shopId: payload.shopId || null, status: 'open', createdAt: timestamp() };
+      entity = { id: id('ticket'), subject: requireText(payload.subject, 'Subject', 100), message: requireText(payload.message, 'Message', 1500), transactionId: linkedTransaction?.id || paymentReference, paymentReference, shopId: linkedTransaction?.shopId || payload.shopId || null, status: 'open', createdAt: timestamp() };
       next.tickets.unshift(entity);
       break;
     }

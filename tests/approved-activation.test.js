@@ -52,7 +52,7 @@ const refreshSource=source('async function refreshShared(', '\nvoid refreshShare
 function harness(state=stateAt()){
  const calls={saved:0,rendered:0,captured:0,initialised:0,posted:[],toasts:[]};
  const shared={connected:true,signedIn:true,user:{id:owner},authVersion:1,account:{userId:owner},partnerRequests:[]};
- const context=vm.createContext({state:copy(state),draft:{},shared,refreshingShared:false,overlayMeta:null,route:{section:'activity',page:'home'},ctx:{},router:null,
+ const context=vm.createContext({state:copy(state),draft:{},shared,refreshingShared:false,sharedHydrated:true,sharedConnectionError:'',persistence:{release(){}},renderSharedReconnect(){},overlayMeta:null,route:{section:'activity',page:'home'},ctx:{},router:null,
   JSON,structuredClone,resumeSharedActivationDraft,
   reconcileState(target,next){for(const key of Object.keys(target))delete target[key];Object.assign(target,copy(next));},
   captureCurrent(){calls.captured++;},persistSession(){calls.saved++;},render(){calls.rendered++;},readPaymentLink(){return null;},toast(message){calls.toasts.push(message);},

@@ -107,3 +107,11 @@ test('a cross-tab session with mismatched inner and outer epochs is ignored',asy
   assert.equal(f.stored().session.user.id,ids.b);assert.equal(f.stored().authEpoch,'epoch-b');
  }finally{f.cleanup()}
 });
+
+test('an epoch mismatch cannot turn a protected account change into anonymous success',async()=>{
+ const f=await setup();try{
+  f.auth('b');
+  const result=await f.module.merchantFetch('/api/auth/password',{method:'POST',body:'{}'}),body=await result.json();
+  assert.equal(result.status,409);assert.equal(body.ok,false);assert.equal(body.code,'AUTH_CHANGED');assert.equal(f.calls.length,0);assert.equal(f.stored().session.user.id,ids.a);
+ }finally{f.cleanup()}
+});

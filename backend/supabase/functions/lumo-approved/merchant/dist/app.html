@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en-GH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#191a22">
+<script src="./appearance.js"></script>
+<meta name="description" content="Lumo Merchant. Every shop in view. Every payment clear. An interactive campus merchant prototype.">
+<title>Lumo Merchant · Collect with a scan</title>
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preload" href="./assets/lumo-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./app.css">
+<link rel="stylesheet" href="./signup.css">
+<link rel="stylesheet" href="./access.css">
+<link rel="stylesheet" href="./people.css">
+<link rel="stylesheet" href="./reporting.css">
+<link rel="stylesheet" href="./operations.css">
+<link rel="stylesheet" href="./devices.css">
+<link rel="stylesheet" href="./directory.css">
+<link rel="stylesheet" href="./campus-pay.css">
+<link rel="stylesheet" href="./collections.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./mobile-app.css">
+<link rel="stylesheet" href="./consumer-brand.css">
+</head>
+<body>
+<div id="app"><div class="startup-loading"><strong class="canonical-wordmark">lumo</strong><span class="brand-qualifier">merchant</span><p>Opening your workspace…</p></div></div>
+<div id="modal-root"></div>
+<div id="payment-announcement" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
+<div id="toast-root" class="toast-stack" role="status" aria-live="polite"></div>
+<noscript>Lumo Merchant needs JavaScript to run this interactive prototype.</noscript>
+<script src="./vendor/qrcode.js"></script>
+<script src="./vendor/jsQR.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
+

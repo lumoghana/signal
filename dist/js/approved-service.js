@@ -2,6 +2,7 @@
 export const APPROVED_CONFIG = Object.freeze({
   url: 'https://iwutbrljiiodamtyoorg.supabase.co',
   publishableKey: 'sb_publishable_4dmChQek8k-opkVhO4N_KA_TCGVjWi6',
+  luxUrl: 'https://lumo-connected-pilot.vercel.app/api/lux',
 });
 const SESSION_KEY = 'lumo-approved-session-v1';
 const PENDING_KEY = 'lumo-approved-pending-v1';
@@ -137,10 +138,37 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
       // payment must keep its original reference across sign-out and account switches.
       const remote = token ? await post('/auth/v1/logout?scope=local', {}, token) : { ok: true };
       if (epoch !== authEpoch) return accountChanged();
-      if (!localCleared && !remote.ok) return failure('Lumo could not confirm sign-out or clear the saved session. Keep this browser private and try again.', 'SIGNOUT_UNCONFIRMED');
+      if (!localCleared) return failure('Lumo could not clear the saved session. Keep this browser private and try again before leaving it.', 'SIGNOUT_UNCONFIRMED', { remoteRevoked: remote.ok === true });
       return { ok: true, pendingLogout: !remote.ok, localCleared };
     },
     snapshot() { return request({ action: 'snapshot' }); },
+    async askLux(question, context, { signal } = {}) {
+      const owner=currentOwner(),epoch=authEpoch;
+      if(!owner || sample) return failure('Sign in to use connected Ask Lux.', 'UNAUTHENTICATED');
+      if(session.expires_at && session.expires_at*1000<Date.now()+45000 && !await refreshSession(owner,epoch)) return failure('Sign in again to ask Lux.', 'UNAUTHENTICATED');
+      if(!current(owner,epoch)) return accountChanged();
+      const send=async()=>{
+        try {
+          const timeout=AbortSignal.timeout(28000);
+          const combined=signal && typeof AbortSignal.any==='function'?AbortSignal.any([signal,timeout]):timeout;
+          if(signal?.aborted) return failure('Question cancelled.', 'CANCELLED');
+          const response=await transport(config.luxUrl||APPROVED_CONFIG.luxUrl,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({question,context}),signal:combined,redirect:'error'});
+          const data=await response.json();
+          return object(data) ? data : failure('Lux could not read that reply. Try again.', 'UNAVAILABLE');
+        } catch { return failure('I couldn’t connect to Lux. Try again; your question has not moved any money.', signal?.aborted?'CANCELLED':'LUX_UNAVAILABLE'); }
+      };
+      let data=await send();
+      if(!current(owner,epoch)) return accountChanged();
+      if(data.code==='UNAUTHENTICATED' && await refreshSession(owner,epoch)) { if(!current(owner,epoch)) return accountChanged();data=await send(); }
+      if(!current(owner,epoch)) return accountChanged();
+      if(data.ok && data.owner!==owner) return accountChanged();
+      if(signal?.aborted) return failure('Question cancelled.', 'CANCELLED');
+      // Install a fresh, authenticated projection through the normal account path.
+      // Chat never uploads a local wallet or touches the money-command journal.
+      if(data.ok && data.state && data.account?.userId===owner && data.sandbox===true && data.currency==='GHS') { account=data.account;onSnapshot(data.state,data); }
+      else if(data.ok){const latest=await request({action:'snapshot'},{owner,epoch});if(!current(owner,epoch))return accountChanged();if(!latest.ok)return failure('I couldn’t refresh your money. Try again before relying on a number.','RECORDS_UNAVAILABLE');}
+      return data;
+    },
     quote(values) { return request({ action: 'quote', ...values }); },
     readPartnerInbox() { return request({ action: 'partnerInbox' }); },
     respondPartner(id, decision) { return request({ action: 'partnerRespond', id, decision }); },

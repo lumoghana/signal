@@ -38,7 +38,7 @@ test('Appearance is reachable before signup and in Administration without changi
  };
  Object.defineProperty(globalThis,'crypto',{value:webcrypto,configurable:true});
  Object.defineProperty(globalThis,'navigator',{value:{onLine:true,userAgent:'Appearance app test',clipboard:{writeText:async()=>{}}},configurable:true});
- const window={document,localStorage,matchMedia(){return media},scrollTo(){},speechSynthesis:{cancel(){}},addEventListener(name,fn){if(!windowListeners.has(name))windowListeners.set(name,[]);windowListeners.get(name).push(fn)},dispatchEvent(event){for(const fn of windowListeners.get(event.type)||[])fn(event)}};
+ const window={document,localStorage,matchMedia(query){return query==='(max-width: 600px)'?{matches:false,addEventListener(){}}:media},scrollTo(){},speechSynthesis:{cancel(){}},addEventListener(name,fn){if(!windowListeners.has(name))windowListeners.set(name,[]);windowListeners.get(name).push(fn)},dispatchEvent(event){for(const fn of windowListeners.get(event.type)||[])fn(event)}};
  // Keep the browser's queued Back/Forward and popstate separate from the click.
  // With history absent, the app falls back to dismiss() and misses preauth bugs.
  const historyStates=[null],historyQueue=[];let historyIndex=0,backCalls=0;

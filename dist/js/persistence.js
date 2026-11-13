@@ -51,15 +51,16 @@ export function createPersistence({storage=globalThis.localStorage,key='lumo-up-
   function receiveStorage(event){if(event?.key!==key&&event?.key!==lockKey)return;if(!loaded)return;try{if(read()!==expectedRaw)blocked='stale';else if(getLock()?.owner!==owner&&getLock()?.expiresAt>now())blocked='another-tab';}catch{blocked='unavailable';}}
   return {load:readState,reload:readState,commit,check,reset,release,status,receiveStorage};
 }
-export function attachPersistenceEvents(controller,{onChange=()=>{},target=globalThis.window,heartbeatMs=5000}={}) {
+export function attachPersistenceEvents(controller,{onChange=()=>{},target=globalThis.window,heartbeatMs=5000,enabled=()=>true}={}) {
   if(!target?.addEventListener)return ()=>{};
   let lastReason=controller.status().reason;
   const notify=()=>{const status=controller.status();if(status.reason!==lastReason){lastReason=status.reason;onChange(status);}};
-  const storage=e=>{controller.receiveStorage(e);notify();};
+  const active=()=>typeof enabled==='function'?enabled():enabled!==false;
+  const storage=e=>{if(!active())return;controller.receiveStorage(e);notify();};
   const leave=()=>controller.release();
-  const focus=()=>{controller.check();notify();};
+  const focus=()=>{if(!active()){controller.release();return;}controller.check();notify();};
   target.addEventListener('storage',storage);target.addEventListener('pagehide',leave);target.addEventListener('focus',focus);
-  const timer=setInterval(()=>{if(globalThis.document?.visibilityState==='hidden')return;controller.check();notify();},heartbeatMs);
+  const timer=setInterval(()=>{if(!active()){controller.release();return;}if(globalThis.document?.visibilityState==='hidden')return;controller.check();notify();},heartbeatMs);
   return ()=>{clearInterval(timer);target.removeEventListener('storage',storage);target.removeEventListener('pagehide',leave);target.removeEventListener('focus',focus);controller.release();};
 }
 const messages={

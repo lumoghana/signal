@@ -25,6 +25,9 @@ export function clearOnboardingMedia(draft) {
   runtimes.delete(draft);
 }
 const routeFor = step => ({ section: 'onboarding', step });
+// Password proofs may be resumed; the shared registration secret never leaves memory.
+export const sharedSignupNeedsPassword = (ctx,d=ctx.draft?.onboarding) => ctx.connected===true && !d?.preview && ctx.hasSignupPassword?.()!==true;
+export const canKeepOnboardingPassword = (ctx,d=ctx.draft?.onboarding) => !!d?.login && !sharedSignupNeedsPassword(ctx,d);
 const action = (label, name) => `<button type="button" class="button" data-onb-action="${name}">${label}</button>`;
 const link = (label, name) => `<button type="button" class="onb-link" data-onb-action="${name}">${label}</button>`;
 const field = (label, key, value, { type = 'text', placeholder = '', maxlength = 60, inputmode = '', autocomplete = 'off', className = '' } = {}) => `<label class="onb-field"><span>${label}</span><input class="input ${className}" data-onb-field="${key}" name="onb-${key}" type="${type}" value="${esc(value)}" placeholder="${esc(placeholder)}" maxlength="${maxlength}" ${inputmode ? `inputmode="${inputmode}"` : ''} autocomplete="${autocomplete}"></label>`;
@@ -116,7 +119,7 @@ export function renderOnboarding(ctx, route) {
     body = renderIdentityVerification(d) + privacyLine(); primary = 'Yep, that’s me'; primaryAction = 'confirm-details'; secondary = link('Something’s not right', 'details-mismatch');
   } else if (step === 'login') {
     title = 'Your way back in.'; description = 'A username and password for signing in. Your transaction PIN comes next.';
-    body = `<div class="onb-login-fields"><label class="onb-field"><span>Username</span><input class="input" data-onb-login="username" name="demo-username" value="${esc(d.login?.username || '')}" autocapitalize="none" spellcheck="false" autocomplete="off" maxlength="30" placeholder="e.g. ama.campus"></label><label class="onb-field"><span>Demo password</span><input class="input" data-onb-login="password" name="demo-password" type="password" autocomplete="off" maxlength="128" placeholder="At least 10 characters"></label><label class="onb-field"><span>Confirm demo password</span><input class="input" data-onb-login="confirm" name="demo-password-confirm" type="password" autocomplete="off" maxlength="128"></label></div><p class="onb-fine">${d.login ? 'Your password is set. Leave both password fields blank to keep it.' : 'Use a made-up password for this local prototype. Never use a real password.'}</p>${link('Use sample sign-in details', 'fill-login')}`;
+    body = `<div class="onb-login-fields"><label class="onb-field"><span>Username</span><input class="input" data-onb-login="username" name="demo-username" value="${esc(d.login?.username || '')}" autocapitalize="none" spellcheck="false" autocomplete="off" maxlength="30" placeholder="e.g. ama.campus"></label><label class="onb-field"><span>Demo password</span><input class="input" data-onb-login="password" name="demo-password" type="password" autocomplete="off" maxlength="128" placeholder="At least 10 characters"></label><label class="onb-field"><span>Confirm demo password</span><input class="input" data-onb-login="confirm" name="demo-password-confirm" type="password" autocomplete="off" maxlength="128"></label></div><p class="onb-fine">${canKeepOnboardingPassword(ctx,d) ? 'Your password is set. Leave both password fields blank to keep it.' : d.login&&ctx.connected&&!d.preview ? 'Enter your test password again. It is kept only in memory, so it must be re-entered after a refresh before you create your PIN.' : 'Use a made-up password for this test account. Never use a real password.'}</p>${link('Use sample sign-in details', 'fill-login')}`;
   } else if (step === 'pin' || step === 'pin-confirm') {
     const confirming = step === 'pin-confirm';
     title = confirming ? 'One more time.' : 'Your money.<br>Your little lock.';
@@ -138,6 +141,7 @@ export function bindOnboarding(ctx, route) {
   const root = ctx.$('.onb-page');
   if (!root) return () => {};
   const d = ctx.draft.onboarding, step = route.step || 'name', r = runtimeFor(d), isSelfie = step === 'selfie', isReview = step === 'identity-review';
+  if (['pin','pin-confirm'].includes(step) && sharedSignupNeedsPassword(ctx,d)) { ctx.go(routeFor('login'),{replace:true}); return () => {}; }
   let alive = true, busy = false, attempt = 0, lastPhase = isSelfie ? selfiePhase(d, r) : '';
   const current = () => alive && root.isConnected && runtimes.get(d) === r && ctx.draft.onboarding === d && ctx.route.section === 'onboarding' && ctx.route.step === step;
   const visible = () => current() && document.visibilityState !== 'hidden';
@@ -279,7 +283,7 @@ export function bindOnboarding(ctx, route) {
     if (step === 'login') {
       const username = normalizeUsername(root.querySelector('[data-onb-login="username"]').value), password = root.querySelector('[data-onb-login="password"]').value, confirm = root.querySelector('[data-onb-login="confirm"]').value;
       if (!validUsername(username)) return error('Choose a username with 3–30 letters, numbers, dots, underscores or hyphens.');
-      if (!(d.login?.username === username && !password && !confirm)) {
+      if (!(d.login?.username === username && !password && !confirm && canKeepOnboardingPassword(ctx,d))) {
         const invalid = validateLoginPassword(password); if (invalid) return error(invalid);
         if (password !== confirm) return error('Those demo passwords don’t match yet.');
         setBusy(true);

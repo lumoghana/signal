@@ -57,8 +57,8 @@ function matchesPeriod(state, entity, value, filters = {}, kind = 'event') {
  try { return matchesDay(state,entity,kind==='payment' ? paymentTradingDay(state,entity) : kind==='refund' ? refundTradingDay(state,entity) : entity.tradingDay || businessDay(value,entity.tradingCutoff || cutoffFor(state,entity.shopId)),filters); } catch { return false; }
 }
 const displayDate = value => value && Number.isFinite(new Date(value).getTime()) ? new Date(value).toLocaleString('en-GH', {timeZone:'Africa/Accra',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-const statusLabel = status => ({paid:'Confirmed',processing:'Processing',failed:'Failed'})[status] || status || 'Unknown';
-const statusBadge = status => `<span class="badge ${status === 'paid' ? 'success' : status === 'processing' ? 'warning' : status === 'failed' ? 'danger' : 'neutral'}">${E(statusLabel(status))}</span>`;
+const statusLabel = status => ({paid:'Confirmed',processing:'Processing',failed:'Failed',requested:'Awaiting approval',rejected:'Declined'})[status] || status || 'Unknown';
+const statusBadge = status => `<span class="badge ${status === 'paid' ? 'success' : ['processing','requested'].includes(status) ? 'warning' : ['failed','rejected'].includes(status) ? 'danger' : 'neutral'}">${E(statusLabel(status))}</span>`;
 const button = (text, action, extra = '', style = 'secondary small') => `<button class="btn ${style}" type="button" data-action="reporting-${action}" ${extra}>${text}</button>`;
 
 export function paymentDate(payment) { return payment?.status === 'paid' ? payment.confirmedAt || payment.createdAt : payment?.createdAt; }
@@ -83,6 +83,20 @@ export function filterPayments(state, filters = {}) {
   && matchesPeriod(state,payment,paymentDate(payment),filters,'payment')
   && (!query || [payment.payer, payment.reference, shopName(state, payment.shopId), paymentPerformer(state,payment), payment.amount, (Number(payment.amount) / 100).toFixed(2), fallbackMoney(payment.amount)].some(value => String(value ?? '').toLocaleLowerCase().includes(query))))
   .sort((a,b) => Date.parse(paymentDate(b)) - Date.parse(paymentDate(a)) || String(a.id).localeCompare(String(b.id)));
+}
+export function refundActivityDate(refund){return refund.status==='paid'?refundDate(refund):refund.decidedAt||refund.rejectedAt||refund.createdAt;}
+export function filterRefundActivity(state,filters={}){
+ if(validateDateRange(filters.from,filters.to))return [];
+ const query=String(filters.search||'').trim().toLocaleLowerCase();
+ return array(state.refunds).filter(refund=>{
+  const payment=array(state.transactions).find(item=>item.id===refund.transactionId),actor=refund.staffId||refund.requestedStaffId,shift=refund.shiftId||refund.requestedShiftId;
+  return (!filters.shopId||filters.shopId==='all'||refund.shopId===filters.shopId)
+   &&(!filters.refundStatus||filters.refundStatus==='all'||refund.status===filters.refundStatus)
+   &&(!filters.staffId||filters.staffId==='all'||(filters.staffId==='unattributed'?!actor:actor===filters.staffId))
+   &&(!filters.shiftId||filters.shiftId==='all'||(filters.shiftId==='unassigned'?!shift:shift===filters.shiftId))
+   &&matchesPeriod(state,refund,refundActivityDate(refund),filters,refund.status==='paid'?'refund':'event')
+   &&(!query||[payment?.reference,payment?.payer,refund.payer,refund.reason,refund.requestedBy,refund.decidedBy,shopName(state,refund.shopId),(refund.amount/100).toFixed(2)].some(value=>String(value||'').toLocaleLowerCase().includes(query)));
+ }).sort((a,b)=>Date.parse(refundActivityDate(b))-Date.parse(refundActivityDate(a))||String(a.id).localeCompare(String(b.id)));
 }
 export function paginate(rows, page = 1, pageSize = 25) {
  const size = Math.max(1, Math.min(100, Math.floor(Number(pageSize) || 25)));
@@ -139,12 +153,16 @@ function staffOptions(state, scope) {
  for(const shift of array(state.shifts))add(shift,shiftPerformer(state,shift));
  return people;
 }
-function filterBar(state, filters, kind, {scope = null, owner = true} = {}) {
+function filterBar(state, filters, kind, {scope = null, owner = true, filtersOpen = true} = {}) {
  const field = (label, name, content) => `<label class="field"><span class="label">${label}</span>${content}</label>`;
  const select = (name, label, options) => field(label,name,`<select class="select" data-reporting="${kind}" name="${name}" id="reporting-${kind}-${name}" aria-label="${label}">${options.map(([value,text]) => `<option value="${E(value)}" ${String(filters[name] || 'all') === String(value) ? 'selected' : ''}>${E(text)}</option>`).join('')}</select>`);
  const shops = array(state.shops).filter(shop => !scope || scope === 'all' || shop.id === scope);
  const shifts = array(state.shifts).filter(shift => (!scope || scope === 'all' || shift.shopId === scope) && (!filters.staffId || filters.staffId === 'all' || shift.staffId === filters.staffId));
- return `<div class="reporting-filters">${owner ? select('shopId','Shop',[['all',scope ? 'Selected shop' : 'All shops'],...shops.map(shop => [shop.id,shop.name])]) : ''}${field('From trading day','from',`<input class="input" type="date" name="from" id="reporting-${kind}-from" value="${E(filters.from || '')}" data-reporting="${kind}" aria-label="From trading day">`)}${field('To trading day','to',`<input class="input" type="date" name="to" id="reporting-${kind}-to" value="${E(filters.to || '')}" data-reporting="${kind}" aria-label="To trading day">`)}${select('staffId','Cashier / operator',[['all','All cashiers'],['unattributed','Shop-level / no cashier'],...staffOptions(state,scope).map(person => [person.id,person.name+(person.active === false ? ' · inactive' : '')])])}${select('shiftId','Shift',[['all','All shifts'],['unassigned','Unassigned receipts'],...shifts.map(shift => [shift.id,`${shiftPerformer(state,shift)} · ${displayDate(shift.startedAt)}`])])}${kind === 'activity' ? select('status','Status',[['all','All statuses'],['paid','Confirmed'],['processing','Processing'],['failed','Failed']]) : ''}<div class="reporting-presets">${button('Today',`${kind}-today`,'',filters.period === 'today' ? 'dark small' : 'secondary small')}${button('Last 7 trading days',`${kind}-week`,'',filters.period === 'week' ? 'dark small' : 'secondary small')}${button('All time',`${kind}-all`,'',filters.period === 'all' ? 'dark small' : 'secondary small')}</div></div>`;
+ const controls=`${owner ? select('shopId','Shop',[['all',scope ? 'Selected shop' : 'All shops'],...shops.map(shop => [shop.id,shop.name])]) : ''}${field('From trading day','from',`<input class="input" type="date" name="from" id="reporting-${kind}-from" value="${E(filters.from || '')}" data-reporting="${kind}" aria-label="From trading day">`)}${field('To trading day','to',`<input class="input" type="date" name="to" id="reporting-${kind}-to" value="${E(filters.to || '')}" data-reporting="${kind}" aria-label="To trading day">`)}${select('staffId','Cashier / operator',[['all','All cashiers'],['unattributed','Shop-level / no cashier'],...staffOptions(state,scope).map(person => [person.id,person.name+(person.active === false ? ' · inactive' : '')])])}${select('shiftId','Shift',[['all','All shifts'],['unassigned','Unassigned receipts'],...shifts.map(shift => [shift.id,`${shiftPerformer(state,shift)} · ${displayDate(shift.startedAt)}`])])}${kind === 'activity' ? select('status','Status',[['all','All statuses'],['paid','Confirmed'],['processing','Processing'],['failed','Failed']]) : ''}`;
+ const presets=`<div class="reporting-presets">${button('Today',`${kind}-today`,`aria-pressed="${filters.period === 'today'}"`,filters.period === 'today' ? 'dark small' : 'secondary small')}${button('Last 7 trading days',`${kind}-week`,`aria-pressed="${filters.period === 'week'}"`,filters.period === 'week' ? 'dark small' : 'secondary small')}${button('All time',`${kind}-all`,`aria-pressed="${filters.period === 'all'}"`,filters.period === 'all' ? 'dark small' : 'secondary small')}</div>`;
+ if(kind!=='activity')return `<div class="reporting-filters">${controls}${presets}</div>`;
+ const active=[owner&&filters.shopId&&filters.shopId!=='all',Boolean(filters.from||filters.to),filters.staffId&&filters.staffId!=='all',filters.shiftId&&filters.shiftId!=='all',filters.status&&filters.status!=='all'].filter(Boolean).length;
+ return `<div class="reporting-activity-filters">${presets}<details class="reporting-more-filters" ${filtersOpen?'open':''}><summary data-action="reporting-toggle-filters"><span>More filters</span><span class="reporting-filter-count">${active} active</span></summary><div class="reporting-filters">${controls}</div><p class="hint">${filters.period === 'today' ? 'Today follows the current trading day at each shop’s cutoff. ' : filters.period === 'week' ? 'Last seven trading days follow each shop’s cutoff. ' : ''}Date fields select recorded shop trading days. Late shop allocations use the open allocation period and keep their original confirmation time. Exports include every matching row across all pages.</p></details></div>`;
 }
 function reportRows(state, payments, refunds, money) {
  const shops = array(state.shops);
@@ -166,11 +184,13 @@ export function renderReport({state, scope = null, formatMoney = fallbackMoney, 
 }
 function paymentTable(state, payments, money) {
  if (!payments.length) return empty('No payments match these filters. Try a wider date range or another status.');
- return `<div class="table-wrap"><table class="data-table reporting-payments"><thead><tr><th>Payment</th><th>Shop / cashier</th><th>Status</th><th>Confirmation / trading day</th><th class="amount">Amount</th></tr></thead><tbody>${payments.map(payment => `<tr role="button" tabindex="0" data-action="reporting-payment" data-id="${E(payment.id)}" aria-label="View payment ${E(payment.reference)}"><td><strong>${E(payment.payer)}</strong><small>${E(payment.reference)}</small></td><td>${E(shopName(state,payment.shopId))}<small>${E(paymentPerformer(state,payment))}</small></td><td>${statusBadge(payment.status)}</td><td>${displayDate(paymentDate(payment))}<small>Trading day ${E(paymentTradingDay(state,payment))}</small>${payment.priorPeriodAllocation?`<small>Late shop allocation · original shop day ${E(payment.allocationReceiptTradingDay||'not recorded')}</small>`:''}${payment.confirmedAt && eventDay(payment.confirmedAt) !== eventDay(payment.createdAt) ? '<small>Confirmed after an earlier request</small>' : ''}</td><td class="amount">${money(payment.amount)}</td></tr>`).join('')}</tbody></table></div>`;
+ const mobile=`<div class="reporting-mobile-payments">${payments.map(payment=>`<button class="reporting-mobile-receipt" type="button" data-action="reporting-payment" data-id="${E(payment.id)}" aria-label="View payment ${E(payment.reference)}"><span><strong>${E(payment.payer)}</strong><small>${E(shopName(state,payment.shopId))} · ${E(payment.reference)}</small><span>${statusBadge(payment.status)}<small>${displayDate(paymentDate(payment))}</small></span></span><strong class="reporting-mobile-amount">${money(payment.amount)}</strong></button>`).join('')}</div>`;
+ return `${mobile}<div class="table-wrap reporting-desktop-payments"><table class="data-table reporting-payments"><thead><tr><th>Payment</th><th>Shop / cashier</th><th>Status</th><th>Confirmation / trading day</th><th class="amount">Amount</th></tr></thead><tbody>${payments.map(payment => `<tr role="button" tabindex="0" data-action="reporting-payment" data-id="${E(payment.id)}" aria-label="View payment ${E(payment.reference)}"><td><strong>${E(payment.payer)}</strong><small>${E(payment.reference)}</small></td><td>${E(shopName(state,payment.shopId))}<small>${E(paymentPerformer(state,payment))}</small></td><td>${statusBadge(payment.status)}</td><td>${displayDate(paymentDate(payment))}<small>Trading day ${E(paymentTradingDay(state,payment))}</small>${payment.priorPeriodAllocation?`<small>Late shop allocation · original shop day ${E(payment.allocationReceiptTradingDay||'not recorded')}</small>`:''}${payment.confirmedAt && eventDay(payment.confirmedAt) !== eventDay(payment.createdAt) ? '<small>Confirmed after an earlier request</small>' : ''}</td><td class="amount">${money(payment.amount)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 export function createReporting(config = {}) {
- const defaults = () => ({from:'',to:'',period:'today',shopId:'all',staffId:'all',shiftId:'all',status:'all',search:'',page:1,pageSize:25});
- let activity=defaults(),report=defaults(),context='';
+ const defaults = () => ({from:'',to:'',period:'today',shopId:'all',staffId:'all',shiftId:'all',status:'all',refundStatus:'all',search:'',page:1,refundPage:1,pageSize:25});
+ let activity=defaults(),report=defaults(),context='',activityFiltersOpen=false;
+ const phoneViewport=typeof window!=='undefined'&&typeof window.matchMedia==='function'?window.matchMedia('(max-width: 600px)'):null;
  const state = () => config.getState?.() || {};
  const scope = () => config.getScope?.() || null;
  const money = config.formatMoney || fallbackMoney;
@@ -184,31 +204,36 @@ export function createReporting(config = {}) {
   const shifts=array(snapshot.shifts).filter(shift=>(!selectedScope||selectedScope==='all'||shift.shopId===selectedScope)&&(filters.staffId==='all'||shift.staffId===filters.staffId));
   if(!['all','unassigned'].includes(filters.shiftId)&&!shifts.some(shift=>shift.id===filters.shiftId))filters.shiftId='all';
  }
- function ensureContext(){const next=contextKey();if(context&&context!==next){activity=defaults();report=defaults()}context=next;normalize(activity);normalize(report)}
+ function ensureContext(){const next=contextKey();if(context&&context!==next){activity=defaults();report=defaults();activityFiltersOpen=false}context=next;normalize(activity);normalize(report)}
  const resolved = filters => ({...filters,shopId:scope() || (filters.shopId === 'all' ? null : filters.shopId)});
  const redraw = () => config.onRender?.();
+ phoneViewport?.addEventListener?.('change',redraw);
  function renderActivity() {
   ensureContext();
-  const snapshot=state(),filters=resolved(activity),rows=filterPayments(snapshot,filters),page=paginate(rows,activity.page,activity.pageSize),error=validateDateRange(activity.from,activity.to);
-  activity.page=page.page;
-  return `<div class="reporting-workspace">${heading('Every payment, clearly.','Find a receipt, follow processing payments and export the exact selection.',button('Export filtered payments','export-activity','','primary'))}<section class="panel reporting-filter-panel"><label class="field reporting-search"><span class="label">Find a payment</span><input class="input" type="search" name="search" id="reporting-activity-search" data-reporting="activity" value="${E(activity.search)}" placeholder="Name, amount, reference or shop" aria-label="Search payments"></label>${filterBar(snapshot,activity,'activity',{scope:scope(),owner:owner()})}${error ? `<p class="reporting-error" role="alert">${E(error)}</p>` : ''}<p class="hint">${activity.period === 'today' ? 'Today follows the current trading day at each shop’s cutoff. ' : activity.period === 'week' ? 'Last seven trading days follow each shop’s cutoff. ' : ''}Date fields select recorded shop trading days. Late shop allocations use the open allocation period and keep their original confirmation time. Exports include every matching row across all pages.</p></section><section class="panel section-gap">${paymentTable(snapshot,page.items,money)}<div class="reporting-pagination"><span>${page.from}–${page.to} of ${page.total} matching payments</span><div><label class="reporting-page-size">Per page <select class="select" name="pageSize" id="reporting-activity-pageSize" data-reporting="activity" aria-label="Payments per page">${[25,50,100].map(size => `<option value="${size}" ${activity.pageSize === size ? 'selected' : ''}>${size}</option>`).join('')}</select></label>${button('Previous','previous',page.page <= 1 ? 'disabled' : '')}<span>Page ${page.page} of ${page.pageCount}</span>${button('Next','next',page.page >= page.pageCount ? 'disabled' : '')}</div></div></section></div>`;
+  const snapshot=state(),filters=resolved(activity),rows=filterPayments(snapshot,filters),page=paginate(rows,activity.page,activity.pageSize),refunds=filterRefundActivity(snapshot,filters),returns=paginate(refunds,activity.refundPage,activity.pageSize),error=validateDateRange(activity.from,activity.to);
+  activity.page=page.page;activity.refundPage=returns.page;
+  return `<div class="reporting-workspace reporting-activity">${heading('Every payment, clearly.','Find a receipt, follow processing payments and export the exact selection.',button('Export filtered payments','export-activity','','primary'))}<section class="panel reporting-filter-panel"><label class="field reporting-search"><span class="label">Find a payment</span><input class="input" type="search" name="search" id="reporting-activity-search" data-reporting="activity" value="${E(activity.search)}" placeholder="Name, amount, reference or shop" aria-label="Search payments"></label>${filterBar(snapshot,activity,'activity',{scope:scope(),owner:owner(),filtersOpen:!phoneViewport?.matches||activityFiltersOpen})}${error ? `<p class="reporting-error" role="alert">${E(error)}</p>` : ''}</section><section class="panel section-gap">${paymentTable(snapshot,page.items,money)}<div class="reporting-pagination"><span>${page.from}–${page.to} of ${page.total} matching payments</span><div><label class="reporting-page-size">Per page <select class="select" name="pageSize" id="reporting-activity-pageSize" data-reporting="activity" aria-label="Payments per page">${[25,50,100].map(size => `<option value="${size}" ${activity.pageSize === size ? 'selected' : ''}>${size}</option>`).join('')}</select></label>${button('Previous','previous',page.page <= 1 ? 'disabled' : '')}<span>Page ${page.page} of ${page.pageCount}</span>${button('Next','next',page.page >= page.pageCount ? 'disabled' : '')}</div></div></section><section class="panel section-gap reporting-refunds"><div class="panel-heading"><h2 class="panel-title">Refunds & decisions</h2>${button('Export refunds','export-refunds')}</div><label class="field refund-status-filter"><span class="label">Refund status</span><select class="select" name="refundStatus" data-reporting="activity" aria-label="Refund status">${[['all','All refunds'],['requested','Awaiting approval'],['paid','Completed'],['rejected','Declined']].map(([value,label])=>`<option value="${value}" ${activity.refundStatus===value?'selected':''}>${label}</option>`).join('')}</select></label>${returns.items.length?returns.items.map(refund=>{const payment=array(snapshot.transactions).find(item=>item.id===refund.transactionId);return `<button type="button" class="reporting-refund-row" data-action="reporting-refund" data-id="${E(refund.transactionId)}"><span><strong>${E(payment?.payer||refund.payer||'Original payer')}</strong><small>${E(refund.reason||'Customer refund')} · ${E(shopName(snapshot,refund.shopId))}</small><small>${E(payment?.reference||refund.transactionId)}</small><span>${statusBadge(refund.status)}<small>${displayDate(refundActivityDate(refund))}</small></span>${refund.status==='rejected'&&!refund.decidedAt?'<small>Request recorded above · decision time unavailable</small>':''}${refund.decidedBy?`<small>Decision by ${E(refund.decidedBy)}</small>`:''}</span><strong class="reporting-mobile-amount">${money(refund.amount)}</strong></button>`}).join(''):empty('No refunds match these filters.')}<div class="reporting-pagination"><span>${returns.from}–${returns.to} of ${returns.total} refunds</span><div>${button('Previous refunds','refund-previous',returns.page<=1?'disabled':'')}<span>Page ${returns.page} of ${returns.pageCount}</span>${button('Next refunds','refund-next',returns.page>=returns.pageCount?'disabled':'')}</div></div></section></div>`;
  }
  function renderCurrentReport() { ensureContext();return renderReport({state:state(),scope:scope(),formatMoney:money,filters:report,owner:owner()}); }
  function handleChange(element) {
   ensureContext();
   const kind=element?.dataset?.reporting;if(!['activity','report'].includes(kind))return false;
   const target=kind === 'activity' ? activity : report;
-  if(!['from','to','shopId','staffId','shiftId','status','search','pageSize'].includes(element.name))return false;
+  if(!['from','to','shopId','staffId','shiftId','status','refundStatus','search','pageSize'].includes(element.name))return false;
   target[element.name]=element.name === 'pageSize' ? Number(element.value) : String(element.value);
-  target.page=1;if(['from','to'].includes(element.name))target.period='custom';if(element.name === 'staffId')target.shiftId='all';
+  target.page=1;target.refundPage=1;if(['from','to'].includes(element.name))target.period='custom';if(element.name === 'staffId')target.shiftId='all';
   redraw();return true;
  }
  function setPeriod(target, period) {
-  target.period=period;target.from='';target.to='';target.page=1;redraw();
+  target.period=period;target.from='';target.to='';target.page=1;target.refundPage=1;redraw();
  }
  function handleClick(action, element = {}) {
   ensureContext();
   const name=String(action).replace(/^reporting-/,'');
+  if(name==='toggle-filters'){activityFiltersOpen=!element.closest?.('details')?.open;return true;}
+  if(name === 'refund-previous'||name==='refund-next'){activity.refundPage+=name==='refund-next'?1:-1;redraw();return true;}
+  if(name === 'refund'){config.onOpenTransaction?.(element.dataset?.id);return true;}
+  if(name === 'export-refunds'){if(!validateDateRange(activity.from,activity.to)){const snapshot=state();config.onExport?.([['Payment reference','Refund reference','Shop','Payer','Amount GHS','Status','Reason','Requested at UTC','Decision at UTC','Returned at UTC','Decision by'],...filterRefundActivity(snapshot,resolved(activity)).map(refund=>[array(snapshot.transactions).find(payment=>payment.id===refund.transactionId)?.reference||refund.transactionId,refund.id,shopName(snapshot,refund.shopId),refund.payer||'',(refund.amount/100).toFixed(2),statusLabel(refund.status),refund.reason||'',refund.createdAt||'',refund.decidedAt||'',refund.status==='paid'?refundDate(refund)||'':'',refund.decidedBy||''])],'lumo-filtered-refunds.csv')}return true;}
   if(name === 'payment'){config.onOpenTransaction?.(element.dataset?.id);return true;}
   if(name === 'closing'){config.onOpenClosing?.(element.dataset?.id);return true;}
   if(name === 'previous' || name === 'next'){activity.page+=name === 'next' ? 1 : -1;redraw();return true;}
@@ -222,5 +247,5 @@ export function createReporting(config = {}) {
   }
   return false;
  }
- return {renderActivity,renderReport:renderCurrentReport,handleClick,handleChange,getFilters:kind=>{ensureContext();return {... (kind === 'report' ? report : activity)}},getFilteredPayments:()=>{ensureContext();return filterPayments(state(),resolved(activity))},reset(){activity=defaults();report=defaults();context=contextKey();}};
+ return {renderActivity,renderReport:renderCurrentReport,handleClick,handleChange,getFilters:kind=>{ensureContext();return {... (kind === 'report' ? report : activity)}},getFilteredPayments:()=>{ensureContext();return filterPayments(state(),resolved(activity))},reset(){activity=defaults();report=defaults();activityFiltersOpen=false;context=contextKey();}};
 }

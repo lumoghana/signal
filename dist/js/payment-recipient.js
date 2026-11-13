@@ -19,6 +19,7 @@ const detailsRoute = (payment, editing = false) => ({ section: 'pay', page: 'rec
 
 export function renderAccountRecipient(ctx, route = {}) {
   const payment = ctx.draft.payment || {}, rail = externalRail(payment.rail), editing = !!route.edit;
+  if(ctx.connected===true)return `<section class="page account-recipient" aria-label="${titleFor(rail)} availability">${head(rail,editing)}<div class="recipient-main"><h1>This provider is not connected.</h1><p class="recipient-intro">No bank or mobile money account lookup is available in this shared test. You can pay a registered Lumo person or scan a connected merchant.</p></div><div class="bottom-action">${'<button type="button" class="button" data-action="pay-cancel">Back to Payments</button>'}</div></section>`;
   if (route.page === 'recipient-confirm' && recipientLookupMatches(payment)) {
     const person = payment.recipientLookup.recipient;
     return `<section class="page account-recipient account-recipient--confirm" aria-label="Confirm recipient">
@@ -47,6 +48,7 @@ export function renderAccountRecipient(ctx, route = {}) {
 export function bindAccountRecipient(ctx, route = {}, { createLookup = createRecipientLookup } = {}) {
   const root = ctx.$('.account-recipient');
   if (!root) return () => {};
+  if(ctx.connected===true)return ()=>{};
   const payment = ctx.draft.payment, rail = externalRail(payment.rail), controller = createLookup(ctx.connected?{lookup:()=>({ok:false,message:'This provider is not connected. Choose Lumo to pay a registered shared account.'}),delay:0}:undefined);
   let alive = true, busy = false;
   const listeners = [], valid = () => alive && root.isConnected !== false && ctx.draft.payment === payment && payment.rail === rail;

@@ -7,7 +7,7 @@ const validDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.is
 const ok=(message,extra={})=>({ok:true,message,...extra}), fail=message=>({ok:false,message});
 export function ensureSavingsParity(s){
   s.savingsHistory ||= [];s.budgetHistory ||= [];s.externalBalanceHistory ||= [];s.categoryRules ||= [];
-  s.budget.periodId ||= uid('period');s.budget.startDate ||= date();s.budget.endDate ||= s.income?.nextDate||date();
+  s.budget.periodId ||= uid('period');s.budget.startDate ||= date();s.budget.endDate ||= s.income?.amount > 0 ? s.income.nextDate || '' : '';
   // Older saves omitted the source period. Bind before a rollover can reuse IDs.
   // For an already rolled-over save, the first archived snapshot after the receipt
   // is the original containing period. Ambiguous old records never touch today's plan.
@@ -37,6 +37,16 @@ export function normalizeSavingsHack(value){
   return hack;
 }
 function following(d,frequency){const n=new Date(`${d}T12:00:00Z`);if(frequency==='monthly'){const original=n.getUTCDate();n.setUTCDate(1);n.setUTCMonth(n.getUTCMonth()+1);const end=new Date(Date.UTC(n.getUTCFullYear(),n.getUTCMonth()+1,0)).getUTCDate();n.setUTCDate(Math.min(original,end));}else n.setUTCDate(n.getUTCDate()+(frequency==='weekly'?7:1));return n.toISOString().slice(0,10);}
+
+/** Canonical automatic work identity: archived rules have no due occurrence. */
+export function savingsAutomaticWork(s, today = date()) {
+  const due = (s.boxes || []).filter(box => !box.archived && box.hack?.type === 'scheduled' && validDate(box.hack.nextRun) && box.hack.nextRun <= today)
+    .map(box => [box.id, box.hack.nextRun, { ...box.hack }]).sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+  const seen = new Set(s._sharedIncomeSeen || []);
+  const income = (s.transactions || []).filter(tx => tx.type === 'income' && tx.direction === 'in' && tx.status === 'success' && tx.ledgerJournalId && !seen.has(tx.ledgerJournalId))
+    .map(tx => tx.ledgerJournalId).sort();
+  return { due, income };
+}
 export function runSavingsRules(s,event,{transaction,getSummary}){
   ensureSavingsParity(s);const results=[],now=date();
   for(const box of s.boxes){

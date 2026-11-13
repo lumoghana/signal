@@ -1,6 +1,11 @@
 import * as Shared from './shared.js';
+import {MERCHANT_CAPABILITIES} from './connected-service.js';
 import {getState,getWorkspaceMode} from './store.js';
 export const isShared=true;
+export const getCapabilities=()=>({...MERCHANT_CAPABILITIES});
+export const supportsCapability=name=>MERCHANT_CAPABILITIES[name]===true;
+function requireCapability(name){if(!supportsCapability(name))throw Object.assign(new Error('This account service is not available in the connected test yet. Your existing sign-in and account details have not changed.'),{status:503,code:'UNAVAILABLE_SERVICE',definitiveNoMutation:true})}
+
 const LEGACY_BACKUP_KEY='lumo-merchant-legacy-import-v1';
 const INVITATION_PENDING_KEY='lumo-merchant-invitation-pending-v1';
 const invitationUsernamePattern=/^[a-z0-9][a-z0-9._]{2,23}$/;
@@ -118,13 +123,13 @@ export async function acceptInvitation(payload){
 export async function resendInvitation(id){const r=await post('/api/invitations/'+encodeURIComponent(id)+'/resend',{});return r.invitation||r.entity||r}
 export async function revokeInvitation(id){return post('/api/invitations/'+encodeURIComponent(id)+'/revoke',{})}
 export async function updateUser(id,updates){const r=await post('/api/users/'+encodeURIComponent(id),updates);return r.user||r.entity||r}
-export async function requestUserReset(id){return post('/api/users/'+encodeURIComponent(id)+'/reset',{})}
+export async function requestUserReset(id){requireCapability('staffReset');return post('/api/users/'+encodeURIComponent(id)+'/reset',{})}
 export async function revokeSession(id){const currentId=getSession()?.id;const result=await post('/api/sessions/'+encodeURIComponent(id)+'/revoke',{});if(id===currentId)Shared.lockLocal('session-ended');return result}
-export async function changePassword(payload){return authPost('/api/auth/password',payload,'password-change')}
-export async function beginRecovery(username){return post('/api/auth/recovery/start',{username})}
-export async function completeRecovery(payload){const result=await authPost('/api/auth/recovery/complete',payload,'password-recovery',false);Shared.lockLocal('password-recovered');return result}
-export async function recoverUsername(payload){return post('/api/auth/username',payload)}
+export async function changePassword(payload){requireCapability('passwordChange');return authPost('/api/auth/password',payload,'password-change')}
+export async function beginRecovery(username){requireCapability('passwordRecovery');return post('/api/auth/recovery/start',{username})}
+export async function completeRecovery(payload){requireCapability('passwordRecovery');const result=await authPost('/api/auth/recovery/complete',payload,'password-recovery',false);Shared.lockLocal('password-recovered');return result}
+export async function recoverUsername(payload){requireCapability('usernameRecovery');return post('/api/auth/username',payload)}
 export async function changePhone(payload){return post('/api/auth/phone',payload)}
 export async function verifyStepUp(payload){const result=await post('/api/auth/step-up',payload);return {...result,stepUpToken:result.stepUpToken||result.proof}}
 export async function regenerateRecoveryKey(payload){return post('/api/auth/recovery-key',payload)}
-export async function transferOwner(payload){const result=await authPost('/api/auth/transfer',payload,'ownership-transfer');Shared.lockLocal('ownership-transferred');return result}
+export async function transferOwner(payload){requireCapability('ownershipTransfer');const result=await authPost('/api/auth/transfer',payload,'ownership-transfer');Shared.lockLocal('ownership-transferred');return result}

@@ -1,4 +1,6 @@
+import {collectionReturnReview} from './domain/group-policy.js';
 import {runSavingsRules} from './domain/savings-parity-model.js';
+import {redactGroupReports,publicGroupReport} from './domain/group-chat-model.js';
 import {overlayPartners,collectPartnerChanges,publicPartnerInbox,scrubPartnerSecrets} from './partners.mjs';
 import {createEmptyState,migrateState,applyAction,validStoredState,getSummary} from './domain/model.js';
 import {getMoneyIQ} from './domain/money-iq-model.js';
@@ -39,17 +41,17 @@ const sensitiveKeys=new Set(['pin','currentPin','newPin','confirmPin','password'
 export function publicState(value){
  const state=clone(value);delete state.settings?.pin;delete state._appliedActions;delete state._sharedIncomeSeen;
  if(state.account){delete state.account.login?.credential;delete state.account.recovery;state.account.signedOut=false;}
- for(const group of state.groups||[]){group.localSimulation=false;group.participantId='me';
+ for(const group of state.groups||[]){redactGroupReports(group);group.localSimulation=false;group.participantId='me';
   const actor=group.members.find(m=>m.id==='me');
   if(actor?.status==='active'&&group.creatorId!=='me'&&!actor.historyConsentAt){
    const joined=Date.parse(actor.joinedAt||group.createdAt||'');const since=item=>Number.isFinite(joined)&&Date.parse(item.at||item.createdAt||'')>=joined;
    group.contributions=(group.contributions||[]).filter(since).map(c=>({...c,statusHistory:(c.statusHistory||[]).filter(since)}));
    group.payouts=(group.payouts||[]).filter(since).map(p=>({...p,history:(p.history||[]).filter(since)}));
-   group.refunds=(group.refunds||[]).filter(since);
+   group.refunds=(group.refunds||[]).filter(since);group.merchantRefunds=(group.merchantRefunds||[]).filter(since);
    if(group.chat){group.chat.messages=(group.chat.messages||[]).filter(since);const visible=new Set(group.chat.messages.map(m=>m.id));for(const message of group.chat.messages)if(message.reply&&!visible.has(message.reply.id))delete message.reply;group.chat.reports=(group.chat.reports||[]).filter(r=>since(r)&&visible.has(r.messageId));group.chat.readBy=Object.fromEntries(Object.entries(group.chat.readBy||{}).map(([id,ids])=>[id,ids.filter(x=>visible.has(x))]));}
   }
   if(actor?.status==='invited'){
-   group.invitationOnly=true;group.balance=0;group.contributions=[];group.payouts=[];group.refunds=[];
+   group.invitationOnly=true;group.balance=0;group.contributions=[];group.payouts=[];group.refunds=[];group.merchantRefunds=[];
    for(const member of group.members)member.amount=0;
    if(group.chat)group.chat={...group.chat,messages:[],reports:[],readBy:{},preferences:{}};
   }
@@ -62,7 +64,7 @@ export function buildState(snapshot){
  state.wallet=snapshot.account.balance;state.settings||={};delete state.settings.pin;
  state.account||={};state.account.signedOut=false;
  state.profile.name=snapshot.account.displayName;state.profile.phone=snapshot.phone||state.profile.phone||'';
- state.groups=(snapshot.groups||[]).map(row=>{const g=mapIdentity(clone(row.state),snapshot.account.userId,'me');g.balance=row.balance;g.participantId='me';return g;});
+ state.groups=(snapshot.groups||[]).map(row=>{const g=mapIdentity(clone(row.state),snapshot.account.userId,'me');g.balance=row.balance;g.merchantRefunds=clone(row.merchantRefunds||[]);g.participantId='me';return g;});
  for(const box of state.boxes||[]){const authoritative=(snapshot.boxes||[]).find(x=>x.id===box.id);box.balance=authoritative?.balance||0;}
  // Ledger events arriving from the other consumer or merchant enter the SAME approved activity list.
  // Existing outgoing transaction IDs are linked to journals at commit, preserving plan/category metadata.
@@ -98,6 +100,7 @@ export function envelope(snapshot,result={ok:true,message:'Your records are up t
 function publicResult(result){
  const clean=clone(result);if(clean.box)scrubPartnerSecrets({boxes:[clean.box]});if(clean.boxes)scrubPartnerSecrets({boxes:clean.boxes});if(clean.group)clean.group=publicState({groups:[clean.group]}).groups[0];if(clean.groups)clean.groups=publicState({groups:clean.groups}).groups;delete clean.settings?.pin;
  if(clean.transaction)delete clean.transaction.pin;
+ if(clean.report)clean.report=publicGroupReport(clean.report);
  return clean;
 }
 export function canonicalJson(value){
@@ -141,7 +144,15 @@ function activationCheckpoint(snapshot,state,p){
 export async function prepareMutation(snapshot,type,payload,attemptId,repo){
  validatePayload(type,payload);const p=clone(payload);delete p.idempotencyKey;
  const before=buildState(snapshot),state=clone(before),intents=[];let recipient=null,merchantQuote=null;
- const requests=[];let splitReceipt=null,splitMembers=[];
+ if(type==='closeGroup'){
+  const group=state.groups.find(g=>g.id===(p.groupId||p.id));
+  if(group&&(group.status!=='closed'||group.balance>0)){
+   const reviewed=collectionReturnReview(group);
+   if(p.reviewedBalance!==reviewed.reviewedBalance||p.reviewedReturnsFingerprint!==reviewed.reviewedReturnsFingerprint)throw fail('CLOSURE_REVIEW_CHANGED','The group returns changed. Open the current amounts and approve them again.');
+  }
+ }
+
+ const requests=[],privateReports=[];let splitReceipt=null,splitMembers=[];
  if(type==='createExpenseSplit'){p.members=await Promise.all((p.members||[]).map(async member=>{if(member.isMe)return {...member,name:state.profile.name};const found=await resolved(repo,member.handle||member.phone||member.name);if(found.userId===snapshot.account.userId)throw fail('INVALID_MEMBER','You are already included in this split.');splitMembers.push({sourceId:member.id,...found});return {...member,name:found.name};}));}
  if(type==='settleSplitShare'&&(p.method||'lumo')==='lumo'){splitReceipt=state.transactions.find(t=>t.id===p.receiptTransactionId&&t.type==='income'&&t.direction==='in'&&t.status==='success'&&t.ledgerJournalId);if(!splitReceipt)throw fail('CONFIRMED_RECEIPT_REQUIRED','Choose a confirmed payment already received in Lumo.');const split=state.expenseSplits.find(x=>x.id===(p.splitId||p.id)),member=split?.members.find(m=>m.id===p.memberId&&!m.isMe);const amount=p.amount??((member?.amount||0)-(member?.paid||0));const allocated=(splitReceipt.iouId&&!splitReceipt.iouAllocations?splitReceipt.amount:(splitReceipt.iouAllocations||[]).reduce((n,a)=>n+a.amount,0))+(splitReceipt.splitAllocations||[]).reduce((n,a)=>n+a.amount,0);if(!Number.isSafeInteger(amount)||amount<=0||amount>splitReceipt.amount-allocated)throw fail('RECEIPT_ALREADY_MATCHED','This receipt has less unmatched money than that share.');p.amount=amount;p.method='cash';}
  if(type==='createMoneyRequest'){const found=await resolved(repo,p.recipient?.handle||p.recipient?.id||p.handle||p.userId||p.name);if(found.userId===snapshot.account.userId)throw fail('SELF_REQUEST','Choose another connected Lumo account.');recipient=found;p.name=found.name;}
@@ -179,8 +190,17 @@ export async function prepareMutation(snapshot,type,payload,attemptId,repo){
  if(['requestPayout','editPayout'].includes(type)){
   const existing=state.groups.find(g=>g.id===(p.groupId||p.id))?.payouts.find(x=>x.id===p.payoutId);
   if((p.rail||existing?.rail||'lumo')!=='lumo')throw fail('PROVIDER_UNAVAILABLE','This payout provider is not connected. No money has moved.');
-  const found=await resolved(repo,p.destination||p.recipient?.id||p.recipient?.number||existing?.destination);
-  p.rail='lumo';p.recipient=found.name;p.destination=`@${found.handle}`;p.fee=0;
+  const destination=String(p.destination||p.recipient?.id||p.recipient?.number||existing?.destination||'');
+  let found=destination.startsWith('merchant:')?null:await repo.resolve(destination);
+  if(found?.ok&&found.recipient){p.recipient=found.recipient.name;p.destination=`@${found.recipient.handle}`;}
+  else {
+   if(found?.code&&found.code!=='RECIPIENT_NOT_FOUND')throw fail(found.code,'Lumo could not verify this recipient. Try again before requesting approval.');
+   const quote=await repo.quote(destination.startsWith('merchant:')?{shopId:destination.slice(9)}:{query:destination});
+   if(!quote?.ok||!quote.shop?.id||destination.startsWith('merchant:')&&quote.shop.id!==destination.slice(9))throw fail('RECIPIENT_NOT_FOUND','Choose a registered Lumo person or an accepting campus merchant.');
+   if(quote.request)throw fail('REQUEST_UNAVAILABLE','Use the shop’s reusable code for a group payout.');
+   p.recipient=[quote.merchant?.name,quote.shop.name].filter(Boolean).join(' · ');p.destination=`merchant:${quote.shop.id}`;
+  }
+  p.rail='lumo';p.fee=0;
  }
  if(['contributeGroup','contributeBox','withdrawBox','fund'].includes(type))p.status='success';
  if(type==='fund'){p.source='Pilot test funds';p.rail='internal';p.note='Pilot test money. No bank or mobile money charge.';}
@@ -202,13 +222,30 @@ export async function prepareMutation(snapshot,type,payload,attemptId,repo){
  else if(type==='reactPayment'&&p.reaction===''){const tx=state.transactions.find(t=>t.id===(p.transactionId||p.id));result=tx?(delete tx.reaction,{ok:true,message:'Reaction removed.',id:tx.id,transaction:tx}):{ok:false,message:'That payment could not be found.'};}
  else result=applyAction(state,type,{...p,idempotencyKey:attemptId});
  if(!result.ok&&!result.persistFailure)return {ok:false,result,state:before};
+ if(type==='accountSupportCreate'&&result.case){
+  for(const update of result.case.updates||[])if(update.kind==='system')update.text='Saved with your shared test account. No live support team has been contacted.';
+ }
+ if(type==='accountDeletionRequest'){result.message='Your deletion request is saved with your shared test account. No live support team has been contacted.';}
+ if(type==='accountCancelDeletion')result.message='Your saved deletion request is cancelled.';
+ if(type==='reportGroupMessage'&&result.report){
+  const report={...clone(result.report),id:`group-report:${p.groupId||p.id}:${result.report.messageId}:${snapshot.account.userId}`,groupId:p.groupId||p.id,reporterId:snapshot.account.userId,status:'saved'};
+  privateReports.push(report);result.report=publicGroupReport(report);result.message='Report saved privately with Lumo. No live moderation team has been contacted.';
+ }
+ for(const group of state.groups||[])redactGroupReports(group);
+
  if(type==='executePayout'){
   const group=state.groups.find(g=>g.id===(p.groupId||p.id)),payout=group?.payouts.find(x=>x.id===p.payoutId);
   if(!payout||payout.rail!=='lumo')throw fail('PROVIDER_UNAVAILABLE','This payout provider is not connected.');
-  recipient=await resolved(repo,payout.destination);if(payout.fee)throw fail('FEE_CHANGED','Review the current zero-fee internal payout.');
+  if(payout.fee)throw fail('FEE_CHANGED','Review the current zero-fee internal payout.');
+  let merchant=null;
+  if(payout.destination.startsWith('merchant:')){
+   merchant=await repo.quote({shopId:payout.destination.slice(9)});
+   if(!merchant?.ok||!merchant.shop?.id||merchant.shop.id!==payout.destination.slice(9)||merchant.request)throw fail('REQUEST_UNAVAILABLE','This shop is no longer accepting this group payout.');
+   if([merchant.merchant?.name,merchant.shop.name].filter(Boolean).join(' · ')!==payout.recipient)throw fail('PAYOUT_CHANGED','This shop’s identity changed. Edit the payout and collect fresh approvals.');
+  }else recipient=await resolved(repo,payout.destination);
   const settled=applyAction(state,'settleGroupPayout',{groupId:group.id,payoutId:payout.id,outcome:'success'});if(!settled.ok)throw fail('PAYOUT_CHANGED',settled.message);
-  Object.assign(result,settled);if(recipient.userId===snapshot.account.userId)state.wallet+=payout.amount;
-  intents.push({kind:'group_payout',amount:payout.amount,source:{kind:'group',id:group.id},destination:recipient.userId===snapshot.account.userId?{kind:'wallet'}:{kind:'user',id:recipient.userId},groupId:group.id,metadata:{proposalId:payout.id,groupName:group.name,payeeName:recipient.name,note:payout.note||''}});
+  Object.assign(result,settled);if(recipient?.userId===snapshot.account.userId)state.wallet+=payout.amount;
+  intents.push({kind:merchant?'merchant_payment':'group_payout',amount:payout.amount,source:{kind:'group',id:group.id},destination:merchant?{kind:'merchant',id:merchant.shop.id}:recipient.userId===snapshot.account.userId?{kind:'wallet'}:{kind:'user',id:recipient.userId},groupId:group.id,...(merchant?{shopId:merchant.shop.id}:{}),metadata:{proposalId:payout.id,groupName:group.name,payeeName:payout.recipient,note:payout.note||'',...(merchant?{merchantName:merchant.merchant?.name||merchant.shop.name,shopName:merchant.shop.name,merchantAccessApproved:merchant.merchantAccessApproved===true}:{} )}});
  }
  if(['sendGroupMessage','retryGroupMessage'].includes(type)&&result.message?.status==='sending'){
   const delivered=applyAction(state,'resolveGroupMessage',{groupId:p.groupId||p.id,messageId:result.message.id,outcome:'sent'});if(!delivered.ok)throw fail('MESSAGE_FAILED',delivered.message);Object.assign(result,delivered);
@@ -240,5 +277,5 @@ export async function prepareMutation(snapshot,type,payload,attemptId,repo){
  const groups=state.groups.filter(g=>!before.groups.some(old=>old.id===g.id&&canonicalJson(old)===canonicalJson(g))).map(g=>({id:g.id,expectedRevision:snapshot.groups.find(row=>row.id===g.id)?.revision||0,state:mapIdentity(g,'me',snapshot.account.userId)}));
  const partners=await collectPartnerChanges(before,state,snapshot,snapshot.account.userId,repo);
  const durableState=clone(state);durableState.groups=[];delete durableState._appliedActions;
- return {ok:true,result:publicResult(result),state,durableState,groups,boxes,intents,requests,partners,profileChange:type==='updateProfile'?{name:state.profile.name,phone:state.profile.phone}:null,requiresAuth:requiresAuth.has(type)||intents.length>0&&!['runScheduledSavings','runAutomaticSavings'].includes(type),expectedWallet:before.wallet};
+ return {ok:true,result:publicResult(result),state,durableState,groups,boxes,intents,requests,privateReports,closeAccount:type==='accountClose'&&result.ok,partners,profileChange:type==='updateProfile'?{name:state.profile.name,phone:state.profile.phone}:null,requiresAuth:requiresAuth.has(type)||intents.length>0&&!['runScheduledSavings','runAutomaticSavings'].includes(type),expectedWallet:before.wallet};
 }

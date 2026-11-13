@@ -1,4 +1,5 @@
 const PREFIX = 'lumo:shared:v1:';
+export const SHARED_CONSUMER_ORIGIN = 'https://lumo-connected-pilot.vercel.app';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const HANDLE = /^[a-z0-9][a-z0-9._-]{2,29}$/;
 const INVALID = 'This is not a valid shared Lumo code. Ask for a fresh QR.';
@@ -58,6 +59,21 @@ function parseObject(source) {
 /** QR identities carry no names, amounts, credentials or authority to pay. */
 export function encodeSharedQr(value) {
   return PREFIX + base64url(JSON.stringify(intent(value)));
+}
+
+/** A tappable wrapper carries exactly the same identity, never payment authority. */
+export function encodeSharedQrLink(value) {
+  const url=new URL('/',SHARED_CONSUMER_ORIGIN);
+  url.searchParams.set('lumoCode',encodeSharedQr(value));
+  return url.href;
+}
+
+export function parseSharedQrLink(raw) {
+  try {
+    const url=new URL(raw);
+    if(url.origin!==SHARED_CONSUMER_ORIGIN||url.pathname!=='/'||url.username||url.password||url.hash||url.searchParams.getAll('lumoCode').length!==1||[...url.searchParams.keys()].some(key=>key!=='lumoCode'))throw invalid();
+    return parseSharedQr(url.searchParams.get('lumoCode'));
+  }catch{throw invalid();}
 }
 
 export function parseSharedQr(raw) {

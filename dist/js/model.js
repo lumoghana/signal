@@ -123,7 +123,7 @@ export function createEmptyState(profile = {}) {
   const state = {
     version: 1, onboardingDone: false,
     profile: { name: text(profile.name || 'Ama', 60), phone: text(profile.phone, 30), campus: text(profile.campus || 'University of Ghana', 80) },
-    wallet: 0, buffer: 10000, income: { amount: 0, nextDate: inDays(14) },
+    wallet: 0, buffer: 10000, income: { amount: 0, nextDate: '' },
     budget: { items: [], created: false }, boxes: [], transactions: [], ious: [], groups: [], externalBalances: [], paymentFavorites: [], virtualCard: null,
     settings: { hideBalance: true, notifications: true, pin: '1234' }, recovery: null,
     _appliedActions: {},
@@ -257,10 +257,25 @@ export function saveState(s) {
   } catch { return false; }
 }
 
-export function getSummary(s) {
+/** A guide needs recorded timing; an empty account never promises an income date. */
+export function getGuidanceHorizon(s, now = new Date()) {
+  const recordedDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && day(value) === value ? value : '';
+  const currentDay = now.toISOString().slice(0, 10);
+  const planDate = s.budget?.created === true && recordedDate(s.budget.endDate) || '';
+  const incomeDate = positive(s.income?.amount) && recordedDate(s.income.nextDate) || '';
+  const recoveryDate = s.recovery?.active && recordedDate(s.recovery.checkInDate || s.recovery.nextDate) || '';
+  const date = recoveryDate || planDate || incomeDate;
+  const source = recoveryDate ? 'recovery' : planDate ? 'plan' : incomeDate ? 'income' : '';
+  // A shorter temporary guide must not drop existing commitments. A longer one
+  // must include debts falling due before its check-in; overdue debts always count.
+  const commitmentDate = [currentDay, planDate || incomeDate, recoveryDate].filter(Boolean).sort().at(-1);
+  return { date, source, recorded: !!date, current: !!date && date >= currentDay, commitmentDate, planEndDate: planDate || incomeDate };
+}
+
+export function getSummary(s, now = new Date()) {
   const available = Math.max(0, integer(s.wallet));
-  const planEndDate = (s.budget?.created && day(s.budget.endDate)) || day(s.income?.nextDate) || inDays(14);
-  const horizon = planEndDate;
+  const guide = getGuidanceHorizon(s, now), planEndDate = guide.planEndDate;
+  const horizon = guide.commitmentDate;
   const plannedBudget = (s.budget?.items || []).reduce((sum, item) => sum + moneyRemaining(item), 0);
   const dueDebts = (s.ious || []).filter(i => i.type === 'owedByMe' && i.status === 'open' && (!day(i.due) || day(i.due) <= horizon));
   const coverage=new Map((s.budget.items||[]).map(i=>[i.id,moneyRemaining(i)]));
@@ -274,11 +289,11 @@ export function getSummary(s) {
   const cardBalance = (s.virtualCards || []).reduce((n,c) => n + Math.max(0, integer(c.balance)),0);
   const outsideTotal = (s.externalBalances || []).reduce((sum, item) => sum + Math.max(0, integer(item.balance)), 0);
   const expected = Math.max(0, integer(s.income?.amount)) + (s.ious || []).filter(i => i.type === 'owedToMe' && i.status === 'open').reduce((sum, i) => sum + iouRemaining(i), 0);
-  const guidanceDate = s.recovery?.active && day(s.recovery.checkInDate) || horizon;
+  const guidanceDate = guide.date;
   const guideHorizon = guidanceDate;
-  const dateDifference = Math.ceil((new Date(`${guideHorizon}T12:00:00Z`) - new Date(`${today()}T12:00:00Z`)) / DAY);
+  const dateDifference = guide.current ? Math.ceil((new Date(`${guideHorizon}T12:00:00Z`) - new Date(`${now.toISOString().slice(0, 10)}T12:00:00Z`)) / DAY) : -1;
   const daysLeft = dateDifference < 0 ? 0 : Math.max(1, dateDifference);
-  return { available, planned, spendable, savings, transferHolds, pendingPaymentHolds, pendingCardHolds, pendingContributionHolds, planEndDate, guidanceDate, cardBalance, cardTotal:cardBalance, total: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance, outsideTotal, allMoneyTotal: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance + outsideTotal, expected, daysLeft, dailyAllowance: daysLeft > 0 ? Math.floor(spendable / daysLeft) : 0 };
+  return { available, planned, spendable, savings, transferHolds, pendingPaymentHolds, pendingCardHolds, pendingContributionHolds, planEndDate, guidanceDate, guidanceSource: guide.source, hasDailyGuide: guide.current, commitmentDate: guide.commitmentDate, cardBalance, cardTotal:cardBalance, total: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance, outsideTotal, allMoneyTotal: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance + outsideTotal, expected, daysLeft, dailyAllowance: daysLeft > 0 ? Math.floor(spendable / daysLeft) : 0 };
 }
 
 function budgetMatch(s, category) {
@@ -287,23 +302,25 @@ function budgetMatch(s, category) {
   return (s.budget?.items||[]).find(i=>budgetCategoryKey(i.name)===key||budgetCategoryKey(i.id)===key)||null;
 }
 
-export function evaluatePayment(s, payload = {}) {
+export function evaluatePayment(s, payload = {}, now = new Date()) {
   const amount = integer(payload.amount, -1);
   const fee = nonnegative(payload.fee) ? payload.fee : 0;
   const total = Math.max(0, amount) + fee;
-  const summary = getSummary(s);
+  const summary = getSummary(s, now);
   const rule = (s.categoryRules || []).find(r => r.merchantKey === String(payload.merchant || payload.recipient?.name || payload.recipient||'').trim().toLowerCase());
   const explicitCategory=!!payload.categoryExplicit || (payload.category && normalized(payload.category)!=='other');
   const debt = payload.iouId ? (s.ious || []).find(i=>i.id===payload.iouId && i.type==='owedByMe' && i.status==='open') : null;
   const item = payload.iouId ? s.budget.items.find(i=>i.id===debt?.budgetItemId) : payload.budgetItemId ? s.budget.items.find(i=>i.id===payload.budgetItemId) : explicitCategory ? budgetMatch(s,payload.category) : rule ? s.budget.items.find(i=>i.id===rule.budgetItemId) : budgetMatch(s,payload.category);
   const allocation = item ? Math.min(Math.max(0, amount), moneyRemaining(item)) : 0;
   const afterAvailable = summary.available - total;
-  let afterPlanned = summary.planned - allocation;
+  let afterPlanned = summary.planned;
   const settlingIOU = payload.iouId ? (s.ious || []).find(i => i.id === payload.iouId && i.type === 'owedByMe' && i.status === 'open') : null;
   const invalidIOU = payload.iouId && (!settlingIOU || amount > repayableIOUAmount(s, settlingIOU));
-  if (settlingIOU && positive(amount) && !invalidIOU) {
-    const preview = {...s, budget:{...s.budget,items:s.budget.items.map(i=>i.id===settlingIOU.budgetItemId?{...i,spent:integer(i.spent)+amount}:i)},ious:s.ious.map(i=>i.id===settlingIOU.id?{...i,paid:integer(i.paid)+amount,status:integer(i.paid)+amount===i.amount?'settled':'open'}:i)};
-    afterPlanned = getSummary(preview).planned;
+  if (positive(amount) && !invalidIOU) {
+    // A purchase can consume a category that also covers an IOU. Recalculate
+    // its uncovered debt instead of treating that category release as free money.
+    const preview = {...s, budget:{...s.budget,items:s.budget.items.map(i=>i.id===item?.id?{...i,spent:integer(i.spent)+amount}:i)},ious:s.ious.map(i=>i.id===settlingIOU?.id?{...i,paid:integer(i.paid)+amount,status:integer(i.paid)+amount===i.amount?'settled':'open'}:i)};
+    afterPlanned = getSummary(preview, now).planned;
   }
   const plannedRelease = summary.planned - afterPlanned;
   const rawAfterSpendable = afterAvailable - afterPlanned - integer(s.buffer);
@@ -318,8 +335,8 @@ export function evaluatePayment(s, payload = {}) {
   else if (rawAfterSpendable < 0) reason = baselineShortfall > 0
     ? additionalShortfall > 0 ? 'This payment would increase the existing shortfall in your plan or cushion.' : 'Your plan already has a shortfall. This payment leaves that gap unchanged.'
     : 'This payment would use money set aside for your plan or your minimum balance.';
-  else if (amount - plannedRelease > summary.dailyAllowance * 1.5 && amount - plannedRelease >= 5000) reason = 'This uses more than a day of your flexible spending money.';
-  const history = evaluatePauseHistory(s,{...payload,budgetItemId:item?.id||payload.budgetItemId},{summary});
+  else if (summary.hasDailyGuide && amount - plannedRelease > summary.dailyAllowance * 1.5 && amount - plannedRelease >= 5000) reason = 'This uses more than a day of your flexible spending money.';
+  const history = evaluatePauseHistory(s,{...payload,budgetItemId:item?.id||payload.budgetItemId},{summary,now});
   if(!reason&&history.show&&positive(amount)&&total<=summary.available)reason=history.reason;
   return {
     historySignals: history.signals, needed: !!reason && positive(amount) && total <= summary.available,

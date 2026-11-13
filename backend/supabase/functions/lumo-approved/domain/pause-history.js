@@ -1,4 +1,5 @@
 /** Ghana-local spending signals. Evidence only, never payment authorisation. */
+import { getSummary } from './model.js';
 const normal = value => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const cents = value => Number.isSafeInteger(value) ? Math.max(0, value) : 0;
 const remaining = item => Math.max(0, cents(item.amount) - cents(item.spent));
@@ -26,11 +27,8 @@ const successfulPayments = state => (state.transactions || []).filter(tx => tx.t
 /** Ghana uses UTC year round. History is evidence, never an authorisation. */
 export function evaluatePauseHistory(state, payload = {}, { now = new Date(), summary } = {}) {
   const at = now.getTime(), amount = cents(payload.amount), fee = cents(payload.fee);
-  const planned = Number.isSafeInteger(summary?.planned) ? summary.planned : (state.budget?.items || []).reduce((total, item) => total + remaining(item), 0);
-  const room = Math.max(0, cents(state.wallet) - planned - cents(state.buffer));
-  const until = new Date(`${state.income?.nextDate || now.toISOString().slice(0, 10)}T12:00:00Z`).getTime();
-  const days = Math.max(1, Math.ceil((until - new Date(now.toISOString().slice(0, 10) + 'T12:00:00Z').getTime()) / 86400000));
-  const guide = Number.isSafeInteger(summary?.dailyAllowance) ? summary.dailyAllowance : Math.floor(room / days), today = now.toISOString().slice(0, 10);
+  const context = summary || getSummary(state, now);
+  const guide = context.hasDailyGuide ? cents(context.dailyAllowance) : 0, today = now.toISOString().slice(0, 10);
   const records = successfulPayments(state).filter(tx => Number.isFinite(Date.parse(tx.at)) && Date.parse(tx.at) <= at);
   const todays = records.filter(tx => tx.at.slice(0, 10) === today);
   const recent = records.filter(tx => at - Date.parse(tx.at) <= 10 * 60000);

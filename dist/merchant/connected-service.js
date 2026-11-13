@@ -1,4 +1,6 @@
 // Transport only. The approved v7 views, forms and domain remain unchanged.
+// Only capabilities backed by the shared service are enabled in this build.
+export const MERCHANT_CAPABILITIES=Object.freeze({passwordChange:false,passwordRecovery:false,usernameRecovery:false,staffReset:false,ownershipTransfer:false,settlement:false,simulation:false,customerWallet:false});
 export const CONNECTED_CONSUMER_ORIGIN='https://lumo-connected-pilot.vercel.app';
 const CONFIG={url:'https://iwutbrljiiodamtyoorg.supabase.co',key:'sb_publishable_4dmChQek8k-opkVhO4N_KA_TCGVjWi6'};
 const KEY='lumo-approved-merchant-session-v1',AUTH_KEY='lumo-shared-auth-state-v2';
@@ -54,7 +56,7 @@ export async function merchantFetch(path,options={}){
  const explicitAuth=['/api/signup','/api/auth/login','/api/login','/api/invitations/accept'].includes(pathname),logout=['/api/auth/logout','/api/logout'].includes(pathname);
  const generation=explicitAuth||logout?++authGeneration:authGeneration;if(explicitAuth||logout)refreshing=null;
  requireCurrent(generation,epoch);
- if(!explicitAuth&&!logout&&saved?.authEpoch&&epoch&&saved.authEpoch!==epoch)return response(empty());
+ if(!explicitAuth&&!logout&&saved?.authEpoch&&epoch&&saved.authEpoch!==epoch)return response({ok:false,status:409,code:'AUTH_CHANGED',error:'Your account changed. Sign in again before continuing.'},409);
  if(pathname==='/api/session'&&!saved?.session?.access_token)return response(empty());
  if(logout&&!saved?.session?.access_token)return response(empty());
  if(pathname==='/api/signup'){

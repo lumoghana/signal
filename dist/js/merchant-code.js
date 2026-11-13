@@ -3,7 +3,7 @@ import { merchantIdFromCode } from './qr-decoder.js';
 
 /** A campus code selects a destination. The customer still reviews and approves payment. */
 export function openMerchantCodeSheet(ctx, {
-  onFound = id => ctx.openQrMerchant(id),
+  onFound = (id,options) => ctx.openQrMerchant(id,options),
   isCurrent = () => true,
   onClose,
 } = {}) {
@@ -22,6 +22,15 @@ export function openMerchantCodeSheet(ctx, {
     submitted = true;
     const button = form.querySelector('[type="submit"]');
     if (button) button.disabled = true;
+    if(ctx.connected){
+      const failure=message=>{if(!current())return;submitted=false;if(button)button.disabled=false;const error=form.querySelector('[data-merchant-error]');if(error){error.textContent=message||'We could not check this merchant. Try again.';error.hidden=false;}};
+      Promise.resolve().then(()=>{if(!current())return {ok:false,cancelled:true};return onFound(id,{isCurrent:current});}).then(result=>{
+        if(!current())return;
+        if(result?.ok===false){if(!result.cancelled)failure(result.message);return;}
+        dispose();ctx.closeSheet();
+      }).catch(()=>failure());
+      return;
+    }
     dispose();
     ctx.closeSheet();
     onFound(id);
@@ -31,6 +40,6 @@ export function openMerchantCodeSheet(ctx, {
     form = sheet.querySelector('form');
     form?.addEventListener('submit', submit);
     sheet.querySelector('input')?.focus();
-  }, { onClose: () => { const wasAlive = alive; dispose(); if (wasAlive) onClose?.(); } });
+  }, { onDispose:()=>form?.removeEventListener('submit',submit),onClose: () => { const wasAlive = alive; dispose(); if (wasAlive) onClose?.(); } });
   return dispose;
 }

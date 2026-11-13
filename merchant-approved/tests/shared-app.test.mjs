@@ -254,6 +254,25 @@ test('legacy D1 compatibility: app modules connect signup, team access, campus w
     assert.equal(calls.filter(call=>call.path==='/api/auth/step-up').length,stepUpBefore+1,'Lookup of an existing payout must not require a new proof or create another payout');await click('dismiss');
    }finally{globalThis.fetch=rawFetch}
   });
+  await t.test('a definitive unavailable settlement releases its saved intent while an unknown failure preserves the same reference',async()=>{
+   const before=store.getState().settlements.length;let code='UNAVAILABLE_SERVICE';
+   globalThis.fetch=async(path,options={})=>{const body=options.body?JSON.parse(options.body):null;if(path==='/api/action'&&body?.type==='SETTLE')return Response.json({ok:false,error:'This service is not connected.',code},{status:503});return rawFetch(path,options)};
+   async function attempt(){await click('open-settle');const posting=submit({amount:'1.00'},'settle');await until(()=>html().includes('Confirm this settlement'),'owner checks unavailable payout');await submit({currentPassword:password});await posting;}
+   try{
+    await attempt();assert.equal([...localStorage.data.keys()].filter(key=>key.startsWith('lumo-pending-settlement-v1:')).length,0);assert.equal(Shared.connectionStatus().status,'online');assert.equal(Auth.getSession().role,'owner');
+    code='STORAGE_UNAVAILABLE';await attempt();const key=[...localStorage.data.keys()].find(key=>key.startsWith('lumo-pending-settlement-v1:'));assert.ok(key);const original=JSON.parse(localStorage.getItem(key));assert.equal(original.submitted,true);assert.equal(original.amount,100);
+    await click('open-settle');assert.match(modal(),/Check your saved settlement/);assert.match(modal(),/value="1.00"[^>]*readonly/);assert.equal(JSON.parse(localStorage.getItem(key)).attemptId,original.attemptId);assert.equal(store.getState().settlements.length,before);
+    localStorage.removeItem(key); // Fixture cleanup only; product retains this unknown reference.
+   }finally{globalThis.fetch=rawFetch;await Shared.refresh();await click('dismiss')}
+  });
+  await t.test('UI preference storage failure does not block navigation and Lux identifies its selected shop',async()=>{
+   const write=localStorage.setItem;localStorage.setItem=function(key,value){if(key==='lumo-merchant-ui-v2')throw Error('Preference storage full');return write.call(this,key,value)};
+   try{await click('go-home');assert.match(html(),/Net collected/);await click('go-activity');assert.match(html(),/Every payment, clearly/);assert.equal(Auth.getSession().role,'owner')}finally{localStorage.setItem=write}
+   await click('go-overview');await change('scope',secondShopId,{change:'scope'});await click('go-lux');const selected=store.getState().shops.find(shop=>shop.id===secondShopId).name;assert.ok(html().includes('Viewing '+selected));await click('ask-lux',{question:'How much did we collect today?'});assert.ok(html().includes(selected+' · Today you have'));await change('scope','all',{change:'scope'});await click('go-overview');
+  });
+  await t.test('owner payment support inherits the linked shop instead of creating a business-only case',async()=>{
+   const payment=store.getState().transactions.find(item=>item.shopId===shopId&&item.status==='paid');await click('support-ticket',{transaction:payment.id});await submit({subject:'Owner counter case',message:'Please check this counter receipt.',transactionId:payment.reference},'ticket');const ticket=store.getState().tickets.find(item=>item.subject==='Owner counter case');assert.equal(ticket.shopId,shopId);assert.equal(ticket.transactionId,payment.id);await click('dismiss');
+  });
   await t.test('a queued settlement cannot request confirmation or submit under a different signed-in owner',async()=>{
    await click('go-settlements');await click('open-settle');const originalRequest=browserLocks.request;let release,held=false;
    browserLocks.request=(name,options,callback)=>{if(!held){held=true;return new Promise(resolve=>{release=()=>resolve(originalRequest.call(browserLocks,name,options,callback))})}return originalRequest.call(browserLocks,name,options,callback)};
@@ -307,8 +326,9 @@ test('legacy D1 compatibility: app modules connect signup, team access, campus w
    const created=store.getState().shops.find(shop=>shop.name==='Shared Confirmed Entrance');assert.ok(created);assert.equal(created.area,'Sarbah Hall');assert.equal(created.activation.locationConfirmed,true);assert.equal(created.activation.qrReady,false);assert.equal(created.published,false);await click('go-overview');
   });
   await t.test('role change and suspension from another owner client invalidate the open staff view',async()=>{
-   await Shared.api('/api/users/'+cashier.userId,{method:'POST',body:{role:'manager',shopIds:[shopId]}});
+   await Shared.api('/api/users/'+cashier.userId,{method:'POST',body:{role:'manager',shopIds:[shopId,secondShopId]}});
    await click('access-sign-out');await until(()=>!Auth.getSession(),'owner signout');await submit({username:'shared.ui.cashier',password:'SharedCashier123'});await until(()=>Auth.getSession()?.role==='manager'&&html().includes('Net collected · since last close'),'manager sign-in to Home');assert.doesNotMatch(html(),/Merchant balance|data-page="settlements"/);
+   await click('go-team');for(const id of [shopId,secondShopId])assert.ok(html().includes(store.getState().shops.find(shop=>shop.id===id).name));assert.doesNotMatch(html(),/Role controls are simulated|Production access requires/);await click('go-home');
    const otherOwner=new Map();await external('/api/auth/login',{username,password},otherOwner);await external('/api/users/'+cashier.userId,{active:false},otherOwner);
    await Shared.refresh();await until(()=>!Auth.getSession()&&html().includes('Welcome back'),'suspended staff gate');
    assert.equal(Shared.getCache().state,null);assert.match(html(),/Welcome back/);

@@ -126,7 +126,7 @@ export function createSignup(config={}){
  }
  function businessScreen(){
   return header('Let’s meet<br>your business.','The name your customers know, and the person behind it.')
-   +form(`${field('Business / trading name','name',data.name,'required maxlength="70" placeholder="e.g. Akua’s Campus Kitchen" autofocus')}${field('Owner’s full name','ownerName',data.ownerName,'required maxlength="70" autocomplete="name" placeholder="Your full name"')}${selection('Business type','businessType',data.businessType,[['registered-business','Registered business'],['sole-proprietor','Sole proprietor']])}${field('Registration reference (optional)','registrationNumber',data.registrationNumber,'maxlength="60" placeholder="Use a sample reference"','Live onboarding will request the documents applicable to your business.')}`,'Continue');
+   +form(`${field('Business / trading name','name',data.name,'required maxlength="70" placeholder="e.g. Akua’s Campus Kitchen" autofocus')}${field('Owner’s full name','ownerName',data.ownerName,'required maxlength="60" autocomplete="name" placeholder="Your full name"')}${selection('Business type','businessType',data.businessType,[['registered-business','Registered business'],['sole-proprietor','Sole proprietor']])}${field('Registration reference (optional)','registrationNumber',data.registrationNumber,'maxlength="60" placeholder="Use a sample reference"','Live onboarding will request the documents applicable to your business.')}`,'Continue');
  }
  function verifyScreen(){
   return header('A little trust<br>goes a long way.','Verify the authorised owner before your business begins accepting payments.')
@@ -268,6 +268,7 @@ export function createSignup(config={}){
    if(password!==confirmation){setError('Your passwords do not match. Enter the same password in both fields.');return}
    credentialsVerified=true;go('business');
   }else if(step==='business'){
+   if(String(data.ownerName||'').trim().length>60){setError('Use an owner name of up to 60 characters.');return}
    if(!phoneVerified){step='phone';setError('Please verify your mobile number first.');return}
    if(!credentialsVerified){step='credentials';setError('Create and confirm your account login before continuing.');return}
    if(data.name.trim().length<2){setError('Enter your business or trading name.');return}

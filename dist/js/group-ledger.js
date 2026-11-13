@@ -1,5 +1,5 @@
 /** Shared collection ledger for the local participant simulation. Amounts are integer pesewas. */
-import { GROUP_PROPOSAL_MS, GROUP_REVIEW_MS, groupPayoutFee, groupPayoutStatus, groupCollectionStatus, groupMandateReady, designatedGroupApprovers, groupMandateAccepted, canonicalGroupRecipient, validateGroupEvidence, collectionRefundPreview } from './group-policy.js';
+import { GROUP_PROPOSAL_MS, GROUP_REVIEW_MS, groupPayoutFee, groupPayoutStatus, groupCollectionStatus, groupMandateReady, designatedGroupApprovers, groupMandateAccepted, canonicalGroupRecipient, validateGroupEvidence, collectionRefundPreview, collectionReturnReview } from './group-policy.js';
 export { groupPayoutStatus, groupCollectionStatus, groupMandateReady, collectionRefundPreview } from './group-policy.js';
 const MAX = 10000000000;
 const money = n => Number.isSafeInteger(n) && n >= 0 && n <= MAX;
@@ -111,7 +111,8 @@ export function groupMoneyEvents(g, state) {
     if (type === 'edit') body = `${cash(amount)} to ${recipient}. Earlier approvals no longer apply; the approvers need to review it again.`;
     events.push({ id: `group-money:${g.id}:payout:${p.id}:${index}`, kind: 'system', at: entry.at || p.at, type: `payout-${type}`, title: titles[type] || 'Payout update', body, payoutId: p.id, actorId: entry.actorId, status: entry.status, amount, revision: entry.revision || 1 });
   });
-  for(const refund of g.refunds||[])events.push({id:`group-money:${g.id}:refund:${refund.id}`,kind:'system',type:'collection-refund',status:'success',at:refund.at,title:'Unused contribution returned',body:`${cash(refund.amount)} returned to ${refund.memberName}’s original source.`,amount:refund.amount});
+  for(const refund of g.merchantRefunds||[])events.push({id:`group-money:${g.id}:merchant-refund:${refund.id}`,kind:'system',type:'merchant-refund',status:'success',at:refund.createdAt,title:'Merchant refund received',body:`${cash(refund.amount)} returned to the group from ${refund.shopName||refund.merchantName||'the merchant'}. Reference ${refund.reference||refund.id}.`,amount:refund.amount,reference:refund.reference,originalPaymentId:refund.originalPaymentId});
+  for(const refund of g.refunds||[])events.push({id:`group-money:${g.id}:refund:${refund.id}`,kind:'system',type:'collection-refund',status:'success',at:refund.at,title:refund.source==='merchant-refund'?'Merchant refund returned':'Unused contribution returned',body:`${cash(refund.amount)} returned to ${refund.memberName}’s original source.`,amount:refund.amount});
   if(g.status==='closed')events.push({id:`group-money:${g.id}:closed`,kind:'system',type:'collection-closed',status:'closed',at:g.closedAt,title:'Collection closed',body:'The conversation and financial history remain here. Unused money has been returned to its original sources.'});
   return events;
 }
@@ -248,20 +249,27 @@ export function handleGroupLedgerAction(s, type, p) {
   }
   if (type === 'closeGroup') {
     if (!actorIsCreator(g)) return fail('Only the creator can close this collection.');
-    if (g.status==='closed') return ok('This collection is already closed.',{group:g,duplicate:true});
+    const returningClosed = g.status === 'closed';
+    if (returningClosed && g.balance === 0) return ok('This collection is already closed.',{group:g,duplicate:true});
+    if (p.reviewedBalance !== undefined || p.reviewedReturnsFingerprint !== undefined) {
+      const review = collectionReturnReview(g);
+      if (p.reviewedBalance !== review.reviewedBalance || p.reviewedReturnsFingerprint !== review.reviewedReturnsFingerprint) return {ok:false,code:'CLOSURE_REVIEW_CHANGED',message:'The group balance or original-source shares changed. Review the returns again.'};
+    }
     if (g.payouts.some(p=>p.status==='processing') || (g.contributions||[]).some(c=>c.status==='pending')) return fail('Resolve processing contributions and payouts before closing the collection.');
     const refunds=collectionRefundPreview(g);
     if(refunds.some(r=>!r.memberId))return fail('Some opening collection money has no recorded contributor. Review its original sources before closing.');
+    if(refunds.some(r=>{const c=g.contributions.find(c=>c.id===r.contributionId);return !c||r.amount>c.amount-(c.refundedAmount||0);}))return fail('These returns exceed their original contribution sources. Review the group records first.');
     if (!money(s.wallet+refunds.filter(r=>r.walletCredit).reduce((n,r)=>n+r.amount,0))) return fail('Check the personal account limit before returning these funds.');
     if (refunds.reduce((n,r)=>n+r.amount,0)!==g.balance) return fail('The collection sources need review before a safe refund can be made.');
     for (const payout of g.payouts) if(['pending','approved','failed'].includes(payout.status)){payout.status='cancelled';addPayoutHistory(payout,'cancelled',actor);}
     for (const r of refunds) {
-      const refund={...r,id:uid('group-refund'),at:now(),status:'success'};g.refunds.push(refund);
+      const refund={...r,id:uid('group-refund'),at:now(),status:'success',...(returningClosed?{source:'merchant-refund'}:{})};g.refunds.push(refund);
       const c=g.contributions.find(c=>c.id===r.contributionId);c.refundedAmount=(c.refundedAmount||0)+r.amount;
-      if (r.walletCredit){s.wallet+=r.amount;s.transactions.unshift({id:uid('tx'),type:'groupRefund',direction:'in',amount:r.amount,merchant:g.name,category:'Group refund',emoji:g.emoji,rail:'internal',status:'success',at:refund.at,groupId:g.id,refundId:refund.id,parentContributionId:c.id,note:'Unused group money returned to its original source'});}
+      if (r.walletCredit){s.wallet+=r.amount;s.transactions.unshift({id:uid('tx'),type:'groupRefund',direction:'in',amount:r.amount,merchant:g.name,category:'Group refund',emoji:g.emoji,rail:'internal',status:'success',at:refund.at,groupId:g.id,refundId:refund.id,parentContributionId:c.id,note:returningClosed?'Merchant refund returned to its original contribution source':'Unused group money returned to its original source'});}
     }
-    g.balance=0;g.status='closed';g.closedAt=now();g.closedBy=actor;
-    return ok('Collection closed. Unused money returned proportionally to the original contributors.',{group:g,refunds:g.refunds});
+    g.balance=0;g.status='closed';
+    if(returningClosed){g.lastReturnAt=now();g.lastReturnBy=actor;}else{g.closedAt=now();g.closedBy=actor;}
+    return ok(returningClosed?'Merchant refund returned proportionally to the original contributors. The collection stays closed.':'Collection closed. Unused money returned proportionally to the original contributors.',{group:g,refunds:g.refunds});
   }
   if (['contributeGroup','retryGroupContribution','requestPayout','approvePayout','executePayout','retryGroupPayout'].includes(type)) {
     if (g.status==='closed') return fail('This collection is closed. Its conversation and financial history are retained.');
