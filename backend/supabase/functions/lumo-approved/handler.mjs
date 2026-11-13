@@ -6,6 +6,7 @@ const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const phone=value=>String(value||'').replace(/[\s()-]/g,'').replace(/^\+233/,'0');
 const failure=(code,message,status=400)=>Object.assign(new Error(message||code),{code,status});
 const messages={AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
+Object.assign(messages,{EXISTING_ACCOUNT:'This account already exists. Sign in instead. If its legacy test PIN needs repair, choose Repair test PIN after signing in.',PIN_REPAIR_UNAVAILABLE:'This one-time repair is available only to eligible legacy test accounts. Your existing PIN is unchanged.',PIN_REPAIR_EXPIRED:'This PIN repair check expired or was already used. Start a fresh password check.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.'});
 const b64url=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unbase64=value=>{if(typeof value!=='string'||!/^[A-Za-z0-9_+/-]+={0,2}$/.test(value)||value.length>8192)throw failure('DEVICE_PROOF_INVALID');return Uint8Array.from(atob(value.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));};
 const jwtClaims=token=>{try{return JSON.parse(new TextDecoder().decode(unbase64(token.split('.')[1])));}catch{throw failure('AUTH_REQUIRED',null,401);}};
@@ -48,6 +49,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  function repository(identity){
   const identityPayload={actor:identity.userId,session:identity.sessionId};return {
    service:(command,payload={})=>service(command,{...payload,...identityPayload}),
+   repair:(command,payload={})=>serviceRpc('lumo_approved_pin_repair',{p_command:command,p_payload:{...payload,...identityPayload}}),
    resolve:query=>service('resolve',{...identityPayload,query:String(query||'')}),
    quote:async payload=>{const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true};},
    rpc:async(command,payload={})=>(await upstream('/rest/v1/rpc/lumo_rpc',{p_command:command,p_payload:payload},{token:identity.accessToken})).data,
@@ -116,6 +118,24 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    if(body.action==='snapshot')return respond(envelope(await runAutomatic(repo,requireOk(await repo.service('load')))));
    if(body.action==='resolve')return respond(requireOk(await repo.resolve(body.query)));
    if(body.action==='quote'){let shopId=body.shopId;if(!shopId&&body.query){const lookup=requireOk(await serviceRpc('lumo_approved_merchant_lookup',{p_query:body.query}));shopId=lookup.shopId;}return respond(requireOk(await repo.quote({shopId,requestId:body.requestId,testKey:body.testKey})));}
+   if(body.action==='pinRepairStatus')return respond(requireOk(await repo.repair('status')));
+   if(body.action==='repairTestPin'){
+    if(Object.keys(body).some(key=>!['action','currentPassword','newPin'].includes(key))||typeof body.currentPassword!=='string'||body.currentPassword.length<8||body.currentPassword.length>128||!body.currentPassword.trim()||typeof body.newPin!=='string'||!/^\d{4}$/.test(body.newPin))throw failure('INVALID_INPUT');
+    // The account/session come from verified Auth, never a browser-supplied owner.
+    const handle=identity.user.email?.split('@')[0];
+    if(!HANDLE.test(handle||'')||identity.user.email!==`${handle}@pilot.lumo.invalid`)throw failure('FORBIDDEN');
+    const begun=requireOk(await repo.repair('begin'));
+    const ip=(request.headers.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';
+    requireOk(await serviceRpc('lumo_pilot_bootstrap',{p_action:'login.check',p_payload:{handle,ipHash:await sha256('lumo-pilot-auth:'+ip,cryptoApi)}}));
+    let proof;
+    try{
+     proof=await passwordSession(handle,body.currentPassword);
+     const verified=await identify(proof.access_token);
+     if(verified.userId!==identity.userId)throw failure('FORBIDDEN');
+     const repaired=requireOk(await repo.repair('commit',{requestId:begun.requestId,proofSession:verified.sessionId,newPin:body.newPin}));
+     return respond({...envelope(requireOk(await repo.service('load'))),...repaired,result:{ok:true,message:'Your test transaction PIN is repaired. Use your new PIN to approve test-money moves.'}});
+    }finally{if(proof)await revoke(proof);}
+   }
    if(body.action==='verifyPin')return respond(requireOk(await repo.service('verifyPin',{pin:body.pin})));
    if(body.action==='changeCredentials')throw failure('CREDENTIAL_CHANGES_UNAVAILABLE','Changing shared login details is not connected yet. Your existing username and password are unchanged.',409);
    if(body.action==='changePin'){

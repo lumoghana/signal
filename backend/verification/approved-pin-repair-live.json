@@ -1,0 +1,150 @@
+{
+  "at": "2026-11-13T09:38:47.423Z",
+  "scope": "Actual HTTP on synthetic legacy QA account only. Legacy account created through original pilot auth, then approved profile mapping seeded for that exact QA identity. No user account credentials or PIN changed.",
+  "checks": 20,
+  "passed": [
+    "synthetic legacy account signs in through original approved gateway",
+    "separate approved QA owner signs in",
+    "only eligible legacy test owner sees one-time repair",
+    "new approved account cannot use legacy repair",
+    "wrong password cannot repair a legacy PIN",
+    "failed password repair leaves existing PIN valid",
+    "failed password repair leaves one-time completion marker untouched",
+    "failed password proof leaves wallet and domain revision unchanged",
+    "other owner cannot supply a target actor for repair",
+    "fresh correct password commits exactly one legacy test PIN repair",
+    "successful repair preserves wallet and domain revision",
+    "repair response excludes credential and hash fields",
+    "old PIN is rejected after repair",
+    "new privately generated PIN authorizes normally",
+    "repair is marked complete and cannot be offered twice",
+    "replaying repair cannot change the PIN again",
+    "normal shared test funding accepts repaired PIN",
+    "normal original one-pesewa transfer accepts repaired PIN",
+    "repaired PIN payment posts exact canonical debit and credit",
+    "blocked second repair leaves the repaired PIN unchanged"
+  ],
+  "requests": [
+    {
+      "action": "login",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "login",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "pinRepairStatus",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "pinRepairStatus",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "snapshot",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "snapshot",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "repairTestPin",
+      "status": 401,
+      "code": "CREDENTIALS_INCORRECT",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "verifyPin",
+      "status": 200,
+      "code": "PIN_REQUIRED",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "pinRepairStatus",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "snapshot",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "repairTestPin",
+      "status": 400,
+      "code": "INVALID_INPUT",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "repairTestPin",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "verifyPin",
+      "status": 400,
+      "code": "PIN_REQUIRED",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "verifyPin",
+      "status": 200,
+      "code": "PIN_REQUIRED",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "pinRepairStatus",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "repairTestPin",
+      "status": 400,
+      "code": "PIN_REPAIR_UNAVAILABLE",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "action",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "action",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "snapshot",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "snapshot",
+      "status": 200,
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    },
+    {
+      "action": "verifyPin",
+      "status": 200,
+      "code": "PIN_REQUIRED",
+      "allowedOrigin": "https://lumo-connected-pilot.vercel.app"
+    }
+  ],
+  "rawCredentialsExcluded": true,
+  "actualUserPinChanged": false,
+  "databaseChecks": {
+    "temporaryPasswordProofSessionRevoked": true,
+    "qaCallerSessionRevoked": true,
+    "exactlyOneQaRepairMarker": true
+  },
+  "postgresRollbackGuardChecks": 38,
+  "backendNodeTests": 98
+}

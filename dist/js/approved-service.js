@@ -145,6 +145,13 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     readPartnerInbox() { return request({ action: 'partnerInbox' }); },
     respondPartner(id, decision) { return request({ action: 'partnerRespond', id, decision }); },
     verifyPin(pin) { return request({ action: 'verifyPin', pin }); },
+    pinRepairStatus() { return request({ action: 'pinRepairStatus' }); },
+    repairTestPin(currentPassword, newPin) {
+      if (typeof currentPassword !== 'string' || !currentPassword || currentPassword.length > 128 || typeof newPin !== 'string' || !/^\d{4}$/.test(newPin)) return Promise.resolve(failure('Enter your sign-in password and a new four-digit test PIN.', 'INVALID_INPUT'));
+      // This one-time test-account repair is credential step-up, never a queued
+      // financial action. Passwords and PINs must not enter the request journal.
+      return request({ action: 'repairTestPin', currentPassword, newPin });
+    },
     changePin(currentPin, pin) { return request({ action: 'changePin', currentPin, pin }); },
     async resolve(query) {
       const value = String(query || '').trim().replace(/^@/, '');

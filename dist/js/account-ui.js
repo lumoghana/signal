@@ -49,7 +49,7 @@ function biometricsSection(ctx){
 }
 function security(ctx){
   const a=ensureAccountState(ctx.state),configured=loginConfigured(ctx);
-  return frame(ctx,'Security & access',`<div class="auth-intro"><h1>Your account. Your keys.</h1><p>One way to sign in. A separate check for your money.</p></div><section class="auth-security-block"><div class="auth-block-heading"><h2>Login details</h2><span class="auth-status">${configured?'Set up':'Needed'}</span></div><p class="muted">${configured?`Username <strong>${esc(a.login.username)}</strong>`:'A username and password for signing in.'}</p>${button(configured?'Change login details':'Set up login','account-login-setup')}</section>${biometricsSection(ctx)}<details class="account-disclosure"><summary>Transaction PIN</summary><div class="account-disclosure-body"><p>Use this four-digit PIN to approve transactions when phone biometrics are off or unavailable.</p><form data-account-form="pin">${pinInput('Current transaction PIN','currentPin')}${pinInput('New transaction PIN','newPin')}${pinInput('Confirm transaction PIN','confirmPin')}${error}<button class="button secondary">Update transaction PIN</button></form></div></details><div class="auth-security-links">${row({emoji:icon('phone'),title:'Devices',sub:'This browser and sample sessions',action:'account-devices'})}${row({emoji:icon('help'),title:'Forgot your password?',sub:'Recover your local login',action:'account-recovery'})}</div><details class="account-disclosure"><summary>Recent security activity</summary><div class="account-disclosure-body">${a.securityEvents.slice(0,5).map(e=>row({emoji:icon('lock'),title:e.detail,sub:new Date(e.at).toLocaleString('en-GH')})).join('')||'<p class="muted">No security changes yet.</p>'}</div></details><button class="button secondary" data-account-signout>${icon('logout',18)} Sign out</button>`);
+  return frame(ctx,'Security & access',`<div class="auth-intro"><h1>Your account. Your keys.</h1><p>One way to sign in. A separate check for your money.</p></div><section class="auth-security-block"><div class="auth-block-heading"><h2>Login details</h2><span class="auth-status">${configured?'Set up':'Needed'}</span></div><p class="muted">${configured?`Username <strong>${esc(a.login.username)}</strong>`:'A username and password for signing in.'}</p>${button(configured?'Change login details':'Set up login','account-login-setup')}</section>${biometricsSection(ctx)}<details class="account-disclosure"><summary>Transaction PIN</summary><div class="account-disclosure-body"><p>Use this four-digit PIN to approve transactions when phone biometrics are off or unavailable.</p><form data-account-form="pin">${pinInput('Current transaction PIN','currentPin')}${pinInput('New transaction PIN','newPin')}${pinInput('Confirm transaction PIN','confirmPin')}${error}<button class="button secondary">Update transaction PIN</button></form>${ctx.connected?'<button type="button" class="text-button" data-account-test-pin-repair hidden>Set up my test PIN</button><p class="muted" data-account-test-pin-repair-status role="status" hidden></p>':''}</div></details><div class="auth-security-links">${row({emoji:icon('phone'),title:'Devices',sub:'This browser and sample sessions',action:'account-devices'})}${row({emoji:icon('help'),title:'Forgot your password?',sub:'Recover your local login',action:'account-recovery'})}</div><details class="account-disclosure"><summary>Recent security activity</summary><div class="account-disclosure-body">${a.securityEvents.slice(0,5).map(e=>row({emoji:icon('lock'),title:e.detail,sub:new Date(e.at).toLocaleString('en-GH')})).join('')||'<p class="muted">No security changes yet.</p>'}</div></details><button class="button secondary" data-account-signout>${icon('logout',18)} Sign out</button>`);
 }
 function recovery(ctx){
   if(ctx.state.onboardingDone!==true)return noSavedAccount(ctx);
@@ -96,6 +96,7 @@ export function bindAccount(ctx,r=ctx.route,{deviceAuth={deviceAuthSupport,devic
   const action= (type,payload,onDone,form)=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,type,payload));if(result.ok){ctx.toast(result.message);onDone?onDone(result):ctx.refresh();}else showError(form,result.message);return result;});};
   const goHome=()=>ctx.go({section:'home',page:'home'},{root:true});
   bindAccountSettings(ctx);
+  const pinRepairEntry=bindTestPinRepairEntry(ctx,ctx.$$('[data-account-test-pin-repair]'),{statusElements:ctx.$$('[data-account-test-pin-repair-status]')});
   ctx.$$('[data-account-resume-signup]').forEach(b=>b.onclick=()=>ctx.go(ctx.draft.onboarding?{section:'onboarding',step:'card-number'}:{section:'welcome'}));
   ctx.$$('[data-account-home]').forEach(b=>b.onclick=goHome);
   ctx.$$('[data-action="account-devices"]').forEach(b=>b.onclick=()=>ctx.go(route('account-devices')));
@@ -146,8 +147,77 @@ export function bindAccount(ctx,r=ctx.route,{deviceAuth={deviceAuthSupport,devic
     }catch(error){if(stillHere())showError(form,error?.message||'That did not finish. Please try again.');}
     finally{Object.keys(values).forEach(key=>{if(/password|pin/i.test(key))values[key]='';});busy=false;if(!disposed&&form.isConnected!==false&&submit)submit.disabled=false;}
   });};});
-ctx.$$('[data-account-revoke]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountRevokeDevice',{deviceId:b.dataset.accountRevoke}));}));ctx.$$('[data-account-device-add]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountAddDemoDevice'));}));ctx.$$('[data-account-recovery-resend]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountStartRecovery',{phone:ctx.state.profile.phone}));}));ctx.$$('[data-account-privacy]').forEach(b=>b.onchange= ()=>runActionFlow(function*(){return (yield action('accountPrivacy',{preference:b.dataset.accountPrivacy,enabled:b.checked}));}));ctx.$$('[data-account-delete-request]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountDeletionRequest'));}));ctx.$$('[data-account-cancel-deletion]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountCancelDeletion',{requestId:b.dataset.accountCancelDeletion}));}));ctx.$$('[data-account-case-status]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountSupportSimulate',{caseId:r.id,status:b.dataset.accountCaseStatus}));}));ctx.$$('[data-account-report-download]').forEach(b=>b.onclick=()=>downloadAccountFile('Lumo-support-report.txt',supportSummary(ctx.state,b.dataset.accountReportDownload)));ctx.$$('[data-account-transaction]').forEach(b=>b.onclick=()=>ctx.go({section:'pay',page:'transaction',id:b.dataset.accountTransaction,returnTo:r}));ctx.$$('[data-account-funding]').forEach(b=>b.onclick=()=>ctx.go({section:'pay',page:'funding-detail',id:b.dataset.accountFunding,returnTo:r}));ctx.$$('[data-account-return]').forEach(b=>b.onclick=()=>ctx.go(r.returnTo||{section:'life',page:'account-support'}));ctx.$$('[data-account-blocker]').forEach(b=>b.onclick=()=>{const blocker=closureBlockers(ctx.state).find(x=>x.code===b.dataset.accountBlocker);if(blocker)ctx.go(blocker.route);});const recordsCleanup=bindAccountRecords(ctx,{download:downloadAccountFile}),supportCleanup=bindSupportDraft(ctx,r);return ()=>{disposed=true;welcomeAccess.cleanup();controllers.forEach(c=>c.abort());ctx.$$('[data-account-form] input[type=password]').forEach(input=>{input.value='';});recordsCleanup?.();supportCleanup?.();};}
+ctx.$$('[data-account-revoke]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountRevokeDevice',{deviceId:b.dataset.accountRevoke}));}));ctx.$$('[data-account-device-add]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountAddDemoDevice'));}));ctx.$$('[data-account-recovery-resend]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountStartRecovery',{phone:ctx.state.profile.phone}));}));ctx.$$('[data-account-privacy]').forEach(b=>b.onchange= ()=>runActionFlow(function*(){return (yield action('accountPrivacy',{preference:b.dataset.accountPrivacy,enabled:b.checked}));}));ctx.$$('[data-account-delete-request]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountDeletionRequest'));}));ctx.$$('[data-account-cancel-deletion]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountCancelDeletion',{requestId:b.dataset.accountCancelDeletion}));}));ctx.$$('[data-account-case-status]').forEach(b=>b.onclick= ()=>runActionFlow(function*(){return (yield action('accountSupportSimulate',{caseId:r.id,status:b.dataset.accountCaseStatus}));}));ctx.$$('[data-account-report-download]').forEach(b=>b.onclick=()=>downloadAccountFile('Lumo-support-report.txt',supportSummary(ctx.state,b.dataset.accountReportDownload)));ctx.$$('[data-account-transaction]').forEach(b=>b.onclick=()=>ctx.go({section:'pay',page:'transaction',id:b.dataset.accountTransaction,returnTo:r}));ctx.$$('[data-account-funding]').forEach(b=>b.onclick=()=>ctx.go({section:'pay',page:'funding-detail',id:b.dataset.accountFunding,returnTo:r}));ctx.$$('[data-account-return]').forEach(b=>b.onclick=()=>ctx.go(r.returnTo||{section:'life',page:'account-support'}));ctx.$$('[data-account-blocker]').forEach(b=>b.onclick=()=>{const blocker=closureBlockers(ctx.state).find(x=>x.code===b.dataset.accountBlocker);if(blocker)ctx.go(blocker.route);});const recordsCleanup=bindAccountRecords(ctx,{download:downloadAccountFile}),supportCleanup=bindSupportDraft(ctx,r);return ()=>{disposed=true;pinRepairEntry.dispose();welcomeAccess.cleanup();controllers.forEach(c=>c.abort());ctx.$$('[data-account-form] input[type=password]').forEach(input=>{input.value='';});recordsCleanup?.();supportCleanup?.();};}
 
+
+const repairIdentity=ctx=>({owner:ctx.shared?.user?.id,version:ctx.shared?.authVersion});
+const sameRepairIdentity=(ctx,identity)=>!!identity.owner&&ctx.connected===true&&ctx.shared?.connected===true&&ctx.shared?.signedIn===true&&ctx.shared.user?.id===identity.owner&&ctx.shared.authVersion===identity.version;
+
+/** A server-scoped entry, hidden until this particular test account is eligible. */
+export function bindTestPinRepairEntry(ctx,buttons,{canShow=()=>true,onOpen,statusElements=[]}={}){
+  const items=[...buttons].filter(Boolean),statuses=[...statusElements].filter(Boolean),identity=repairIdentity(ctx);
+  let disposed=false,eligible=false,repaired=false;
+  const current=()=>!disposed&&sameRepairIdentity(ctx,identity);
+  const refresh=()=>{items.forEach(button=>{button.hidden=!(current()&&eligible&&canShow());});statuses.forEach(element=>{const confirmed=current()&&repaired;element.hidden=!confirmed;element.textContent=confirmed?'Your test transaction PIN is set.':'';});};
+  for(const button of items){
+    button.hidden=true;
+    button.onclick=()=>{if(!current()||!eligible||!canShow()||button.isConnected===false)return;onOpen?.();void openTestPinRepair(ctx);};
+  }
+  refresh();
+  if((items.length||statuses.length)&&current()&&typeof ctx.shared.pinRepairStatus==='function'){
+    Promise.resolve(ctx.shared.pinRepairStatus()).then(status=>{if(!current())return;repaired=status.ok===true&&status.testOnly===true&&status.repaired===true;eligible=status.ok===true&&status.testOnly===true&&status.eligible===true&&!repaired;refresh();}).catch(()=>{});
+  }
+  return {refresh,dispose(){disposed=true;eligible=false;repaired=false;for(const button of items){button.hidden=true;button.onclick=null;}refresh();}};
+}
+
+/** One-time repair for an authenticated earlier test account. It never pays. */
+export async function openTestPinRepair(ctx){
+  const identity=repairIdentity(ctx),initiatingRoute=JSON.stringify(ctx.route||null);
+  const current=()=>sameRepairIdentity(ctx,identity)&&JSON.stringify(ctx.route||null)===initiatingRoute;
+  if(!current()||typeof ctx.shared?.pinRepairStatus!=='function'||typeof ctx.shared?.repairTestPin!=='function')return false;
+  let status;
+  try{status=await ctx.shared.pinRepairStatus();}catch{if(current())ctx.toast('We could not check this test PIN setup. Try again when your connection returns.');return false;}
+  if(!current())return false;
+  if(!status.ok||status.testOnly!==true||status.eligible!==true){ctx.toast(status.message||'This one-time test PIN setup is not available for this account.');return false;}
+  let dispose=()=>{};
+  ctx.sheet(`<h2>Set your transaction PIN.</h2><p>Your earlier test account needs its PIN set once. Confirm your sign-in password, then choose four digits. No money will move.</p><form class="form-stack" data-test-pin-repair-form novalidate>${authInput('Sign-in password','currentPassword',{type:'password',autocomplete:'current-password',extras:'required maxlength="128"'})}${pinInput('New transaction PIN','newPin')}${pinInput('Confirm transaction PIN','confirmPin')}<p class="error" data-test-pin-repair-error role="alert"></p><button type="submit" class="button" data-test-pin-repair-submit>Save my test PIN</button><button type="button" class="button secondary" data-test-pin-repair-cancel>Cancel</button></form>`,el=>{
+    let done=false,busy=false;
+    const form=el.querySelector('[data-test-pin-repair-form]'),error=el.querySelector('[data-test-pin-repair-error]'),submit=el.querySelector('[data-test-pin-repair-submit]');
+    const inputs=['currentPassword','newPin','confirmPin'].map(name=>el.querySelector(`[name="${name}"]`));
+    const clear=()=>inputs.forEach(input=>{input.value='';});
+    dispose=()=>{if(done)return;done=true;clear();};
+    const stillHere=()=>!done&&el.isConnected!==false&&current();
+    el.querySelector('[data-test-pin-repair-cancel]').onclick=()=>{dispose();ctx.closeSheet();};
+    form.onsubmit=async event=>{
+      event.preventDefault();if(busy)return;if(!stillHere()){clear();return;}
+      const values={currentPassword:inputs[0].value,newPin:inputs[1].value,confirmPin:inputs[2].value};
+      clear();error.textContent='';
+      try{
+        if(!values.currentPassword||values.currentPassword.length>128)throw Error('Enter your sign-in password.');
+        if(!/^\d{4}$/.test(values.newPin))throw Error('Choose a four-digit transaction PIN.');
+        if(values.confirmPin!==values.newPin)throw Error('Those transaction PINs do not match.');
+        busy=true;submit.disabled=true;
+        const result=await ctx.shared.repairTestPin(values.currentPassword,values.newPin);
+        values.currentPassword='';values.confirmPin='';
+        if(!stillHere())return;
+        if(!result.ok){
+          if(result.unknown){
+            const checked=await ctx.shared.pinRepairStatus();if(!stillHere())return;
+            if(checked.ok&&checked.repaired===true){
+              const verified=await ctx.shared.verifyPin(values.newPin);if(!stillHere())return;
+              if(verified.ok){dispose();ctx.closeSheet();ctx.toast('Your test PIN is ready. Review your payment again and use the new PIN.');ctx.refresh?.();return;}
+            }
+            throw Error('We could not confirm the new PIN. Check it in Security & access before trying another payment.');
+          }
+          throw Error(result.message||'Your test PIN was not changed. Please check your sign-in password.');
+        }
+        dispose();ctx.closeSheet();ctx.toast(result.result?.message||'Your test PIN is ready. Review your payment again and use the new PIN.');ctx.refresh?.();
+      }catch(problem){if(stillHere())error.textContent=problem?.message||'We could not confirm this test PIN setup.';}
+      finally{values.currentPassword='';values.newPin='';values.confirmPin='';clear();busy=false;if(stillHere())submit.disabled=false;}
+    };
+  },{onClose:()=>dispose(),onDispose:()=>dispose(),closeLabel:'Cancel test PIN setup'});
+  return true;
+}
 
 /** A verified device assertion can approve once; cancellation never authorises. */
 export function openBiometricAuth(ctx,{onSuccess,onFallback,onCancel,title='A quick check. Then you’re good.',deviceAuth={authenticateDevice}}={}){
