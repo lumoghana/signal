@@ -198,7 +198,7 @@ test('display-name edits return to that page without pretending the legal identi
 
 test('PIN and confirmation are separate gates and changes revoke the appropriate completion', () => {
   const draft = through(createOnboardingDraft(), 'login');
-  for (const pin of ['', '4321']) {
+  for (const pin of ['', '12', '12345', '12ab']) {
     updateOnboardingField(draft, 'pin', pin);
     assert.ok(validateOnboardingStep(draft, 'pin')); assert.equal(completeOnboardingStep(draft, 'pin').ok, false);
   }
@@ -362,6 +362,21 @@ test('nine accepted pages create two empty accounts once using the confirmed leg
   try { assert.equal(saveState(state), true); assert.ok(saved); } finally { if (oldStorage === undefined) delete globalThis.localStorage; else globalThis.localStorage = oldStorage; }
   assert.equal(draft.completed, true); assert.equal(buildOnboardingState(draft).ok, false); assert.equal(completeOnboardingStep(draft, 'pin').ok, false);
   assert.equal(resetLiveness(draft).ok, false); assert.equal(resetCameraCaptures(draft).ok, false); assert.equal(recordSelfieCapture(draft, 'centre').ok, false);
+});
+
+test('signup preserves the chosen transaction PIN, including its leading zero', () => {
+  for (const chosenPin of ['9472', '0246']) {
+    const draft = through(createOnboardingDraft(), 'login');
+    updateOnboardingField(draft, 'pin', chosenPin);
+    okay(completeOnboardingStep(draft, 'pin'));
+    updateOnboardingField(draft, 'pinConfirm', chosenPin === '0246' ? '2460' : '1234');
+    assert.equal(completeOnboardingStep(draft, 'pin-confirm').ok, false);
+    updateOnboardingField(draft, 'pinConfirm', chosenPin);
+    okay(completeOnboardingStep(draft, 'pin-confirm'));
+    const result = okay(buildOnboardingState(draft));
+    assert.equal(result.state.settings.pin, chosenPin);
+    assert.notEqual(result.state.settings.pin, '1234');
+  }
 });
 
 test('missing or malformed draft shapes fail all gated actions safely', () => {
