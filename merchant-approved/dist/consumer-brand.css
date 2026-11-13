@@ -42,6 +42,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .signup-mobile-brand>.brand-qualifier,.access-mobile-brand>.brand-qualifier { margin:5px 0 0; padding:0; border:0; font-size:9px; letter-spacing:1.1px; }
 .collections-app .topbar .mobile-brand>.brand-qualifier { margin:5px 0 0; padding:0; border:0; font-size:9px; letter-spacing:1.1px; }
 .signup-topbar .appearance-entry,.access-topbar .appearance-entry { margin-left:auto; }
+#signup-heading:focus-visible,#access-heading:focus-visible,#modal-title:focus-visible { outline:none; }
+.lux-symbol { background:transparent url('./assets/lux-chat-2d.webp') center/contain no-repeat; border:0; }
+.lux-symbol>.icon { visibility:hidden; }
 .collections-app .topbar { min-height:64px; height:calc(64px + env(safe-area-inset-top)); padding:env(safe-area-inset-top) 20px 0; background:var(--canvas); border-color:var(--line); }
 .collections-app .topbar .mobile-brand { font-size:29px; letter-spacing:-2px; }
 .collections-app .topbar .icon-btn { border:0; background:transparent; color:var(--ink); }
