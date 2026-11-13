@@ -167,7 +167,7 @@
   "dist/merchant/icon.svg": "dab846eb02a29b691ca99b85529489c863e1e2cd5951ae1349299f583a76ebb2",
   "dist/merchant/index.html": "384f5ceb6a500f24de57dcf2694fff3f0ad7afde9679a80c4bf8d3ff27fdd492",
   "dist/merchant/lux-brain.js": "734edf5bfc1acd3c84a1892b5f0be07f7540c2778ff7e8449231a2f58b87d988",
-  "dist/merchant/lux-chat.css": "eaa76ef72a3536f1dd1f2f56a2ea09ea2a9d98caea0971f132c5fdc159a588d5",
+  "dist/merchant/lux-chat.css": "562d65adc48365b65e76d798b3e0055dd592184fa0b0be2e733a153847d8498a",
   "dist/merchant/lux-chat.js": "2eb05f97ff753527987b7a274dc44861a76fdd1ff5f3ed09a33ec8e4966280f3",
   "dist/merchant/manifest.webmanifest": "d70ba4dacdc1b0de044b8046098a28c5bd5eaf0b6691bb784adc651e3a70c192",
   "dist/merchant/mobile-app.css": "6e6eccce243f594fd6155273a9f08d079a7d5becd7483f519ddec6049a1a9eb5",
@@ -209,7 +209,7 @@
   "dist/qr-screen.css": "81ea41ab61019d52bd135ec3b22e3f25ee603660f13adad8351a79f499bf292b",
   "dist/setup-terms.css": "bcece25dcc4cc0ab4ee1cb9ac3655a84cc1ca8da8f31409088b618cb0f17cf93",
   "dist/style.css": "d4d45416c950198865d872526eaa11cfdd8fa67b36b6ba8ac9d350d4093b873b",
-  "dist/sw.js": "aa6cd3edd0b235baf80e74688859de4873ce344bd3ea27de3b99b7b617651b79",
+  "dist/sw.js": "ed16b7343c61fb3873603bf8d03979c6ede51bc53135c30051040cba399bc523",
   "dist/tour.css": "1ea09bcac5119469e13ec3ee2f88a3910973a6d13c8208c45c984ddffd789735",
   "dist/welcome-photo.css": "b19f8641956553156650918527af2387eb80bbda9d0ddb5488307fcfdd933121",
   "dist/welcome.css": "58eb0102daa4e5891c35787b6cbb1d06a6cbeadd9f63d06e1260d3896ec564c6"
