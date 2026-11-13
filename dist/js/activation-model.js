@@ -14,7 +14,7 @@ const good = message => ({ ok: true, message });
 const uid = () => globalThis.crypto?.randomUUID?.() || `activation-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const active = d => d && !d.completed && d.state?.onboardingDone === true;
 const funded = d => {
-  if(d?.shared)return d.funded===true&&d.state?.transactions?.some(t=>t.id===d.fundingTransactionId&&t.type==='income'&&t.status==='success'&&positive(t.amount))===true;
+  if(d?.shared)return d.funded===true&&positive(d.state?.wallet)&&d.state?.transactions?.some(t=>t.id===d.fundingTransactionId&&t.type==='income'&&t.status==='success'&&positive(t.amount)&&t.ledgerJournalId)===true;
   if (d?.funded !== true || !positive(d.state?.wallet)) return false;
   const transaction = d.state.transactions?.find(t => t.id === d.fundingTransactionId && t.type === 'income' && t.status === 'success' && positive(t.amount));
   if (!transaction) return false;
@@ -45,6 +45,10 @@ function initializeExampleNumber(state) {
 /** Isolated from the existing account, including when signup is previewed. */
 export function createActivationDraft({ state, preview = false } = {}) {
   if (!state?.onboardingDone || state.wallet !== 0 || state.budget?.created) throw new Error('Start activation with a new empty account.');
+  return initialActivationDraft(state,preview);
+}
+
+function initialActivationDraft(state,preview=false) {
   const isolatedState = structuredClone(state);
   // One persisted example belongs to the simulated operational record. Never
   // manufacture a live number, borrow the Savings number, or change the source.
@@ -52,6 +56,24 @@ export function createActivationDraft({ state, preview = false } = {}) {
   return { schema: 1, state: isolatedState, preview: !!preview, step: 'account-created', accountAcknowledged: false, funding: { source: 'Mobile money', amountText: '', phone: accountFundingPhone(isolatedState) }, fundingAttempt: null, fundingHistory: [],
     keepBackText: '0', items: [], category: '', categoryName: '', amountText: '', due: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
     error: '', funded: false, budgetSaved: false, fundingKey: uid(), fundingTransactionId: '', completed: false };
+}
+
+/** Resume only an explicitly saved shared setup, never infer one for a legacy account. */
+export function resumeSharedActivationDraft(state, ownerId) {
+  const checkpoint=state?.activation;
+  if(!ownerId||state?.onboardingDone!==true||!checkpoint||!['account-created','fund','purpose','ready'].includes(checkpoint.step))return null;
+  const d=initialActivationDraft(state);
+  d.shared=true;d.sharedUserId=ownerId;
+  d.accountAcknowledged=checkpoint.accountAcknowledged===true;
+  const incomes=(state.transactions||[]).filter(t=>t.type==='income'&&t.direction==='in'&&t.status==='success'&&positive(t.amount)&&t.ledgerJournalId);
+  const receipt=incomes.find(t=>t.id===checkpoint.fundingTransactionId)||incomes[0];
+  d.fundingTransactionId=receipt?.id||'';d.funded=!!receipt&&positive(state.wallet);
+  d.budgetSaved=checkpoint.budgetSaved===true&&state.budget?.created===true;
+  if(state.budget?.created){d.items=structuredClone(state.budget.items||[]);d.keepBackText=((state.buffer||0)/100).toFixed(2);d.due=state.budget.endDate||d.items.find(i=>i.due)?.due||d.due;}
+  d.step=safeActivationStep(d,checkpoint.step);
+  // Acknowledged accounts do not replay the account-arrival celebration on another device.
+  d.accountCelebrated=d.accountAcknowledged;
+  return d;
 }
 
 /** Read only the bank's operational record, never the Savings account. */
@@ -195,12 +217,19 @@ export function addActivationBudgetItem(d, { name, emoji = '📌', amount } = {}
   return good('Added to your first budget.');
 }
 
-export function saveActivationBudget(d, { items = d?.items, due = d?.due, buffer = 0 } = {}) {
+/** First-plan rules are identical for the local preview and connected account. */
+export function validateActivationBudget(d, { items = d?.items, due = d?.due, buffer = 0 } = {}) {
   if (!active(d) || !acknowledged(d) || !funded(d)) return fail('Review your account details and add money before creating your first budget.');
   if (!Array.isArray(items) || !items.length || items.some(i => !positive(i.amount) || (i.spent || 0) !== 0)) return fail('Give at least one essential an amount above zero.');
   if (!Number.isSafeInteger(buffer) || buffer < 0) return fail('Choose a keep-back amount of zero or more.');
   if (items.reduce((sum, i) => sum + i.amount, 0) + buffer > d.state.wallet) return fail('Keep your budget within the money you just added.');
   if (typeof due !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(due) || !Number.isFinite(new Date(due + 'T12:00:00Z').getTime()) || new Date(due + 'T12:00:00Z').toISOString().slice(0, 10) !== due || due < new Date().toISOString().slice(0, 10)) return fail('Choose today or a future date for this money.');
+  return good('Your first plan is ready to save.');
+}
+
+export function saveActivationBudget(d, { items = d?.items, due = d?.due, buffer = 0 } = {}) {
+  const validation=validateActivationBudget(d,{items,due,buffer});
+  if(!validation.ok)return validation;
   const result = applyAction(d.state, 'createBudget', { items: items.map(i => ({ ...i, due })), buffer });
   if (!result.ok) return result;
   // Plan coverage and an expected allowance are independent choices.

@@ -106,7 +106,7 @@ test('purpose controls reveal the selected category and used categories cannot b
   assert.match(added, /GH₵70\.00/);
 });
 
-function binder(d, { step = 'purpose', fields = [], entering = false, selectors = {} } = {}) {
+function binder(d, { step = 'purpose', fields = [], entering = false, selectors = {}, context = {} } = {}) {
   const handlers = {}, navigations = [], error = { textContent: '' }, copyFeedback = { textContent: '' };
   let refreshes = 0, exits = 0, saves = 0, captureCurrent = null;
   const root = {
@@ -116,7 +116,7 @@ function binder(d, { step = 'purpose', fields = [], entering = false, selectors 
     querySelector(selector) { return selector === '.activation-error' ? error : selector === '[data-activation-copy-feedback]' ? copyFeedback : selectors[selector] || null; },
     addEventListener(name, handler) { handlers[name] = handler; }, removeEventListener() {},
   };
-  const ctx = { draft: { activation: d }, $: () => root, setCapture(callback) { captureCurrent = callback; }, saveDraft() { saves++; }, refresh() { captureCurrent?.(); refreshes++; }, go(route) { captureCurrent?.(); navigations.push(route); }, exitActivation() { captureCurrent?.(); exits++; } };
+  const ctx = { draft: { activation: d }, $: () => root, setCapture(callback) { captureCurrent = callback; }, saveDraft() { saves++; }, refresh() { captureCurrent?.(); refreshes++; }, go(route) { captureCurrent?.(); navigations.push(route); }, exitActivation() { captureCurrent?.(); exits++; }, ...context };
   const cleanup = bindActivation(ctx, { step });
   return { error, copyFeedback, navigations, cleanup, get refreshes() { return refreshes; }, get exits() { return exits; }, get saves() { return saves; }, input(target) { handlers.input({ target }); }, change(target) { handlers.change({ target }); }, click(dataset) { return handlers.click({ target: { closest() { return { dataset, disabled: false }; } } }); } };
 }
@@ -512,4 +512,77 @@ test('first top-up displays the account phone read-only and cannot capture an in
   assert.equal(d.fundingAttempt.phone, '0240000000');
   assert.equal(d.state.wallet, 0);
   ui.cleanup();
+});
+
+test('connected first-plan validation keeps the approved cushion, date and essential rules before any server request', async () => {
+  for (const alter of [
+    d => { d.keepBackText = '90'; },
+    d => { d.keepBackText = '-1'; },
+    d => { d.due = '2020-01-01'; },
+    d => { d.items = []; },
+  ]) {
+    const d = draft({ funded: true }); d.shared = true; d.state.transactions[0].ledgerJournalId = 'confirmed-shared-funding';
+    addActivationBudgetItem(d, { name: 'Transport', amount: 3000 }); alter(d);
+    const before = JSON.stringify(d.state), calls = [];
+    const ui = binder(d, { context: { connected: true, checkpointActivation: async () => ({ok:true}), actAsync(...args) { calls.push(args); throw Error('Invalid first plan must not be posted.'); } } });
+    await ui.click({ activationAction: 'save-budget' });
+    assert.equal(calls.length, 0);
+    assert.ok(ui.error.textContent);
+    assert.equal(JSON.stringify(d.state), before);
+    assert.equal(ui.navigations.length, 0);
+    assert.equal(d.budgetSaved, false);
+    ui.cleanup();
+  }
+});
+
+test('connected Complete budget waits for the same confirmed plan before showing the approved ready recap', async () => {
+  const d = draft({ funded: true }); d.shared = true; d.state.transactions[0].ledgerJournalId = 'confirmed-shared-funding'; d.keepBackText = '10';
+  addActivationBudgetItem(d, { name: 'Transport', amount: 3000 });
+  let confirm; const calls = [], pending = new Promise(resolve => { confirm = resolve; });
+  const ui = binder(d, { context: { connected: true, checkpointActivation: async () => ({ok:true}), actAsync(type, payload) { calls.push({type,payload}); return pending; } } });
+  const posting = ui.click({ activationAction: 'save-budget' });
+  assert.equal(calls.length, 1); assert.equal(calls[0].type, 'createBudget');
+  assert.equal(calls[0].payload.buffer, 1000); assert.equal(calls[0].payload.endDate, d.due);
+  assert.equal(calls[0].payload.items[0].due, d.due);
+  assert.equal(d.state.budget.created, false); assert.equal(d.budgetSaved, false); assert.equal(ui.navigations.length, 0);
+  await ui.click({ activationAction: 'save-budget' }); assert.equal(calls.length, 1, 'Repeated taps cannot create a second first plan.');
+  d.state.budget = { ...d.state.budget, created: true, items: structuredClone(calls[0].payload.items), endDate: d.due }; d.state.buffer = 1000;
+  confirm({ok:true}); await posting;
+  assert.equal(d.budgetSaved, true); assert.equal(ui.navigations.at(-1).step, 'ready');
+  const recap = renderActivation({draft:{activation:d}}, {step:'ready'});
+  assert.match(recap, /FIRST MOVE\. MADE\./); assert.match(recap, /Meet my Lumo/); assert.match(recap, /GH₵60\.00/);
+  assert.equal(d.state.wallet, 10000, 'Planning does not move money out of Everyday.');
+  ui.cleanup();
+});
+
+test('an unconfirmed connected first-plan save retains the entered essentials for correction or retry', async () => {
+  const d = draft({ funded: true }); d.shared = true; d.state.transactions[0].ledgerJournalId = 'confirmed-shared-funding';
+  addActivationBudgetItem(d, { name: 'Transport', amount: 3000 });
+  const before = JSON.stringify(d.state), ui = binder(d, { context: { connected: true, checkpointActivation: async () => ({ok:true}), actAsync: async () => ({ok:false,message:'Lumo could not confirm this plan yet.'}) } });
+  await ui.click({ activationAction: 'save-budget' });
+  assert.match(ui.error.textContent, /could not confirm/); assert.equal(d.items[0].amount, 3000);
+  assert.equal(d.budgetSaved, false); assert.equal(ui.navigations.length, 0); assert.equal(JSON.stringify(d.state), before);
+  ui.cleanup();
+});
+
+test('shared account acknowledgement stays on its approved arrival screen until the checkpoint confirms', async () => {
+  const d = draft({ acknowledged: false }); d.shared = true;
+  let confirm; const posted = [], ui = binder(d, { step:'account-created', context: { connected:true, checkpointActivation(step,details) { posted.push({step,details}); return new Promise(resolve=>{confirm=resolve;}); } } });
+  const acknowledgement = ui.click({activationAction:'acknowledge-account'});
+  assert.deepEqual(posted,[{step:'fund',details:{accountAcknowledged:true}}]);
+  assert.equal(d.accountAcknowledged,false);assert.equal(ui.navigations.length,0);assert.equal(d.state.wallet,0);
+  d.accountAcknowledged=true;confirm({ok:true});await acknowledgement;
+  assert.equal(ui.navigations.at(-1).step,'fund');assert.equal(d.state.transactions.length,0);ui.cleanup();
+});
+
+test('editing a saved connected first plan gets a fresh reference while unchanged retries reuse theirs', async () => {
+  const d = draft({funded:true});d.shared=true;d.state.transactions[0].ledgerJournalId='confirmed-shared-funding';addActivationBudgetItem(d,{name:'Transport',amount:3000});
+  const posted=[],checkpoints=[];
+  const context={connected:true,checkpointActivation:async step=>{checkpoints.push(step);return {ok:true};},actAsync:async(type,payload)=>{
+    posted.push({type,payload:structuredClone(payload)});d.state.budget={...d.state.budget,created:true,items:structuredClone(payload.items),endDate:payload.endDate};d.state.buffer=payload.buffer;return {ok:true};
+  }};
+  for(const amount of [3000,3000,4000]){d.items[0].amount=amount;const ui=binder(d,{context});await ui.click({activationAction:'save-budget'});assert.equal(ui.navigations.at(-1).step,'ready');ui.cleanup();}
+  assert.equal(posted[0].payload.idempotencyKey,posted[1].payload.idempotencyKey);
+  assert.notEqual(posted[1].payload.idempotencyKey,posted[2].payload.idempotencyKey);
+  assert.deepEqual(checkpoints,['ready','ready','ready']);assert.equal(d.state.wallet,10000);assert.equal(d.state.budget.items[0].amount,4000);
 });

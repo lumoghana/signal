@@ -6,7 +6,7 @@ import { renderActivationFunding } from './activation-funding-view.js';
 import { readDemoActivationFundingReceipt, simulateActivationFundingReceipt } from './activation-funding-demo.js';
 import {
   ACTIVATION_CATEGORIES, safeActivationStep, requestActivationFunding, checkActivationFunding, retryActivationFunding, activationFundingStatus,
-  addActivationBudgetItem, saveActivationBudget, acknowledgeCreatedAccount, activationEverydayAccount, activationEverydayAccountNumber
+  addActivationBudgetItem, saveActivationBudget, validateActivationBudget, acknowledgeCreatedAccount, activationEverydayAccount, activationEverydayAccountNumber
 } from './activation-model.js';
 
 const renderedActivationSteps = new WeakMap();
@@ -142,6 +142,19 @@ export function bindActivation(ctx, route) {
     } finally { if (current()) button.disabled = false; }
   };
   const go = next => { d.step = next; d.error = ''; ctx.setCapture?.(null); ctx.saveDraft?.(); ctx.go(routeFor(next)); };
+  const sharedCheckpoint=async(next,details={})=>{
+    if(!d.shared||!ctx.connected)return {ok:true};
+    if(typeof ctx.checkpointActivation!=='function')return {ok:false,message:'Lumo could not confirm your setup. Try this step again.'};
+    return ctx.checkpointActivation(next,details);
+  };
+  const checkpointGo=async(next,details={})=>{
+    if(!d.shared||!ctx.connected)return go(next);
+    busy=true;
+    const result=await sharedCheckpoint(next,details);
+    if(!current())return;
+    busy=false;if(!result.ok)return error(result.message);
+    go(next);
+  };
   const addItem = () => {
     const name = String(d.category === 'custom' ? d.categoryName : d.categoryName || d.category || '').trim();
     const selected = ACTIVATION_CATEGORIES.find(c => c.name === name);
@@ -195,13 +208,14 @@ export function bindActivation(ctx, route) {
     if (action === 'exit') return ctx.exitActivation();
     if (action === 'copy-account-number') return copyNumber(button);
     if (action === 'acknowledge-account') {
+      if(d.shared&&ctx.connected)return checkpointGo('fund',{accountAcknowledged:true,...(d.fundingTransactionId?{fundingTransactionId:d.fundingTransactionId}:{})});
       const result = acknowledgeCreatedAccount(d);
       if (!result.ok) return error(result.message);
       return go('fund');
     }
-    if (action === 'defer') { busy = true; button.disabled = true; return ctx.deferActivationFunding(); }
-    if (action === 'back') return go(step === 'ready' ? 'purpose' : step === 'purpose' ? 'fund' : 'account-created');
-    if (action === 'continue-purpose') return go('purpose');
+    if (action === 'defer') { busy = true; button.disabled = true; try{return await ctx.deferActivationFunding();}finally{if(current()){busy=false;button.disabled=false;}} }
+    if (action === 'back') return checkpointGo(step === 'ready' ? 'purpose' : step === 'purpose' ? 'fund' : 'account-created');
+    if (action === 'continue-purpose') return checkpointGo('purpose',{fundingTransactionId:d.fundingTransactionId});
     if (action === 'check-funding') return checkFunding({ manual: true });
     if (action === 'retry-funding') { const result = retryActivationFunding(d); if (!result.ok) return error(result.message); return refresh(); }
     if (action === 'fund') {
@@ -211,7 +225,12 @@ export function bindActivation(ctx, route) {
         ctx.auth({title:`Add ${cash(amount)} of shared test money?`,onSuccess:async()=>{
           const result=await ctx.actAsync('fund',{amount,source:'Shared test money',rail:'test',note:'Shared pilot test money. No bank or MoMo debit.',idempotencyKey:d.fundingKey});
           if(!result.ok)return error(result.message);
-          d.funded=true;d.fundingTransactionId=result.id||result.transaction?.id;d.fundingAttempt=null;d.error='';d.step='fund';refresh();
+          if(!current())return;
+          d.funded=true;d.fundingTransactionId=result.id||result.transaction?.id;d.fundingAttempt=null;d.error='';d.step='fund';ctx.saveDraft?.();
+          const checkpoint=await sharedCheckpoint('fund',{fundingTransactionId:d.fundingTransactionId});
+          if(!current())return;
+          if(!checkpoint.ok)d.error=checkpoint.message;
+          refresh();
         }});return;
       }
       const result = requestActivationFunding(d, { amount: parseAmount(d.funding.amountText), source: d.funding.source, phone: d.funding.phone ?? d.state.profile?.phone });
@@ -223,16 +242,26 @@ export function bindActivation(ctx, route) {
     if (action === 'save-budget') {
       if (pendingEssential(d)) return error('Add this essential first, or cancel the item before completing your budget.');
       if(d.shared&&ctx.connected){
+        const buffer=parseAmount(d.keepBackText||'0'),validation=validateActivationBudget(d,{items:d.items,due:d.due,buffer});
+        if(!validation.ok)return error(validation.message);
+        const items=d.items.map(item=>({...item,due:d.due}));
+        const signature=JSON.stringify({items:items.map(item=>({id:item.id,name:item.name,emoji:item.emoji||'📌',amount:item.amount,due:item.due})),due:d.due,buffer});
+        if(d.budgetAttempt?.signature!==signature)d.budgetAttempt={signature,key:`${d.fundingKey}-budget-${globalThis.crypto?.randomUUID?.()||Date.now().toString(36)}`};
+        ctx.saveDraft?.();
         busy=true;button.disabled=true;
-        const result=await ctx.actAsync('createBudget',{items:d.items.map(item=>({...item,due:d.due})),buffer:parseAmount(d.keepBackText||'0'),endDate:d.due,idempotencyKey:`${d.fundingKey}-budget`});
-        busy=false;button.disabled=false;if(!result.ok)return error(result.message);
+        const result=await ctx.actAsync('createBudget',{items,buffer,endDate:d.due,idempotencyKey:d.budgetAttempt.key});
+        if(!current())return;
+        if(!result.ok){busy=false;button.disabled=false;return error(result.message);}
+        const checkpoint=await sharedCheckpoint('ready');
+        if(!current())return;
+        busy=false;button.disabled=false;if(!checkpoint.ok)return error(checkpoint.message);
         d.budgetSaved=true;d.items=structuredClone(d.state.budget.items);return go('ready');
       }
       const result = saveActivationBudget(d, { items: d.items, due: d.due, buffer: parseAmount(d.keepBackText || '0') });
       if (!result.ok) return error(result.message);
       return go('ready');
     }
-    if (action === 'complete') { busy = true; button.disabled = true; ctx.completeActivation(); }
+    if (action === 'complete') { busy = true; button.disabled = true; try{return await ctx.completeActivation();}finally{if(current()){busy=false;button.disabled=false;}} }
   };
   const submit = event => { event.preventDefault(); (step === 'purpose' && pendingEssential(d) ? root.querySelector('[data-activation-action="add-item"]') : root.querySelector('.activation-footer .button'))?.click(); };
   root.addEventListener('input', input); root.addEventListener('change', input); root.addEventListener('click', click);

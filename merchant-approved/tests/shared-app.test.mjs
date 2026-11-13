@@ -1,3 +1,4 @@
+import './legacy-d1-transport.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync} from 'node:fs';
@@ -5,7 +6,8 @@ import {webcrypto} from 'node:crypto';
 import {createD1} from '../scripts/d1-adapter.mjs';
 import {handleAPI} from '../server/api.js';
 
-// The real browser modules call the real API against a disposable SQLite-backed D1 adapter.
+// Legacy domain/UI compatibility: real browser modules use the actual D1 API
+// through an explicit test-only transport. This is not a Supabase integration test.
 // A minimal DOM is sufficient for checking event wiring, role gates and rendered data.
 class Storage { constructor(){this.data=new Map()} getItem(k){return this.data.get(k)??null} setItem(k,v){this.data.set(k,String(v))} removeItem(k){this.data.delete(k)} clear(){this.data.clear()} }
 class Element {
@@ -47,11 +49,23 @@ async function external(path,body,jar){const result=await jarClient(jar)(path,{m
 let store,Auth,Shared;
 const username='shared.ui.owner',password='SharedOwner123';
 
-test('actual app modules connect signup, team access, campus wallet and current merchant balances through the shared API',async t=>{
+test('legacy D1 compatibility: app modules connect signup, team access, campus wallet and current merchant balances',async t=>{
  try{
   await import('../dist/app.js');store=await import('../dist/store.js');Auth=await import('../dist/account.js');Shared=await import('../dist/shared.js');
   await t.test('fresh-browser sign-in opens the account form',async()=>{
    assert.equal(store.hasRegistration(),false);await click('signup-login');assert.match(html(),/Welcome back/);await click('access-signup');assert.match(html(),/Create merchant account/);
+  });
+  await t.test('sample Collect and both QR types explain the consumer-app limitation and open the existing signup',async()=>{
+   const warning=/Its QR and shop code cannot receive payments from the Lumo consumer app/;
+   await click('signup-demo');await click('collect-shortcut',{mode:'amount'});
+   assert.equal(store.getWorkspaceMode(),'sample');assert.match(html(),warning);assert.match(html(),/data-action="onboarding">Create merchant account/);assert.match(html(),/collect-keypad/);
+   await click('key',{value:'1'});await click('create-charge');
+   assert.match(modal(),warning);assert.match(modal(),/data-action="onboarding"[^>]*>Create merchant account/);assert.match(modal(),/GH₵1.00/);assert.match(modal(),/Preview a sample payment in this browser/);assert.doesNotMatch(modal(),/Scan with Lumo/);
+   await click('onboarding');assert.equal(modal(),'');assert.match(html(),/signup-shell is-welcome/);assert.match(html(),/Create merchant account/);
+   await click('signup-demo');await click('collect-shortcut',{mode:'static'});
+   assert.match(html(),warning);assert.match(html(),/Preview a sample payment in this browser/);assert.match(html(),/Use Preview customer payment to explore this sample/);assert.doesNotMatch(html(),/Customer scans, enters the amount and pays/);
+   await click('shop-qr',{id:store.getState().shops[0].id});assert.match(modal(),warning);assert.match(modal(),/data-action="onboarding"[^>]*>Create merchant account/);
+   await click('onboarding');assert.equal(modal(),'');assert.match(html(),/signup-shell is-welcome/);assert.equal(calls.filter(call=>call.path==='/api/signup').length,0,'The clarity action opens signup without registering or publishing the sample shop');
   });
   await t.test('signup success displays the new server business, not sample account data',async()=>{
    await click('signup-begin');await submit({phone:'0245550188'},'signup');await submit({otp:'123456'},'signup');
@@ -80,6 +94,7 @@ test('actual app modules connect signup, team access, campus wallet and current 
    }
    for(const mode of ['amount','static'])assert.match(html(),new RegExp('<button\\b(?=[^>]*data-action="collect-shortcut")(?=[^>]*data-mode="'+mode+'")[^>]*>'),'Both Home collection shortcuts must be wired');
    await click('collect-shortcut',{mode:'static'});assert.match(html(),/static-qr/);assert.match(html(),/Customer scans, enters the amount and pays/);assert.match(html(),/Shared Night Market Counter/);assert.doesNotMatch(html(),/collect-keypad/);assert.equal(modal(),'','The shortcut opens Collect rather than a second QR dialog');
+   assert.doesNotMatch(html(),/Browser-only sample|cannot receive payments from the Lumo consumer app|data-action="onboarding"/);
    await click('go-home');await click('collect-shortcut',{mode:'amount'});assert.match(html(),/Generate payment QR/);assert.match(html(),/collect-keypad/);assert.doesNotMatch(html(),/static-qr/);
    await click('go-administration');assert.match(html(),/Business overview/);assert.match(html(),/Settle to bank/);assert.match(html(),/Team & access/);
    await click('go-checkout');assert.match(html(),/Generate payment QR/);assert.doesNotMatch(html(),/Merchant balance|Net collected · since last close|Confirmed payments|Still processing|Your receiving phone|data-change="collectShop"|data-action="collection-requests"/);assert.match(html(),/Shared Night Market Counter/);
@@ -284,7 +299,8 @@ test('actual app modules connect signup, team access, campus wallet and current 
   });
   await t.test('a lost refund response retains its original reference and UI retry returns one refund',async()=>{
    const transaction=store.getState().transactions.find(tx=>tx.status==='paid'&&tx.amount>=200),before=store.getState().refunds.length;await click('refund',{id:transaction.id});let drop=true;globalThis.fetch=async(path,options={})=>{const body=options.body?JSON.parse(options.body):null,response=await rawFetch(path,options);if(path==='/api/action'&&body?.type==='REFUND'&&drop){drop=false;assert.ok(response.ok,await response.clone().text());throw new TypeError('Refund committed but response lost')}return response};
-   try{await submit({transactionId:transaction.id,amount:'1.00',reason:'Customer request'},'refund');const key=[...localStorage.data.keys()].find(key=>key.startsWith('lumo-pending-refund-v1:'));assert.ok(key);const pending=JSON.parse(localStorage.getItem(key));await submit({transactionId:transaction.id,amount:'9.00',reason:'Changed reason'},'refund');assert.equal(store.getState().refunds.length,before+1);assert.equal(store.getState().refunds.find(refund=>refund.attemptId===pending.attemptId)?.amount,100);assert.equal(localStorage.getItem(key),null)}finally{globalThis.fetch=rawFetch;await click('dismiss')}
+   async function confirmedRefund(values){const posting=submit(values,'refund');await until(()=>html().includes('Confirm this refund'),'refund password confirmation');await submit({currentPassword:password});await posting;}
+   try{await confirmedRefund({transactionId:transaction.id,amount:'1.00',reason:'Customer request'});const key=[...localStorage.data.keys()].find(key=>key.startsWith('lumo-pending-refund-v1:'));assert.ok(key);const pending=JSON.parse(localStorage.getItem(key));await confirmedRefund({transactionId:transaction.id,amount:'9.00',reason:'Changed reason'});assert.equal(store.getState().refunds.length,before+1);assert.equal(store.getState().refunds.find(refund=>refund.attemptId===pending.attemptId)?.amount,100);assert.equal(localStorage.getItem(key),null)}finally{globalThis.fetch=rawFetch;await click('dismiss')}
   });
   await t.test('Add Shop retains the explicitly checked entrance confirmation through the actual app and API',async()=>{
    await click('go-shops');await click('add-shop');await submit({id:'',name:'Shared Confirmed Entrance',area:'Other',customArea:'Sarbah Hall',category:'Food & drinks',landmark:'Checked hall entrance',hours:'8 am – 10 pm',lat:'5.65',lng:'-.18',locationConfirmed:'on'},'shop');

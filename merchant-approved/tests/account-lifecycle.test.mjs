@@ -1,3 +1,4 @@
+import './legacy-d1-transport.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {createBusiness} from '../dist/domain.js';

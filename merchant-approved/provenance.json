@@ -2,5 +2,12 @@
   "approvedSite": "https://lumo-merchant-mobile.oness15.chatgpt.site",
   "approvedVersion": 7,
   "approvedCommit": "0e0ce95efc5d03719599fe3c745b7f1365e70c45",
-  "sourceProjectId": "appgprj_6af5be2c38548191822030bb895d6d3d"
+  "sourceProjectId": "appgprj_6af5be2c38548191822030bb895d6d3d",
+  "currentConnectedRelease": {
+    "siteVersion": 9,
+    "sourceCommit": "4a1f3b7bf8e705614693db288f77a8cbb7962be3",
+    "deployedUrl": "https://lumo-merchant-mobile.oness15.chatgpt.site",
+    "date": "2026-11-13",
+    "reason": "Allow configured shared backend in document CSP, reduce registered QR density, distinguish sample codes"
+  }
 }

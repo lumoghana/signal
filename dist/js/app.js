@@ -28,14 +28,14 @@ import {renderOnboarding,bindOnboarding,clearOnboardingMedia} from './onboarding
 import {renderActivation,bindActivation} from './activation.js';
 import {renderTour,bindTour} from './tour.js';
 import {createTourDraft,normalizeTourDraft,loadTourRecord,saveTourRecord,shouldOfferTour} from './tour-model.js';
-import {createActivationDraft,restoreActivationDraft,completeActivation as finishActivation,deferActivationFunding} from './activation-model.js';
+import {createActivationDraft,restoreActivationDraft,resumeSharedActivationDraft,completeActivation as finishActivation,deferActivationFunding} from './activation-model.js';
 import {ONBOARDING_SCHEMA,createOnboardingDraft,normalizeOnboardingDraft,persistableOnboardingDraft,safeOnboardingStep,buildOnboardingState,resetCameraCaptures} from './onboarding-model.js';
 import {createApprovedService} from './approved-service.js';
 import {openPartnerInbox} from './partner-inbox-ui.js';
 
 const persistence=createPersistence({key:STORAGE_KEY,validate:validStoredState,empty:createEmptyState,migrate:migrateState});
 const opened=persistence.load();
-const shared=createApprovedService({onSnapshot:(saved,envelope)=>{reconcileState(state,migrateState(saved));if(envelope.account?.handle){state.account||={};state.account.login={username:envelope.account.handle};}if(draft.activation?.shared)reconcileState(draft.activation.state,state);}});
+const shared=createApprovedService({onSnapshot:(saved,envelope)=>{reconcileState(state,migrateState(saved));if(envelope.account?.handle){state.account||={};state.account.login={username:envelope.account.handle};}syncSharedActivation(envelope.account?.userId||shared.user?.id);}});
 let state=shared.connected?createEmptyState():opened.state||createEmptyState(), route=state.onboardingDone?{section:'home',page:'home'}:{section:'welcome'}, cleanup=null, toastTimer=null, overlayCleanup=null, router=null, captureCurrent=null, overlayMeta=null, pendingPageNavigation=false, pendingModalPop=false, lastRenderedKey='';
 let authorizationPin='',signupPassword='',refreshingShared=false;
 let tourRecord=loadTourRecord();
@@ -44,7 +44,33 @@ const daysFromNow=n=>new Date(Date.now()+n*86400000).toISOString().slice(0,10);
 const firstName=()=>state.profile.name.split(' ')[0]||'friend';
 const rootRoutes=['home','activity','pay','boxes','plan','groups'];
 const isRoot=()=>rootRoutes.includes(route.section)&&(!route.page||route.page==='home')||route.section==='life'&&route.page==='groups';
-const ctx={get state(){return state},get route(){return route},get connected(){return shared.connected},shared,draft,$:s=>view.querySelector(s),$$:s=>[...view.querySelectorAll(s)],go,back,openChat,returnToApp,finish:next=>go(next,{finish:true}),saveDraft:persistSession,setCapture:fn=>{captureCurrent=typeof fn==='function'?fn:null;},setSignupPassword:value=>{signupPassword=value;},refresh:render,toast,sheet,closeSheet,auth,celebrate,act,actAsync,reset,signOut,completeOnboarding:completeSignup,exitOnboarding:exitSignup,startOnboardingPreview:startSignupPreview,completeActivation:completeAccountActivation,deferActivationFunding:()=>completeAccountActivation({waitForFunding:true}),exitActivation:exitAccountActivation,startTour,finishTour,installLoadedState,completeSetupTerms,exitSetupTerms};
+const ctx={get state(){return state},get route(){return route},get connected(){return shared.connected},shared,draft,$:s=>view.querySelector(s),$$:s=>[...view.querySelectorAll(s)],go,back,openChat,returnToApp,finish:next=>go(next,{finish:true}),saveDraft:persistSession,setCapture:fn=>{captureCurrent=typeof fn==='function'?fn:null;},setSignupPassword:value=>{signupPassword=value;},refresh:render,toast,sheet,closeSheet,auth,celebrate,act,actAsync,reset,signOut,checkpointActivation,completeOnboarding:completeSignup,exitOnboarding:exitSignup,startOnboardingPreview:startSignupPreview,completeActivation:completeAccountActivation,deferActivationFunding:()=>completeAccountActivation({waitForFunding:true}),exitActivation:exitAccountActivation,startTour,finishTour,installLoadedState,completeSetupTerms,exitSetupTerms};
+
+function syncSharedActivation(ownerId){
+  const current=draft.activation;
+  const oldPhone=String(current?.state?.profile?.phone||'').replace(/\s/g,''),phone=String(state.profile?.phone||'').replace(/\s/g,'');
+  const oldHandle=current?.state?.account?.login?.username,handle=state.account?.login?.username;
+  if(current?.shared&&!current.sharedUserId&&ownerId&&oldPhone&&oldPhone===phone&&oldHandle&&oldHandle===handle)current.sharedUserId=ownerId;
+  if(current?.shared&&current.sharedUserId===ownerId){
+    reconcileState(current.state,state);
+    const resumed=resumeSharedActivationDraft(state,ownerId);
+    if(resumed){current.accountAcknowledged=resumed.accountAcknowledged;current.fundingTransactionId=resumed.fundingTransactionId||current.fundingTransactionId;current.funded=resumed.funded;
+      if(!current.items.length&&['account-created','fund'].includes(current.step)&&resumed.budgetSaved){current.items=resumed.items;current.keepBackText=resumed.keepBackText;current.due=resumed.due;current.budgetSaved=true;}}
+    return;
+  }
+  if(current?.shared)delete draft.activation;
+  if(!draft.activation){const resumed=resumeSharedActivationDraft(state,ownerId);if(resumed)draft.activation=resumed;}
+}
+async function checkpointActivation(step,details={}){
+  const d=draft.activation;
+  if(!d?.shared||!shared.connected)return {ok:true};
+  const owner=shared.user?.id,version=shared.authVersion;
+  if(!owner||d.sharedUserId!==owner)return {ok:false,message:'Continue setup from your own signed-in account.'};
+  const result=await actAsync('activationCheckpoint',{step,...details});
+  if(draft.activation!==d||shared.user?.id!==owner||shared.authVersion!==version)return {ok:false,code:'ACCOUNT_CHANGED',message:'Your account changed. Continue with the current sign-in.'};
+  if(result.ok){const checkpoint=state.activation;d.accountAcknowledged=checkpoint?.accountAcknowledged===true;d.fundingTransactionId=checkpoint?.fundingTransactionId||d.fundingTransactionId;d.funded=state.wallet>0&&state.transactions.some(t=>t.id===d.fundingTransactionId&&t.type==='income'&&t.status==='success'&&t.ledgerJournalId);ctx.saveDraft();}
+  return result;
+}
 
 function installLoadedState(saved){closeSheet();reconcileState(state,saved);route=safeRoute(route,state,draft);render();}
 function act(type,payload={}){
@@ -259,7 +285,11 @@ async function completeSignup(){
     if(!registered.ok){d.completed=false;toast(registered.message);render();return;}
     signupPassword='';
     clearOnboardingMedia(d);
-    draft.activation=createActivationDraft({state,preview:false});draft.activation.shared=true;
+    draft.activation=createActivationDraft({state,preview:false});draft.activation.shared=true;draft.activation.sharedUserId=shared.user?.id;
+    persistSession();
+    const checkpoint=await checkpointActivation('account-created');
+    if(checkpoint.code==='ACCOUNT_CHANGED')return;
+    if(!checkpoint.ok)draft.activation.error=checkpoint.message;
   }else{clearOnboardingMedia(d);draft.activation=createActivationDraft({state:result.state,preview:d.preview});}
   delete draft.onboarding;persistSession();
   go({section:'activation',step:'account-created'},{finish:true});
@@ -271,9 +301,11 @@ function exitAccountActivation(){
   if(draft.activation?.preview){delete draft.activation;persistSession();ctx.finish({section:'life',page:'settings'});}
   else ctx.go({section:'welcome'});
 }
-function completeAccountActivation({waitForFunding=false}={}){
+async function completeAccountActivation({waitForFunding=false}={}){
   if(completingSignup)return;
-  const result=waitForFunding?deferActivationFunding(draft.activation):finishActivation(draft.activation);
+  const d=draft.activation,connected=shared.connected&&d?.shared;
+  const source=connected?structuredClone(d):d;
+  const result=waitForFunding?deferActivationFunding(source):finishActivation(source);
   if(!result.ok){toast(result.message);return;}
   completingSignup=true;
   if(result.preview){
@@ -282,7 +314,12 @@ function completeAccountActivation({waitForFunding=false}={}){
     celebrate({title:waitForFunding?'Ready when your money is.':'That’s your first move.',body:waitForFunding?'You explored the waiting state. Your current demo account stays exactly where you left it.':'Signup, a first top-up and a budget. Your current demo account stays exactly where you left it.',button:'Back to my Lumo',onDone:()=>{completingSignup=false;ctx.finish({section:'life',page:'settings'});}});
     return;
   }
-  if(shared.connected&&draft.activation?.shared){delete draft.activation;persistSession();completingSignup=false;ctx.finish(readPaymentLink(ctx)||{section:'home',page:'home'});return;}
+  if(connected){
+    const checkpoint=await checkpointActivation(waitForFunding?'waiting':'complete',{accountAcknowledged:d.accountAcknowledged,fundingTransactionId:d.fundingTransactionId||undefined});
+    if(draft.activation!==d||checkpoint.code==='ACCOUNT_CHANGED'){completingSignup=false;return;}
+    if(!checkpoint.ok){d.error=checkpoint.message;completingSignup=false;persistSession();render();return;}
+    delete draft.activation;persistSession();completingSignup=false;ctx.finish(readPaymentLink(ctx)||{section:'home',page:'home'});return;
+  }
   const saved=persistence.commit(migrateState(result.state));
   if(!saved.ok){draft.activation.completed=false;completingSignup=false;toast(saved.message);render();return;}
   state=saved.state;
@@ -328,8 +365,18 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 installExperienceClarity();
 
 async function refreshShared({initial=false}={}){
-  if(!shared.connected||!shared.signedIn||refreshingShared||draft.activation)return;
-  refreshingShared=true;try{captureCurrent?.();const result=await shared.snapshot();if(result.ok){if(initial){route=readPaymentLink(ctx)||{section:'home',page:'home'};router=makeRouter();router.initialise();}else if(!overlayMeta&&((route.section==='life'&&route.page==='group-chat')||!view.querySelector('input:focus,textarea:focus,select:focus')))render();}else if(initial)toast(result.message);}finally{refreshingShared=false;}
+  if(!shared.connected||!shared.signedIn||refreshingShared)return;
+  const owner=shared.user?.id,version=shared.authVersion,before=JSON.stringify([state,shared.account,shared.partnerRequests]);
+  refreshingShared=true;
+  try{
+    captureCurrent?.();const result=await shared.snapshot();
+    if(shared.user?.id!==owner||shared.authVersion!==version)return;
+    if(result.ok){
+      if(draft.activation?.shared&&['complete','waiting'].includes(state.activation?.step)){delete draft.activation;persistSession();}
+      if(initial){route=draft.activation?{section:'activation',step:draft.activation.step}:readPaymentLink(ctx)||{section:'home',page:'home'};router=makeRouter();router.initialise();}
+      else if(before!==JSON.stringify([state,shared.account,shared.partnerRequests])&&!overlayMeta&&((route.section==='life'&&route.page==='group-chat')||!view.querySelector('input:focus,textarea:focus,select:focus')))render();
+    }else if(initial)toast(result.message);
+  }finally{refreshingShared=false;}
 }
 void refreshShared({initial:true});
 window.addEventListener('focus',()=>void refreshShared());
