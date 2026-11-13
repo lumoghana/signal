@@ -1,9 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GH">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#173e2a">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#191a22">
+<script src="./appearance.js"></script>
 <meta name="description" content="Lumo Merchant. Every shop in view. Every payment clear. An interactive campus merchant prototype.">
 <title>Lumo Merchant · Collect with a scan</title>
 <link rel="icon" type="image/svg+xml" href="./icon.svg">
@@ -21,12 +22,13 @@
 <link rel="stylesheet" href="./campus-pay.css">
 <link rel="stylesheet" href="./collections.css">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="./mobile-app.css">
+<link rel="stylesheet" href="./consumer-brand.css">
 </head>
 <body>
-<div id="app"><div class="startup-loading"><strong>lumo merchant</strong><p>Opening your workspace…</p></div></div>
+<div id="app"><div class="startup-loading"><strong class="canonical-wordmark">lumo</strong><span class="brand-qualifier">merchant</span><p>Opening your workspace…</p></div></div>
 <div id="modal-root"></div>
 <div id="payment-announcement" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
 <div id="toast-root" class="toast-stack" role="status" aria-live="polite"></div>

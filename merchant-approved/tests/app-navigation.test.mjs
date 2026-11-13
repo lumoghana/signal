@@ -29,6 +29,13 @@ test('request state updates replace the same modal layer rather than stacking di
  assert.equal(h.states.length,2);h.back();assert.equal(h.restored.at(-1).modal,null);
 });
 
+test('Back and Forward restore Appearance without storing device or business data in history',()=>{
+ const h=harness();h.nav.reset({page:'administration',shopId:'shop-a'});h.nav.openModal({kind:'appearance-settings',preference:'light'});
+ h.back();assert.deepEqual(h.restored.at(-1),{page:'administration',shopId:'shop-a',modal:null});
+ h.forward();assert.deepEqual(h.restored.at(-1),{page:'administration',shopId:'shop-a',modal:{kind:'appearance-settings'}});
+ assert.ok(!JSON.stringify(h.states).includes('preference'));
+});
+
 test('page navigation from a modal replaces its layer and Back returns to prior page',()=>{
  const h=harness();h.nav.reset({page:'administration',shopId:'shop-a'});h.nav.openModal({kind:'approvals'});h.nav.syncPage({page:'activity',shopId:'shop-a'});
  assert.equal(h.states.length,2);h.back();assert.equal(h.restored.at(-1).page,'administration');assert.equal(h.restored.at(-1).modal,null);

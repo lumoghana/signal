@@ -7,7 +7,7 @@ const route=value=>({page:simple(value?.page)||'checkout',shopId:simple(value?.s
 const identity=value=>typeof value==='string'?value:JSON.stringify(value??'');
 const sameRoute=(a,b)=>a.page===b.page&&a.shopId===b.shopId;
 const idModals=new Set(['request-detail','shop-qr','transaction','closing-detail','settlement-detail','ticket-detail','open-close','edit-shop']);
-const plainModals=new Set(['collection-requests','notifications','account-menu','mobile-menu','approvals','privacy','sound-settings','role-switch','demo-console','confirm-reset','charge-shop','account-details','add-shop','add-staff','open-settle','edit-destination']);
+const plainModals=new Set(['collection-requests','notifications','account-menu','mobile-menu','approvals','privacy','appearance-settings','sound-settings','role-switch','demo-console','confirm-reset','charge-shop','account-details','add-shop','add-staff','open-settle','edit-destination']);
 function modalRoute(value){
  const kind=simple(value?.kind);
  if(idModals.has(kind)){const id=simple(value?.id);return id?{kind,id}:null;}

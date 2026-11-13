@@ -1,0 +1,228 @@
+/* Shared with the approved Lumo consumer experience. Merchant tasks keep their own routes. */
+:root {
+  --canvas:#191a22; --paper:#24252f; --paper-soft:#2d2e38;
+  --ink:#f5f5f7; --muted:#999aa6; --faint:#999aa6; --line:#34353f;
+  --lime:#d4f65a; --green:#d4f65a; --lime-soft:#d4f65a16; --green-soft:#d4f65a16;
+  --on-accent:#191a22; --radius:18px; --shadow:none;
+  --success:#a4dcac; --success-soft:#a4dcac14; --success-line:#a4dcac38;
+  --amber-line:#edc27e38; --red-line:#ffaaa338;
+  --amber:#edc27e; --amber-soft:#edc27e14; --red:#ffaaa3; --red-soft:#ffaaa314;
+  --brand-font:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
+  --mobile-nav-height:66px;
+  font-family:var(--brand-font); font-synthesis:weight; font-size:16px; color-scheme:dark;
+}
+:root[data-theme="light"] {
+  --canvas:#eeefe7; --paper:#fff; --paper-soft:#e2e6d9;
+  --ink:#191c17; --muted:#505749; --faint:#65705c; --line:#c3c9b8;
+  --green:#20271a; --lime-soft:#e5edcc; --green-soft:#e5edcc;
+  --success:#28663c; --success-soft:#e7f2e5; --success-line:#b5d8bc;
+  --amber-line:#e6ce9e; --red-line:#e8beb9;
+  --amber:#825819; --amber-soft:#fff1d6; --red:#ab3d35; --red-soft:#fff0ed;
+  color-scheme:light;
+}
+html,body,.collections-app { color:var(--ink); background:var(--canvas); }
+body,.signup-shell,.access-shell,.access-security-page { font-family:var(--brand-font); }
+.collections-app { background:transparent; }
+.main-shell { background:transparent; }
+button,input,select,textarea { font-family:var(--brand-font); }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible { outline:3px solid var(--lime); outline-offset:3px; }
+.icon,.signup-icon,.access-icon { stroke-width:1.65; stroke-linecap:round; stroke-linejoin:round; }
+.canonical-wordmark,.brand-word,.mobile-brand,.signup-mobile-brand,.access-mobile-brand,
+.signup-brand-name,.access-brand-word {
+  color:var(--green); font-family:var(--brand-font); font-size:29px; font-weight:850;
+  letter-spacing:-2px; line-height:1; font-style:normal;
+}
+.brand-qualifier,.collections-app .topbar .mobile-brand>span,.brand-word>span,
+.signup-mobile-brand>span,.access-mobile-brand>span {
+  display:block; margin-top:5px; font-size:9px; font-weight:600; letter-spacing:1.1px;
+  line-height:1.1; text-transform:uppercase; color:var(--muted);
+}
+.signup-mobile-brand,.access-mobile-brand,.collections-app .topbar .mobile-brand { flex-direction:column; align-items:flex-start; gap:0; flex-shrink:0; }
+.signup-mobile-brand>.canonical-wordmark,.access-mobile-brand>.canonical-wordmark { font-size:29px; font-weight:850; letter-spacing:-2px; }
+.signup-mobile-brand>.brand-qualifier,.access-mobile-brand>.brand-qualifier { margin:5px 0 0; padding:0; border:0; font-size:9px; letter-spacing:1.1px; }
+.collections-app .topbar .mobile-brand>.brand-qualifier { margin:5px 0 0; padding:0; border:0; font-size:9px; letter-spacing:1.1px; }
+.signup-topbar .appearance-entry,.access-topbar .appearance-entry { margin-left:auto; }
+.collections-app .topbar { min-height:64px; height:calc(64px + env(safe-area-inset-top)); padding:env(safe-area-inset-top) 20px 0; background:var(--canvas); border-color:var(--line); }
+.collections-app .topbar .mobile-brand { font-size:29px; letter-spacing:-2px; }
+.collections-app .topbar .icon-btn { border:0; background:transparent; color:var(--ink); }
+.collections-app .topbar-actions { gap:4px; }
+.collections-app .page { padding:22px 20px calc(90px + env(safe-area-inset-bottom)); }
+.collections-app .collect-amount-page { min-height:calc(100dvh - 64px - env(safe-area-inset-top)); padding-bottom:calc(78px + env(safe-area-inset-bottom)); }
+.page-title,.admin-intro h1,.collect-focused-heading h1 { font-size:32px; font-weight:600; line-height:1.13; letter-spacing:-.035em; color:var(--ink); }
+.subtitle,.collections-app .subtitle,.admin-intro p { font-size:14px; line-height:1.5; color:var(--muted); }
+.eyebrow,.admin-group h2 { color:var(--muted); font-size:12px; letter-spacing:1px; font-weight:600; }
+.panel-title { font-size:22px!important; font-weight:600; letter-spacing:-.035em; }
+.collections-app .btn,.collections-app .btn.small,.modal-footer .btn,.signup-btn,.access-btn {
+  min-height:52px; border-radius:14px; padding:12px 16px; font-size:16px; line-height:1.3;
+  font-weight:600; letter-spacing:-.02em; box-shadow:none;
+}
+.btn.primary,.collections-app .btn.primary,.signup-btn.primary,.access-btn.primary {
+  color:var(--on-accent); background:var(--lime); border-color:var(--lime);
+}
+.btn.secondary,.btn.light,.signup-btn.secondary,.access-btn.secondary {
+  background:var(--paper); color:var(--ink); border-color:var(--line);
+}
+.btn.primary:hover:not(:disabled),.signup-btn.primary:hover:not(:disabled),.access-btn.primary:hover:not(:disabled) { background:#e0ff77; border-color:#e0ff77; color:var(--on-accent); box-shadow:none; }
+.collections-app .text-btn,.text-btn,.signup-demo-link,.signup-sample-link { color:var(--green); font-size:14px; min-height:44px; }
+.input,.select,.signup-input,.signup-select,.access-input { min-height:52px; border-radius:14px; border-color:var(--line); background-color:var(--paper); color:var(--ink); font-size:16px; }
+.label,.signup-label,.access-label { color:var(--ink); font-size:14px; font-weight:500; }
+.field small,.help,.signup-help,.access-help { color:var(--muted); font-size:13px; line-height:1.5; }
+.collections-app .bottom-nav { min-height:calc(66px + env(safe-area-inset-bottom)); padding:0 18px env(safe-area-inset-bottom); background:var(--canvas); border-color:var(--line); }
+.collections-app .bottom-nav button { min-height:66px; color:var(--muted); font-size:11px; font-weight:500; gap:5px; }
+.collections-app .bottom-nav button .icon { width:22px; height:22px; }
+.collections-app .bottom-nav button.active { color:var(--green); }
+.collections-app .bottom-nav button.active:before { display:none; }
+.avatar,.transaction-avatar { background:var(--paper-soft); color:var(--green); }
+.badge { font-size:11px; border-radius:8px; }
+.callout,.notice,.shared-indicator,.role-banner { font-size:13px; line-height:1.5; border-radius:14px; }
+.settings-links button { min-height:60px; color:var(--ink); font-size:16px; }
+
+/* Home follows the same account-led gradient and activity sheet as consumer Home. */
+.collections-app:has(.home-page) { background:linear-gradient(180deg,#505d14 0%,#343e20 23%,#232820 49%,#191a22 81%); }
+:root[data-theme="light"] .collections-app:has(.home-page) { background:linear-gradient(180deg,#dfeab6 0%,#eaf0d9 27%,#f1f3e9 58%,#f6f7f1 100%); }
+.collections-app:has(.home-page) .topbar { background:transparent; border-color:transparent; }
+.merchant-home .home-heading { margin:0 0 28px; }
+.merchant-home .home-heading h1 { font-size:22px; font-weight:600; letter-spacing:-.035em; }
+.merchant-home .home-shop-selector { font-size:14px; color:var(--ink); }
+.merchant-home .home-net small { font-size:14px; color:#d6d9c7; margin-bottom:12px; }
+.merchant-home .home-net>strong { color:var(--lime); font-size:56px; font-weight:600; letter-spacing:-.04em; }
+.merchant-home .home-summary-details>div,.merchant-home .home-summary-details strong { font-size:13px; color:#d6d9c7; }
+.collections-app .merchant-home .home-actions .btn { min-height:52px; font-size:15px; }
+.collections-app .merchant-home .home-actions .home-shop-qr { color:var(--ink); background:var(--paper); border-color:var(--line); }
+.merchant-home .home-quick-status .text-btn { color:#d6d9c7; font-size:12px; }
+.merchant-home .home-activity { margin:16px -20px 0; padding:14px 20px 6px; border-radius:24px 24px 0 0; background:var(--paper); }
+.merchant-home .collect-receipts h2 { font-size:20px; font-weight:600; letter-spacing:-.035em; }
+.merchant-home .collect-receipts>header .text-btn { font-size:13px; }
+.merchant-home .collect-receipt { min-height:70px; padding:14px 0; border-color:var(--line); }
+.merchant-home .collect-receipt .transaction-avatar { width:40px; height:40px; flex-basis:40px; background:var(--paper-soft); color:var(--green); }
+.merchant-home .collect-receipt>span:nth-child(2)>strong,.merchant-home .collect-receipt>strong { font-size:14px; }
+.merchant-home .collect-receipt>span:nth-child(2)>small { font-size:12px; line-height:1.35; }
+.merchant-home .home-panels { margin:0 -20px; padding:0 20px; border:0; background:var(--paper); }
+.merchant-home .home-panel>summary { font-size:14px; min-height:56px; }
+.merchant-home .home-panel-meta { font-size:12px; }
+:root[data-theme="light"] .merchant-home .home-net>strong { color:#233018; }
+:root[data-theme="light"] .merchant-home .home-net small,
+:root[data-theme="light"] .merchant-home .home-summary-details>div,
+:root[data-theme="light"] .merchant-home .home-summary-details strong,
+:root[data-theme="light"] .merchant-home .home-quick-status .text-btn { color:#4e5945; }
+
+/* A focused amount screen, with the familiar Lumo controls and keypad. */
+.collect-focused-heading { margin-bottom:18px; }
+.collect-focused-heading h1 { min-width:0; flex:1 1 auto; }
+.collect-current-shop { font-size:13px; color:var(--muted); max-width:42%; min-width:0; flex:0 1 42%; }
+.collect-terminal { border-radius:18px; background:var(--paper); border-color:var(--line); box-shadow:none; }
+.collect-tabs { background:var(--paper-soft); border-radius:14px; }
+.collect-tabs button { font-size:14px; color:var(--muted); border-radius:11px; }
+.collect-tabs button.active { background:var(--paper); color:var(--ink); box-shadow:none; }
+.collect-amount strong { color:var(--ink); font-weight:500; }
+.collect-amount>small,.collect-amount>span:first-child,.collect-terminal-foot { color:var(--muted); font-size:13px; }
+.collect-note input { color:var(--ink); border-color:var(--line); min-height:44px; }
+.collect-keypad button { color:var(--ink); font-weight:400; }
+.collect-keypad button:hover,.collect-keypad button:active { background:var(--paper-soft); }
+.collections-app .collect-generate.btn.primary { font-size:16px; border-radius:14px; color:var(--on-accent); background:var(--lime); border-color:var(--lime); }
+.collections-app .collect-generate.btn.primary:disabled { color:var(--muted); background:var(--paper-soft); border-color:var(--line); }
+.collect-receipts h2,.collect-requests h2 { font-size:20px; font-weight:600; letter-spacing:-.035em; }
+.static-title h2 { font-size:22px; letter-spacing:-.035em; }
+.static-title p,.static-instructions { font-size:14px; color:var(--muted); }
+.static-actions .btn { font-size:14px; }
+.admin-intro { margin-bottom:24px; }
+.admin-balance { background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:18px; padding:22px; }
+.admin-balance small,.admin-balance p { color:var(--muted); font-size:13px; }
+.admin-balance strong { color:var(--green); }
+.admin-tool { min-height:86px; padding:18px 16px; border-color:var(--line); }
+.admin-tool strong { font-size:16px; font-weight:500; color:var(--ink); }
+.admin-tool small { font-size:13px; line-height:1.4; color:var(--muted); }
+.admin-tool-icon { background:var(--paper-soft); color:var(--green); }
+.admin-tools { background:var(--paper); border-color:var(--line); border-radius:18px; overflow:hidden; }
+
+/* Signup and access belong to the same app, including their first screen. */
+.signup-shell,.access-shell,.access-security-page {
+  --signup-ink:var(--ink); --signup-green:var(--green); --signup-lime:var(--lime); --signup-muted:var(--muted); --signup-line:var(--line); --signup-paper:var(--paper);
+  --access-ink:var(--ink); --access-green:var(--green); --access-lime:var(--lime); --access-muted:var(--muted); --access-line:var(--line); --access-paper:var(--paper);
+  background:var(--canvas); color:var(--ink); font-size:16px;
+}
+.signup-topbar,.access-topbar { min-height:80px; padding:22px 20px; gap:12px; }
+.signup-content,.access-content { padding:24px 20px 36px; align-items:flex-start; }
+.signup-title,.access-title { font-size:32px; line-height:1.13; font-weight:600; letter-spacing:-.035em; }
+.is-welcome .signup-title { font-size:40px; line-height:1.08; font-weight:600; letter-spacing:-.04em; }
+.signup-kicker,.access-kicker { font-size:12px; letter-spacing:.8px; color:var(--muted); }
+.signup-description,.access-description { font-size:15px; line-height:1.55; color:var(--muted); }
+.signup-benefits { gap:22px; margin:28px 0; }
+.signup-benefit-icon { width:44px; height:44px; border-radius:14px; background:var(--paper-soft); color:var(--green); }
+.signup-benefit-copy strong { font-size:16px; font-weight:500; }
+.signup-benefit-copy p { font-size:14px; color:var(--muted); line-height:1.5; }
+.signup-bottom-note,.signup-demo-note,.signup-privacy,.signup-privacy-body,.access-bottom-note { font-size:13px; color:var(--muted); line-height:1.5; }
+.signup-progress-label,.signup-review-row,.signup-review-title,.access-description small { font-size:13px; }
+.signup-actions { margin-top:24px; }
+.signup-aside,.access-aside { background:#191a22; color:#f5f5f7; }
+.signup-aside .canonical-wordmark,.access-aside .canonical-wordmark { color:#d4f65a; }
+.signup-phone-field { border-color:var(--line); border-radius:14px; background:var(--paper); }
+.signup-country { background:var(--paper-soft); color:var(--muted); border-color:var(--line); }
+.signup-input::placeholder,.access-input::placeholder { color:var(--muted); font-size:16px; }
+.signup-check-card,.signup-review-block,.access-card { border-radius:18px; border-color:var(--line); background:var(--paper); }
+
+/* Shared sheet treatment. Payment QR remains a dedicated full screen. */
+.modal-backdrop { align-items:flex-end; padding:0; background:#0009; backdrop-filter:blur(6px); animation:none; }
+.modal,.modal.wide { height:auto; max-height:calc(100dvh - 24px); border-radius:24px 24px 0 0; background:var(--paper); padding-top:0; }
+.modal::before { content:''; display:block; flex-shrink:0; width:40px; height:4px; border-radius:2px; background:var(--line); margin:10px auto 0; }
+.modal-header { padding:14px 20px 12px; min-height:64px; border-color:var(--line); }
+.modal-header h2 { font-size:22px; font-weight:600; letter-spacing:-.035em; }
+.modal-header .close-btn { border:0; background:var(--paper-soft); }
+.modal-body { padding:14px 20px 24px; font-size:15px; }
+.modal-footer { padding:12px 20px calc(16px + env(safe-area-inset-bottom)); background:var(--paper); border-color:var(--line); }
+.modal-footer .btn { font-size:16px; }
+.modal:has(.collection-qr-dialog) { height:100dvh; max-height:100dvh; border-radius:0; padding-top:env(safe-area-inset-top); overflow-y:auto; }
+.modal:has(.collection-qr-dialog)::before { display:none; }
+.modal:has(.collection-qr-dialog) .modal-header { position:sticky; top:0; z-index:1; background:var(--paper); }
+.modal:has(.collection-qr-dialog) .modal-body { flex:0 0 auto; overflow:visible; }
+.modal:has(.collection-qr-dialog) .modal-footer { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+.modal:has(.collection-qr-dialog) .modal-footer .btn { min-width:0; padding:12px 10px; font-size:14px; white-space:normal; }
+.collection-qr-dialog .qr-card { color:var(--ink); background:transparent; }
+.collection-qr-dialog .qr-card p,.collection-qr-dialog .notice { color:var(--muted); font-size:13px; }
+.qr-image,.static-qr { background:#fff!important; color:#000!important; }
+.qr-image svg,.static-qr svg { background:#fff; }
+.qr-state-line { font-size:13px; }
+.toast { font-size:14px; background:var(--paper); color:var(--ink); border-color:var(--line); }
+
+.appearance-entry { display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:14px; width:44px; min-width:44px; height:44px; padding:10px; font-size:13px; }
+.appearance-entry .icon { width:18px; height:18px; }
+.appearance-settings-group { margin-top:24px; }
+.appearance-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; border:0; padding:0; margin:0; }
+.appearance-choice { min-width:0; display:flex; flex-direction:column; gap:10px; border:1px solid var(--line); border-radius:14px; padding:14px 8px; text-align:center; color:var(--ink); font-size:14px; cursor:pointer; }
+.appearance-choice:has(input:checked) { border-color:var(--lime); box-shadow:inset 0 0 0 1px var(--lime); }
+.appearance-choice input { accent-color:var(--lime); width:18px; height:18px; margin:0 auto; }
+.appearance-choice-face { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; min-height:120px; color:var(--ink); }
+.appearance-choice-face svg { width:36px; height:36px; }
+.appearance-choice-face i { display:grid; place-items:center; width:24px; height:24px; border:1px solid var(--line); border-radius:50%; color:transparent; }
+.appearance-choice:has(input:checked) .appearance-choice-face i { color:var(--on-accent); background:var(--lime); border-color:var(--lime); }
+.appearance-choice input { position:absolute; opacity:0; }
+.appearance-choice:focus-within { outline:3px solid var(--lime); outline-offset:3px; }
+.appearance-hint { color:var(--muted); font-size:14px; line-height:1.5; margin:18px 0 0; }
+@media(max-width:370px) {
+  .collections-app .page { padding-left:18px; padding-right:18px; }
+  .merchant-home .home-activity,.merchant-home .home-panels { margin-left:-18px; margin-right:-18px; padding-left:18px; padding-right:18px; }
+  .merchant-home .home-net>strong { font-size:48px; }
+  .collect-focused-heading h1 { font-size:24px; }
+  .collect-current-shop { font-size:12px; max-width:34%; flex-basis:34%; }
+  .is-welcome .signup-title { font-size:36px; }
+  .signup-topbar,.access-topbar { gap:8px; }
+}
+@media(max-height:650px) {
+  .collections-app .page { padding-top:14px; }
+  .merchant-home .home-heading { margin-bottom:16px; }
+  .merchant-home .home-summary { margin-bottom:18px; }
+  .merchant-home .home-net>strong { font-size:46px; }
+  .collect-amount-page .collect-terminal { padding-left:12px; padding-right:12px; }
+  .collections-app .collect-amount-page .collect-generate.btn.primary { min-height:52px; }
+  .is-welcome .signup-benefits { gap:16px; margin:20px 0; }
+  .is-welcome .signup-topbar { min-height:72px; padding-top:14px; padding-bottom:14px; }
+  .is-welcome .signup-content { padding-top:20px; }
+  .is-welcome .signup-title { font-size:32px; }
+  .is-welcome .signup-heading { margin-bottom:20px; }
+  .is-welcome .signup-benefit-copy strong { font-size:14px; }
+  .is-welcome .signup-benefit-copy p { display:none; }
+  .is-welcome .signup-benefit-icon { width:36px; height:36px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+}
