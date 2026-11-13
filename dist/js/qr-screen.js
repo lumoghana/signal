@@ -54,7 +54,7 @@ export function bindQrScreen(ctx, route = {}, {
     const result = parseQrPayload(raw, { origin: globalThis.location?.origin });
     if (!result.ok) { showStatus(result.message, { live: scanner?.active }); return false; }
     stop(); showStatus('Code found. Let’s check the details.');
-    if (result.payment.type === 'merchant') ctx.openQrMerchant(result.payment.id);
+    if (result.payment.type === 'merchant') ctx.openQrMerchant(ctx.connected?result.payment:result.payment.id);
     else ctx.openQrPayment(result.payment);
     return true;
   };

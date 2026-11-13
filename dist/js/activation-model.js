@@ -14,6 +14,7 @@ const good = message => ({ ok: true, message });
 const uid = () => globalThis.crypto?.randomUUID?.() || `activation-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const active = d => d && !d.completed && d.state?.onboardingDone === true;
 const funded = d => {
+  if(d?.shared)return d.funded===true&&d.state?.transactions?.some(t=>t.id===d.fundingTransactionId&&t.type==='income'&&t.status==='success'&&positive(t.amount))===true;
   if (d?.funded !== true || !positive(d.state?.wallet)) return false;
   const transaction = d.state.transactions?.find(t => t.id === d.fundingTransactionId && t.type === 'income' && t.status === 'success' && positive(t.amount));
   if (!transaction) return false;

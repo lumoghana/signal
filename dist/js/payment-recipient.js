@@ -47,7 +47,7 @@ export function renderAccountRecipient(ctx, route = {}) {
 export function bindAccountRecipient(ctx, route = {}, { createLookup = createRecipientLookup } = {}) {
   const root = ctx.$('.account-recipient');
   if (!root) return () => {};
-  const payment = ctx.draft.payment, rail = externalRail(payment.rail), controller = createLookup();
+  const payment = ctx.draft.payment, rail = externalRail(payment.rail), controller = createLookup(ctx.connected?{lookup:()=>({ok:false,message:'This provider is not connected. Choose Lumo to pay a registered shared account.'}),delay:0}:undefined);
   let alive = true, busy = false;
   const listeners = [], valid = () => alive && root.isConnected !== false && ctx.draft.payment === payment && payment.rail === rail;
   const listen = (element, name, handler) => { if (!element) return; element.addEventListener(name, handler); listeners.push(() => element.removeEventListener(name, handler)); };

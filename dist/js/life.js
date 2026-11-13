@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import { prepareIOURepayment } from './payments.js';
 import { esc, cash, icon, pageHead, row, field, btn, empty, progress, dateLabel } from './ui.js';
 import { getSummary, pendingIOUAmount, repayableIOUAmount } from './model.js';
@@ -27,15 +28,15 @@ const formError = (root, message) => {
   const el = root.querySelector('.life-form-error');
   if (el) el.textContent = message;
 };
-const commit = (ctx, type, payload, root) => {
-  const result = ctx.act(type, payload);
+const commit = (ctx, type, payload, root) => {return runActionFlow(function*(){
+  const result = (yield (ctx.actAsync||ctx.act).call(ctx,type, payload));
   if (!result?.ok) {
     if (root?.isConnected) formError(root, result?.message || 'Please check the details and try again.');
     else ctx.toast(result?.message || 'Please check the details and try again.');
     return null;
   }
   return result;
-};
+});};
 
 function actionRow(action, emoji, title, sub = '', right = '') {
   return row({ action, emoji, title, sub, right });
@@ -121,25 +122,25 @@ function editOutsideMoney(ctx, balance = null, draft = null) {
       name.placeholder = outsideKinds[d.type].name;
       el.querySelectorAll('[data-outside-kind]').forEach((choice) => choice.setAttribute('aria-pressed', String(choice.dataset.outsideKind === d.type)));
     });
-    el.querySelector('form').onsubmit = (e) => {
+    el.querySelector('form').onsubmit = (e) => {return runActionFlow(function*(){
       e.preventDefault(); capture();
       if (!d.name.trim()) { formError(el, 'Give this balance a name you’ll recognise.'); return; }
       if (!/^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})$/.test(d.balance)) { formError(el, 'Enter a balance of zero or more, with up to two decimal places.'); return; }
       const value = Math.round(Number(d.balance) * 100);
-      const result = commit(ctx, balance ? 'updateExternalBalance' : 'createExternalBalance', { id: balance?.id, type: d.type, name: d.name.trim(), balance: value, idempotencyKey: d.requestKey }, el);
+      const result = (yield commit(ctx, balance ? 'updateExternalBalance' : 'createExternalBalance', { id: balance?.id, type: d.type, name: d.name.trim(), balance: value, idempotencyKey: d.requestKey }, el));
       if (!result) return;
       ctx.closeSheet(); ctx.refresh(); ctx.toast(balance ? 'Outside balance updated.' : 'Outside money added to your picture.');
-    };
+    });};
     el.querySelector('[data-action="outside-cancel"]').onclick = () => ctx.closeSheet();
     const remove = el.querySelector('[data-action="outside-remove"]');
     if (remove) remove.onclick = () => {
       capture();
       ctx.sheet(sheetHead('Remove ' + balance.name + '?', 'Only this manual record will be removed. No money moves.') + errorBox + btn('Keep this balance', 'outside-keep') + btn('Remove balance', 'outside-confirm-remove', { secondary: true }), (confirm) => {
         confirm.querySelector('[data-action="outside-keep"]').onclick = () => editOutsideMoney(ctx, balance, d);
-        confirm.querySelector('[data-action="outside-confirm-remove"]').onclick = () => {
-          if (!commit(ctx, 'removeExternalBalance', { id: balance.id, idempotencyKey: uid() }, confirm)) return;
+        confirm.querySelector('[data-action="outside-confirm-remove"]').onclick = () => {return runActionFlow(function*(){
+          if (!(yield commit(ctx, 'removeExternalBalance', { id: balance.id, idempotencyKey: uid() }, confirm))) return;
           ctx.closeSheet(); ctx.refresh(); ctx.$('[data-action="life-external-add"]')?.focus(); ctx.toast('Outside balance removed.');
-        };
+        });};
       }, { onClose: () => editOutsideMoney(ctx, balance, d), closeLabel: 'Cancel removal' });
     };
   }, { closeLabel: 'Cancel balance changes' });
@@ -251,14 +252,14 @@ function reviewRecoveryIncome(ctx) {
   const r=ctx.state.recovery, received=ctx.state.transactions.filter(t=>t.type==='income'&&t.status==='success'&&t.at>=r.startedAt);
   ctx.sheet(sheetHead('Let’s check what arrived.','Only confirmed money already in your ledger can be reviewed. This does not add money again.') + (received.length ? '<div class="stack">'+received.map(t=>'<button type="button" class="panel life-option" data-review-income="'+esc(t.id)+'"><span><strong>'+esc(t.merchant||'Money received')+'</strong><small>'+dateLabel(t.at)+'</small></span><strong>'+personalMoney(ctx,t.amount)+'</strong></button>').join('')+'</div>' : '<p class="muted">No confirmed money has arrived since this plan began. Expected allowance and IOUs do not count.</p>') + errorBox + btn('Back to my plan','recovery-review-back'), el=>{
     el.querySelector('[data-action="recovery-review-back"]').onclick=()=>ctx.closeSheet();
-    el.querySelectorAll('[data-review-income]').forEach(button=>button.onclick=()=>{const result=commit(ctx,'reviewRecoveryIncome',{transactionId:button.dataset.reviewIncome,idempotencyKey:'recovery-review:'+r.startedAt+':'+button.dataset.reviewIncome},el);if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);}});
+    el.querySelectorAll('[data-review-income]').forEach(button=>button.onclick=()=>{return runActionFlow(function*(){const result=(yield commit(ctx,'reviewRecoveryIncome',{transactionId:button.dataset.reviewIncome,idempotencyKey:'recovery-review:'+r.startedAt+':'+button.dataset.reviewIncome},el));if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);}});});
   });
 }
 function finishRecovery(ctx) {
   const sum=getSummary(ctx.state), gap=Math.max(0,sum.planned+(ctx.state.buffer||0)-sum.available);
   ctx.sheet(sheetHead('Ready to finish recovery?','Your commitments and money records stay intact. Saving rules resume only when money allows.') + '<div class="panel life-padded"><p>Current shortfall: <strong>'+personalMoney(ctx,gap)+'</strong></p><p>Available: '+personalMoney(ctx,sum.available)+' · Planned: '+personalMoney(ctx,sum.planned)+'</p></div>' + (gap ? '<label class="recovery-protect"><input type="checkbox" name="recoveryAdjusted"><span>I have reviewed this remaining gap and adjusted my arrangements outside this plan.</span></label>' : '') + errorBox + btn('Finish recovery','recovery-finish-confirm') + btn('Keep this plan','recovery-finish-cancel',{secondary:true}),el=>{
     el.querySelector('[data-action="recovery-finish-cancel"]').onclick=()=>ctx.closeSheet();
-    el.querySelector('[data-action="recovery-finish-confirm"]').onclick=()=>{ const confirmAdjusted=el.querySelector('[name="recoveryAdjusted"]')?.checked===true; const result=commit(ctx,'completeRecovery',{confirmAdjusted,idempotencyKey:'recovery-complete:'+ctx.state.recovery.startedAt},el);if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);} };
+    el.querySelector('[data-action="recovery-finish-confirm"]').onclick=()=>{return runActionFlow(function*(){ const confirmAdjusted=el.querySelector('[name="recoveryAdjusted"]')?.checked===true; const result=(yield commit(ctx,'completeRecovery',{confirmAdjusted,idempotencyKey:'recovery-complete:'+ctx.state.recovery.startedAt},el));if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);} });};
   });
 }
 
@@ -444,33 +445,33 @@ function settleIOU(ctx, x) {
       el.querySelector('[name="repaymentMethod"]')?.addEventListener('change',e=>{d.method=e.target.value;el.querySelector('[data-outside-choice]').hidden=d.method!=='outside';ctx.saveDraft?.();});
       el.querySelector('[name="outsideDestination"]')?.addEventListener('change',e=>{d.destination=e.target.value;ctx.saveDraft?.();});
       el.querySelector('[data-action="life-settlement-close"]').onclick=()=>ctx.closeSheet();
-      el.querySelector('form').onsubmit=e=>{
+      el.querySelector('form').onsubmit=e=>{return runActionFlow(function*(){
         e.preventDefault();d.amountText=el.querySelector('[name="settleAmount"]').value;ctx.saveDraft?.();
         const amount=readAmount(el.querySelector('[name="settleAmount"]'));
         if(!Number.isSafeInteger(amount)||amount<=0||amount>remaining(x))return formError(el,'Choose an amount up to '+personalMoney(ctx,remaining(x))+'.');
         if(incoming&&(!d.destination||(d.destination==='lumo'&&!d.receiptTransactionId)))return formError(el,'Choose where it arrived and a confirmed receipt for Lumo money.');
         if(!incoming && d.method!=='outside'){ const available=repayableIOUAmount(ctx.state,x);if(amount>available)return formError(el,'There is '+personalMoney(ctx,Math.max(0,available))+' left to repay after pending payments.');ctx.closeSheet();prepareIOURepayment(ctx,x,amount,d.method);return; }
         if(!incoming&&!['cash','momo','bank'].includes(d.destination))return formError(el,'Choose where you already paid.');
-        const act=()=>{
+        const act=()=>{return runActionFlow(function*(){
           const payload={id:x.id,amount,idempotencyKey:d.operationId,...(incoming?d.destination==='lumo'?{receiptTransactionId:d.receiptTransactionId}:{destination:d.destination}:{outside:true,destination:d.destination})};
-          const r=commit(ctx,'settleIOU',payload,el);if(!r)return;
+          const r=(yield commit(ctx,'settleIOU',payload,el));if(!r)return;
           delete ctx.draft.iouSettlement;ctx.saveDraft?.();ctx.closeSheet();ctx.refresh();ctx.toast(r.message);
-        };
-        if(incoming)act();else ctx.auth({title:'Record outside repayment to '+x.name,onCancel:show,onSuccess:act});
-      };
+        });};
+        if(incoming)(yield act());else ctx.auth({title:'Record outside repayment to '+x.name,onCancel:show,onSuccess:act});
+      });};
     });
   }
   show();
 }
 
-async function shareText(ctx, title, text, onReturn) {
+function shareText(ctx, title, text, onReturn) {return runActionFlow(function*(){
   try {
     if (navigator.share) {
-      await navigator.share({ title, text });
+      (yield navigator.share({ title, text }));
       return;
     }
     if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
+      (yield navigator.clipboard.writeText(text));
       ctx.toast('Copied. Share it wherever you like.');
       return;
     }
@@ -481,7 +482,7 @@ async function shareText(ctx, title, text, onReturn) {
     el.querySelector('textarea').select();
     el.querySelector('[data-action="life-share-done"]').onclick = () => onReturn ? onReturn() : ctx.closeSheet();
   });
-}
+});}
 
 const groupPhone = value => String(value || '').replace(/[\s()-]/g, '');
 const groupApproverCount = d => 1 + d.members.filter(m => m.role === 'approver').length;
@@ -611,14 +612,14 @@ function editProfile(ctx) {
     field({ label: 'What should we call you?', name: 'profileName', value: ctx.state.profile.name, required: true }) +
     field({ label: 'Your campus', name: 'profileCampus', value: ctx.state.profile.campus || '', placeholder: 'University of Ghana' }) +
     errorBox + '<button class="button" type="submit">Save details</button></form>', (el) => {
-    el.querySelector('form').onsubmit = (e) => {
+    el.querySelector('form').onsubmit = (e) => {return runActionFlow(function*(){
       e.preventDefault();
       const name = el.querySelector('[name="profileName"]').value.trim().slice(0, 50);
       const campus = el.querySelector('[name="profileCampus"]').value.trim().slice(0, 80);
       if (!name) return formError(el, 'What name would you like to use?');
-      if (!commit(ctx, 'updateProfile', { name, campus }, el)) return;
+      if (!(yield commit(ctx, 'updateProfile', { name, campus }, el))) return;
       ctx.closeSheet(); ctx.refresh(); ctx.toast('That is you.');
-    };
+    });};
   });
 }
 
@@ -658,7 +659,7 @@ export function bindLife(ctx, route) {
   root.querySelectorAll('[data-action]').forEach((b) => {
     const a = b.dataset.action;
     if (!a?.startsWith('life-')) return;
-    b.addEventListener('click', () => {
+    b.addEventListener('click', () => {return runActionFlow(function*(){
       const s = ctx.state;
       const x = (s.ious || []).find((i) => i.id === route.id);
       const g = (s.groups || []).find((i) => i.id === route.id);
@@ -669,8 +670,8 @@ export function bindLife(ctx, route) {
       if (a === 'life-recovery-adjust') { ctx.draft.recovery = { days: ctx.state.recovery.days || 7, checkInDate: ctx.state.recovery.active ? ctx.state.recovery.checkInDate || ctx.state.recovery.nextDate : addDays(7), adjustments: {}, editing: true }; ctx.go(go('recovery',{step:0})); return; }
       if (a === 'life-external-add') { editOutsideMoney(ctx); return; }
       if (a.startsWith('life-external-edit:')) { const balance = (s.externalBalances || []).find((item) => item.id === a.slice('life-external-edit:'.length)); if (balance) editOutsideMoney(ctx, balance); return; }
-      if (a === 'life-visibility') { ctx.act('settings', { hideBalance: !s.settings.hideBalance }); ctx.refresh(); return; }
-      if (a === 'life-notifications') { ctx.act('settings', { notifications: !s.settings.notifications }); ctx.refresh(); return; }
+      if (a === 'life-visibility') { (yield (ctx.actAsync||ctx.act).call(ctx,'settings', { hideBalance: !s.settings.hideBalance })); ctx.refresh(); return; }
+      if (a === 'life-notifications') { (yield (ctx.actAsync||ctx.act).call(ctx,'settings', { notifications: !s.settings.notifications })); ctx.refresh(); return; }
       if (a === 'life-tour') { ctx.startTour({ replay: true, returnTo: route }); return; }
       if (a === 'life-onboarding-preview') { ctx.startOnboardingPreview(); return; }
       if (a === 'life-requests' || a === 'life-splits') { ctx.go({section:'pay',page:a === 'life-requests'?'requests':'splits'}); return; }
@@ -697,7 +698,7 @@ export function bindLife(ctx, route) {
         if (!ctx.draft.iouCreate || !validateIOUStep(ctx, route)) return;
         const d = ctx.draft.iouCreate;
         if (!d.name.trim() || !Number.isSafeInteger(d.amount) || d.amount <= 0) { formError(root, 'Check the person and total amount before saving.'); return; }
-        const r = commit(ctx, d.edit ? 'updateIOU' : 'createIOU', { id: d.edit ? d.id : undefined, name: d.name.trim(), type: d.type, amount: d.amount, due: d.due, note: d.note.trim().slice(0, 240), budgetItemId: d.type === 'owedByMe' ? d.budgetItemId || '' : '', idempotencyKey: d.idempotencyKey }, root);
+        const r = (yield commit(ctx, d.edit ? 'updateIOU' : 'createIOU', { id: d.edit ? d.id : undefined, name: d.name.trim(), type: d.type, amount: d.amount, due: d.due, note: d.note.trim().slice(0, 240), budgetItemId: d.type === 'owedByMe' ? d.budgetItemId || '' : '', idempotencyKey: d.idempotencyKey }, root));
         if (!r) return;
         const id = r.iou?.id || r.id, edited = d.edit;
         delete ctx.draft.iouCreate; ctx.saveDraft?.(); ctx.finish(go('iou-detail', { id })); ctx.toast(edited ? 'IOU updated.' : 'A clear agreement. Kept.'); return;
@@ -715,9 +716,9 @@ export function bindLife(ctx, route) {
           el.querySelector('[data-action="iou-edit"]').onclick = () => openIOUWizard(ctx, x);
           el.querySelector('[data-action="iou-cancel"]').onclick = () => {
             infoSheet(ctx, 'Cancel this IOU?', '<p>The remaining ' + personalMoney(ctx,remaining(x)) + ' will leave your open IOUs. No money moves.</p><button class="button secondary" data-action="iou-confirm-cancel">Yes, cancel the record</button>');
-            document.querySelector('[data-action="iou-confirm-cancel"]').onclick = () => {
-              if (commit(ctx, 'cancelIOU', { id: x.id })) { ctx.closeSheet(); ctx.refresh(); ctx.toast('IOU cancelled.'); }
-            };
+            document.querySelector('[data-action="iou-confirm-cancel"]').onclick = () => {return runActionFlow(function*(){
+              if ((yield commit(ctx, 'cancelIOU', { id: x.id }))) { ctx.closeSheet(); ctx.refresh(); ctx.toast('IOU cancelled.'); }
+            });};
           };
         }); return;
       }
@@ -747,11 +748,11 @@ export function bindLife(ctx, route) {
       }
       if (a === 'life-recovery-save') {
         const d = recoveryDraft(ctx), reductions = recoveryReductions(ctx,d);
-        const r = commit(ctx, 'recoveryPlan', { checkInDate: d.checkInDate || d.nextDate || addDays(d.days), days: d.days, reduceCategories: reductions, pauseSavings: true, message: reductions.length ? 'Your chosen costs eased. Other commitments protected.' : 'Current plan protected.' });
+        const r = (yield commit(ctx, 'recoveryPlan', { checkInDate: d.checkInDate || d.nextDate || addDays(d.days), days: d.days, reduceCategories: reductions, pauseSavings: true, message: reductions.length ? 'Your chosen costs eased. Other commitments protected.' : 'Current plan protected.' }));
         if (!r) return;
         delete ctx.draft.recovery; ctx.saveDraft?.(); ctx.go(go('recovery')); ctx.toast('Your recovery plan is in place. One day at a time.'); return;
       }
-      if (a === 'life-printing-demo') { const result = ctx.act('ensureProjectPrintingDemo', {}); if (result?.ok) ctx.go(go('group-detail', { id: result.group?.id || result.id || 'group-project-printing' })); else ctx.toast(result?.message || 'This sample is unavailable.'); return; }
+      if (a === 'life-printing-demo') { const result = (yield (ctx.actAsync||ctx.act).call(ctx,'ensureProjectPrintingDemo', {})); if (result?.ok) ctx.go(go('group-detail', { id: result.group?.id || result.id || 'group-project-printing' })); else ctx.toast(result?.message || 'This sample is unavailable.'); return; }
       if (a === 'life-new-group' || a === 'life-resume-group') { newGroup(ctx); return; }
       if (a === 'life-restart-group') { restartGroup(ctx); return; }
       if (a === 'life-create-exit') { captureGroupDraft(ctx, route); ctx.saveDraft?.(); ctx.go(go('groups'), { replace: true }); return; }
@@ -765,7 +766,7 @@ export function bindLife(ctx, route) {
         if (!d) return;
         if (!d.name.trim() || !Number.isSafeInteger(d.target) || d.target <= 0 || !d.members.length || d.threshold > groupApproverCount(d)) { ctx.toast('Review the group name, target and agreement first.'); return; }
         const members = [{ id: 'me', name: ctx.state.profile.name || 'You', role: 'approver' }, ...d.members.map(m => ({ ...m }))];
-        const r = commit(ctx, 'createGroup', { name: d.name.trim(), purpose: d.purpose?.trim() || d.name.trim(), deadline: d.deadline || '', emoji: d.emoji, target: d.target, members, mandate: { approvers: members.filter(m => m.role === 'approver').map(m => m.id), threshold: d.threshold }, idempotencyKey: d.idempotencyKey }, root);
+        const r = (yield commit(ctx, 'createGroup', { name: d.name.trim(), purpose: d.purpose?.trim() || d.name.trim(), deadline: d.deadline || '', emoji: d.emoji, target: d.target, members, mandate: { approvers: members.filter(m => m.role === 'approver').map(m => m.id), threshold: d.threshold }, idempotencyKey: d.idempotencyKey }, root));
         if (!r) return;
         const id = r.group?.id || r.id || ctx.state.groups.at(-1)?.id, name = d.name;
         delete ctx.draft.groupCreate; ctx.saveDraft?.();
@@ -775,11 +776,11 @@ export function bindLife(ctx, route) {
       if (a === 'life-profile-edit') { editProfile(ctx); return; }
       if (a === 'life-keepback') {
         ctx.sheet(sheetHead('What would you like to leave untouched?') + '<form class="form-stack">' + amountInput('keepback', ((s.buffer || 0) / 100).toFixed(2), 'Keep-back amount', '0') + errorBox + '<button class="button" type="submit">Keep that aside</button></form>', (el) => {
-          el.querySelector('form').onsubmit = (e) => {
+          el.querySelector('form').onsubmit = (e) => {return runActionFlow(function*(){
             e.preventDefault(); const amount = readAmount(el.querySelector('[name="keepback"]'));
             if (!Number.isSafeInteger(amount) || amount < 0 || amount > s.wallet) return formError(el, 'Choose an amount within your available balance.');
-            if (commit(ctx, 'settings', { buffer: amount }, el)) { ctx.closeSheet(); ctx.refresh(); ctx.toast('Your keep-back is updated.'); }
-          };
+            if ((yield commit(ctx, 'settings', { buffer: amount }, el))) { ctx.closeSheet(); ctx.refresh(); ctx.toast('Your keep-back is updated.'); }
+          });};
         }); return;
       }
       if (a === 'life-reset' || a === 'life-demo') {
@@ -802,6 +803,6 @@ export function bindLife(ctx, route) {
       if (a === 'life-help-balance') { infoSheet(ctx, 'Three views of your money', '<p><strong>Available</strong> is the money in your everyday account.</p><p><strong>Planned</strong> is what you have reserved for commitments.</p><p><strong>Left after plan</strong> subtracts your plan and keep-back from available money. Money Boxes are held separately.</p>'); return; }
       if (a === 'life-help-expected') { infoSheet(ctx, 'Expected is not available.', '<p>Allowance and money someone owes you remain expected until they actually arrive.</p><p>Match an existing confirmed Lumo receipt, or record a repayment that arrived in cash, MoMo or another bank. Recording an IOU repayment never credits Lumo a second time. A due date alone never adds money.</p>'); return; }
       if (a === 'life-help-pause') { infoSheet(ctx, 'A moment of clarity.', '<p>Lumo may pause when a payment could use money your plan is relying on.</p><p>You can see the effect, change the amount or continue after reviewing it. There is no judgement.</p>'); }
-    });
+    });});
   });
 }

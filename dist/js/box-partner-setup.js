@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import {esc,icon,field,btn} from './ui.js';
 import {validatePartnerDetails} from './box-protection.js';
 import {getBoxPartnerInvitation,getBoxPartnerInvitationPreview} from './box-partner-invitation.js';
@@ -26,43 +27,43 @@ function openPartnerPhone(ctx){
  if(!view){ctx.toast('Send a new partner code first.');return;}
  const accepted=['accepted','verified','consumed'].includes(view.status),code=view.code,expired=['expired','locked','superseded'].includes(view.status)||(!['verified','consumed'].includes(view.status)&&Date.parse(view.expiresAt)<=Date.now());
  ctx.sheet(`<div class="partner-phone-simulation"><span class="eyebrow">Partner’s phone · Simulation</span><h2>${accepted?'You’re on their side.':'A little backup for a big goal.'}</h2><p><strong>${esc(ctx.state.profile.name.split(' ')[0])}</strong> asked you to be an accountability partner for <strong>${esc(view.boxName)}</strong>.</p><div class="partner-phone-address">${icon('phone',18)} ${esc(view.partner?.phone||d.partnerPhone)}</div><p>You’ll receive a fresh code when they request money back from this box. Sharing a code approves only that request. They still use their own PIN.</p><p class="muted">You do not get access to their balance, budgets or other boxes.</p>${expired?'<p class="notice">This invitation code is no longer available. Ask for a fresh code before accepting.</p>':code?`<div class="partner-phone-code"><small>Share this first code after accepting</small><strong>${esc(code)}</strong></div><p class="muted">This confirms your number and role before the box is created. This first code cannot release money.</p>`:accepted?'<p class="notice">This confirmation has already been verified or the code has expired.</p>':view.status==='declined'?'<p class="notice">You declined this invitation. No box with you as partner can be created from it.</p>':`<label class="partner-role-consent"><input type="checkbox" data-partner-consent><span>I agree to be the accountability partner for this Money Box.</span></label><p class="error" role="alert" data-partner-phone-error></p><button class="button" data-partner-accept>Accept and reveal my code</button><button class="button text" data-partner-decline>Decline invitation</button>`}<p class="box-partner-demo">Local participant simulation. No SMS or message was sent, and this is not another person’s live device.</p></div>`,el=>{
-   const respond=decision=>{
+   const respond=decision=>{return runActionFlow(function*(){
     if(!el.isConnected||ctx.draft.box!==d||ctx.route.section!=='boxes'||ctx.route.page!=='create')return;
     if(decision==='accepted'&&!el.querySelector('[data-partner-consent]')?.checked){el.querySelector('[data-partner-phone-error]').textContent='Confirm you accept this role first.';return;}
-    const result=ctx.act('respondBoxPartnerInitialInvitation',{invitationId:d.partnerInvitationId,decision});
+    const result=(yield (ctx.actAsync||ctx.act).call(ctx,'respondBoxPartnerInitialInvitation',{invitationId:d.partnerInvitationId,decision}));
     if(!result.ok){const error=el.querySelector('[data-partner-phone-error]');if(error)error.textContent=result.message;else ctx.toast(result.message);return;}
     ctx.closeSheet();ctx.refresh();openPartnerPhone(ctx);
-   };
-   el.querySelector('[data-partner-accept]')?.addEventListener('click',()=>respond('accepted'));
-   el.querySelector('[data-partner-decline]')?.addEventListener('click',()=>respond('declined'));
+   });};
+   el.querySelector('[data-partner-accept]')?.addEventListener('click',()=>runActionFlow(function*(){return (yield respond('accepted'));}));
+   el.querySelector('[data-partner-decline]')?.addEventListener('click',()=>runActionFlow(function*(){return (yield respond('declined'));}));
  });
 }
 
-export function handleInitialPartnerAction(ctx,route,action,{setError,boxRoute,refresh}){
+export function handleInitialPartnerAction(ctx,route,action,{setError,boxRoute,refresh}){return runActionFlow(function*(){
  if(!['box-partner','box-partner-toggle','box-partner-skip','partner-initial-preview','partner-initial-verify','partner-initial-resend','partner-initial-details','partner-initial-continue'].includes(action))return false;
  const d=ctx.draft.box;if(!d)return true;
  const error=message=>setError(ctx,message);
  const continueToReview=()=>{if(route.edit)delete ctx.draft.boxEditBackup;boxRoute('review');};
- const send=()=>{
+ const send=()=>{return runActionFlow(function*(){
   const checked=validatePartnerDetails({name:d.partnerName,phone:d.partnerPhone},ctx.state.profile?.phone);
   if(!checked.ok){error(checked.message);return;}
   d.partnerName=checked.partner.name;d.partnerPhone=checked.partner.phone;d.partnerSetupId ||= uid();
-  const result=ctx.act('sendBoxPartnerInvitation',{...scope(d)});
+  const result=(yield (ctx.actAsync||ctx.act).call(ctx,'sendBoxPartnerInvitation',{...scope(d)}));
   if(!result.ok){error(result.message);return;}
   d.partnerInvitationId=result.invitationId;d.partnerCodePhase='code';refresh();
- };
+ });};
  if(action==='box-partner-toggle'){d.partnerEnabled=!d.partnerEnabled;refresh();}
  else if(action==='box-partner-skip'){d.partnerEnabled=false;d.partnerCodePhase='';continueToReview();}
- else if(action==='box-partner'){if(!d.partnerEnabled)continueToReview();else if(partnerReady(ctx)){d.partnerCodePhase='code';refresh();}else send();}
- else if(action==='partner-initial-resend')send();
+ else if(action==='box-partner'){if(!d.partnerEnabled)continueToReview();else if(partnerReady(ctx)){d.partnerCodePhase='code';refresh();}else (yield send());}
+ else if(action==='partner-initial-resend')(yield send());
  else if(action==='partner-initial-details'){d.partnerCodePhase='';refresh();}
  else if(action==='partner-initial-preview')openPartnerPhone(ctx);
  else if(action==='partner-initial-continue'){if(!partnerReady(ctx)){error('Ask your partner to confirm again before creating this box.');return true;}continueToReview();}
  else if(action==='partner-initial-verify'){
   const input=ctx.$('[name="box-partner-code"]'),code=input?.value||'';
-  const result=ctx.act('verifyBoxPartnerInvitation',{...scope(d),code});
+  const result=(yield (ctx.actAsync||ctx.act).call(ctx,'verifyBoxPartnerInvitation',{...scope(d),code}));
   if(!result.ok){if(input)input.value='';refresh();error(result.message);return true;}
   if(input)input.value='';refresh();ctx.toast(`${d.partnerName} is confirmed. Your Money Box is ready to create.`);
  }
  return true;
-}
+});}

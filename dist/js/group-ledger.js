@@ -38,7 +38,7 @@ const addPayoutHistory = (p, type, actorId) => { p.history ||= []; p.history.pus
 export function ensureGroupState(state) {
   for (const g of state.groups || []) {
     g.creatorId ||= g.members.some(m => m.id === 'me') ? 'me' : g.members[0]?.id || 'me';
-    g.participantId ||= 'me'; g.localSimulation = true;
+    g.participantId ||= 'me'; g.localSimulation ??= true;
     g.purpose = typeof g.purpose === 'string' ? g.purpose : g.name;
     g.deadline = typeof g.deadline === 'string' ? g.deadline : '';
     g.status ||= 'open'; g.refunds ||= [];

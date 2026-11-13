@@ -13,7 +13,7 @@ export function openMerchantCodeSheet(ctx, {
   const submit = event => {
     event.preventDefault();
     if (!current() || submitted) return;
-    const id = merchantIdFromCode(form.elements.merchantCode.value);
+    const id = ctx.connected?form.elements.merchantCode.value.trim():merchantIdFromCode(form.elements.merchantCode.value);
     if (!id) {
       const error = form.querySelector('[data-merchant-error]');
       if (error) { error.textContent = 'We couldn’t find that code. Check it and try again.'; error.hidden = false; }

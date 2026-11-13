@@ -1,9 +1,29 @@
 /** Portable Lumo sandbox client. Host apps own secure session storage and UI approval. */
-const MONEY_COMMANDS = new Set(['wallet.fund', 'transfer', 'payment.pay', 'payment.refund']);
+const CORE_MONEY = new Set(['wallet.fund', 'transfer', 'payment.pay', 'payment.refund']);
+// Metadata can create an approval, consume an invitation or alter a mandate. It needs
+// the same durable original-attempt recovery as an immediate money posting.
+const EXTENDED_MUTATIONS = new Set([
+  'group.create','group.invite','group.respond','group.join','group.message','group.contribute',
+  'group.payout.request','group.payout.approve','group.payout.cancel','group.member.remove','group.leave','group.close',
+  'plan.save','box.create','box.update','box.archive','box.save','box.withdraw',
+  'box.partner.invite','box.partner.respond','box.release.request','box.release.decide','box.release.cancel',
+  'hack.save','hack.delete','iou.create','iou.respond','iou.remind','iou.pay','iou.cancel',
+  'staff.invite','staff.respond','staff.remove','shift.start','shift.end','merchant.settings',
+  'refund.decide','notification.read','profile.update','security.pin','support.create',
+  'recovery.save','recovery.finish','money.record','group.cancel',
+  'merchant.create','shop.create','request.create','merchant.close','shop.discovery','favourite.save','favourite.delete',
+  'person.request.create','person.request.pay','person.request.cancel','learning.save','chat.clear',
+  'money.archive','schedule.create','schedule.cancel','security.session.revoke',
+]);
+const MONEY_COMMANDS = new Set([...CORE_MONEY, ...EXTENDED_MUTATIONS]);
+const SECRET_KEYS = new Set(['pin','partnerCode','oldPin','newPin']);
+const PIN_COMMANDS = new Set(['group.contribute','group.payout.request','group.payout.approve',
+  'box.save','box.withdraw','iou.pay','box.partner.respond','box.release.decide','refund.decide','group.cancel','person.request.pay','schedule.create','schedule.cancel','security.session.revoke']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ATTEMPT = /^[A-Za-z0-9_.:-]{10,100}$/;
 const clone = value => JSON.parse(JSON.stringify(value));
 const plain = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const canonical = value => JSON.stringify(value, (key, item) => plain(item) ? Object.fromEntries(Object.keys(item).sort().map(k => [k,item[k]])) : item);
 // Node adapters share this mutex only inside one process and for the same storage object.
 // Browsers must use Web Locks. Native/multi-process hosts must inject a LockManager-compatible
 // adapter whose exclusive lease covers every context that can access the pending storage.
@@ -76,10 +96,21 @@ function sessionFrom(result) {
 }
 function moneyPayload(command, input, makeId) {
   if (!plain(input)) throw error('INVALID_INPUT');
+  if (EXTENDED_MUTATIONS.has(command)) {
+    const payload = clone(input);
+    payload.attemptId ||= makeId();
+    if (typeof payload.attemptId !== 'string' || !ATTEMPT.test(payload.attemptId) || JSON.stringify(payload).length > 20000) throw error('INVALID_INPUT');
+    if (PIN_COMMANDS.has(command) && (typeof payload.pin !== 'string' || !/^[0-9]{4,6}$/.test(payload.pin))) throw error('PIN_REQUIRED');
+    if ('amount' in payload && (!Number.isSafeInteger(payload.amount) || payload.amount < 1 || payload.amount > 1000000)) throw error('INVALID_INPUT');
+    for (const key of ['groupId','proposalId','boxId','iouId','shopId','membershipId','releaseId','invitationId','notificationId']) {
+      if (key in payload && !UUID.test(payload[key])) throw error('INVALID_INPUT');
+    }
+    return payload;
+  }
   const allowed = {
     'wallet.fund': ['amount', 'confirmSandbox', 'attemptId'],
-    transfer: ['recipientHandle', 'amount', 'pin', 'attemptId'],
-    'payment.pay': ['shopId', 'requestId', 'amount', 'pin', 'attemptId'],
+    transfer: ['recipientHandle', 'amount', 'pin', 'attemptId', 'budgetCategoryId'],
+    'payment.pay': ['shopId', 'requestId', 'amount', 'pin', 'attemptId', 'budgetCategoryId'],
     'payment.refund': ['paymentId', 'amount', 'pin', 'attemptId'],
   }[command];
   if (Object.keys(input).some(key => !allowed.includes(key))) throw error('INVALID_INPUT');
@@ -96,14 +127,15 @@ function moneyPayload(command, input, makeId) {
   }
   if (command === 'payment.pay' && (!UUID.test(payload.shopId) || payload.requestId != null && !UUID.test(payload.requestId))) throw error('INVALID_INPUT');
   if (command === 'payment.refund' && !UUID.test(payload.paymentId)) throw error('INVALID_INPUT');
+  if ('budgetCategoryId' in payload && payload.budgetCategoryId != null && !UUID.test(payload.budgetCategoryId)) throw error('INVALID_INPUT');
   return payload;
 }
-function savedPayload(payload) { const saved = clone(payload); delete saved.pin; return saved; }
+function savedPayload(payload) { const saved = clone(payload); for (const key of SECRET_KEYS) delete saved[key]; return saved; }
 function validPending(value, userId) {
   if (!plain(value) || value.version !== 1 || value.userId !== userId || !MONEY_COMMANDS.has(value.command) ||
-      !plain(value.payload) || typeof value.payload.attemptId !== 'string' || !ATTEMPT.test(value.payload.attemptId) || !Number.isSafeInteger(value.payload.amount) || value.payload.amount < 1 ||
+      !plain(value.payload) || typeof value.payload.attemptId !== 'string' || !ATTEMPT.test(value.payload.attemptId) || CORE_MONEY.has(value.command) && (!Number.isSafeInteger(value.payload.amount) || value.payload.amount < 1) ||
       typeof value.createdAt !== 'string' || !Number.isFinite(Date.parse(value.createdAt)) ||
-      Object.keys(value.payload).some(key => /pin|password|token|secret/i.test(key))) throw error('JOURNAL_CORRUPT');
+      Object.keys(value.payload).some(key => SECRET_KEYS.has(key) || /password|token|secret/i.test(key))) throw error('JOURNAL_CORRUPT');
   try { moneyPayload(value.command, { ...value.payload, ...(value.command === 'wallet.fund' ? {} : { pin: '1234' }) }, () => { throw error('JOURNAL_CORRUPT'); }); }
   catch { throw error('JOURNAL_CORRUPT'); }
   return value;
@@ -207,6 +239,11 @@ export class LumoClient {
     const generation = ++this._authGeneration;
     this._session = null;
     try { if (original) await this._raw('/auth/v1/logout?scope=local', { token: original.access_token }); }
+    catch (failure) {
+      // Another window may already have revoked this exact session. The local
+      // sign-out still completes, and an already invalid token is not an error.
+      if (!(failure instanceof LumoClientError) || ![401,403].includes(failure.status)) throw failure;
+    }
     finally {
       // A later sign-in owns host session storage. This old logout must never clear it.
       if (generation === this._authGeneration) {
@@ -287,6 +324,38 @@ export class LumoClient {
   }
   _verifyReceipt(pending, result) {
     const receipt = result.receipt, account = result.account, payload = pending.payload;
+    const extended = EXTENDED_MUTATIONS.has(pending.command);
+    if (extended || pending.command === 'payment.refund' && !receipt) {
+      if (result.command !== pending.command || result.attemptId !== payload.attemptId ||
+          !plain(account) || !UUID.test(account.id) || account.userId !== pending.userId ||
+          account.currency !== 'GHS' || !Number.isSafeInteger(account.balance) || account.balance < 0) throw error('RECEIPT_MISMATCH');
+      if (result.bindings !== undefined && (!plain(result.bindings) || canonical(result.bindings) !== canonical(payload))) throw error('RECEIPT_MISMATCH');
+      for (const [key, entities] of Object.entries({ groupId:['group'],proposalId:['proposal','refundProposal'],
+        boxId:['box','release','hack'],iouId:['iou'],membershipId:['membership'],releaseId:['release'],invitationId:['invitation'],
+        notificationId:['notification'],shopId:['shop','request','shift'] })) {
+        if (!payload[key]) continue;
+        const matches = result.bindings?.[key] === payload[key] || result[key] === payload[key] || result.receipt?.[key] === payload[key] ||
+          entities.some(entity => result[entity]?.id === payload[key] || result[entity]?.[key] === payload[key]);
+        if (!matches) throw error('RECEIPT_MISMATCH');
+      }
+      if (pending.command === 'plan.save' && (!plain(result.plan) || !Number.isSafeInteger(result.plan.revision))) throw error('RECEIPT_MISMATCH');
+      if (pending.command === 'payment.refund' && (!plain(result.refundProposal) || result.refundProposal.paymentId !== payload.paymentId || result.refundProposal.amount !== payload.amount || result.refundProposal.status !== 'pending')) throw error('RECEIPT_MISMATCH');
+      const expectedType = {'group.contribute':'group_contribution','group.payout.approve':'group_payout','group.cancel':'group_refund',
+        'box.save':'box_save','box.withdraw':'box_withdraw','iou.pay':'iou_payment','refund.decide':'refund','person.request.pay':'transfer'}[pending.command];
+      const receipts = [...(receipt ? [receipt] : []), ...(Array.isArray(result.receipts) ? result.receipts : [])];
+      if (['group.contribute','box.save','box.withdraw','iou.pay','person.request.pay'].includes(pending.command) && !receipt) throw error('RECEIPT_MISMATCH');
+      for (const posting of receipts) {
+        if (!plain(posting) || !UUID.test(posting.id) || posting.status !== 'posted' || posting.sandbox !== true || posting.currency !== 'GHS' ||
+            posting.actorUserId !== pending.userId || posting.type !== expectedType || !UUID.test(posting.payerAccountId) || !UUID.test(posting.payeeAccountId) ||
+            !Number.isSafeInteger(posting.amount) || posting.amount < 1 || typeof posting.reference !== 'string' || !posting.reference ||
+            payload.amount != null && pending.command !== 'group.cancel' && posting.amount !== payload.amount) throw error('RECEIPT_MISMATCH');
+        if (['group.contribute','box.save','iou.pay','person.request.pay'].includes(pending.command) && posting.payerAccountId !== account.id ||
+            pending.command === 'box.withdraw' && posting.payeeAccountId !== account.id) throw error('RECEIPT_MISMATCH');
+        if (pending.command === 'person.request.pay' && posting.personalRequestId !== payload.requestId) throw error('RECEIPT_MISMATCH');
+        for (const key of ['groupId','boxId','iouId','proposalId']) if (payload[key] && posting[key] !== payload[key]) throw error('RECEIPT_MISMATCH');
+      }
+      return;
+    }
     const expectedType = { 'wallet.fund': 'test_funding', transfer: 'transfer', 'payment.pay': 'merchant_payment', 'payment.refund': 'refund' }[pending.command];
     if (result.attemptId !== payload.attemptId || !plain(receipt) || !UUID.test(receipt.id) ||
         receipt.type !== expectedType || receipt.status !== 'posted' || receipt.sandbox !== true || receipt.currency !== 'GHS' ||
@@ -298,9 +367,11 @@ export class LumoClient {
         pending.command === 'payment.pay' && (receipt.shopId !== payload.shopId || (receipt.requestId || null) !== (payload.requestId || null)) ||
         pending.command === 'payment.refund' && receipt.originalPaymentId !== payload.paymentId) throw error('RECEIPT_MISMATCH');
   }
-  async _submitPending(pending, pin, owner) {
+  async _submitPending(pending, credentials, owner) {
     try {
-      const result = await this._rpc(pending.command, { ...pending.payload, ...(pending.command === 'wallet.fund' ? {} : { pin }) }, owner);
+      const secrets = typeof credentials === 'string' ? { pin: credentials } : plain(credentials) ? credentials : {};
+      const supplied = Object.fromEntries(Object.entries(secrets).filter(([key]) => SECRET_KEYS.has(key)));
+      const result = await this._rpc(pending.command, { ...pending.payload, ...supplied }, owner);
       this._verifyReceipt(pending, result);
       await this._clearPending(owner);
       this._assertOwner(owner);
@@ -322,11 +393,11 @@ export class LumoClient {
         if (await this.getPending()) throw error('PENDING_PAYMENT');
         const pending = { version: 1, userId: owner, command, payload: savedPayload(body), createdAt: new Date().toISOString() };
         await this._savePending(pending, owner);
-        return await this._submitPending(pending, body.pin, owner);
+        return await this._submitPending(pending, Object.fromEntries(Object.entries(body).filter(([key]) => SECRET_KEYS.has(key))), owner);
       });
     } finally { this._moneyBusy = false; }
   }
-  async retryPending(pin) {
+  async retryPending(credentials) {
     if (this._moneyBusy) throw error('PENDING_PAYMENT');
     this._moneyBusy = true;
     try {
@@ -334,11 +405,12 @@ export class LumoClient {
       return await this._withMoneyLock(owner, async () => {
         const pending = await this.getPending();
         if (!pending) throw error('INVALID_INPUT');
-        if (pending.command !== 'wallet.fund' && (typeof pin !== 'string' || !/^[0-9]{4,6}$/.test(pin))) throw error('INVALID_INPUT');
+        const pin = typeof credentials === 'string' ? credentials : credentials?.pin;
+        if ((CORE_MONEY.has(pending.command) && pending.command !== 'wallet.fund' || PIN_COMMANDS.has(pending.command)) && (typeof pin !== 'string' || !/^[0-9]{4,6}$/.test(pin))) throw error('PIN_REQUIRED');
         // A previous failed storage write may have left only an in-memory unresolved marker.
         // Never send that original request until its durable copy has been verified again.
         await this._savePending(pending, owner);
-        return await this._submitPending(pending, pin, owner);
+        return await this._submitPending(pending, credentials, owner);
       });
     } finally { this._moneyBusy = false; }
   }
@@ -382,7 +454,7 @@ export class LumoClient {
     return this.command('recipient.lookup', { handle: handle.trim().toLowerCase() });
   }
   fundTestWallet(amount, { confirmSandbox = false, attemptId } = {}) { return this.command('wallet.fund', { amount, confirmSandbox, ...(attemptId ? { attemptId } : {}) }); }
-  transfer({ recipientHandle, amount, pin, attemptId }) { return this.command('transfer', { recipientHandle, amount, pin, ...(attemptId ? { attemptId } : {}) }); }
+  transfer({ recipientHandle, amount, pin, attemptId, budgetCategoryId }) { return this.command('transfer', { recipientHandle, amount, pin, ...(attemptId ? { attemptId } : {}), ...(budgetCategoryId ? { budgetCategoryId } : {}) }); }
   createMerchant(payload) { return this.command('merchant.create', { ...payload, attemptId: payload.attemptId || this.makeAttemptId() }); }
   getMerchant() { return this.command('merchant.get'); }
   createPaymentRequest(payload) { return this.command('request.create', { ...payload, attemptId: payload.attemptId || this.makeAttemptId() }); }

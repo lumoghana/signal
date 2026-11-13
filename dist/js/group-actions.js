@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import { esc, cash, icon, field, progress, dateLabel } from './ui.js';
 import { getGroupActor, activeGroupMember, canReadGroup, groupApprovers, groupSummary, groupPayoutStatus, groupCollectionStatus, groupMandateReady, collectionRefundPreview } from './group-ledger.js';
 
@@ -20,22 +21,22 @@ const payoutKey = p => JSON.stringify([p.amount,p.recipient,p.rail,p.destination
 const latest = (ctx, g) => ctx.state.groups?.find(x => x.id === g.id);
 const valid = (ctx, g, actor = getGroupActor(g)) => latest(ctx, g) === g && getGroupActor(g) === actor && (!ctx.route || ctx.route.id === g.id && ctx.route.section === 'life');
 function showError(el, message) { const node = el?.querySelector('.group-action-error'); if (node) node.textContent = message; }
-function commit(ctx, g, action, payload = {}, el, actor = getGroupActor(g)) {
+function commit(ctx, g, action, payload = {}, el, actor = getGroupActor(g)) {return runActionFlow(function*(){
   if (!valid(ctx, g, actor) || action !== 'acceptGroupInvite' && !canReadGroup(g)) return null;
-  const result = ctx.act(action, { groupId: g.id, ...payload });
+  const result = (yield (ctx.actAsync||ctx.act).call(ctx,action, { groupId: g.id, ...payload }));
   if (!result?.ok) { if (el?.isConnected !== false) showError(el, result?.message || 'Please check this step.'); ctx.toast?.(result?.message || 'Please check this step.'); return null; }
   return result;
-}
+});}
 function finish(ctx, g, message) { ctx.closeSheet(); if (latest(ctx, g) && (!ctx.route || ctx.route.id === g.id)) ctx.refresh(); if (message) ctx.toast?.(message); }
 function authorise(ctx, g, title, action, payload, returnTo, el) {
   const actor = getGroupActor(g);
   if (!valid(ctx,g,actor) || el?.isConnected === false || !canReadGroup(g)) return;
   const operationId = uid(), payout = payload.payoutId ? g.payouts.find(p => p.id === payload.payoutId) : null, fingerprint = payout ? payoutKey(payout) : null, revision = payload.revision ?? payout?.revision;
-  ctx.auth({ title, onCancel: () => { if (valid(ctx, g, actor)) returnTo(); }, onSuccess: () => {
+  ctx.auth({ title, onCancel: () => { if (valid(ctx, g, actor)) returnTo(); }, onSuccess: () => {return runActionFlow(function*(){
     if (payout && (payoutKey(payout) !== fingerprint || payout.revision !== revision)) { ctx.toast?.('This payout changed. Review the current details first.'); return; }
-    const r = commit(ctx, g, action, { ...payload, ...(payout ? {revision} : {}), idempotencyKey: operationId }, el, actor);
+    const r = (yield commit(ctx, g, action, { ...payload, ...(payout ? {revision} : {}), idempotencyKey: operationId }, el, actor));
     if (r) finish(ctx, g, r.message);
-  } });
+  });} });
 }
 function groupGuard(ctx, g) {
   if (canReadGroup(g)) return true;
@@ -52,10 +53,10 @@ export function openGroupJoin(ctx, g) {
   const actor = getGroupActor(g), member = g.members.find(m => m.id === actor), mandateRevision = g.mandateRevision || 1, invitationVersion = member?.invitationVersion || 1;
   if (member?.status !== 'invited') return;
   ctx.sheet(head(`You’re invited, ${member.name}.`, `Join ${g.name} as ${member.role === 'approver' ? 'an approver' : 'a contributor'}.`) + `<div class="panel life-padded"><h3>Everyone starts in the picture.</h3><p>After joining, you can see the full group conversation, including messages and money activity from before you joined.</p><p class="muted">Purpose: ${esc(g.purpose || g.name)}</p><p class="muted">Every payout needs ${groupSummary(g).requiredApprovals} different approvals.</p><p class="muted">${member.role === 'approver' ? 'You can contribute and review payout requests. Only an explicit authorised approval counts.' : 'You can contribute and join the conversation. You cannot approve payouts.'}</p></div><form class="form-stack"><label class="life-check"><input type="checkbox" name="groupJoinConsent" required><span>I understand the history and payout agreement.</span></label>${error}<button type="submit" class="button">Accept invitation</button></form>${note('Participant simulation on this browser. No invitation is sent to another person.')}`, el => {
-    const form = el.querySelector('form'); form.onsubmit = event => { event.preventDefault(); if (!valid(ctx, g, actor) || el.isConnected === false) return;
+    const form = el.querySelector('form'); form.onsubmit = event => {return runActionFlow(function*(){ event.preventDefault(); if (!valid(ctx, g, actor) || el.isConnected === false) return;
       if (!el.querySelector('[name="groupJoinConsent"]').checked) return showError(el, 'Read and accept the group agreement first.');
-      if (commit(ctx, g, 'acceptGroupInvite', { acceptHistory:true, mandateRevision, invitationVersion, idempotencyKey: `accept-${g.id}-${actor}-${invitationVersion}-${mandateRevision}` }, el, actor)) finish(ctx, g, 'You’re in. Keep everyone in the picture.');
-    };
+      if ((yield commit(ctx, g, 'acceptGroupInvite', { acceptHistory:true, mandateRevision, invitationVersion, idempotencyKey: `accept-${g.id}-${actor}-${invitationVersion}-${mandateRevision}` }, el, actor))) finish(ctx, g, 'You’re in. Keep everyone in the picture.');
+    });};
   });
 }
 
@@ -66,10 +67,10 @@ function inviteMember(ctx, g, rejoining = null) {
   ctx.sheet(head(rejoining ? 'Welcome them back.' : 'Who’s joining you?', rejoining ? 'A fresh invitation. Their earlier contributions and messages stay with their existing membership.' : 'They choose whether to accept. Contributor invitations do not pause the group.') + `<form class="form-stack">${field({label:'Their name',name:'groupInviteName',value:d.name,placeholder:'Abena',required:true})}${field({label:'Phone, if you like',name:'groupInvitePhone',value:d.phone,placeholder:'024 000 0000'})}<label class="field"><span>Their role</span><select class="input" name="groupInviteRole"><option value="contributor"${d.role === 'contributor' ? ' selected' : ''}>Contributor</option><option value="approver"${d.role === 'approver' ? ' selected' : ''}>Approver</option></select></label>${note('Adding an approver changes the payout agreement. Existing payout approvals reset, and designated approvers must accept the new rule. Contributor invitations do not change it.')}${error}<button type="submit" class="button">Create demo invitation</button></form>${note('No one is notified. Use Participant simulation to open their invitation, review the history disclosure and accept.')}`, el => {
     const actor = getGroupActor(g), capture = () => { d.name = el.querySelector('[name="groupInviteName"]').value.slice(0,60); d.phone = el.querySelector('[name="groupInvitePhone"]').value.slice(0,30); d.role = el.querySelector('[name="groupInviteRole"]').value; ctx.saveDraft?.(); };
     el.querySelectorAll('input,select').forEach(input => input.addEventListener('input', capture));
-    el.querySelector('form').onsubmit = event => { event.preventDefault(); if (!valid(ctx,g,actor) || el.isConnected === false) return; capture();
-      const result = commit(ctx,g,'inviteGroupMember',{name:d.name.trim(),phone:d.phone.trim(),role:d.role,...(rejoining?{memberId:rejoining.id}:{}),idempotencyKey:d.operationId},el,actor);
+    el.querySelector('form').onsubmit = event => {return runActionFlow(function*(){ event.preventDefault(); if (!valid(ctx,g,actor) || el.isConnected === false) return; capture();
+      const result = (yield commit(ctx,g,'inviteGroupMember',{name:d.name.trim(),phone:d.phone.trim(),role:d.role,...(rejoining?{memberId:rejoining.id}:{}),idempotencyKey:d.operationId},el,actor));
       if (!result) return; delete draft[draftKey]; ctx.saveDraft?.(); finish(ctx,g,'Invitation ready. They’ll need to accept before joining.');
-    };
+    });};
   });
 }
 
@@ -90,17 +91,17 @@ export function openGroupMandate(ctx,g) {
   if (!designated.some(m => m.id === actor)) return openGroupMembers(ctx,g);
   ctx.sheet(head('Same group. Clear agreement.', `${g.name} · Agreement ${revision}`) + `<div class="panel life-padded"><h3>${groupSummary(g).requiredApprovals} different approvals per payout.</h3><p>${designated.map(m=>esc(m.name)).join(', ')}</p><p class="muted">Every designated approver must accept this rule. Each payment still needs a separate review, demo PIN and confirmed payment result. A message saying “approved” never counts.</p></div><form class="form-stack"><label class="life-check"><input type="checkbox" name="groupMandateConsent" required><span>I accept my approver role and this payout agreement.</span></label>${error}<button type="submit" class="button">Accept payout agreement</button></form>${button('Back to members','back',true)}`, el => {
     el.querySelector('[data-group-sheet="back"]').onclick=()=>openGroupMembers(ctx,g);
-    el.querySelector('form').onsubmit=event=>{event.preventDefault();if(!valid(ctx,g,actor)||el.isConnected===false)return;if(!el.querySelector('[name="groupMandateConsent"]').checked)return showError(el,'Read and accept the current payout agreement first.');if(commit(ctx,g,'acceptGroupMandate',{acceptMandate:true,mandateRevision:revision,idempotencyKey:`mandate-${g.id}-${actor}-${revision}`},el,actor))finish(ctx,g,'Agreement accepted. Payments still need their own approvals.');};
+    el.querySelector('form').onsubmit=event=>{return runActionFlow(function*(){event.preventDefault();if(!valid(ctx,g,actor)||el.isConnected===false)return;if(!el.querySelector('[name="groupMandateConsent"]').checked)return showError(el,'Read and accept the current payout agreement first.');if((yield commit(ctx,g,'acceptGroupMandate',{acceptMandate:true,mandateRevision:revision,idempotencyKey:`mandate-${g.id}-${actor}-${revision}`},el,actor)))finish(ctx,g,'Agreement accepted. Payments still need their own approvals.');});};
   });
 }
 function manageMember(ctx,g,memberId) {
   const m = g.members.find(m => m.id === memberId); if (!m || !isCreator(g) || memberId === g.creatorId) return;
   ctx.sheet(head(m.name, 'A role change or removal updates future chat and money permissions.') + `<p class="muted">Changing designated approvers clears open payout approvals. Each designated approver must accept the updated agreement. The required approval count stays the same.</p>${error}${button(m.role === 'approver' ? 'Make a contributor' : 'Make an approver','role')}${button('Remove from group','remove',true)}${button('Back to members','back',true)}`, el => {
     el.querySelector('[data-group-sheet="back"]').onclick = () => openGroupMembers(ctx,g);
-    el.querySelector('[data-group-sheet="role"]').onclick = () => { if (el.isConnected === false) return; if (commit(ctx,g,'setGroupMemberRole',{memberId,role:m.role === 'approver' ? 'contributor' : 'approver',idempotencyKey:uid()},el)) finish(ctx,g,'Role updated. Check the payout agreement in Your people.'); };
+    el.querySelector('[data-group-sheet="role"]').onclick = () => {return runActionFlow(function*(){ if (el.isConnected === false) return; if ((yield commit(ctx,g,'setGroupMemberRole',{memberId,role:m.role === 'approver' ? 'contributor' : 'approver',idempotencyKey:uid()},el))) finish(ctx,g,'Role updated. Check the payout agreement in Your people.'); });};
     el.querySelector('[data-group-sheet="remove"]').onclick = () => ctx.sheet(head(`Remove ${m.name}?`, 'Their earlier messages and financial records stay with the group. They lose future access.') + error + button('Remove member','confirm') + button('Keep in group','back',true), inner => {
       inner.querySelector('[data-group-sheet="back"]').onclick = () => openGroupMembers(ctx,g);
-      inner.querySelector('[data-group-sheet="confirm"]').onclick = () => { if (inner.isConnected === false) return; if (commit(ctx,g,'removeGroupMember',{memberId,idempotencyKey:uid()},inner)) finish(ctx,g,'Member removed. Earlier records are kept.'); };
+      inner.querySelector('[data-group-sheet="confirm"]').onclick = () => {return runActionFlow(function*(){ if (inner.isConnected === false) return; if ((yield commit(ctx,g,'removeGroupMember',{memberId,idempotencyKey:uid()},inner))) finish(ctx,g,'Member removed. Earlier records are kept.'); });};
     });
   });
 }
@@ -116,18 +117,18 @@ function contributionResultControls(g,c) {
 export function openGroupSimulation(ctx,g) {
   const actor = getGroupActor(g), canRead = canReadGroup(g), contributions = (g.contributions || []).filter(c => ['pending','success','failed'].includes(c.status));
   ctx.sheet(head('Participant simulation', 'One browser. Sample people. No live messages or payments.') + `<p class="muted">Choose a participant to test their own invitation, conversation and permissions.</p>${canRead && g.isSample && contributions.some(c=>c.status==='pending'&&(actor===g.creatorId||c.memberId===actor)) ? `<div class="group-simulation-next"><p class="eyebrow">Next in the sample</p>${contributions.filter(c=>c.status==='pending'&&(actor===g.creatorId||c.memberId===actor)).map(c=>`<div class="group-simulation-record"><strong>${esc(memberName(g,c.memberId))} · ${cash(c.amount)} pending</strong>${contributionResultControls(g,c)}</div>`).join('')}</div>`:''}<div class="panel">${g.members.map(m => `<button type="button" class="row" data-group-participant="${esc(m.id)}"${m.status === 'removed' ? ' disabled' : ''}><span class="row-icon">${esc(m.name.slice(0,1).toUpperCase())}</span><span class="row-copy"><span class="row-title">${esc(m.name)}${m.id === 'me' ? ' · Account holder' : ''}</span><span class="row-sub">${m.status === 'invited' ? 'Review invitation' : m.status === 'removed' ? 'Removed' : m.role === 'approver' ? 'Approver' : 'Contributor'}${m.phone?` · ${esc(m.phone.slice(-4))}`:''}</span></span>${m.id === actor ? icon('check',18) : icon('chevron',18)}</button>`).join('')}</div>${canRead && contributions.length ? `<details class="group-simulation-results"><summary>Test contribution results</summary><p>Only a confirmed record changes the collection. This changes sample payment results, not another person’s bank account.</p>${contributions.map(c => `<div class="group-simulation-record"><strong>${esc(memberName(g,c.memberId))} · ${cash(c.amount)}</strong><small>${esc(c.status)}</small>${contributionResultControls(g,c)}</div>`).join('')}</details>` : ''}${error}`, el => {
-    el.querySelectorAll('[data-group-participant]').forEach(b => b.onclick = () => { if (el.isConnected === false) return;
-      const r = ctx.act('setGroupParticipant',{groupId:g.id,memberId:b.dataset.groupParticipant}); if (!r?.ok) return showError(el,r?.message || 'This participant is unavailable.');
+    el.querySelectorAll('[data-group-participant]').forEach(b => b.onclick = () => {return runActionFlow(function*(){ if (el.isConnected === false) return;
+      const r = (yield (ctx.actAsync||ctx.act).call(ctx,'setGroupParticipant',{groupId:g.id,memberId:b.dataset.groupParticipant})); if (!r?.ok) return showError(el,r?.message || 'This participant is unavailable.');
       ctx.closeSheet(); if (ctx.route?.page === 'group-chat' && !canReadGroup(g)) ctx.go({section:'life',page:'group-detail',id:g.id},{replace:true}); else ctx.refresh();
-    });
-    el.querySelectorAll('[data-group-contribution-retry]').forEach(b => b.onclick = () => { if (!valid(ctx,g,actor) || el.isConnected === false) return; if (commit(ctx,g,'retryGroupContribution',{contributionId:b.dataset.groupContributionRetry,idempotencyKey:uid()},el,actor)) finish(ctx,g,'Retry processing. Only a confirmed result will count.'); });
-    el.querySelectorAll('[data-group-contribution-result]').forEach(b => b.onclick = () => { if (!valid(ctx,g,actor) || el.isConnected === false) return; const split=b.dataset.groupContributionResult.lastIndexOf(':'), contributionId=b.dataset.groupContributionResult.slice(0,split), outcome=b.dataset.groupContributionResult.slice(split+1);
-      if (commit(ctx,g,'settleGroupContribution',{contributionId,outcome,idempotencyKey:`result-${contributionId}-${g.contributions.find(c=>c.id===contributionId)?.attempt||1}-${outcome}`},el,actor)) finish(ctx,g,outcome === 'success' ? 'Confirmed contribution recorded once.' : outcome === 'reversed' ? 'Reversal recorded. The total is updated.' : 'Failed contribution recorded. It is not collected money.');
-    });
+    });});
+    el.querySelectorAll('[data-group-contribution-retry]').forEach(b => b.onclick = () => {return runActionFlow(function*(){ if (!valid(ctx,g,actor) || el.isConnected === false) return; if ((yield commit(ctx,g,'retryGroupContribution',{contributionId:b.dataset.groupContributionRetry,idempotencyKey:uid()},el,actor))) finish(ctx,g,'Retry processing. Only a confirmed result will count.'); });});
+    el.querySelectorAll('[data-group-contribution-result]').forEach(b => b.onclick = () => {return runActionFlow(function*(){ if (!valid(ctx,g,actor) || el.isConnected === false) return; const split=b.dataset.groupContributionResult.lastIndexOf(':'), contributionId=b.dataset.groupContributionResult.slice(0,split), outcome=b.dataset.groupContributionResult.slice(split+1);
+      if ((yield commit(ctx,g,'settleGroupContribution',{contributionId,outcome,idempotencyKey:`result-${contributionId}-${g.contributions.find(c=>c.id===contributionId)?.attempt||1}-${outcome}`},el,actor))) finish(ctx,g,outcome === 'success' ? 'Confirmed contribution recorded once.' : outcome === 'reversed' ? 'Reversal recorded. The total is updated.' : 'Failed contribution recorded. It is not collected money.');
+    });});
   });
 }
 
-export function openGroupFinancial(ctx,g,action,payoutId) {
+export function openGroupFinancial(ctx,g,action,payoutId) {return runActionFlow(function*(){
   if (!groupGuard(ctx,g)) return;
   if (action === 'contribute') return contribute(ctx,g);
   if (action === 'request') return request(ctx,g);
@@ -135,10 +136,10 @@ export function openGroupFinancial(ctx,g,action,payoutId) {
   if (!payout) return ctx.toast?.('There isn’t a payout to review yet.');
   if (action === 'edit') return request(ctx,g,payout);
   if (action === 'cancel') return cancel(ctx,g,payout);
-  if (action === 'execute') return execute(ctx,g,payout);
+  if (action === 'execute') return (yield execute(ctx,g,payout));
   if (action === 'retry') return retry(ctx,g,payout);
-  return review(ctx,g,payout);
-}
+  return (yield review(ctx,g,payout));
+});}
 function contribute(ctx,g) {
   if(g.status==='closed')return ctx.toast?.('This collection is closed. Its history is still here.');
   if(!groupMandateReady(g))return openWaitingAgreement(ctx,g);
@@ -149,7 +150,7 @@ function contribute(ctx,g) {
   const key = `${g.id}:${actor}`, d = ctx.draft.groupContribution ||= {};
   if (d.key !== key) Object.assign(d,{key,groupId:g.id,amountText:g.isSample ? String(Math.min(3000,capacity)/100) : '',status:'success',operationId:uid()});
   const show = () => ctx.sheet(head('Put your part in.', `${g.name} · ${cash(capacity)} still needed after pending payments`) + `<form class="form-stack">${amountField('groupContributionAmount',d.amountText)}${me ? note(`From your Everyday account. Available: ${cash(ctx.state.wallet)}.`) : note(`${memberName(g,actor)}’s external contribution is simulated. Your personal Everyday balance is not used.`)}<details class="group-simulation-results"><summary>Test a different result</summary><label class="field"><span>Simulated payment outcome</span><select class="input" name="groupContributionStatus"><option value="success"${d.status === 'success' ? ' selected' : ''}>Confirmed</option><option value="pending"${d.status === 'pending' ? ' selected' : ''}>Pending</option><option value="failed"${d.status === 'failed' ? ' selected' : ''}>Failed</option></select></label></details>${error}<button type="submit" class="button">Review contribution</button></form>${note('Only confirmed money counts towards the target. A chat message or receipt claim does not.')}`, el => {
-    const capture=()=>{d.amountText=el.querySelector('[name="groupContributionAmount"]').value;d.status=el.querySelector('[name="groupContributionStatus"]').value;ctx.saveDraft?.();};
+    const capture=()=>{d.amountText=el.querySelector('[name="groupContributionAmount"]').value;d.status=ctx.connected?'success':el.querySelector('[name="groupContributionStatus"]').value;ctx.saveDraft?.();};
     el.querySelectorAll('input,select').forEach(input=>input.addEventListener('input',capture));
     el.querySelector('form').onsubmit = event => { event.preventDefault(); if (!valid(ctx,g,actor) || el.isConnected === false) return; capture(); const amount=parseMoney(d.amountText);
       if (!Number.isSafeInteger(amount)||amount<=0||amount>capacity||(me && amount>ctx.state.wallet)) return showError(el,`Choose an amount within ${cash(Math.min(capacity,me?ctx.state.wallet:capacity))}.`);
@@ -157,7 +158,7 @@ function contribute(ctx,g) {
         inner.querySelector('[data-group-sheet="edit"]').onclick=show;
         inner.querySelector('[data-group-sheet="confirm"]').onclick=()=>{
           if(!valid(ctx,g,actor)||inner.isConnected===false)return;
-          const pin=()=>{if(!valid(ctx,g,actor))return;ctx.auth({title:`Confirm ${cash(amount)} contribution`,onCancel:show,onSuccess:()=>{const r=commit(ctx,g,'contributeGroup',{amount,status,idempotencyKey:d.operationId},inner,actor);if(!r)return;delete ctx.draft.groupContribution;ctx.saveDraft?.();finish(ctx,g,r.message);}});};
+          const pin=()=>{if(!valid(ctx,g,actor))return;ctx.auth({title:`Confirm ${cash(amount)} contribution`,onCancel:show,onSuccess:()=>{return runActionFlow(function*(){const r=(yield commit(ctx,g,'contributeGroup',{amount,status,idempotencyKey:d.operationId},inner,actor));if(!r)return;delete ctx.draft.groupContribution;ctx.saveDraft?.();finish(ctx,g,r.message);});}});};
           if(me&&status!=='failed') {
             const impact=evaluatePayment(ctx.state,{amount,fee:0,category:'Other',merchant:g.name});
             if(!impact.allowed)return showError(inner,impact.reason);
@@ -173,7 +174,7 @@ function request(ctx,g,payout) {
   if (!eligible(g)) return ctx.toast?.('Only a designated approver can request or change a payout.');
   if(g.status==='closed')return ctx.toast?.('This collection is closed.');
   if(!groupMandateReady(g))return openWaitingAgreement(ctx,g);
-  const actor=getGroupActor(g), revision=payout?.revision, reviewedFingerprint=payout?payoutKey(payout):null, summary=groupSummary(g), key=`${g.id}:${actor}:${payout?.id||'new'}`, saved=ctx.draft.groupPayout||{},controller=createRecipientLookup();
+  const actor=getGroupActor(g), revision=payout?.revision, reviewedFingerprint=payout?payoutKey(payout):null, summary=groupSummary(g), key=`${g.id}:${actor}:${payout?.id||'new'}`, saved=ctx.draft.groupPayout||{},controller=createRecipientLookup(ctx.connected?{lookup:()=>({ok:false,message:'This payout provider is not connected. Choose a registered Lumo account.'}),delay:0}:undefined);
   const d=saved.key===key?saved:{key,amountText:payout?(payout.amount/100).toFixed(2):g.isSample?(Math.min(summary.available,g.target)/100).toFixed(2):'',recipient:payout?.recipient||(g.isSample?'Balme Library prints':''),rail:String(payout?.rail||'lumo').toLowerCase(),destination:payout?.destination||(g.isSample?'@balmeprints':''),bank:payout?.bank||'',network:payout?.network||'',lookedUp:payout?.lookupSource==='demo',note:payout?.note||(g.isSample?'Print and bind six project reports.':''),evidence:payout?.evidence||[],evidenceReference:payout?.evidenceReference||'',operationId:uid()};ctx.draft.groupPayout=d;
   d.evidence=Array.isArray(d.evidence)?d.evidence.map(file=>({...file})):[];
   const available=()=>groupSummary(g).available+(payout&&['pending','approved'].includes(groupPayoutStatus(payout))?payout.amount+(payout.fee||0):0);
@@ -191,7 +192,7 @@ function request(ctx,g,payout) {
     if(d.rail!=='lumo'){
       el.querySelector('[name="groupPayoutDestination"]').addEventListener('input',invalidate);el.querySelector('[name="groupPayoutBank"]')?.addEventListener('change',invalidate);
       el.querySelector('[data-group-sheet="sample"]').onclick=()=>{if(!valid(ctx,g,actor)||el.isConnected===false)return;capture();d.destination=d.rail==='momo'?DEMO_MOMO_ACCOUNTS[0].number:RECIPIENT_BANKS[0].example;d.bank=d.rail==='bank'?RECIPIENT_BANKS[0].label:'';d.lookedUp=false;d.recipient='';show();};
-      el.querySelector('[data-group-sheet="lookup"]').onclick=async event=>{if(!valid(ctx,g,actor)||el.isConnected===false)return;capture();const checked=validateRecipientLookup(d.rail,{number:d.destination,bank:d.bank});if(!checked.ok)return showError(el,checked.message);const key=checked.key,lookupButton=event.currentTarget;lookupButton.disabled=true;lookupButton.textContent='Finding their account…';showError(el,'');let result;try{result=await controller.run(checked.request);}catch{result={ok:false,message:'The demo lookup took too long. Try again.'};}if(!valid(ctx,g,actor)||el.isConnected===false||!result)return;const current=validateRecipientLookup(d.rail,{number:d.destination,bank:d.bank});if(!current.ok||current.key!==key)return;lookupButton.disabled=false;lookupButton.textContent='Find registered account';if(!result.ok)return showError(el,result.message);d.recipient=result.recipient.name;d.destination=result.recipient.number;d.bank=result.recipient.bank||'';d.network=result.recipient.network||'';d.lookedUp=true;ctx.saveDraft?.();show();};
+      el.querySelector('[data-group-sheet="lookup"]').onclick=event=>{return runActionFlow(function*(){if(!valid(ctx,g,actor)||el.isConnected===false)return;capture();const checked=validateRecipientLookup(d.rail,{number:d.destination,bank:d.bank});if(!checked.ok)return showError(el,checked.message);const key=checked.key,lookupButton=event.currentTarget;lookupButton.disabled=true;lookupButton.textContent='Finding their account…';showError(el,'');let result;try{result=(yield controller.run(checked.request));}catch{result={ok:false,message:'The demo lookup took too long. Try again.'};}if(!valid(ctx,g,actor)||el.isConnected===false||!result)return;const current=validateRecipientLookup(d.rail,{number:d.destination,bank:d.bank});if(!current.ok||current.key!==key)return;lookupButton.disabled=false;lookupButton.textContent='Find registered account';if(!result.ok)return showError(el,result.message);d.recipient=result.recipient.name;d.destination=result.recipient.number;d.bank=result.recipient.bank||'';d.network=result.recipient.network||'';d.lookedUp=true;ctx.saveDraft?.();show();});};
     }
     el.querySelectorAll('[data-group-evidence-remove]').forEach(b=>b.onclick=()=>{d.evidence.splice(Number(b.dataset.groupEvidenceRemove),1);ctx.saveDraft?.();show();});
     const picker=el.querySelector('[name="groupPayoutEvidence"]');
@@ -199,7 +200,7 @@ function request(ctx,g,payout) {
     picker.addEventListener('click',()=>{if(!valid(ctx,g,actor)||el.isConnected===false)return;capture();stopEvidenceRead();pickState('choosing');});
     // Supported browsers emit cancel when their chooser closes without a selection.
     picker.addEventListener('cancel',()=>{if(!valid(ctx,g,actor)||el.isConnected===false)return;stopEvidenceRead();pickState('');});
-    picker.addEventListener('change',async event=>{
+    picker.addEventListener('change',event=>{return runActionFlow(function*(){
       if(!valid(ctx,g,actor)||el.isConnected===false)return;
       capture();stopEvidenceRead();const token=evidenceEpoch,files=[...(event.target.files||[])];
       const current=()=>token===evidenceEpoch&&valid(ctx,g,actor)&&el.isConnected!==false;
@@ -208,7 +209,7 @@ function request(ctx,g,payout) {
       if(files.some(file=>file.size>GROUP_EVIDENCE_MAX_BYTES)){pickState('');return showError(el,'Keep each sample document under 500 KB.');}
       pickState('reading');const added=[];
       for(const file of files){
-        const dataUrl=await new Promise(resolve=>{let reader;try{reader=new FileReader();evidenceReaders.add(reader);const finish=value=>{evidenceReaders.delete(reader);resolve(value);};reader.onload=()=>finish(reader.result);reader.onerror=reader.onabort=()=>finish('');reader.readAsDataURL(file);}catch{if(reader)evidenceReaders.delete(reader);resolve('');}});
+        const dataUrl=(yield new Promise(resolve=>{let reader;try{reader=new FileReader();evidenceReaders.add(reader);const finish=value=>{evidenceReaders.delete(reader);resolve(value);};reader.onload=()=>finish(reader.result);reader.onerror=reader.onabort=()=>finish('');reader.readAsDataURL(file);}catch{if(reader)evidenceReaders.delete(reader);resolve('');}}));
         if(!current())return;
         if(!dataUrl){pickState('retry');return showError(el,'That file could not be read. Choose it again, or continue without it.');}
         added.push({name:file.name,type:file.type,size:file.size,dataUrl});
@@ -216,21 +217,30 @@ function request(ctx,g,payout) {
       const checked=validateGroupEvidence([...d.evidence,...added]);
       if(!checked.ok){pickState('');return showError(el,checked.message);}
       capture();d.evidence=checked.evidence;pickState('');show();
-    });
-    el.querySelector('form').onsubmit=event=>{event.preventDefault();if(!valid(ctx,g,actor)||el.isConnected===false)return;capture();if(d.evidencePick==='reading')return showError(el,'Let the file finish before reviewing the payout.');if(d.evidencePick)pickState('');const amount=parseMoney(d.amountText),fee=groupPayoutFee(d.rail);
+    });});
+    el.querySelector('form').onsubmit= event=>{return runActionFlow(function*(){event.preventDefault();if(!valid(ctx,g,actor)||el.isConnected===false)return;capture();if(d.evidencePick==='reading')return showError(el,'Let the file finish before reviewing the payout.');if(d.evidencePick)pickState('');const amount=parseMoney(d.amountText),fee=groupPayoutFee(d.rail);
       if(!d.recipient.trim()||!d.destination.trim()||!d.note.trim()||!Number.isSafeInteger(amount)||amount<=0||amount+fee>available())return showError(el,'Add the recipient, purpose and an amount plus fee within the group funds.');
       if(d.rail!=='lumo'&&!d.lookedUp)return showError(el,'Find and confirm the registered account before continuing.');
+      if(ctx.connected){
+        if(d.rail!=='lumo')return showError(el,'This payout provider is not connected. Choose a registered Lumo account.');
+        const destination=d.destination.trim(),found=(yield ctx.shared.resolve(destination));
+        if(!valid(ctx,g,actor)||el.isConnected===false)return;
+        if(d.destination.trim()!==destination)return showError(el,'Those details changed. Review the current destination first.');
+        if(!found.ok)return showError(el,found.message);
+        d.recipient=found.recipient.name;d.destination='@'+found.recipient.handle;ctx.saveDraft?.();
+      }
       const payload={amount,fee,recipient:d.recipient.trim(),rail:d.rail,destination:d.destination.trim(),bank:d.bank,network:d.network,note:d.note.trim(),evidence:d.evidence,evidenceReference:d.evidenceReference,...(payout?{payoutId:payout.id,revision}:{})};
       ctx.sheet(head(payout?'Fresh details. Fresh approvals.':'All looking right?',`${cash(amount+fee)} total from the group account`)+payoutDetails({...payload,status:'pending',approvals:[],requiredApprovals:summary.requiredApprovals})+note(payout?'Earlier approvals will not authorise these updated details.':'Creating a request does not move money or count as an approval. It expires after 48 hours.')+error+button(payout?'Save with demo PIN':'Create with demo PIN','confirm')+button('Edit details','edit',true),inner=>{
-        inner.querySelector('[data-group-sheet="edit"]').onclick=show;inner.querySelector('[data-group-sheet="confirm"]').onclick=()=>{if(!valid(ctx,g,actor)||inner.isConnected===false)return;ctx.auth({title:payout?'Authorise payout changes':'Authorise payout request',onCancel:show,onSuccess:()=>{if(payout&&payoutKey(payout)!==reviewedFingerprint){ctx.toast?.('This payout changed. Review the current details first.');return;}const r=commit(ctx,g,payout?'editPayout':'requestPayout',{...payload,idempotencyKey:d.operationId},inner,actor);if(!r)return;delete ctx.draft.groupPayout;ctx.saveDraft?.();finish(ctx,g,r.message);}});};
+        inner.querySelector('[data-group-sheet="edit"]').onclick=show;inner.querySelector('[data-group-sheet="confirm"]').onclick=()=>{if(!valid(ctx,g,actor)||inner.isConnected===false)return;ctx.auth({title:payout?'Authorise payout changes':'Authorise payout request',onCancel:show,onSuccess:()=>{return runActionFlow(function*(){if(payout&&payoutKey(payout)!==reviewedFingerprint){ctx.toast?.('This payout changed. Review the current details first.');return;}const r=(yield commit(ctx,g,payout?'editPayout':'requestPayout',{...payload,idempotencyKey:d.operationId},inner,actor));if(!r)return;delete ctx.draft.groupPayout;ctx.saveDraft?.();finish(ctx,g,r.message);});}});};
       });
-    };
+    });};
   },{onClose:()=>{controller.dispose();stopEvidenceRead();recoverEvidence();}});};show();
 }
 function payoutDetails(p){return `<div class="panel life-padded group-payout-details"><div class="group-detail-line"><span>Recipient receives</span><strong>${cash(p.amount)}</strong></div><div class="group-detail-line"><span>Demo fee</span><strong>${cash(p.fee||0)}</strong></div><div class="group-detail-line"><span>Total from group</span><strong>${cash(p.amount+(p.fee||0))}</strong></div><div class="group-detail-line"><span>Recipient</span><strong>${esc(p.recipient)}</strong></div><div class="group-detail-line"><span>Destination</span><strong>${esc(p.rail)} · ${esc(p.destination)}${p.bank?`<br>${esc(p.bank)}`:p.network?`<br>${esc(p.network)}`:''}</strong></div><div class="group-detail-line"><span>Purpose</span><strong>${esc(p.note||p.purpose||'Group expense')}</strong></div>${p.evidenceReference?`<div class="group-detail-line"><span>Reference</span><strong>${esc(p.evidenceReference)}</strong></div>`:''}${p.evidence?.length?`<div class="group-evidence"><p class="eyebrow">Supporting sample documents</p>${p.evidence.map(f=>`<a class="button secondary" href="${esc(f.dataUrl)}" download="${esc(f.name)}">${icon('download',16)} ${esc(f.name)}</a>`).join('')}<p class="muted">Shared evidence does not confirm a contribution or approve a payment.</p></div>`:''}<div class="group-detail-line"><span>Approvals</span><strong>${p.approvals?.length||0} of ${p.requiredApprovals}</strong></div>${progress(p.approvals?.length||0,p.requiredApprovals)}${p.expiresAt?`<p class="muted">Request expires ${esc(new Date(p.expiresAt).toLocaleString('en-GH',{timeZone:'Africa/Accra'}))}.</p>`:''}</div>`;}
-function review(ctx,g,p){
-  if(groupPayoutStatus(p)==='expired')ctx.act('expireGroupPayouts',{groupId:g.id});
-  if(['pending','approved','failed'].includes(p.status)&&eligible(g))ctx.act('reviewPayout',{groupId:g.id,payoutId:p.id,revision:p.revision});
+function review(ctx,g,p){return runActionFlow(function*(){
+  if(groupPayoutStatus(p)==='expired')(yield (ctx.actAsync||ctx.act).call(ctx,'expireGroupPayouts',{groupId:g.id}));
+  if(['pending','approved','failed'].includes(p.status)&&eligible(g)){const checked=(yield (ctx.actAsync||ctx.act).call(ctx,'reviewPayout',{groupId:g.id,payoutId:p.id,revision:p.revision}));if(!checked?.ok)return ctx.toast?.(checked?.message||'Review the current payout first.');}
+  if(!valid(ctx,g))return;
   const actor=getGroupActor(g), revision=p.revision, fingerprint=payoutKey(p), settlementKey=`settle-${p.id}-${p.attempt||1}`, approved=(p.approvals||[]).includes(actor), mine=eligible(g), status={pending:'Awaiting approval',approved:'Approvals complete',processing:'Payment processing',success:'Payment confirmed',failed:'Payment failed',cancelled:'Request cancelled',declined:'Request declined',expired:'Request expired'}[groupPayoutStatus(p)]||p.status;
   ctx.sheet(head(status,`${cash(p.amount)} to ${p.recipient}`)+payoutDetails(p)+`<div class="group-approval-people">${groupApprovers(g).map(m=>`<p><span>${esc(m.name)}</span><span>${p.approvals.includes(m.id)?'Approved':p.declines?.some(d=>d.memberId===m.id)?'Declined':'Not approved'}</span></p>`).join('')}</div>`+note('Messages, replies and emoji do not approve payments. Group money stays separate from personal money.')+error+
     (p.status==='pending'?(mine&&!approved?button(`Approve as ${memberName(g,actor)}`,'approve'):note(approved?'Your approval is recorded. Another designated approver can review independently.':'You can follow this payout. Only the designated approvers can authorise it.')):'')+
@@ -244,25 +254,25 @@ function review(ctx,g,p){
     (['pending','approved','failed','declined'].includes(p.status)&&mine?`<div class="inline-actions">${button('Edit details','edit',true)}${button('Cancel request','cancel',true)}</div>`:'')+button('Back to the group','close',true),el=>{
       const current=()=>valid(ctx,g,actor)&&el.isConnected!==false&&p.revision===revision&&payoutKey(p)===fingerprint;
       el.querySelector('[data-group-sheet="close"]').onclick=()=>ctx.closeSheet();
-      el.querySelector('[data-group-sheet="approve"]')?.addEventListener('click',()=>{if(current())authorise(ctx,g,`Approve ${cash(p.amount)} to ${p.recipient}`,'approvePayout',{payoutId:p.id,revision,reviewId:p.reviews?.[actor]?.id},()=>review(ctx,g,p),el);});
+      el.querySelector('[data-group-sheet="approve"]')?.addEventListener('click',()=>{if(current())authorise(ctx,g,`Approve ${cash(p.amount)} to ${p.recipient}`,'approvePayout',{payoutId:p.id,revision,reviewId:p.reviews?.[actor]?.id},()=>runActionFlow(function*(){return (yield review(ctx,g,p));}),el);});
       el.querySelector('[data-group-sheet="decline"]')?.addEventListener('click',()=>{if(current())decline(ctx,g,p);});
-      for(const a of ['execute','edit','cancel','retry'])el.querySelector(`[data-group-sheet="${a}"]`)?.addEventListener('click',()=>{if(current())openGroupFinancial(ctx,g,a,p.id);});
-      for(const [a,outcome]of [['confirm-result','success'],['fail-result','failed']])el.querySelector(`[data-group-sheet="${a}"]`)?.addEventListener('click',()=>{if(current()&&commit(ctx,g,'settleGroupPayout',{payoutId:p.id,revision,outcome,idempotencyKey:`${settlementKey}-${outcome}`},el,actor))finish(ctx,g,outcome==='success'?'Group payment confirmed.':'Payment failed. Group funds are available again.');});
+      for(const a of ['execute','edit','cancel','retry'])el.querySelector(`[data-group-sheet="${a}"]`)?.addEventListener('click',()=>{return runActionFlow(function*(){if(current())(yield openGroupFinancial(ctx,g,a,p.id));});});
+      for(const [a,outcome]of [['confirm-result','success'],['fail-result','failed']])el.querySelector(`[data-group-sheet="${a}"]`)?.addEventListener('click',()=>{return runActionFlow(function*(){if(current()&&(yield commit(ctx,g,'settleGroupPayout',{payoutId:p.id,revision,outcome,idempotencyKey:`${settlementKey}-${outcome}`},el,actor)))finish(ctx,g,outcome==='success'?'Group payment confirmed.':'Payment failed. Group funds are available again.');});});
     });
-}
-function execute(ctx,g,p){if(groupPayoutStatus(p)==='expired')return review(ctx,g,p);if(eligible(g))ctx.act('reviewPayout',{groupId:g.id,payoutId:p.id,revision:p.revision});const revision=p.revision;if(p.status!=='approved')return review(ctx,g,p);ctx.sheet(head('Ready to pay.',`${p.requiredApprovals} approvers have agreed.`)+payoutDetails(p)+note('This uses the group account. Your personal balance stays the same. The result will appear only after processing.')+error+button('Confirm group payment','confirm')+button('Back to payout','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>review(ctx,g,p);el.querySelector('[data-group-sheet="confirm"]').onclick=()=>authorise(ctx,g,'Confirm group payment','executePayout',{payoutId:p.id,revision},()=>execute(ctx,g,p),el);});}
-function retry(ctx,g,p){const revision=p.revision;ctx.sheet(head('Give it another try?', 'Review the same payment details before submitting again.')+payoutDetails(p)+note('A retry reuses this payout record. It cannot debit the group twice. Changed details require fresh approvals.')+error+button('Review approved retry','confirm')+button('Back to payout','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>review(ctx,g,p);el.querySelector('[data-group-sheet="confirm"]').onclick=()=>{if(el.isConnected===false)return;if(commit(ctx,g,'retryGroupPayout',{payoutId:p.id,revision,idempotencyKey:uid()},el)){ctx.closeSheet();ctx.refresh();execute(ctx,g,p);}};});}
-function cancel(ctx,g,p){const revision=p.revision;ctx.sheet(head('Cancel this request?', 'No group money is sent. Reserved funds become available again.')+error+button('Cancel payout request','confirm')+button('Keep request','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>review(ctx,g,p);el.querySelector('[data-group-sheet="confirm"]').onclick=()=>{if(el.isConnected===false)return;if(commit(ctx,g,'cancelPayout',{payoutId:p.id,revision,idempotencyKey:uid()},el))finish(ctx,g,'Request cancelled. Money stays with the group.');};});}
+});}
+function execute(ctx,g,p){return runActionFlow(function*(){if(groupPayoutStatus(p)==='expired')return (yield review(ctx,g,p));if(eligible(g))(yield (ctx.actAsync||ctx.act).call(ctx,'reviewPayout',{groupId:g.id,payoutId:p.id,revision:p.revision}));const revision=p.revision;if(p.status!=='approved')return (yield review(ctx,g,p));ctx.sheet(head('Ready to pay.',`${p.requiredApprovals} approvers have agreed.`)+payoutDetails(p)+note('This uses the group account. Your personal balance stays the same. The result will appear only after processing.')+error+button('Confirm group payment','confirm')+button('Back to payout','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>runActionFlow(function*(){return (yield review(ctx,g,p));});el.querySelector('[data-group-sheet="confirm"]').onclick=()=>authorise(ctx,g,'Confirm group payment','executePayout',{payoutId:p.id,revision},()=>runActionFlow(function*(){return (yield execute(ctx,g,p));}),el);});});}
+function retry(ctx,g,p){const revision=p.revision;ctx.sheet(head('Give it another try?', 'Review the same payment details before submitting again.')+payoutDetails(p)+note('A retry reuses this payout record. It cannot debit the group twice. Changed details require fresh approvals.')+error+button('Review approved retry','confirm')+button('Back to payout','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>runActionFlow(function*(){return (yield review(ctx,g,p));});el.querySelector('[data-group-sheet="confirm"]').onclick=()=>{return runActionFlow(function*(){if(el.isConnected===false)return;if((yield commit(ctx,g,'retryGroupPayout',{payoutId:p.id,revision,idempotencyKey:uid()},el))){ctx.closeSheet();ctx.refresh();(yield execute(ctx,g,p));}});};});}
+function cancel(ctx,g,p){const revision=p.revision;ctx.sheet(head('Cancel this request?', 'No group money is sent. Reserved funds become available again.')+error+button('Cancel payout request','confirm')+button('Keep request','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>runActionFlow(function*(){return (yield review(ctx,g,p));});el.querySelector('[data-group-sheet="confirm"]').onclick=()=>{return runActionFlow(function*(){if(el.isConnected===false)return;if((yield commit(ctx,g,'cancelPayout',{payoutId:p.id,revision,idempotencyKey:uid()},el)))finish(ctx,g,'Request cancelled. Money stays with the group.');});};});}
 
 function openWaitingAgreement(ctx,g){
   const waiting=groupMandatePending(g), actor=getGroupActor(g);
   ctx.sheet(head('A clear agreement first.', 'The designated approvers need to accept this payout agreement. Contributor invitations do not pause the group.')+`<div class="panel life-padded">${waiting.map(m=>`<p><strong>${esc(m.name)}</strong><br><span class="muted">${m.status==='invited'?'Invitation waiting':'Payout agreement to review'}</span></p>`).join('')}</div>`+note('Use Participant simulation to review each person’s own invitation or approver agreement. No messages or invitations are sent.')+(waiting.some(m=>m.id===actor)?button('Review my payout agreement','accept-mandate'):'')+button('Open your people','members')+button('Back to the group','back',true),el=>{el.querySelector('[data-group-sheet="accept-mandate"]')?.addEventListener('click',()=>openGroupMandate(ctx,g));el.querySelector('[data-group-sheet="members"]').onclick=()=>openGroupMembers(ctx,g);el.querySelector('[data-group-sheet="back"]').onclick=()=>ctx.closeSheet();});
 }
 function decline(ctx,g,p){
-  const actor=getGroupActor(g),revision=p.revision;ctx.sheet(head('What needs a change?', 'Your decline is recorded. No group money moves.')+`<form class="form-stack">${field({label:'A short reason',name:'groupDeclineReason',value:'',placeholder:'Please attach the printer’s quote.',required:true})}${error}<button class="button" type="submit">Review decline</button></form>`+button('Back to payout','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>review(ctx,g,p);el.querySelector('form').onsubmit=e=>{e.preventDefault();if(!valid(ctx,g,actor)||el.isConnected===false)return;const reason=el.querySelector('[name="groupDeclineReason"]').value.trim();if(!reason)return showError(el,'Let the group know what needs to change.');authorise(ctx,g,'Confirm your payout decline','declinePayout',{payoutId:p.id,revision,reason},()=>review(ctx,g,p),el);};});
+  const actor=getGroupActor(g),revision=p.revision;ctx.sheet(head('What needs a change?', 'Your decline is recorded. No group money moves.')+`<form class="form-stack">${field({label:'A short reason',name:'groupDeclineReason',value:'',placeholder:'Please attach the printer’s quote.',required:true})}${error}<button class="button" type="submit">Review decline</button></form>`+button('Back to payout','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>runActionFlow(function*(){return (yield review(ctx,g,p));});el.querySelector('form').onsubmit=e=>{e.preventDefault();if(!valid(ctx,g,actor)||el.isConnected===false)return;const reason=el.querySelector('[name="groupDeclineReason"]').value.trim();if(!reason)return showError(el,'Let the group know what needs to change.');authorise(ctx,g,'Confirm your payout decline','declinePayout',{payoutId:p.id,revision,reason},()=>runActionFlow(function*(){return (yield review(ctx,g,p));}),el);};});
 }
 function closeCollection(ctx,g){
   if(!isCreator(g)||g.status==='closed')return;
   const actor=getGroupActor(g),refunds=collectionRefundPreview(g),fingerprint=JSON.stringify([g.balance,g.contributions,g.payouts.map(p=>[p.id,p.status,p.amount,p.fee,p.revision])]);
-  ctx.sheet(head('Wrap this one up?', 'Unused money goes back to the original contributors, in proportion to their confirmed contributions.')+`<div class="panel life-padded"><div class="group-detail-line"><span>To return</span><strong>${cash(g.balance)}</strong></div>${refunds.map(r=>`<div class="group-detail-line"><span>${esc(r.memberName)}</span><strong>${cash(r.amount)}</strong></div>`).join('')}</div>`+note('Processing money must finish first. Open payout requests will be cancelled. Earlier messages, payments, contributions and refund records stay available. No new contributions or payouts can be made.')+error+button('Close & return unused money','confirm')+button('Keep the collection open','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>openGroupDetails(ctx,g);el.querySelector('[data-group-sheet="confirm"]').onclick=()=>{if(!valid(ctx,g,actor)||el.isConnected===false)return;ctx.auth({title:'Confirm collection closure',onCancel:()=>closeCollection(ctx,g),onSuccess:()=>{if(JSON.stringify([g.balance,g.contributions,g.payouts.map(p=>[p.id,p.status,p.amount,p.fee,p.revision])])!==fingerprint)return ctx.toast?.('The group money changed. Review the returns again.');if(commit(ctx,g,'closeGroup',{idempotencyKey:uid()},el,actor))finish(ctx,g,'Collection closed. Original-source returns are recorded.');}});};});
+  ctx.sheet(head('Wrap this one up?', 'Unused money goes back to the original contributors, in proportion to their confirmed contributions.')+`<div class="panel life-padded"><div class="group-detail-line"><span>To return</span><strong>${cash(g.balance)}</strong></div>${refunds.map(r=>`<div class="group-detail-line"><span>${esc(r.memberName)}</span><strong>${cash(r.amount)}</strong></div>`).join('')}</div>`+note('Processing money must finish first. Open payout requests will be cancelled. Earlier messages, payments, contributions and refund records stay available. No new contributions or payouts can be made.')+error+button('Close & return unused money','confirm')+button('Keep the collection open','back',true),el=>{el.querySelector('[data-group-sheet="back"]').onclick=()=>openGroupDetails(ctx,g);el.querySelector('[data-group-sheet="confirm"]').onclick=()=>{if(!valid(ctx,g,actor)||el.isConnected===false)return;ctx.auth({title:'Confirm collection closure',onCancel:()=>closeCollection(ctx,g),onSuccess:()=>{return runActionFlow(function*(){if(JSON.stringify([g.balance,g.contributions,g.payouts.map(p=>[p.id,p.status,p.amount,p.fee,p.revision])])!==fingerprint)return ctx.toast?.('The group money changed. Review the returns again.');if((yield commit(ctx,g,'closeGroup',{idempotencyKey:uid()},el,actor)))finish(ctx,g,'Collection closed. Original-source returns are recorded.');});}});};});
 }

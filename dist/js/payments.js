@@ -1,3 +1,5 @@
+import {encodeSharedQr} from './approved-qr.js';
+import {runActionFlow} from './approved-flow.js';
 import {paymentFee} from './payments-parity-model.js';
 import {renderPaymentParity,bindPaymentParity,createSplitSheet,createRequestSheet} from './payments-parity-ui.js';
 import {renderPauseAlternatives,bindPauseAlternatives,getPauseTradeoff} from './pause-intelligence.js';
@@ -152,7 +154,7 @@ function txRows(transactions) {
 function home(ctx) { return renderPaymentsHub(paymentContext(ctx), ctx.route || payRoute('home')); }
 function paymentContext(ctx) {
   const child = Object.create(ctx);
-  child.paymentContacts = CONTACTS;
+  child.paymentContacts = ctx.connected ? [] : CONTACTS;
   child.topUpShortcuts = id => getTopUpShortcuts(ctx.state, id);
   child.startPayment = (person = null, rail = 'lumo') => startPayment(ctx, person, rail);
   child.resumePayment = () => resumePayment(ctx);
@@ -175,18 +177,27 @@ function paymentContext(ctx) {
   child.qrCodeMarkup = () => { ensureRequest(); return paymentCode(ctx); };
   child.openQrPayment = parsed => openQrPayment(ctx, parsed);
   child.findQrPerson = () => startPayment(ctx, null, 'lumo', false, { ...ctx.route });
-  child.openQrMerchant = id => { const service=getPaymentService(id);if(isCampusCodeService(service))ctx.go(payRoute('service',{id,backTo:payRoute('home',{hubTab:getServiceHubTab(service)})})); };
+  child.openQrMerchant = id => { if(ctx.connected)return openSharedMerchant(ctx,id);const service=getPaymentService(id);if(isCampusCodeService(service))ctx.go(payRoute('service',{id,backTo:payRoute('home',{hubTab:getServiceHubTab(service)})})); };
   child.enterMerchantCode = () => openMerchantCodeSheet(child);
   child.editQrRequest = () => { ensureRequest(); collectAmountSheet(ctx); };
   child.shareQrCode = () => shareText(ctx, collectLink(ctx), 'Pay me with Lumo');
   child.copyQrCode = () => copyText(ctx, collectLink(ctx));
   return child;
 }
+ function openSharedMerchant(ctx,input){return runActionFlow(function*(){
+  const value=typeof input==='string'?{query:input}:input||{};
+  const quote=(yield ctx.shared.quote(value.shopId?{shopId:value.shopId,...(value.requestId?{requestId:value.requestId}:{}),...(value.testKey?{testKey:value.testKey}:{})}:{query:value.query}));
+  if(!quote.ok||!quote.shop?.id){ctx.toast(quote.message||'This merchant is unavailable. Check their code and try again.');return;}
+  const name=quote.merchant?.name||quote.shop.name||'Lumo merchant',origin={...ctx.route};
+  const d=resetDraft(ctx,{id:quote.shop.id,name,emoji:name.charAt(0)},'merchant');
+  Object.assign(d,{shopId:quote.shop.id,...(quote.request?.id?{requestId:quote.request.id}:{}),...(value.testKey?{testKey:value.testKey}:{}),amount:quote.request?.amount||0,amountText:quote.request?.amount?amountInput(quote.request.amount):'',flowOrigin:origin,amountBackTo:origin,note:quote.request?.note||''});
+  remember(ctx);ctx.go(payRoute(d.amount?'review':'amount',{backTo:origin}));
+});}
 function openQrPayment(ctx, parsed) {
   if(parsed?.type !== 'person' || typeof parsed.name !== 'string' || !parsed.name.trim() || parsed.name.length > 60 || !Number.isSafeInteger(parsed.amount) || parsed.amount < 0 || parsed.amount > 100000000) { ctx.toast('This QR code does not contain a valid Lumo payment.');return; }
   const origin = { ...ctx.route }, adopt = () => {
     ctx.setCapture?.(null);
-    const d=resetDraft(ctx,{name:parsed.name.trim(),number:'@'+parsed.name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,16),emoji:parsed.name.charAt(0).toUpperCase()},'lumo');
+    const d=resetDraft(ctx,{...(parsed.handle?{handle:parsed.handle}:{}),name:parsed.name.trim(),number:'@'+parsed.name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,16),emoji:parsed.name.charAt(0).toUpperCase()},'lumo');
     d.amount=parsed.amount;d.amountText=amountInput(parsed.amount);d.note=String(parsed.note||'').slice(0,140);d.flowOrigin=origin;
     d.amountBackTo=origin;remember(ctx);
     ctx.go(payRoute(d.amount?'review':'amount',{backTo:d.amount?payRoute('amount',{backTo:origin}):origin}));
@@ -235,11 +246,12 @@ function recipients(ctx, route = ctx.route || payRoute('recipient')) {
   const rail = d.rail || 'lumo';
   if (rail === 'momo' || rail === 'bank') return renderAccountRecipient(ctx, route);
   const f = d.recipientForms?.[rail] || d.recipient || {};
+  const contacts=ctx.connected?[]:CONTACTS;
   return `<div class="page pay-recipient">${taskHead('Pay someone',{editing:!!ctx.route?.edit})}
     <div class="content"><h1 class="large-question">Who’s it for?</h1>
     <div class="chips rail-chips" role="group" aria-label="Payment method">${RAILS.map(r => `<button class="chip ${rail === r.id ? 'selected' : ''}" data-rail="${r.id}">${icon(r.icon, 17)}${r.label}</button>`).join('')}</div>
     <label class="search-field">${icon('search', 19)}<input class="input" id="recipient-search" placeholder="Search your people" autocomplete="off" aria-label="Search people" value="${esc(d.recipientSearch || '')}"></label>
-    <div class="panel contacts-list">${CONTACTS.map(c => `<button class="row" data-contact="${c.id}" data-person="${esc(c.name.toLowerCase())}">${recipientAvatar(c)}<span class="row-copy"><span class="row-title">${esc(c.name)}</span><span class="row-sub">@${c.id === 'nightmarket' ? 'nightmarket' : c.id} · Lumo</span></span><span class="row-right">${icon('chevron')}</span></button>`).join('')}</div><p class="muted small">Or use a Lumo name below.</p>
+    <div class="panel contacts-list">${contacts.map(c => `<button class="row" data-contact="${c.id}" data-person="${esc(c.name.toLowerCase())}">${recipientAvatar(c)}<span class="row-copy"><span class="row-title">${esc(c.name)}</span><span class="row-sub">@${c.id === 'nightmarket' ? 'nightmarket' : c.id} · Lumo</span></span><span class="row-right">${icon('chevron')}</span></button>`).join('')}</div><p class="muted small">Or use a Lumo name below.</p>
     <div class="form-stack">${field({ label: 'Lumo name', name: 'recipientName', value: f.name || '', placeholder: '@kofi' })}</div>
     <p class="error" id="payment-error" role="alert" hidden></p><p class="muted small">Demo recipients. No real account lookup is performed.</p></div>
     <div class="bottom-action">${btn('Continue', 'pay-recipient-next')}</div>
@@ -412,20 +424,25 @@ function noteSheet(ctx) {
     el.querySelector('[data-action="save-note"]').addEventListener('click', () => { d.note = el.querySelector('[name="paymentNote"]').value.trim().slice(0, 140); delete d.noteDraft; remember(ctx); ctx.closeSheet(); ctx.refresh(); });
   });
 }
-function authenticatePayment(ctx) {
+ function authenticatePayment(ctx) {return runActionFlow(function*(){
   const d = draft(ctx);
+  if(ctx.connected){
+    if(!['lumo','merchant'].includes(d.rail)){ctx.toast('This provider is not connected. Use a registered Lumo account or a connected merchant.');return;}
+    if(d.rail==='lumo'&&d.requestId){const request=ctx.state.moneyRequests?.find(item=>item.id===d.requestId&&item.direction==='incoming');if(!request){ctx.toast('This request is no longer available.');return;}d.recipient={id:request.senderUserId,name:request.name,emoji:request.name.charAt(0)};}
+    else if(d.rail==='lumo'){const found=(yield ctx.shared.resolve(d.recipient?.handle||d.recipient?.number||d.recipient?.name));if(!found.ok){ctx.toast(found.message);ctx.go(payRoute('recipient'));return;}d.recipient={...found.recipient,number:'@'+found.recipient.handle,emoji:found.recipient.name.charAt(0)};}
+  }
   if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
-  ctx.auth({ title: d.serviceId ? `Pay ${cash(d.amount)} for ${recipientLabel(d)}` : `Send ${cash(d.amount)} to ${recipientLabel(d).split(' ')[0]}`, onCancel: () => { ctx.refresh(); }, onSuccess: () => {
+  ctx.auth({ title: d.serviceId ? `Pay ${cash(d.amount)} for ${recipientLabel(d)}` : `Send ${cash(d.amount)} to ${recipientLabel(d).split(' ')[0]}`, onCancel: () => { ctx.refresh(); }, onSuccess: () => {return runActionFlow(function*(){
     if (d.completed || ctx.draft.payment !== d) return;
     if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
-    const result = ctx.act('payment', { ...d, fee:paymentFee(d.rail), merchant: recipientLabel(d), status: d.outcome || 'success' });
+    const result = (yield (ctx.actAsync||ctx.act).call(ctx,'payment', { ...d, fee:paymentFee(d.rail), merchant: recipientLabel(d), status: d.outcome || 'success' }));
     if (!result.ok) { ctx.toast(result.message || 'We couldn’t complete that payment.'); ctx.go(paymentReviewRoute(d)); return; }
     const tx = result.transaction || getTransaction(ctx, result.id) || ctx.state.transactions[0];
     ctx.draft.lastPayment = tx;
     d.completed = true; d.lastTransactionId = tx?.id || result.id; remember(ctx);
     finish(ctx, payRoute('status', { id: tx?.id || result.id, backTo: payRoute('home') }));
-  } });
-}
+  });} });
+});}
 
 export function bindPayments(ctx, route) {
   if (['requests','request-detail','splits','split-detail','funding-detail'].includes(route.page)) return bindPaymentParity(paymentContext(ctx), route);
@@ -456,17 +473,18 @@ export function bindPayments(ctx, route) {
     }));
     ctx.$$('[name="recipientName"], [name="recipientNumber"], [name="recipientNetwork"], [name="recipientBank"]').forEach(el => { el.addEventListener('input', () => capturePayment(ctx, route)); el.addEventListener('change', () => capturePayment(ctx, route)); });
     ctx.$('#recipient-search')?.addEventListener('input', event => { d.recipientSearch = event.target.value; remember(ctx); const term = event.target.value.toLowerCase(); ctx.$$('[data-person]').forEach(el => { el.hidden = !el.dataset.person.includes(term); }); });
-    on(ctx, 'pay-recipient-next', () => {
+    on(ctx, 'pay-recipient-next',  () => {return runActionFlow(function*(){
       const name = ctx.$('[name="recipientName"]')?.value.trim();
       const number = ctx.$('[name="recipientNumber"]')?.value.trim() || name;
       if (!name || name.length < 2) return formError(ctx, 'Tell us who you’re paying.');
       if (d.rail === 'momo' && !/^0\d{9}$/.test(number.replace(/\s/g, ''))) return formError(ctx, 'Use a 10-digit Ghanaian mobile number, starting with 0.');
       if (d.rail === 'bank' && !/^\d{8,16}$/.test(number.replace(/\s/g, ''))) return formError(ctx, 'Check the account number. It should have 8–16 digits.');
-      d.recipient = { name: name.replace(/^@/, ''), number, emoji: name.replace(/^@/, '').charAt(0).toUpperCase(), network: ctx.$('[name="recipientNetwork"]')?.value, bank: ctx.$('[name="recipientBank"]')?.value };
+      if(ctx.connected){const found=(yield ctx.shared.resolve(name));if(!found.ok)return formError(ctx,found.message);d.recipient={...found.recipient,number:'@'+found.recipient.handle,emoji:found.recipient.name.charAt(0)};}
+      else d.recipient = { name: name.replace(/^@/, ''), number, emoji: name.replace(/^@/, '').charAt(0).toUpperCase(), network: ctx.$('[name="recipientNetwork"]')?.value, bank: ctx.$('[name="recipientBank"]')?.value };
       d.amountBackTo = d.flowOrigin ? payRoute('recipient',{backTo:d.flowOrigin}) : payRoute('recipient'); if(route.edit)delete ctx.draft.paymentEditBackup; ctx.setCapture?.(null); remember(ctx);
       if(d.iouId)d.iouReviewBackTo=d.amountBackTo;
       ctx.go(route.edit || d.iouId && d.amount > 0 ? paymentReviewRoute(d) : payRoute('amount', { backTo: d.amountBackTo }), { replace: !!route.edit });
-    });
+    });});
   }
   if (route.page === 'conversation') {
     on(ctx, 'pay-conversation-send', () => { let d = draft(ctx); const person = d.recipient, rail = d.rail; if (d.completed) { ctx.setCapture?.(null); d = resetDraft(ctx, person, rail); } d.amountBackTo = payRoute('conversation', { id: route.id || person?.id, backTo: d.flowOrigin || payRoute('home') }); remember(ctx); ctx.go(payRoute('amount', { backTo: d.amountBackTo })); });
@@ -498,7 +516,7 @@ export function bindPayments(ctx, route) {
   }
   if (route.page === 'review' || route.page === 'pause') on(ctx, 'pay-edit-amount', () => { if(draft(ctx).serviceId)return editServicePayment(ctx);beginPaymentEdit(ctx); ctx.go(payRoute('amount', { edit: true, backTo: payRoute('review', { backTo: payRoute('amount', { backTo: amountParent(draft(ctx)) }) }) }), { replace: true }); });
   if (route.page === 'review') ctx.$('#payment-outcome')?.addEventListener('change', e => { draft(ctx).outcome=e.target.value; remember(ctx); });
-  if (route.page === 'review') on(ctx, 'pay-save-favourite', () => { const d=draft(ctx), result=ctx.act('savePaymentFavorite',{rail:d.rail,recipient:d.recipient});ctx.toast(result.ok?'Saved to Favourites.':result.message); });
+  if (route.page === 'review') on(ctx, 'pay-save-favourite', () => {return runActionFlow(function*(){ const d=draft(ctx), result=(yield (ctx.actAsync||ctx.act).call(ctx,'savePaymentFavorite',{rail:d.rail,recipient:d.recipient}));ctx.toast(result.ok?'Saved to Favourites.':result.message); });});
   if (route.page === 'review') on(ctx, 'pay-edit-recipient', () => { beginPaymentEdit(ctx); ctx.go(payRoute('recipient', { edit: true, backTo: payRoute('review') }), { replace: true }); });
   if (route.page === 'review') on(ctx, 'pay-review-next', () => {
     const d = draft(ctx);
@@ -531,23 +549,23 @@ export function bindPayments(ctx, route) {
       const d=prepareFailedPaymentRetry(tx);ctx.draft.payment=d;
       remember(ctx);finish(ctx,d.lookupRequired?payRoute('recipient',{backTo:payRoute('status',{id:tx.id})}):paymentReviewRoute(d));
     });
-    on(ctx, 'pay-check-status', () => {
+    on(ctx, 'pay-check-status', () => {return runActionFlow(function*(){
       const id = route.id || ctx.draft.lastPayment?.id;
-      const result = ctx.act('checkPaymentOutcome', { id });
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'checkPaymentOutcome', { id }));
       if (!result.ok) return ctx.toast(result.message || 'We’re still checking this payment.');
       ctx.draft.lastPayment = getTransaction(ctx, id); ctx.refresh(); ctx.toast(result.message);
-    });
+    });});
   }
   if (['transaction','status'].includes(route.page)) {
-    for(const outcome of ['success','failed','reversed']) on(ctx,`pay-simulate-${outcome}`,()=>{const result=ctx.act('simulatePaymentOutcome',{id:route.id||ctx.draft.lastPayment?.id,status:outcome,idempotencyKey:nonce('payment-result')});if(result.ok)ctx.refresh();ctx.toast(result.message);});
-    on(ctx,'pay-delivery-check',()=>{const result=ctx.act('checkServiceDelivery',{id:route.id});ctx.toast(result.message);});
-    on(ctx,'pay-delivery-success',()=>{const result=ctx.act('simulateServiceDelivery',{id:route.id,status:'delivered',idempotencyKey:nonce('delivery')});if(result.ok)ctx.refresh();ctx.toast(result.message);});
-    on(ctx,'pay-delivery-failed',()=>{const result=ctx.act('simulateServiceDelivery',{id:route.id,status:'failed',idempotencyKey:nonce('delivery')});if(result.ok)ctx.refresh();ctx.toast(result.message);});
+    for(const outcome of ['success','failed','reversed']) on(ctx,`pay-simulate-${outcome}`,()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulatePaymentOutcome',{id:route.id||ctx.draft.lastPayment?.id,status:outcome,idempotencyKey:nonce('payment-result')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});
+    on(ctx,'pay-delivery-check',()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'checkServiceDelivery',{id:route.id}));ctx.toast(result.message);});});
+    on(ctx,'pay-delivery-success',()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulateServiceDelivery',{id:route.id,status:'delivered',idempotencyKey:nonce('delivery')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});
+    on(ctx,'pay-delivery-failed',()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulateServiceDelivery',{id:route.id,status:'failed',idempotencyKey:nonce('delivery')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});
   }
   if (route.page === 'transaction' || (route.page === 'status' && isOutsideRepayment(getTransaction(ctx, route.id)))) {
     const tx = getTransaction(ctx, route.id);
     on(ctx,'pay-split-receipt',()=>createSplitSheet(ctx,{transactionId:tx?.id}));
-    ctx.$$('[data-reaction]').forEach(el => el.addEventListener('click', () => { const result = ctx.act('reactPayment', { id: route.id, reaction: el.dataset.reaction }); if (result.ok) ctx.refresh(); else ctx.toast(result.message || 'Try that again.'); }));
+    ctx.$$('[data-reaction]').forEach(el => el.addEventListener('click', () => {return runActionFlow(function*(){ const result = (yield (ctx.actAsync||ctx.act).call(ctx,'reactPayment', { id: route.id, reaction: el.dataset.reaction })); if (result.ok) ctx.refresh(); else ctx.toast(result.message || 'Try that again.'); });}));
     on(ctx, 'pay-share-receipt', () => { if (tx) shareText(ctx, paymentReceiptText(tx), isOutsideRepayment(tx) ? 'Outside repayment record' : 'Lumo payment receipt'); });
   }
   if (route.page === 'collect') {
@@ -573,6 +591,7 @@ function collectAmountSheet(ctx) {
   });
 }
 function collectLink(ctx) {
+  if(ctx.connected&&ctx.shared.account?.handle)return encodeSharedQr({kind:'person',handle:ctx.shared.account.handle});
   const c = ctx.draft.collect || {};
   const url = new URL(window.location.origin + window.location.pathname);
   url.searchParams.set('payTo', ctx.state.profile?.name || 'Ama');
@@ -580,28 +599,28 @@ function collectLink(ctx) {
   if (c.note) url.searchParams.set('note', c.note);
   return url.toString();
 }
-async function copyText(ctx, text) {
-  try { await navigator.clipboard.writeText(text); ctx.toast('Copied. Ready to share.'); }
+function copyText(ctx, text) {return runActionFlow(function*(){
+  try { (yield navigator.clipboard.writeText(text)); ctx.toast('Copied. Ready to share.'); }
   catch {
     ctx.sheet(`<div class="content"><h2>Ready to share</h2><p class="muted">Select and copy the text below.</p><textarea class="input share-text" readonly aria-label="Text to copy">${esc(text)}</textarea><div class="sheet-actions">${btn('Done', 'share-close')}</div></div>`, el => { el.querySelector('textarea')?.select(); el.querySelector('[data-action="share-close"]')?.addEventListener('click', () => ctx.closeSheet()); });
   }
-}
-async function shareText(ctx, text, title) {
+});}
+function shareText(ctx, text, title) {return runActionFlow(function*(){
   if (navigator.share) {
-    try { await navigator.share({ title, text }); return; }
+    try { (yield navigator.share({ title, text })); return; }
     catch (error) { if (error.name === 'AbortError') return; }
   }
-  await copyText(ctx, text);
-}
+  (yield copyText(ctx, text));
+});}
 function trackCollection(ctx) {
   const c = ctx.draft.collect || {};
   ctx.sheet(`<div class="content"><p class="eyebrow">Expected money</p><h2 class="large-question">Who owes you?</h2>${field({ label: 'Their name', name: 'collectFrom', value: c.from || '', placeholder: 'e.g. Kofi' })}${field({ label: 'Amount (GH₵)', name: 'collectTrackAmount', type: 'number', value: amountInput(c.amount), min: '0.01' })}${field({ label: 'Expected back', name: 'collectDue', type: 'date', value: new Date(Date.now() + 86400000).toISOString().slice(0, 10) })}<p class="muted small">This stays outside available money until you confirm it has been received.</p><p class="error" id="collect-track-error" role="alert" hidden></p><div class="sheet-actions">${btn('Track expected money', 'collect-track-save')}</div></div>`, el => {
-    el.querySelector('[data-action="collect-track-save"]').addEventListener('click', () => {
+    el.querySelector('[data-action="collect-track-save"]').addEventListener('click', () => {return runActionFlow(function*(){
       const name = el.querySelector('[name="collectFrom"]').value.trim(), amount = pence(el.querySelector('[name="collectTrackAmount"]').value), due = el.querySelector('[name="collectDue"]').value;
-      const result = ctx.act('createIOU', { name, amount, due, type: 'owedToMe', note: c.note || 'Payment request', idempotencyKey: c.idempotencyKey || nonce('collect') });
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'createIOU', { name, amount, due, type: 'owedToMe', note: c.note || 'Payment request', idempotencyKey: c.idempotencyKey || nonce('collect') }));
       if (!result.ok) { const error = el.querySelector('#collect-track-error'); error.textContent = result.message; error.hidden = false; return; }
       c.idempotencyKey = nonce('collect'); ctx.closeSheet(); ctx.toast('Tracked as expected money.'); ctx.go({ section: 'life', page: 'ious' });
-    });
+    });});
   });
 }
 
@@ -621,10 +640,10 @@ export function openFunding(ctx, restored = null) {
       capture();const value=f.amountText,amount=pence(value),error=el.querySelector('#fund-error');
       if(!/^\d+(?:\.\d{1,2})?$/.test(value)||!Number.isSafeInteger(amount)||amount<=0||amount>100000000){error.textContent='Use GH₵0.01 to GH₵1,000,000, with up to two decimal places.';error.hidden=false;return;}
       const number=f.number.replace(/\s/g,'');if(!bank&&!/^0\d{9}$/.test(number)){error.textContent='Your registered Lumo number is missing or invalid. Check your account details before adding money.';error.hidden=false;return;}
-      ctx.closeSheet();ctx.auth({title:bank?`Track ${cash(amount)} bank transfer?`:`Request ${cash(amount)} from your own wallet?`,onCancel:()=>openFunding(ctx,f),onSuccess:()=>{
-        const result=ctx.act('startFundingAttempt',{amount,rail:bank?'bank':'momo',number,source:f.source,idempotencyKey:f.idempotencyKey});if(!result.ok)return ctx.toast(result.message);
-        ctx.draft.fundingReturnTo=f.returnTo;delete ctx.draft.funding;finish(ctx,payRoute('funding-detail',{id:result.id,backTo:f.returnTo}));
-      }});
+      ctx.closeSheet();ctx.auth({title:ctx.connected?`Add ${cash(amount)} of shared test money?`:bank?`Track ${cash(amount)} bank transfer?`:`Request ${cash(amount)} from your own wallet?`,onCancel:()=>openFunding(ctx,f),onSuccess:()=>{return runActionFlow(function*(){
+        const result=(yield (ctx.actAsync||ctx.act).call(ctx,ctx.connected?'fund':'startFundingAttempt',ctx.connected?{amount,rail:'test',source:'Shared test money',note:'Shared pilot test money. No bank or MoMo debit.',idempotencyKey:f.idempotencyKey}:{amount,rail:bank?'bank':'momo',number,source:f.source,idempotencyKey:f.idempotencyKey}));if(!result.ok)return ctx.toast(result.message);
+        ctx.draft.fundingReturnTo=f.returnTo;delete ctx.draft.funding;if(ctx.connected){ctx.draft.lastFunding=result.transaction;finish(ctx,payRoute('fund-status',{id:result.id,backTo:f.returnTo}));}else finish(ctx,payRoute('funding-detail',{id:result.id,backTo:f.returnTo}));
+      });}});
     };
   });
 }

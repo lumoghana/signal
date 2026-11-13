@@ -287,6 +287,7 @@ export function bindOnboarding(ctx, route) {
           const credential = await createLoginCredential(password);
           if (!current()) return;
           const saved = setOnboardingLogin(d, { username, credential }); if (!saved.ok) return error(saved.message);
+          if(!d.preview)ctx.setSignupPassword?.(password);
           root.querySelector('[data-onb-login="password"]').value = ''; root.querySelector('[data-onb-login="confirm"]').value = '';
         } catch { return error('Couldn’t prepare sign-in on this browser. Please try again.'); }
         finally { if (current()) setBusy(false); }

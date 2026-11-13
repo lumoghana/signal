@@ -1,0 +1,441 @@
+.access-shell,
+.access-security-page {
+  --access-ink: #1d2b20;
+  --access-green: #173e2a;
+  --access-lime: #d6f95b;
+  --access-muted: #65745c;
+  --access-line: #e2e8da;
+  --access-paper: #fff;
+  font-family: 'Lumo Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--access-ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.access-shell {
+  display: grid;
+  grid-template-columns: minmax(340px, 42%) minmax(0, 1fr);
+  min-height: 100dvh;
+  background: #f8f9f3;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+.access-shell *,
+.access-shell *::before,
+.access-shell *::after,
+.access-security-page *,
+.access-security-page *::before,
+.access-security-page *::after { box-sizing: border-box; }
+.access-shell button,
+.access-shell input,
+.access-shell select,
+.access-shell textarea,
+.access-security-page button,
+.access-security-page input { font: inherit; }
+.access-shell button,
+.access-security-page button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.access-shell button:disabled,
+.access-security-page button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.access-shell h1,
+.access-shell h2,
+.access-shell h3,
+.access-shell p,
+.access-security-page h1,
+.access-security-page h2,
+.access-security-page h3,
+.access-security-page p { margin-top: 0; }
+.access-shell h1,
+.access-shell h2,
+.access-shell h3,
+.access-security-page h1,
+.access-security-page h2,
+.access-security-page h3 { color: inherit; }
+.access-shell a,
+.access-security-page a { color: inherit; }
+.access-shell button:focus-visible,
+.access-shell input:focus-visible,
+.access-shell a:focus-visible,
+.access-security-page button:focus-visible,
+.access-security-page input:focus-visible,
+.access-security-page a:focus-visible {
+  outline: 3px solid #a9ca3e;
+  outline-offset: 4px;
+}
+.access-shell .access-icon,
+.access-security-page .access-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+.access-aside {
+  min-width: 0;
+  background: var(--access-green);
+  color: #fff;
+  padding: 42px clamp(32px, 4.4vw, 78px);
+  min-height: 100dvh;
+  height: 100dvh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.access-brand { display: inline-flex; align-items: center; gap: 12px; width: fit-content; color: white; text-decoration: none; }
+.access-brand-mark { display: inline-grid; place-items: center; width: 36px; height: 39px; flex-shrink: 0; border-radius: 11px; background: var(--access-lime); color: #173e2a; font-size: 31px; font-weight: 750; font-style: italic; letter-spacing: -3px; padding-right: 3px; line-height: 1; }
+.access-brand-word { display: block; font-weight: 750; letter-spacing: -1.8px; font-size: 34px; line-height: 1; }
+.access-brand small { display: block; color: #c9d9bd; font-size: 8px; letter-spacing: 2.7px; text-transform: uppercase; font-weight: 600; margin: 8px 0 0 2px; }
+.access-aside-copy { position: relative; z-index: 1; margin-top: clamp(54px, 10vh, 106px); }
+.access-aside-copy .access-kicker { color: #c2d6a9; margin-bottom: 17px; }
+.access-aside-title { font-size: clamp(40px, 4.1vw, 61px); letter-spacing: -2.7px; line-height: 1.1; font-weight: 600; margin: 0 0 21px; }
+.access-aside-title span { color: var(--access-lime); }
+.access-aside-subtitle { color: #b9cdb0; font-size: 13px; max-width: 325px; line-height: 1.85; margin-bottom: 0; }
+.access-art { position: relative; width: min(100%, 360px); min-height: 190px; margin: clamp(36px, 7vh, 70px) auto 22px; display: flex; justify-content: center; align-items: center; z-index: 1; }
+.access-art::before { content: ''; position: absolute; width: 355px; height: 355px; border: 1px solid #d6f95b12; border-radius: 50%; left: 13%; top: -30%; z-index: -1; }
+.access-art::after { content: ''; position: absolute; width: 260px; height: 260px; border: 1px solid #d6f95b12; border-radius: 50%; left: 27%; top: -5%; z-index: -1; }
+.access-art-shield { width: 99px; height: 112px; display: grid; place-items: center; position: absolute; right: 0; top: -15px; z-index: 3; border: 1px solid #d7eea642; background: #244c31; box-shadow: 0 15px 35px #08261328; border-radius: 26px; transform: rotate(8deg); color: #d7f577; }
+.access-art-shield > .access-icon { width: 52px; height: 52px; stroke-width: 1.2; }
+.access-art-card { position: relative; width: 88%; min-height: 135px; padding: 25px; background: #f5f8ed; border: 1px solid #ffffff9c; box-shadow: 0 20px 40px #09231122; border-radius: 18px; color: #21432b; transform: rotate(-4deg); margin-right: 26px; z-index: 2; }
+.access-art-label { font-size: 9px; letter-spacing: 1px; color: #7f9370; display: flex; align-items: center; gap: 7px; font-weight: 600; }
+.access-art-label > .access-icon { width: 15px; height: 15px; flex-basis: 15px; }
+.access-art-value { display: block; margin-top: 15px; color: #25492d; font-size: 27px; line-height: 1.3; letter-spacing: -.8px; font-weight: 650; }
+.access-art-card > small { display: block; color: #829976; margin-top: 10px; font-size: 10px; line-height: 1.6; }
+.access-aside-note { margin-top: auto; position: relative; z-index: 1; padding-top: 25px; color: #b6c9ac; font-size: 10px; display: flex; align-items: flex-start; gap: 9px; line-height: 1.8; }
+.access-aside-note > .access-icon { width: 15px; height: 15px; flex-basis: 15px; color: #bddc8e; margin-top: 2px; }
+.access-main { min-width: 0; min-height: 100dvh; display: flex; flex-direction: column; }
+.access-topbar { min-height: 87px; padding: 25px clamp(28px, 4vw, 60px); display: flex; justify-content: flex-end; align-items: center; gap: 20px; }
+.access-mobile-brand { display: none; }
+.access-top-link,
+.access-link,
+.access-back-link { background: transparent; border: 0; padding: 5px 0; color: #69805d; display: inline-flex; align-items: center; justify-content: center; gap: 7px; line-height: 1.7; text-decoration: none; font-size: 11px; font-weight: 550; }
+.access-top-link:hover,
+.access-link:hover,
+.access-back-link:hover { color: #315530; }
+.access-top-link .access-icon,
+.access-link .access-icon,
+.access-back-link .access-icon { width: 14px; height: 14px; flex-basis: 14px; }
+.access-link { text-decoration: underline; text-underline-offset: 3px; }
+.access-content { flex: 1; display: flex; justify-content: center; align-items: center; padding: 18px clamp(28px, 4vw, 60px) 34px; min-width: 0; }
+.access-card { width: 100%; max-width: 490px; margin: 0 auto; min-width: 0; }
+.access-kicker { display: block; font-size: 9px; letter-spacing: 1.9px; font-weight: 700; text-transform: uppercase; color: var(--access-muted); margin-bottom: 14px; }
+.access-title { font-size: clamp(30px, 3vw, 40px); font-weight: 650; letter-spacing: -1.5px; line-height: 1.2; margin: 0 0 15px; }
+.access-description { color: var(--access-muted); font-size: 12px; line-height: 1.85; margin: 0 0 28px; max-width: 455px; }
+.access-description strong { font-weight: 650; color: #385535; }
+.access-step-label { display: flex; align-items: center; justify-content: space-between; color: #748768; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 21px; }
+.access-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; margin-bottom: 20px; }
+.access-label { display: block; font-size: 11px; font-weight: 650; color: #4c6240; line-height: 1.55; }
+.access-input { display: block; width: 100%; min-width: 0; min-height: 49px; padding: 12px 14px; background: #fff; border: 1px solid #dce5d0; border-radius: 10px; color: #2e4227; font-size: 13px; line-height: 1.5; font-weight: 450; transition: border-color .16s, box-shadow .16s; }
+.access-input::placeholder { color: #8b9880; opacity: 1; font-size: 12px; }
+.access-input:hover { border-color: #c5d6b0; }
+.access-input:focus { outline: none; border-color: #97b95a; box-shadow: 0 0 0 3px #c9ed5d21; }
+.access-input[readonly],
+.access-input:disabled { background: #f0f4e7; color: #768a66; }
+.access-password-wrap { position: relative; width: 100%; }
+.access-password-wrap > .access-input { padding-right: 57px; }
+.access-password-toggle { width: 40px; height: 40px; border: 0; border-radius: 8px; display: inline-grid; place-items: center; color: #839775; background: transparent; position: absolute; right: 5px; top: 50%; transform: translateY(-50%); }
+.access-password-toggle:hover { background: #f0f5e5; color: #3d622f; }
+.access-password-toggle .access-icon { width: 18px; height: 18px; }
+.access-hint { color: #728568; font-size: 10px; line-height: 1.75; margin: 0; }
+.access-field > .access-hint { margin-top: 1px; }
+.access-error { display: flex; align-items: flex-start; gap: 9px; color: #9a4a38; background: #fff1e9; border: 1px solid #f1d3c3; border-radius: 10px; padding: 13px 15px; font-size: 11px; line-height: 1.75; margin: 18px 0; overflow-wrap: anywhere; }
+.access-error > .access-icon { width: 15px; height: 15px; flex-basis: 15px; margin-top: 2px; }
+.access-notice { color: #647a55; background: #f0f5e6; border: 1px solid #e0e9d4; border-radius: 10px; padding: 13px 15px; font-size: 11px; line-height: 1.75; margin: 19px 0; display: flex; align-items: flex-start; gap: 9px; }
+.access-notice > .access-icon { color: #7b9c54; width: 16px; height: 16px; flex-basis: 16px; margin-top: 2px; }
+.access-notice strong { color: #4c7137; font-weight: 650; }
+.access-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 11px; margin: 27px 0 0; }
+.access-actions > .access-btn:last-child { margin-left: auto; }
+.access-actions.stacked { flex-direction: column; align-items: stretch; }
+.access-actions.stacked > .access-btn { width: 100%; margin: 0; }
+.access-btn { min-height: 48px; padding: 12px 19px; border: 1px solid transparent; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; font-size: 12px; line-height: 1.5; font-weight: 650; text-align: center; background: transparent; color: var(--access-green); transition: background .16s, border-color .16s, transform .16s, box-shadow .16s; text-decoration: none; }
+.access-btn .access-icon { width: 17px; height: 17px; flex-basis: 17px; }
+.access-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.access-btn.primary { background: var(--access-lime); border-color: var(--access-lime); color: #24371b; }
+.access-btn.primary:hover:not(:disabled) { background: #c9ee49; border-color: #c9ee49; box-shadow: 0 5px 12px #b5d34923; }
+.access-btn.secondary { background: #fff; border-color: #dce5d0; color: #415c32; }
+.access-btn.secondary:hover:not(:disabled) { background: #f2f6e8; border-color: #bfd29e; }
+.access-btn.ghost { padding-left: 0; padding-right: 0; color: #6d825e; }
+.access-btn.ghost:hover:not(:disabled) { color: #315530; }
+.access-btn.danger { background: #fff0eb; border-color: #f0d2c6; color: #9a4a38; }
+.access-btn.danger:hover:not(:disabled) { background: #ffe4d8; }
+.access-btn.small { min-height: 36px; font-size: 11px; padding: 8px 11px; border-radius: 8px; }
+.access-btn.full { width: 100%; }
+.access-checkbox { display: flex; align-items: flex-start; gap: 9px; color: #677c59; font-size: 11px; line-height: 1.75; cursor: pointer; }
+.access-checkbox input { accent-color: var(--access-green); width: 17px; height: 17px; margin: 2px 0 0; flex-shrink: 0; cursor: pointer; }
+.access-inline-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 22px; }
+.access-form-footer { margin-top: 23px; font-size: 11px; color: #78896a; text-align: center; line-height: 1.8; }
+.access-form-footer .access-link { font-size: 11px; margin-left: 4px; }
+.access-divider { display: flex; align-items: center; gap: 15px; color: #98a68b; font-size: 10px; margin: 23px 0; }
+.access-divider::before,
+.access-divider::after { content: ''; flex: 1; height: 1px; background: #e3e9da; }
+.access-footer { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 18px clamp(28px, 4vw, 60px) 28px; font-size: 9px; color: #89977d; line-height: 1.8; }
+.access-footer .access-link { padding: 0; font-size: inherit; color: #7b8e6c; }
+.access-footer-note { width: 100%; max-width: 560px; color: #8a977f; font-size: 9px; line-height: 1.8; }
+.access-otp { text-align: center; letter-spacing: 13px; font-size: 29px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 67px; padding-left: 24px; max-width: 330px; }
+.access-otp::placeholder { font-size: 28px; letter-spacing: 11px; color: #c4ceba; }
+.access-strength { margin: 10px 0 0; }
+.access-strength-bars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; width: 100%; }
+.access-strength-bar { height: 4px; border-radius: 4px; background: #e6ecdd; transition: background .15s; }
+.access-strength-bar.on { background: #a9c858; }
+.access-strength[data-score='1'] .access-strength-bar.on { background: #d7a764; }
+.access-strength[data-score='4'] .access-strength-bar.on { background: #5f9647; }
+.access-strength-label { display: block; margin-top: 6px; color: #869779; font-size: 9px; line-height: 1.6; }
+.access-requirements { display: flex; flex-wrap: wrap; gap: 7px 13px; padding: 0; list-style: none; margin: 12px 0 0; color: #96a18c; font-size: 9px; line-height: 1.7; }
+.access-requirement { display: inline-flex; align-items: center; gap: 5px; }
+.access-requirement::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #bdc7b1; flex-shrink: 0; }
+.access-requirement.met { color: #688a4b; }
+.access-requirement.met::before { background: #8eb04d; }
+.access-success-icon { width: 64px; height: 64px; margin: 0 0 23px; border-radius: 50%; background: #e5f3c5; color: #547d2d; display: grid; place-items: center; }
+.access-success-icon > .access-icon { width: 28px; height: 28px; }
+.access-summary { border: 1px solid var(--access-line); border-radius: 13px; background: #fff; padding: 5px 18px; margin: 22px 0; }
+.access-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 17px; padding: 13px 0; border-bottom: 1px solid #edf0e6; font-size: 11px; line-height: 1.65; }
+.access-summary-row:last-child { border-bottom: 0; }
+.access-summary-row > span { color: #839474; flex-shrink: 0; }
+.access-summary-row > strong { font-weight: 600; color: #405d33; text-align: right; overflow-wrap: anywhere; }
+.access-invite-card { border: 1px solid #dce8ca; background: #f3f8e8; border-radius: 13px; padding: 19px 20px; margin: 22px 0; }
+.access-invite-card > strong { font-size: 14px; letter-spacing: -.2px; display: block; }
+.access-invite-card > p { font-size: 11px; color: #7e906d; line-height: 1.8; margin: 7px 0 0; }
+.access-invite-card .access-role-badge { margin-top: 13px; }
+.access-role-badge { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #d6e5bd; border-radius: 6px; background: #ebf3dc; color: #698a49; font-size: 9px; font-weight: 650; line-height: 1.5; padding: 4px 8px; text-transform: capitalize; }
+.access-role-badge > .access-icon { width: 12px; height: 12px; flex-basis: 12px; }
+.access-profile-avatar { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 0 18px; border-radius: 19px; background: #e8efd7; color: #587d36; font-size: 22px; font-weight: 650; }
+.access-profile-name { font-size: 24px; font-weight: 650; letter-spacing: -.7px; margin: 0 0 4px; }
+.access-profile-username { font-size: 12px; color: #8c9c7d; margin: 0 0 20px; }
+.access-username-prefix { display: inline-flex; align-items: center; color: #8ea178; font-weight: 500; font-size: 13px; }
+.access-empty { text-align: center; padding: 30px 20px; border: 1px dashed #dfe7d4; border-radius: 12px; color: #8b9b7c; background: #fafcf6; font-size: 12px; line-height: 1.8; }
+.access-empty > .access-icon { width: 28px; height: 28px; margin-bottom: 12px; }
+.access-empty p { margin: 7px 0 0; }
+.access-session-list { display: flex; flex-direction: column; gap: 12px; margin: 23px 0 0; }
+.access-session-card { border: 1px solid #e0e8d5; border-radius: 12px; background: #fff; padding: 17px 18px; }
+.access-session-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.access-session-top > div { min-width: 0; flex: 1; }
+.access-session-top strong { display: block; font-size: 12px; font-weight: 650; line-height: 1.6; }
+.access-session-top > .access-icon { color: #7a965c; width: 23px; height: 23px; flex-basis: 23px; margin-top: 2px; }
+.access-session-meta { color: #8a9a7b; font-size: 10px; line-height: 1.85; margin: 7px 0 0; }
+.access-session-meta small { font-size: inherit; display: block; }
+.access-session-card .access-actions { margin-top: 14px; }
+.access-session-card .access-btn { min-height: 32px; padding: 6px 10px; font-size: 10px; }
+.access-status-badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; padding: 4px 7px; color: #6b8b4e; background: #edf5df; font-size: 8px; font-weight: 650; white-space: nowrap; line-height: 1.5; }
+.access-status-badge::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.access-status-badge.danger { color: #a0604b; background: #fff0e8; }
+.access-status-badge.warning { color: #9b7b38; background: #fff4d9; }
+.access-status-badge.neutral { color: #87977b; background: #f0f3ea; }
+.access-security-page { width: 100%; }
+.access-security-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; margin: 24px 0; }
+.access-security-card { display: flex; flex-direction: column; align-items: flex-start; text-align: left; border: 1px solid var(--access-line); border-radius: 16px; background: #fff; padding: 23px; min-width: 0; transition: border-color .16s, box-shadow .16s, transform .16s; }
+button.access-security-card:hover { border-color: #bfd2a4; box-shadow: 0 7px 22px #2842210b; transform: translateY(-2px); }
+.access-security-card > .access-icon { width: 26px; height: 26px; flex-basis: 26px; color: #688a4a; margin-bottom: 19px; }
+.access-security-card > strong,
+.access-security-card > h3 { display: block; font-size: 14px; font-weight: 650; letter-spacing: -.2px; margin: 0 0 8px; }
+.access-security-card > span,
+.access-security-card > p { font-size: 11px; line-height: 1.8; font-weight: 400; color: #829373; margin: 0 0 16px; }
+.access-security-card > .access-link { margin-top: auto; font-size: 10px; }
+.access-security-page .access-summary { max-width: none; }
+.access-security-page .access-summary-row { font-size: 12px; padding-block: 16px; }
+.access-security-page .access-profile-avatar { width: 53px; height: 53px; font-size: 18px; border-radius: 16px; margin-bottom: 12px; }
+.access-audit-list { display: flex; flex-direction: column; border: 1px solid var(--access-line); background: #fff; border-radius: 14px; overflow: hidden; margin-top: 20px; }
+.access-audit-row { display: flex; align-items: flex-start; gap: 12px; padding: 17px 20px; font-size: 11px; line-height: 1.7; border-bottom: 1px solid #edf1e6; }
+.access-audit-row:last-child { border-bottom: 0; }
+.access-audit-row > .access-icon { width: 16px; height: 16px; flex-basis: 16px; color: #8a9d75; margin-top: 3px; }
+.access-audit-row > span,
+.access-audit-row > div { flex: 1; min-width: 0; }
+.access-audit-row strong { display: block; font-weight: 600; color: #4e6b3b; font-size: 11px; }
+.access-audit-row small { display: block; color: #91a080; font-size: 9px; margin-top: 4px; }
+.access-audit-row time { color: #97a68a; font-size: 9px; white-space: nowrap; padding-top: 2px; }
+@media (max-width: 1180px) {
+  .access-shell { grid-template-columns: minmax(300px, 39%) minmax(0, 1fr); }
+  .access-aside { padding: 34px 35px; }
+  .access-aside-title { font-size: 45px; letter-spacing: -2px; }
+  .access-art { margin-top: 45px; }
+  .access-content { padding-inline: 35px; }
+  .access-topbar, .access-footer { padding-inline: 35px; }
+}
+@media (max-height: 760px) and (min-width: 861px) {
+  .access-aside-copy { margin-top: 48px; }
+  .access-aside-title { font-size: 42px; }
+  .access-aside-subtitle { font-size: 12px; }
+  .access-art { min-height: 145px; margin-top: 28px; }
+  .access-art-card { min-height: 115px; padding: 19px 22px; }
+  .access-art-shield { width: 76px; height: 89px; top: -9px; }
+  .access-art-shield > .access-icon { width: 41px; height: 41px; }
+}
+@media (max-width: 1000px) {
+  .access-security-cards { gap: 13px; }
+  .access-security-card { padding: 20px; }
+}
+@media (max-width: 860px) {
+  .access-shell { display: block; }
+  .access-aside { display: none; }
+  .access-main { min-height: 100dvh; }
+  .access-topbar { min-height: 75px; padding: 18px 26px; border-bottom: 1px solid #e7ecdf; justify-content: space-between; }
+  .access-mobile-brand { display: flex; align-items: center; gap: 10px; color: #173e2a; line-height: 1; }
+  .access-mobile-brand > strong { font-size: 29px; font-weight: 700; letter-spacing: -1.6px; }
+  .access-mobile-brand > span { border-left: 1px solid #dce4d1; padding-left: 11px; color: #7d9070; font-size: 7px; letter-spacing: 1.4px; }
+  .access-content { align-items: flex-start; padding: 39px 26px 35px; }
+  .access-card { max-width: 500px; }
+  .access-title { font-size: 33px; letter-spacing: -1.25px; }
+  .access-description { font-size: 12px; line-height: 1.8; }
+  .access-footer { padding: 17px 26px 26px; font-size: 9px; }
+  .access-input { font-size: 16px; min-height: 51px; }
+  .access-input::placeholder { font-size: 13px; }
+  .access-password-wrap .access-password-toggle { width: 43px; height: 43px; }
+  .access-label { font-size: 11px; }
+  .access-hint { font-size: 10px; }
+  .access-otp { font-size: 29px; }
+  .access-otp::placeholder { font-size: 27px; }
+  .access-security-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .access-topbar { min-height: 71px; padding: 18px 22px; gap: 12px; }
+  .access-top-link { font-size: 10px; }
+  .access-content { padding: 33px 22px 29px; }
+  .access-kicker { font-size: 9px; letter-spacing: 1.6px; }
+  .access-title { font-size: 32px; line-height: 1.2; letter-spacing: -1.25px; }
+  .access-description { margin-bottom: 25px; font-size: 12px; }
+  .access-field { margin-bottom: 20px; gap: 7px; }
+  .access-inline-row { gap: 10px; }
+  .access-checkbox { font-size: 10px; }
+  .access-checkbox input { width: 17px; height: 17px; }
+  .access-inline-row .access-link { font-size: 10px; }
+  .access-btn { min-height: 49px; font-size: 12px; padding: 12px 16px; }
+  .access-btn.small { min-height: 40px; font-size: 10px; padding: 9px 11px; }
+  .access-actions { gap: 10px; margin-top: 25px; }
+  .access-actions > .access-btn.primary { flex: 1; }
+  .access-actions > .access-btn.full { flex-basis: 100%; }
+  .access-footer { padding: 17px 22px 24px; font-size: 8px; gap: 10px 16px; }
+  .access-footer-note { font-size: 9px; }
+  .access-otp { max-width: 100%; letter-spacing: 12px; padding-left: 24px; }
+  .access-success-icon { width: 58px; height: 58px; margin-bottom: 20px; }
+  .access-summary { padding-inline: 15px; }
+  .access-summary-row { font-size: 11px; gap: 12px; }
+  .access-summary-row > strong { max-width: 64%; }
+  .access-invite-card { padding: 17px; }
+  .access-session-card { padding: 16px; }
+  .access-session-top { flex-wrap: wrap; }
+  .access-session-top > div { flex-basis: calc(100% - 35px); }
+  .access-session-top > .access-status-badge { margin-left: 33px; }
+  .access-session-meta { font-size: 10px; }
+  .access-session-card .access-actions { margin-top: 12px; }
+  .access-session-card .access-btn { min-height: 38px; }
+  .access-security-cards { grid-template-columns: 1fr; gap: 12px; }
+  .access-security-card { padding: 21px; }
+  .access-security-card > .access-icon { margin-bottom: 15px; }
+  .access-security-page .access-summary-row { font-size: 11px; }
+  .access-audit-row { padding: 16px; gap: 10px; flex-wrap: wrap; }
+  .access-audit-row > span,
+  .access-audit-row > div { flex-basis: calc(100% - 28px); }
+  .access-audit-row time { margin-left: 26px; }
+}
+@media (max-width: 370px) {
+  .access-topbar { padding-inline: 18px; }
+  .access-content { padding-inline: 18px; padding-top: 29px; }
+  .access-title { font-size: 29px; letter-spacing: -1.1px; }
+  .access-input { padding-inline: 12px; }
+  .access-password-wrap > .access-input { padding-right: 52px; }
+  .access-inline-row { flex-wrap: wrap; gap: 10px 15px; }
+  .access-btn { padding-inline: 13px; }
+  .access-art-card { width: 100%; }
+  .access-otp { letter-spacing: 10px; font-size: 27px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .access-shell *,
+  .access-shell *::before,
+  .access-shell *::after,
+  .access-security-page *,
+  .access-security-page *::before,
+  .access-security-page *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+.access-heading { margin-bottom: 2px; }
+.access-heading .access-description { margin-bottom: 27px; }
+.access-password-wrap { display: block; min-width: 0; }
+.access-password-wrap > .access-input { display: block; width: 100%; min-width: 0; }
+.access-password-toggle { grid-template-rows: 20px 9px; align-content: center; gap: 1px; padding: 0; line-height: 1; }
+.access-password-toggle > .access-icon { width: 17px; height: 17px; }
+.access-password-toggle > span { display: block; font-size: 7px; font-weight: 600; line-height: 1; }
+.access-requirement::before { display: none; }
+.access-requirement > .access-icon { width: 11px; height: 11px; flex-basis: 11px; color: #acb99f; stroke-width: 2; }
+.access-requirement.met > .access-icon { color: #7d9f50; }
+.access-field:has(+ .access-strength) { margin-bottom: 12px; }
+.access-requirements + .access-field { margin-top: 21px; }
+.access-mobile-brand > small { border-left: 1px solid #dce4d1; padding-left: 11px; color: #7d9070; font-size: 7px; letter-spacing: 1.4px; line-height: 1.6; }
+.access-invite-card > small { display: block; margin-top: 9px; color: #7c9169; font-size: 10px; line-height: 1.8; }
+.access-invite-card > .access-role-badge { margin-top: 0; margin-bottom: 12px; }
+.access-profile-summary { display: flex; align-items: center; gap: 16px; padding: 21px 24px; background: #fff; border: 1px solid var(--access-line); border-radius: 16px; margin: 0 0 24px; }
+.access-profile-summary > .access-profile-avatar { margin: 0; width: 51px; height: 51px; border-radius: 15px; flex: 0 0 51px; font-size: 18px; }
+.access-profile-summary > span:nth-child(2) { min-width: 0; flex: 1; }
+.access-profile-summary > span:nth-child(2) > strong { display: block; color: #395632; font-size: 15px; font-weight: 650; letter-spacing: -.2px; line-height: 1.65; }
+.access-profile-summary > span:nth-child(2) > small { display: block; color: #829473; font-size: 11px; margin-top: 4px; line-height: 1.7; overflow-wrap: anywhere; }
+.access-profile-summary > .access-btn { margin-left: auto; }
+.access-owner-note { display: flex; align-items: center; gap: 11px; border: 1px solid #e0e9d3; background: #f0f5e6; border-radius: 12px; padding: 16px 19px; font-size: 11px; color: #7b9069; line-height: 1.8; margin: 22px 0 0; }
+.access-owner-note > .access-icon { width: 18px; height: 18px; flex-basis: 18px; color: #779750; }
+.access-owner-note strong { font-weight: 650; color: #587c3a; }
+.access-security-card-icon { width: 43px; height: 43px; display: inline-grid; place-items: center; border-radius: 12px; background: #f0f5e2; color: #7b9858; margin-bottom: 21px; }
+.access-security-card-icon > .access-icon { width: 22px; height: 22px; }
+.access-security-card > .access-btn { margin-top: auto; align-self: flex-start; }
+.access-session-top > span:not(.access-status-badge) { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.access-session-top > span:not(.access-status-badge) > .access-icon { width: 22px; height: 22px; flex-basis: 22px; color: #86a06a; }
+.access-session-meta > span { display: block; }
+.access-session-card > .access-btn { margin-top: 14px; }
+.access-session-list + .access-btn.full { margin-top: 23px; }
+.access-audit-row > span:first-child:has(> .access-icon) { flex: 0 0 18px; min-width: 18px; }
+.access-audit-row > span:first-child > .access-icon { width: 17px; height: 17px; color: #8a9f74; }
+.access-audit-list > .access-empty { border: 0; border-radius: 0; padding: 22px; }
+.access-security-page > .notice { margin-left: 0; margin-right: 0; }
+@media (max-width: 600px) {
+  .access-profile-summary { padding: 18px; gap: 12px; flex-wrap: wrap; }
+  .access-profile-summary > .access-profile-avatar { width: 43px; height: 43px; flex-basis: 43px; border-radius: 13px; font-size: 16px; }
+  .access-profile-summary > span:nth-child(2) { flex-basis: calc(100% - 57px); }
+  .access-profile-summary > span:nth-child(2) > strong { font-size: 14px; }
+  .access-profile-summary > span:nth-child(2) > small { font-size: 10px; }
+  .access-profile-summary > .access-btn { margin: 0 0 0 55px; min-height: 34px; }
+  .access-owner-note { align-items: flex-start; padding: 15px 16px; font-size: 10px; }
+  .access-owner-note > .access-icon { margin-top: 3px; width: 16px; height: 16px; flex-basis: 16px; }
+  .access-security-card-icon { margin-bottom: 16px; }
+  .access-session-top > span:not(.access-status-badge) { flex-basis: calc(100% - 1px); }
+  .access-session-top > .access-status-badge { margin-left: 32px; }
+  .access-audit-row > div { flex-basis: calc(100% - 30px); }
+}
+
+
+.access-recovery-links { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.access-recovery-links .access-link { min-height: 24px; }
+.access-status-badge.ended { background: #f0f1ed; border-color: #e0e4da; color: #7c8673; }
+.access-session-card.is-ended { background: #fafbf8; border-color: #e5e8df; }
+.access-session-ended { margin: 13px 0 0; color: #87917e; font-size: 11px; line-height: 1.7; }
+.access-profile-tools { margin-top: 22px; }
+.access-recovered-users { display: grid; gap: 12px; margin: 22px 0; }
+.access-recovered-users > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px; border: 1px solid var(--access-line); border-radius: 12px; background: #fff; }
+.access-recovered-users strong { color: #254c35; font-size: 15px; overflow-wrap: anywhere; }
+.access-recovered-users p { color: #809175; font-size: 12px; line-height: 1.8; }
+.access-recovery-key-box { background: #f1f6e6; border: 1px solid #dce7c9; border-radius: 14px; padding: 18px; margin: 0 0 20px; }
+.access-recovery-key-box .access-field { margin-bottom: 12px; }
+.access-recovery-key-box .access-input { font-family: ui-monospace, monospace; font-size: 13px; letter-spacing: .4px; }
+.access-key-actions { display: flex; align-items: center; gap: 10px; }
+.access-key-actions .access-btn { min-height: 42px; }
+.access-key-actions .access-btn.full { flex: 1; }
+.access-key-saved { margin: 24px 0; align-items: flex-start; font-size: 12px; line-height: 1.8; }
+.access-key-saved input { margin-top: 3px; flex: 0 0 18px; }
+.access-protected-label { color: #849773; font-size: 10px; }
+@media (max-width: 600px) {
+ .access-recovery-links { gap: 3px; }
+ .access-recovery-links .access-link { min-height: 32px; }
+ .access-recovered-users > div { flex-wrap: wrap; gap: 10px; }
+ .access-key-actions { flex-direction: column; align-items: stretch; }
+ .access-key-actions .access-btn { min-height: 46px; }
+ .access-key-saved { font-size: 12px; }
+}
+
+.access-recovery-settings { display: flex; align-items: center; gap: 17px; padding: 22px 24px; background: #f2f6e9; border: 1px solid #dfe8d3; border-radius: 15px; margin: 24px 0; }
+.access-recovery-settings > .access-security-card-icon { flex: 0 0 43px; margin: 0; }
+.access-recovery-settings > div { flex: 1; }
+.access-recovery-settings h3 { margin: 0 0 7px; font-size: 14px; color: #385632; font-weight: 650; }
+.access-recovery-settings p { margin: 0; color: #819471; font-size: 11px; line-height: 1.8; max-width: 650px; }
+.access-recovery-settings > .access-btn { flex-shrink: 0; }
+@media (max-width: 700px) { .access-recovery-settings { flex-wrap: wrap; padding: 20px; gap: 13px; } .access-recovery-settings > div { flex-basis: calc(100% - 59px); } .access-recovery-settings > .access-btn { margin-left: 56px; min-height: 44px; } }
+
+.access-import-consent { display: flex; gap: 11px; align-items: flex-start; margin: 24px 0; font-size: 12px; color: #718667; line-height: 1.8; }
+.access-import-consent input { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 3px; accent-color: #769d40; }

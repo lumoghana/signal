@@ -1,0 +1,18 @@
+{
+  "approvedSite": "https://lumo-merchant-mobile.oness15.chatgpt.site",
+  "approvedVersion": 7,
+  "approvedCommit": "0e0ce95efc5d03719599fe3c745b7f1365e70c45",
+  "identicalAssetCount": 47,
+  "modifiedAssets": [
+    "access.js",
+    "app.js",
+    "people.js",
+    "shared.js"
+  ],
+  "newAssets": [
+    "connected-service.js"
+  ],
+  "unchangedPresentationAssets": true,
+  "rendererFunctions": "Approved screen markup and layout preserved; invitation link destination and action/transport hooks adapted.",
+  "purpose": "Transport, account epoch safety, existing password confirmation for shared refunds, canonical QR destination, and invitation base path. Original screen templates, markup, styles, assets and navigation preserved."
+}

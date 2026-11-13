@@ -387,3 +387,72 @@ test('injected exclusive lease covers storage, original POST, retry and PIN-free
   assert.equal(acquisitions, 4);
   assert.equal(held, false);
 });
+
+const GROUP = '50000000-0000-4000-8000-000000000001';
+const PROPOSAL = '50000000-0000-4000-8000-000000000002';
+const BOX = '60000000-0000-4000-8000-000000000001';
+const extResult = (command, extra = {}) => ok({command, attemptId:ATTEMPT,account:account(),...extra});
+
+test('a group payout proposal is journalled and its lost response recovers without a debit receipt or PIN', async () => {
+  const original = extResult('group.payout.request',{groupId:GROUP,proposalId:PROPOSAL,proposal:{id:PROPOSAL,status:'pending',amount:2500},group:{id:GROUP}});
+  let first=true;
+  const h=await setup(call=>{
+    if(first){first=false;throw new Error('committed proposal response lost');}
+    assert.equal(call.body.p_command,'attempt.lookup');
+    return json(ok({found:true,result:original,account:account()}));
+  });
+  await assert.rejects(()=>h.client.command('group.payout.request',{groupId:GROUP,recipientHandle:'akua',amount:2500,pin:'4917'}),errorCode('NETWORK_ERROR'));
+  const pending=await h.client.getPending();assert.equal(pending.command,'group.payout.request');assert.equal(pending.payload.pin,undefined);
+  const result=await h.client.recoverPending();assert.equal(result.proposalId,PROPOSAL);assert.equal(result.recovered,true);assert.equal(await h.client.getPending(),null);
+});
+
+test('a nonreceipt response with the wrong command, owner or group cannot clear the original request', async () => {
+  for(const extra of [{command:'group.close'}, {account:{...account(),userId:OTHER}}, {groupId:PROPOSAL,group:{id:PROPOSAL}}]){
+    const h=await setup(()=>json(extResult('group.message',{groupId:GROUP,group:{id:GROUP},...extra})));
+    await assert.rejects(()=>h.client.command('group.message',{groupId:GROUP,text:'Meet at six'}),errorCode('RECEIPT_MISMATCH'));
+    assert.equal((await h.client.getPending()).payload.groupId,GROUP);
+  }
+});
+
+test('protected box secrets are excluded from durable metadata but re-entered credentials can retry the same reference', async () => {
+  let first=true;
+  const h=await setup(call=>{
+    const saved=JSON.parse([...h.storage.map.values()][0]);
+    assert.equal(saved.payload.partnerCode,undefined);assert.equal(saved.payload.pin,undefined);
+    assert.equal(call.body.p_payload.partnerCode,'partner-secret-code');
+    if(first){first=false;throw new Error('temporary connection loss');}
+    return json(extResult('box.create',{box:{id:BOX,ownerUserId:USER}}));
+  });
+  await assert.rejects(()=>h.client.command('box.create',{name:'Fees',goal:50000,partnerCode:'partner-secret-code',partnerInvitationId:PROPOSAL}),errorCode('NETWORK_ERROR'));
+  const result=await h.client.retryPending({partnerCode:'partner-secret-code'});
+  assert.equal(result.box.id,BOX);assert.equal(h.calls.at(-1).body.p_payload.attemptId,ATTEMPT);
+});
+
+test('group contribution requires a bound ledger receipt with the current personal account as payer', async () => {
+  for(const changed of [{}, {payerAccountId:RECIPIENT},{groupId:PROPOSAL}]){
+    const posting={...receipt('transfer').receipt,type:'group_contribution',groupId:GROUP,...changed};
+    const h=await setup(()=>json(extResult('group.contribute',{groupId:GROUP,group:{id:GROUP},receipt:posting})));
+    if(Object.keys(changed).length)await assert.rejects(()=>h.client.command('group.contribute',{groupId:GROUP,amount:2500,pin:'4917'}),errorCode('RECEIPT_MISMATCH'));
+    else{await h.client.command('group.contribute',{groupId:GROUP,amount:2500,pin:'4917'});assert.equal(await h.client.getPending(),null);}
+  }
+});
+
+test('refund approval proposals survive without an immediate receipt and retain original amount binding', async () => {
+  const h=await setup(()=>json(extResult('payment.refund',{refundProposal:{id:PROPOSAL,paymentId:PAYMENT,amount:2500,status:'pending'}})));
+  const result=await h.client.refundPayment({paymentId:PAYMENT,amount:2500,pin:'4917'});
+  assert.equal(result.refundProposal.status,'pending');assert.equal(await h.client.getPending(),null);
+});
+
+test('budget source is captured in the original transfer and persists through a lost response', async () => {
+  const h=await setup(()=>{throw new Error('lost');});
+  await assert.rejects(()=>h.client.transfer({...transfer,budgetCategoryId:BOX}),errorCode('NETWORK_ERROR'));
+  assert.equal((await h.client.getPending()).payload.budgetCategoryId,BOX);
+  assert.equal(h.calls.at(-1).body.p_payload.budgetCategoryId,BOX);
+});
+
+test('an already revoked session still signs out locally without showing a false failure',async()=>{
+ const h=await setup(()=>json({message:'Session already revoked'},403));
+ await h.client.signOut();
+ assert.equal(h.client.signedIn,false);
+ assert.equal(h.changes.at(-1),null);
+});

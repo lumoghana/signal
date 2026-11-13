@@ -49,6 +49,7 @@ export function renderActivation(ctx, route) {
   if (step === 'fund') {
     fundingStage = renderActivationFunding(d, amountField);
     ({ body, title, description, primary, action } = fundingStage);
+    if(d.shared&&fundingStage.status==='idle'){description='Add shared test money to try Lumo across devices. No bank or mobile money debit is made.';primary='Add test money';}
   } else if (step === 'purpose') {
     title = 'Give it a purpose.';
     description = 'Food, data, transport. Start with what this money needs to cover.';
@@ -166,7 +167,7 @@ export function bindActivation(ctx, route) {
       root.querySelectorAll('[data-activation-category]').forEach(button => button.setAttribute('aria-pressed', 'false'));
     }
   };
-  const click = event => {
+  const click = async event => {
     const button = event.target.closest('button');
     if (!current() || !button || button.disabled || busy) return;
     if (button.dataset.activationAction === 'choose-item') {
@@ -179,6 +180,7 @@ export function bindActivation(ctx, route) {
     if (button.dataset.activationSource) { if (activationFundingStatus(d) !== 'idle') return; d.funding.source = button.dataset.activationSource; return refresh(); }
     if (button.dataset.activationAmount) { if (activationFundingStatus(d) !== 'idle') return; d.funding.amountText = (Number(button.dataset.activationAmount) / 100).toFixed(2); return refresh(); }
     if (button.dataset.activationDemoOutcome) {
+      if(ctx.connected)return error('Provider outcome controls are unavailable for shared accounts.');
       const result = simulateActivationFundingReceipt(d, { outcome: button.dataset.activationDemoOutcome });
       if (!result.ok) return error(result.message);
       ctx.saveDraft?.();
@@ -203,6 +205,15 @@ export function bindActivation(ctx, route) {
     if (action === 'check-funding') return checkFunding({ manual: true });
     if (action === 'retry-funding') { const result = retryActivationFunding(d); if (!result.ok) return error(result.message); return refresh(); }
     if (action === 'fund') {
+      if(d.shared&&ctx.connected){
+        const amount=parseAmount(d.funding.amountText);
+        if(!Number.isSafeInteger(amount)||amount<=0)return error('Choose an amount above zero to start with.');
+        ctx.auth({title:`Add ${cash(amount)} of shared test money?`,onSuccess:async()=>{
+          const result=await ctx.actAsync('fund',{amount,source:'Shared test money',rail:'test',note:'Shared pilot test money. No bank or MoMo debit.',idempotencyKey:d.fundingKey});
+          if(!result.ok)return error(result.message);
+          d.funded=true;d.fundingTransactionId=result.id||result.transaction?.id;d.fundingAttempt=null;d.error='';d.step='fund';refresh();
+        }});return;
+      }
       const result = requestActivationFunding(d, { amount: parseAmount(d.funding.amountText), source: d.funding.source, phone: d.funding.phone ?? d.state.profile?.phone });
       if (!result.ok) return error(result.message);
       return refresh();
@@ -211,6 +222,12 @@ export function bindActivation(ctx, route) {
     if (action === 'clear-item') { d.category = ''; d.categoryName = ''; d.amountText = ''; d.error = ''; return refresh(); }
     if (action === 'save-budget') {
       if (pendingEssential(d)) return error('Add this essential first, or cancel the item before completing your budget.');
+      if(d.shared&&ctx.connected){
+        busy=true;button.disabled=true;
+        const result=await ctx.actAsync('createBudget',{items:d.items.map(item=>({...item,due:d.due})),buffer:parseAmount(d.keepBackText||'0'),endDate:d.due,idempotencyKey:`${d.fundingKey}-budget`});
+        busy=false;button.disabled=false;if(!result.ok)return error(result.message);
+        d.budgetSaved=true;d.items=structuredClone(d.state.budget.items);return go('ready');
+      }
       const result = saveActivationBudget(d, { items: d.items, due: d.due, buffer: parseAmount(d.keepBackText || '0') });
       if (!result.ok) return error(result.message);
       return go('ready');

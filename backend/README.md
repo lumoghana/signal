@@ -10,7 +10,13 @@ The first migration provides account setup, exact-handle recipient lookup, expli
 
 All commands validate a live Supabase Auth session. Money moves verify the server-held transaction PIN and apply PIN throttling. The backend binds retry references to the signed-in user, command and original payload. `attempt.lookup` recovers committed or definitively rejected operations without storing a PIN on the device.
 
-The connected consumer web, merchant web and Android 2.5.0 pilot adopt this contract through a separate connected experience. The existing full local prototypes retain their own preview data. Existing local demo balances must not be imported as shared funding. Staff delegation, Money Boxes, budgets, groups, IOUs, push delivery, account recovery and operations screens need their own integration work before full feature parity is claimed.
+Consumer web, merchant web and Android 2.6.0 use these shared accounts and records. Android opens the connected experience by default. The optional Local preview retains its own simulated data; no local demo balances are imported as shared funds.
+
+Shared journeys include Essentials and keep-back, source-aware payments and refund restoration, actual Money Box accounts and Savings Hacks, partner codes and protected releases, consent-based IOUs and repayments, group membership/chat/contributions/mandated payouts and pro-rata cancellation refunds, grounded Money Chat/history, persisted late-allowance recovery, informational outside-money records, private favourites and fixed personal payment requests. The approved 12 lessons and six campus stories share versioned resume state across web and Android.
+
+Merchant operations include accepted shop staff roles, owner/staff shifts, cumulative refund approvals, consolidated owner balances, per-shop reporting, opt-in proximity discovery and private support tickets. User preferences, transaction PIN changes, own-session revocation and notification inboxes are server-backed. Internal scheduled transfers execute from explicit PIN-authorised bounded mandates using a private cron worker; failures stop the mandate without fabricating a payment.
+
+No bank, MoMo, bills, cards, NIA or SMS provider is connected. Synthetic handles do not verify a phone, email or identity. Password recovery, OS background push, group mandate changes/designated approver revisions and evidence uploads, and partner changes/verified-support releases remain unavailable. Existing group mandates cannot be changed to bypass consent. Money Chat computes actual ledger records; no external LLM or unseen finances are implied.
 
 ## Client
 

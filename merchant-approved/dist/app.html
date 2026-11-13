@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#173e2a">
+<meta name="description" content="Lumo Merchant. Every shop in view. Every payment clear. An interactive campus merchant prototype.">
+<title>Lumo Merchant · Collect with a scan</title>
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preload" href="./assets/lumo-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./app.css">
+<link rel="stylesheet" href="./signup.css">
+<link rel="stylesheet" href="./access.css">
+<link rel="stylesheet" href="./people.css">
+<link rel="stylesheet" href="./reporting.css">
+<link rel="stylesheet" href="./operations.css">
+<link rel="stylesheet" href="./devices.css">
+<link rel="stylesheet" href="./directory.css">
+<link rel="stylesheet" href="./campus-pay.css">
+<link rel="stylesheet" href="./collections.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./mobile-app.css">
+</head>
+<body>
+<div id="app"><div class="startup-loading"><strong>lumo merchant</strong><p>Opening your workspace…</p></div></div>
+<div id="modal-root"></div>
+<div id="payment-announcement" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
+<div id="toast-root" class="toast-stack" role="status" aria-live="polite"></div>
+<noscript>Lumo Merchant needs JavaScript to run this interactive prototype.</noscript>
+<script src="./vendor/qrcode.js"></script>
+<script src="./vendor/jsQR.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
+

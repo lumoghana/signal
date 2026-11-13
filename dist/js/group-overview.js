@@ -33,7 +33,7 @@ export function bindGroupOverview(ctx,route){
   const root=ctx.$?.('[data-group-overview]')||ctx.$?.('.group-access-page')||document.querySelector('[data-group-overview],.group-access-page');
   if(!root)return()=>{};
   const g=ctx.state.groups?.find(g=>g.id===route.id);if(!g)return()=>{};
-  if(g.payouts.some(p=>p.status!=='expired'&&groupPayoutStatus(p)==='expired')){const result=ctx.act('expireGroupPayouts',{groupId:g.id});if(result?.ok)ctx.refresh();}
+  if(g.payouts.some(p=>p.status!=='expired'&&groupPayoutStatus(p)==='expired')){const result=(ctx.actAsync||ctx.act).call(ctx,'expireGroupPayouts',{groupId:g.id});if(result?.then)void result.then(value=>{if(value?.ok)ctx.refresh();});else if(result?.ok)ctx.refresh();}
   let alive=true;const valid=()=>alive&&root.isConnected!==false&&ctx.route?.id===g.id&&ctx.route?.page==='group-detail';
   const click=event=>{const b=event.target?.closest?.('button');if(!b||!valid())return;
     if(b.dataset.groupTab||b.dataset.groupAction==='chat'){ctx.go({section:'life',page:b.dataset.groupTab==='overview'?'group-detail':'group-chat',id:g.id},{replace:!!b.dataset.groupTab});return;}
