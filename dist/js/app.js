@@ -95,7 +95,11 @@ function focusView(){if(overlayMeta)return;const heading=view.querySelector('h1,
 function persistSession(){try{const savedDraft={...draft};if(draft.onboarding)savedDraft.onboarding=persistableOnboardingDraft(draft.onboarding);if(shared.connected){if(savedDraft.onboarding){savedDraft.onboarding.pin='';savedDraft.onboarding.pinConfirm='';}if(savedDraft.activation){savedDraft.activation=structuredClone(savedDraft.activation);delete savedDraft.activation.state?.settings?.pin;}}sessionStorage.setItem('lumo-session-v1',JSON.stringify({route,draft:savedDraft,navigation:router?.snapshot()}));}catch{}}
 function reset({demo=false,persistenceReset=false}={}){shared.setSample(demo);const candidate=demo?createDemoState():createEmptyState();const saved=persistence.reset(candidate);if(!saved.ok){toast(saved.message);render();return;}clearOnboardingMedia(draft.onboarding);pendingPageNavigation=true;captureCurrent=null;closeSheet();clearTimeout(toastTimer);document.querySelector('#toast').textContent='';document.querySelector('#toast').classList.remove('visible');for(const key of Object.keys(draft))delete draft[key];state=saved.state;route=demo?(readPaymentLink(ctx)||{section:'home',page:'home'}):{section:'welcome'};router=makeRouter();router.initialise();}
 async function signOut(){
-  const result=shared.connected?await shared.signOut():act('accountSignOut');
+  const wasConnected=shared.connected;
+  const operation=wasConnected?shared.signOut():act('accountSignOut');
+  const identityVersion=shared.authVersion;
+  const result=await operation;
+  if(shared.authVersion!==identityVersion||(wasConnected&&shared.signedIn))return;
   if(!result.ok){toast(result.message);return;}
   signupPassword='';authorizationPin='';
   cleanup?.();cleanup=null;clearOnboardingMedia(draft.onboarding);captureCurrent=null;
