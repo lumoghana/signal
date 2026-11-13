@@ -114,13 +114,15 @@ export async function api(path,options={}){
  if(isLocallyLocked()&&!options.unlockOnSuccess&&!publicPath(path)&&!path.startsWith('/api/logout'))throw localLockedError();
  const headers={Accept:'application/json',...(options.headers||{})};
  if(method!=='GET'&&method!=='HEAD'){headers['Content-Type']='application/json';headers['X-Lumo-Request']='1'}
+ if(options.signal?.aborted)throw new DOMException('Question cancelled.','AbortError');
  const controller=new AbortController();controllers.add(controller);
- const timeout=setTimeout(()=>controller.abort(new DOMException('The connection timed out. Retry with the same reference.','TimeoutError')),15000);timeout.unref?.();
+ const callerAbort=()=>controller.abort();options.signal?.addEventListener('abort',callerAbort,{once:true});
+ const timeout=setTimeout(()=>controller.abort(new DOMException('The connection timed out. Retry with the same reference.','TimeoutError')),path==='/api/lux'?28000:15000);timeout.unref?.();
  try{
   const response=await merchantFetch(path,{signal:controller.signal,authEpoch:epoch,method,credentials:'same-origin',headers,...(options.body!==undefined?{body:JSON.stringify(options.body)}:{})});
   if(epoch!==getAuthEpoch())throw failChanged();
   if(!(response.headers.get('content-type')||'').includes('application/json'))throw new Error('The shared service is unavailable. Please retry when connected.');
-  const result=await response.json();if(epoch!==getAuthEpoch())throw failChanged();
+  const result=await response.json();if(controller.signal.aborted)throw new DOMException('Question cancelled.','AbortError');if(epoch!==getAuthEpoch())throw failChanged();
   if(!response.ok){
    if(response.status===401&&cache.session&&isAuthFailure(path,result))lockLocal('session-ended');
    const error=new Error(result.error?.message||result.error||result.message||'We could not complete that request.');error.status=response.status;error.code=result.code||result.error?.code;error.definitiveNoMutation=error.code==='UNAVAILABLE_SERVICE'||result.noMutation===true;throw error;
@@ -134,9 +136,9 @@ export async function api(path,options={}){
   if(options.unlockOnSuccess&&transitionBackup&&(error.status>=400&&error.status<500&&error.status!==401||error.definitiveNoMutation===true)&&isAuthTransitionPending()){
    const saved=transitionBackup;transitionBackup=null;cache=saved.cache;revisions=saved.revisions;recoveryKey=saved.recoveryKey;recoveryKeyReference=saved.recoveryKeyReference||'';writeAuth({...authState(),locked:false,pendingLogout:false,kind:'authenticated'},{expectedEpoch:epoch});authSignature=signature();stateSignature=snapshotSignature(cache.state);if(cache.state)replaceRegisteredState(cache.state,{activate:saved.workspace==='registered'});emit('authority');emit('account');emit('data');
   }
-  if((!error.status||error.status>=500)&&error.code!=='AUTH_CHANGED'&&!error.definitiveNoMutation){connection='offline';lastError=error.message;emit('connection')}
+  if((!error.status||error.status>=500)&&!(error.name==='AbortError'&&options.signal?.aborted)&&error.code!=='AUTH_CHANGED'&&!error.definitiveNoMutation){connection='offline';lastError=error.message;emit('connection')}
   throw error;
- }finally{clearTimeout(timeout);controllers.delete(controller)}
+ }finally{clearTimeout(timeout);options.signal?.removeEventListener('abort',callerAbort);controllers.delete(controller)}
 }
 async function retryLogout(){
  const current=authState();if(logoutRetry||!current.locked||!current.pendingLogout)return;logoutRetry=true;

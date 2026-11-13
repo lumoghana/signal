@@ -69,6 +69,16 @@ export async function merchantFetch(path,options={}){
  }
  if(saved?.session?.expires_at&&saved.session.expires_at*1000<Date.now()+45000)await refresh(signal,generation,epoch);
  requireCurrent(generation,epoch);
+ if(pathname==='/api/lux'){
+  const owner=saved?.session?.user?.id;if(!owner||!saved?.merchantToken)return response({ok:false,code:'SESSION_INVALID',message:'Sign in to your merchant account to ask Lux.'},401);
+  const send=async()=>{const r=await fetch(CONNECTED_CONSUMER_ORIGIN+'/api/merchant-lux',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+saved.session.access_token},body:JSON.stringify({question:input.question,context:input.context,shopId:input.shopId||null,merchantToken:saved.merchantToken}),signal,redirect:'error'});const data=await r.json();if(signal?.aborted)throw new DOMException('Question cancelled','AbortError');if(!data||typeof data!=='object'||Array.isArray(data))throw Error('Lux could not read a response. Please try again.');return{data,status:r.status};};
+  let result=await send();requireCurrent(generation,epoch);
+  if(result.status===401&&await refresh(signal,generation,epoch)){requireCurrent(generation,epoch);result=await send();requireCurrent(generation,epoch);}
+  if(owner!==saved?.session?.user?.id)throw changed();
+  if(result.data.ok&&result.data.owner!==owner)throw changed();
+  if(result.status===401)result.data.code='SESSION_INVALID';
+  return response(result.data,result.status);
+ }
  const wrapper={action:'merchant',path,method:options.method||'GET',body:input,...(saved?.merchantToken?{merchantToken:saved.merchantToken}:{}),...(pathname==='/api/auth/step-up'?{password:input.currentPassword}:{})};
  const ownerId=saved?.session?.user?.id;
  let result=await post('/functions/v1/lumo-approved',wrapper,saved?.session?.access_token,signal);requireCurrent(generation,epoch);

@@ -115,3 +115,35 @@ test('an epoch mismatch cannot turn a protected account change into anonymous su
   assert.equal(result.status,409);assert.equal(body.ok,false);assert.equal(body.code,'AUTH_CHANGED');assert.equal(f.calls.length,0);assert.equal(f.stored().session.user.id,ids.a);
  }finally{f.cleanup()}
 });
+
+const luxReply=(owner=ids.a)=>({ok:true,owner,mode:'recorded',answer:{title:'Confirmed records',paragraphs:[],stats:[]},state:{business:{id:'synthetic-business'}}});
+const luxRequest={method:'POST',body:JSON.stringify({question:'What is still processing?',context:{questions:[]},shopId:'night-market',state:{openingBalance:999999}})};
+test('merchant Lux sends questions and session authority, never local financial records',async()=>{
+ const f=await setup();try{
+  f.configure(call=>{assert.equal(call.url,'https://lumo-connected-pilot.vercel.app/api/merchant-lux');assert.equal(call.options.headers.Authorization,'Bearer a-access');assert.equal(call.body.merchantToken,'a'.repeat(64));assert.equal(call.body.shopId,'night-market');assert.equal(call.body.state,undefined);assert.equal(call.body.question,'What is still processing?');return response({...luxReply(),merchantToken:'c'.repeat(64)})});
+  const result=await f.module.merchantFetch('/api/lux',luxRequest);assert.equal((await result.json()).ok,true);assert.equal(f.calls.length,1);assert.equal(f.stored().merchantToken,'a'.repeat(64));
+ }finally{f.cleanup()}
+});
+test('merchant Lux discards an old account answer after another account signs in',async()=>{
+ const f=await setup(),pending=deferred(),started=deferred();try{
+  f.configure(call=>{if(call.url.endsWith('/api/merchant-lux')){started.resolve();return pending.promise}return f.usual(call)});
+  const old=f.module.merchantFetch('/api/lux',luxRequest);await started.promise;await f.loginB();pending.resolve(response(luxReply()));await staleOutcome(old);assert.equal(f.stored().session.user.id,ids.b);
+ }finally{f.cleanup()}
+});
+test('merchant Lux rejects answers addressed to another shared user',async()=>{
+ const f=await setup();try{f.configure(()=>response(luxReply(ids.b)));await staleOutcome(f.module.merchantFetch('/api/lux',luxRequest));assert.equal(f.stored().session.user.id,ids.a)}finally{f.cleanup()}
+});
+test('merchant Lux refreshes an expired shared credential before reading records',async()=>{
+ const f=await setup({expired:true});try{
+  f.configure(call=>{if(call.url.includes('grant_type=refresh_token'))return response({...session('a'),access_token:'a-renewed'});assert.equal(call.options.headers.Authorization,'Bearer a-renewed');return response(luxReply())});
+  assert.equal((await(await f.module.merchantFetch('/api/lux',luxRequest)).json()).ok,true);assert.equal(f.calls.length,2);assert.equal(f.stored().merchantToken,'a'.repeat(64));
+ }finally{f.cleanup()}
+});
+test('merchant Lux cancellation cannot return a late successful answer',async()=>{
+ const f=await setup(),pending=deferred(),started=deferred(),controller=new AbortController();try{
+  f.configure(()=>{started.resolve();return pending.promise});const result=f.module.merchantFetch('/api/lux',{...luxRequest,signal:controller.signal});await started.promise;controller.abort();pending.resolve(response(luxReply()));await assert.rejects(result,{name:'AbortError'});assert.equal(f.stored().merchantToken,'a'.repeat(64));
+ }finally{f.cleanup()}
+});
+test('merchant Lux handles a malformed service reply with a focused retry',async()=>{
+ const f=await setup();try{f.configure(()=>response(null));await assert.rejects(f.module.merchantFetch('/api/lux',luxRequest),/could not read a response/)}finally{f.cleanup()}
+});

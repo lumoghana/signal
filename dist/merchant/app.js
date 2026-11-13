@@ -9,6 +9,8 @@ import * as Auth from './account.js';
 import * as Shared from './shared.js';
 import {createReporting,paymentDate} from './reporting.js';
 import {businessDay,financialTradingDay} from './domain.js';
+import {createMerchantLuxConversation,renderMerchantLux} from './lux-chat.js';
+import {merchantLuxStale} from './lux-brain.js';
 import {createRefundAttempts} from './refund-attempts.js';
 import {createSettlementAttempts} from './settlement-attempts.js';
 import {createOperations} from './operations.js';
@@ -61,6 +63,16 @@ let deviceId;try{deviceId=localStorage.getItem('lumo-sample-receiver-id')||crypt
 let remembered={}; try{remembered=JSON.parse(localStorage.getItem(storeKey)||'{}');}catch{}
 let ui={role:'owner',shopId:'night-market',staffId:'staff-kojo',page:'home',collectMode:'amount',collectionNote:'',scope:'all',activitySearch:'',activityStatus:'all',activityPeriod:'today',nearbySearch:'',area:'Night Market',charge:'',category:'all',modal:null,chat:[],location:null,...remembered};
 let state=getState();let navigation=null,restoringNavigation=false,campusOverlayActive=false;
+// Legacy sample data has no account ID. Give only that local workspace a stable
+// reasoning identity; registered accounts always use the server's business ID.
+function luxState(){return getWorkspaceMode()==='sample'&&!state.business.id?{...state,business:{...state.business,id:'sample-business'}}:state;}
+function luxActor(){
+ const session=getWorkspaceMode()==='registered'?Auth.getSession():null;
+ if(getWorkspaceMode()==='registered')return session?{id:session.userId,role:session.role,shopIds:session.shopIds||[],businessId:session.businessId}:{id:'signed-out',role:'none',shopIds:[],businessId:state.business.id};
+ return{id:ui.role==='owner'?'sample-owner':'sample-'+ui.role+'-'+(ui.staffId||'member'),role:ui.role,shopIds:ui.role==='owner'?state.shops.map(s=>s.id):[ui.shopId],businessId:luxState().business.id};
+}
+const merchantChat=createMerchantLuxConversation({getState:luxState,getActor:luxActor,getShopId:()=>scoped(),getIdentity:()=>[getWorkspaceMode(),Shared.getAuthEpoch(),Auth.getSession()?.id||'sample'],isConnected:()=>getWorkspaceMode()==='registered',request:(question,context,signal)=>Shared.api('/api/lux',{method:'POST',body:{question,context,shopId:scoped()},signal}),onChange:()=>{if(appReady&&ui.page==='lux'){render();requestAnimationFrame(()=>{const log=document.querySelector('.lux-panel .chat-log');if(log)log.scrollTop=log.scrollHeight;});}}});
+
 const url=new URL(location.href);
 if((url.searchParams.has('pay')||url.searchParams.has('request'))&&['sample','registered'].includes(url.searchParams.get('workspace'))){
  try{state=switchWorkspace(url.searchParams.get('workspace'))}catch{}
@@ -399,8 +411,8 @@ function soundPanel(){
 }
 function nearby(){return directory.render();}
 function lux(){
- return heading('A clearer view, with Lux.',`Viewing ${E(scoped()?shopName(scoped()):'all shops')}. Answers use confirmed Lumo records in this scope.`,ui.role==='owner'?scopeSelect():'','LUX FOR BUSINESS')
- +`<section class="panel lux-panel"><div class="lux-welcome"><span class="lux-symbol large">${icon('spark')}</span><h2>What would you like to understand?</h2><p>I can help you read your Lumo collections, shop activity and settlements.</p></div><div class="chat-log">${ui.chat.map(c=>`<div class="chat-bubble ${c.role}">${E(c.text).replace(/\n/g,'<br>')}</div>`).join('')}</div><div class="chat-suggestions">${['How much did we collect today?','Which shop collected the most?','What is still processing?','What can I settle?'].map(q=>btn(E(q),'ask-lux','secondary small',`data-question="${E(q)}"`)).join('')}</div><form data-form="lux" class="chat-compose"><input class="input" name="question" placeholder="Ask about your collections…" aria-label="Ask Lux" required maxlength="200"><button type="submit" class="btn primary" aria-label="Send question">${icon('arrow')}</button></form><p class="notice">Prototype answers use your sample Lumo records. External sales and live AI are not connected.</p></section>`;
+ const chat=merchantChat.sync();
+ return heading('A clearer view, with Lux.',`Viewing ${E(scoped()?shopName(scoped()):'all shops')}. Answers use confirmed Lumo records in this scope.`,ui.role==='owner'?scopeSelect():'','LUX FOR BUSINESS')+renderMerchantLux({view:chat,state:luxState(),actor:luxActor(),connected:getWorkspaceMode()==='registered'});
 }
 function topbarAccess(student,owner,manager){
  if(student)return getWorkspaceMode()==='sample'?`<button class="btn ghost small" data-action="role-switch">Switch experience ${icon('down')}</button>`:`<button class="btn ghost small" data-action="merchant-signin">Merchant sign in ${icon('arrow')}</button>`;
@@ -410,7 +422,7 @@ function topbarAccess(student,owner,manager){
 let renderedFormContext='';
 function formContext(){return [getWorkspaceMode(),state.business.id,Auth.getSession()?.id||ui.role,ui.page,ui.shopId].join(':')}
 function render(){
- state=getState();
+ state=getState();merchantChat.sync();
  if(getWorkspaceMode()==='registered'&&ui.role!=='student'&&!signup.isActive())access?.enforceRecoveryCheckpoint?.();
  const formDrafts=renderedFormContext===formContext()?[...document.querySelectorAll('#app form[data-form="business"],#app form[data-form="lux"]')].map(form=>({type:form.dataset.form,fields:[...form.querySelectorAll('input,select,textarea')].filter(el=>el.name&&el.type!=='password').map(el=>({name:el.name,value:el.value,focused:el===document.activeElement,caret:el.selectionStart}))})):[];
  const draftContext=formContext(),mainFocus=renderedFormContext===formContext()?captureFocus($('#app')):null;
@@ -618,15 +630,22 @@ function say(amount,test=false,shopId=ui.shopId,payment=null){
 function csv(rows,name){const content='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/^[=+@-]/,"'$&").replaceAll('"','""')+'"').join(',')).join('\r\n');download(content,name,'text/csv;charset=utf-8')}
 function download(content,name,type='text/plain'){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);toast('Download prepared.')}
 async function copy(value){try{await navigator.clipboard.writeText(value);toast('Copied to clipboard.')}catch{modal('copy-fallback',{value});toast('Copy the displayed details manually.')}}
-function ask(q){const m=metrics(scoped()),scopeLabel=scoped()?shopName(scoped()):'All shops';let answer;
- if(/most|best|shop/i.test(q)){const sorted=state.shops.filter(s=>!scoped()||s.id===scoped()).map(s=>({s,m:metrics(s.id)})).sort((a,b)=>b.m.todayGross-a.m.todayGross);answer=`${sorted[0].s.name} has collected ${money(sorted[0].m.todayGross)} today across ${sorted[0].m.todayCount} confirmed payments. This compares Lumo collections only.`}
- else if(/pending|processing|waiting/i.test(q))answer=`${money(m.pending)} is still processing. It is excluded from confirmed collections and available merchant funds. Open Payments and filter by Processing to inspect each receipt.`;
- else if(/settle|available|balance/i.test(q))answer=ui.role==='owner'?`Your merchant balance is ${money(metrics().balance)}. ${money(metrics().available)} is currently available to settle after payout reservations. Closing a shop day does not change that balance.`:`Your shop has ${money(m.currentNet)} in its current collection period. The owner controls settlement from the shared merchant account.`;
- else if(/today|collect|sales/i.test(q))answer=`Today you have ${money(m.todayGross)} in confirmed Lumo collections from ${m.todayCount} payments. Completed refunds are ${money(m.todayRefunds)}, leaving ${money(m.todayNet)} net collections. Processing payments are excluded.`;
- else if(/refund/i.test(q))answer=`Completed refunds today total ${money(m.todayRefunds)}. Refunds stay linked to the original payment. Your daily report shows them separately from new collections.`;
- else answer='I can help with today’s collections, shop comparisons, processing receipts, refunds and available settlement funds. Try one of the questions above. This prototype does not connect to live AI.';
- ui.chat.push({role:'user',text:q},{role:'assistant',text:scopeLabel+' · '+answer});render();$('.chat-log')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+function ask(q,options){return merchantChat.ask(q,options);}
+function luxHandoff(el){
+ const message=merchantChat.getView().messages.find(m=>m.id===el.dataset.index),a=message?.answer?.actions?.[Number(el.dataset.option)];
+ if(!message||!a)return;
+ if(merchantLuxStale(luxState(),message.answer,{actor:luxActor()})){void ask(message.question,{previous:message.answer.plan});return;}
+ const allowed=ui.role==='owner'?['activity','overview','reports','settlements','close','shops','shop-detail']:['activity','overview','reports','close'];
+ if(!allowed.includes(a.page))return;
+ if(a.shopId&&!selectShop(a.shopId))return;
+ if(a.page==='close'&&ui.role==='owner'){modal('open-close',{id:a.shopId||ui.shopId});return;}
+ if(a.filters&&['activity','reports'].includes(a.page)){
+  if(ui.role==='owner')ui.scope=state.shops.some(s=>s.id===a.filters.shopId)?a.filters.shopId:'all';
+  reporting.openReview(a.page==='reports'?'report':'activity',a.filters);
+ }
+ navigate(a.page,a.shopId);
 }
+
 function acceptScannedLink(text){
  try{
   const intent=parseMerchantPaymentLink(text,{origin:location.origin});
@@ -721,7 +740,10 @@ document.addEventListener('click',async e=>{
  case'support-ticket':modal('support-ticket',{subject:el.dataset.subject,transaction:el.dataset.transaction});break;
  case'onboarding':dismiss();signup.start();render();break;
  
- case'ask-lux':ask(el.dataset.question);break;
+ case'ask-lux':void ask(el.dataset.question);break;
+ case'lux-fresh':merchantChat.clear();break;
+ case'lux-open':luxHandoff(el);break;
+ case'lux-recheck':{const m=merchantChat.getView().messages.find(m=>m.id===el.dataset.index);if(m)void ask(m.question,{previous:m.answer?.plan});break;}
  case'reset-demo':resetDemo();ui={role:'owner',shopId:'night-market',staffId:'staff-kojo',page:'home',collectMode:'amount',collectionNote:'',scope:'all',activitySearch:'',activityStatus:'all',activityPeriod:'today',nearbySearch:'',area:'Night Market',charge:'',chat:[],modal:null};localStorage.removeItem('lumo-sound');resetReceiptBaseline();navigation?.reset({page:ui.page,shopId:ui.shopId});persist();render();toast('Sample workspace restored.');break;
  case'export-payments':{reporting.handleClick('reporting-export-activity',el);break;const list=txns();csv([['Reference','Payer','Shop','Amount GHS','Status','Date','Method'],...list.map(t=>[t.reference,t.payer,shopName(t.shopId),(t.amount/100).toFixed(2),t.status,t.createdAt,t.method])],'lumo-payments.csv');break}
  case'export-settlements':csv([['Reference','Amount GHS','Fee GHS','Status','Destination','Date'],...state.settlements.map(t=>[t.reference,(t.amount/100).toFixed(2),(t.fee/100).toFixed(2),t.status,t.destination,t.createdAt])],'lumo-settlements.csv');break;
@@ -775,11 +797,12 @@ document.addEventListener('submit',async e=>{
  case'lookup':{if(p.type==='student-scan'){acceptScannedLink(p.value);break}let s,r;if(p.type==='enter-code')s=state.shops.find(s=>s.code.toUpperCase()===p.value.trim().toUpperCase());else if(p.type==='enter-account'){if(p.value.replace(/\s/g,'')===state.business.accountNumber)s=shop(p.shopId)}else{try{const u=new URL(p.value);s=shop(u.searchParams.get('pay'));r=state.requests.find(r=>r.id===u.searchParams.get('request'));if(u.searchParams.has('request')&&!r)s=null}catch{}}if(!s){toast('No matching shop found. Check the code or account.',true);break}modal('student-pay',{id:s.id,request:r?.id,method:p.type==='enter-code'?'code':p.type==='enter-account'?'account':'qr'});break}
  case'ticket':{const linked=state.transactions.find(t=>t.id===p.transactionId||t.reference===p.transactionId),shopId=linked?.shopId||(ui.role==='owner'?p.shopId||null:ui.shopId);const t=await act('ADD_TICKET',{...p,shopId});if(t){modal('ticket-detail',{id:t.id});toast('Prototype support case saved.')}break}
  case'assign':if(await act('ASSIGN_PAYMENT',p)){dismiss();toast('Collection assigned to the shop.')}break;
- case'lux':ask(p.question);break;
+ case'lux':void ask(p.question);break;
 
  }
 });
 function handleField(element){
+ if(element.name==='question'&&element.closest?.('form[data-form="lux"]')){merchantChat.setInput(element.value);return;}
  if(element.name==='appearance'&&element.type==='radio'){if(!element.checked)return;const result=window.LumoAppearance?.setPreference(element.value);updateAppearanceUI();if(!result?.saved){const hint=document.querySelector('.appearance-hint');if(hint)hint.textContent='Changed for now. Your browser could not save this choice.'}return}
  if(access.isActive()){access.handleChange(element);return}
  if(signup.isActive()){signup.handleChange(element);return}
@@ -802,6 +825,7 @@ function handleField(element){
 document.addEventListener('input',e=>handleField(e.target));
 document.addEventListener('change',e=>handleField(e.target));
 document.addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.target?.name==='question'&&e.target.closest?.('form[data-form="lux"]')){e.preventDefault();void ask(e.target.value);return;}
  if(ui.page==='checkout'&&(ui.collectMode||'amount')==='amount'&&!ui.modal&&!signup.isActive()&&!access.isActive()&&!campusPay.isActive()&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|TEXTAREA|SELECT/.test(e.target?.tagName||'')){if(/^[0-9.]$/.test(e.key)||e.key==='Backspace'){e.preventDefault();document.querySelector(`[data-action="key"][data-value="${e.key==='Backspace'?'⌫':e.key}"]`)?.click()}else if(e.key==='Enter'&&!e.target.closest?.('button,a,[role="button"]')){e.preventDefault();document.querySelector('[data-action="create-charge"]:not(:disabled)')?.click()}}
  if(e.key==='Escape'){if(ui.modal||campusPay.isActive())closeOverlayWithBack();return}
  if((e.key==='Enter'||e.key===' ')&&e.target.matches('tr[data-action]')){e.preventDefault();e.target.click()}

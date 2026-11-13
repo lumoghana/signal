@@ -47,10 +47,10 @@ async function snapshot(token,fetcher) {
   return data;
 }
 
-export async function interpretLux(input,{fetcher=fetch,credential=process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN}={}) {
+export async function interpretLux(input,{fetcher=fetch,credential=process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN,systemPrompt=system,responseSchema=PLAN_SCHEMA,validatePlan=validateLuxPlan}={}) {
   if(!credential) return {mode:'recorded',reason:'AI_NOT_CONFIGURED'};
   try {
-    const response=await fetcher('https://ai-gateway.vercel.sh/v1/chat/completions',{method:'POST',headers:{Authorization:`Bearer ${credential}`,'Content-Type':'application/json'},body:JSON.stringify({model:MODEL,messages:[{role:'system',content:system},{role:'user',content:JSON.stringify({question:input.question,context:input.context})}],max_completion_tokens:1100,reasoning_effort:'low',response_format:{type:'json_schema',json_schema:{name:'lux_question_plan',strict:true,schema:PLAN_SCHEMA}}}),signal:AbortSignal.timeout(12000),redirect:'error'});
+    const response=await fetcher('https://ai-gateway.vercel.sh/v1/chat/completions',{method:'POST',headers:{Authorization:`Bearer ${credential}`,'Content-Type':'application/json'},body:JSON.stringify({model:MODEL,messages:[{role:'system',content:systemPrompt},{role:'user',content:JSON.stringify({question:input.question,context:input.context})}],max_completion_tokens:1100,reasoning_effort:'low',response_format:{type:'json_schema',json_schema:{name:'lux_question_plan',strict:true,schema:responseSchema}}}),signal:AbortSignal.timeout(12000),redirect:'error'});
     if(!response.ok) {
       let data;try{data=await response.json();}catch{}
       const candidate=data?.error?.code||data?.error?.type||data?.code||data?.type||'';
@@ -61,12 +61,12 @@ export async function interpretLux(input,{fetcher=fetch,credential=process.env.A
     }
     const data=await response.json(),content=data.choices?.[0]?.message?.content;
     if(typeof content!=='string'||content.length>6000) return {mode:'recorded',reason:'AI_UNREADABLE'};
-    const plan=validateLuxPlan(JSON.parse(content),input.question,input.context);
+    const plan=validatePlan(JSON.parse(content),input.question,input.context);
     return plan?{mode:'ai',plan}:{mode:'recorded',reason:'AI_PLAN_REJECTED'};
   } catch { return {mode:'recorded',reason:'AI_UNAVAILABLE'}; }
 }
 
-async function reserveInference(token,fetcher) {
+export async function reserveInference(token,fetcher) {
   try {
     const response=await fetcher(`${APPROVED_CONFIG.url}/rest/v1/rpc/lumo_lux_reserve`,{method:'POST',headers:{'Content-Type':'application/json',apikey:APPROVED_CONFIG.publishableKey,Authorization:`Bearer ${token}`},body:'{}',signal:AbortSignal.timeout(4000),redirect:'error'});
     const data=await response.json();

@@ -247,5 +247,13 @@ export function createReporting(config = {}) {
   }
   return false;
  }
- return {renderActivity,renderReport:renderCurrentReport,handleClick,handleChange,getFilters:kind=>{ensureContext();return {... (kind === 'report' ? report : activity)}},getFilteredPayments:()=>{ensureContext();return filterPayments(state(),resolved(activity))},reset(){activity=defaults();report=defaults();activityFiltersOpen=false;context=contextKey();}};
+ function openReview(kind,filters={}){
+  ensureContext();const next=defaults();next.period=['today','all'].includes(filters.period)?filters.period:'all';
+  if(filters.period==='custom'&&filters.from&&filters.to&&!validateDateRange(filters.from,filters.to))Object.assign(next,{period:'custom',from:filters.from,to:filters.to});
+  if(['all','paid','processing','failed'].includes(filters.status))next.status=filters.status;
+  if(typeof filters.shopId==='string')next.shopId=filters.shopId;
+  if(typeof filters.search==='string')next.search=filters.search.slice(0,100);
+  normalize(next);if(kind==='report')report=next;else activity=next;
+ }
+ return {renderActivity,renderReport:renderCurrentReport,handleClick,handleChange,openReview,getFilters:kind=>{ensureContext();return {... (kind === 'report' ? report : activity)}},getFilteredPayments:()=>{ensureContext();return filterPayments(state(),resolved(activity))},reset(){activity=defaults();report=defaults();activityFiltersOpen=false;context=contextKey();}};
 }
