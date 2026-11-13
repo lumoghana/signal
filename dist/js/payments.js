@@ -19,6 +19,7 @@ import { renderPaymentExtras, bindPaymentExtras } from './payment-extras.js';
 import { renderQrScreen, bindQrScreen } from './qr-screen.js';
 import { renderAccountRecipient, bindAccountRecipient } from './payment-recipient.js';
 import { recipientLookupMatches } from './recipient-lookup.js';
+import {renderLumoRecipientDirectory,bindLumoRecipientDirectory} from './lumo-recipient-directory.js';
 
 const CONTACTS = [
   { id: 'kofi', name: 'Kofi Mensah', short: 'Kofi', number: '024 555 0182', emoji: 'K', colour: 'violet' },
@@ -279,6 +280,7 @@ function recipients(ctx, route = ctx.route || payRoute('recipient')) {
   if (rail === 'momo' || rail === 'bank') return renderAccountRecipient(ctx, route);
   const f = d.recipientForms?.[rail] || d.recipient || {};
   const contacts=ctx.connected?[]:CONTACTS;
+  if(ctx.connected)return `<div class="page pay-recipient">${taskHead('Pay someone',{editing:!!ctx.route?.edit})}<div class="content"><h1 class="large-question">Who’s it for?</h1><div class="chips rail-chips" role="group" aria-label="Payment method">${RAILS.map(r=>`<button class="chip ${rail===r.id?'selected':''}" data-rail="${r.id}">${icon(r.icon,17)}${r.label}</button>`).join('')}</div>${renderLumoRecipientDirectory(d)}</div><div class="bottom-action">${btn('Continue','pay-recipient-next')}</div></div>`;
   return `<div class="page pay-recipient">${taskHead('Pay someone',{editing:!!ctx.route?.edit})}
     <div class="content"><h1 class="large-question">Who’s it for?</h1>
     <div class="chips rail-chips" role="group" aria-label="Payment method">${RAILS.map(r => `<button class="chip ${rail === r.id ? 'selected' : ''}" data-rail="${r.id}">${icon(r.icon, 17)}${r.label}</button>`).join('')}</div>
@@ -551,6 +553,11 @@ export function bindPayments(ctx, route) {
       const newRail = el.dataset.rail;
       if (newRail !== d.rail && RAILS.some(rail => rail.id === newRail)) { capturePayment(ctx, route); d.rail = newRail; d.recipient = null; d.lookupRequired = newRail !== 'lumo'; delete d.recipientLookup; ctx.setCapture?.(null); remember(ctx); ctx.refresh(); }
     }));
+    if(ctx.connected)return bindLumoRecipientDirectory(ctx,route,{onContinue:person=>{
+      d.recipient=person;d.amountBackTo=d.flowOrigin?payRoute('recipient',{backTo:d.flowOrigin}):payRoute('recipient');
+      if(route.edit)delete ctx.draft.paymentEditBackup;if(d.iouId)d.iouReviewBackTo=d.amountBackTo;ctx.setCapture?.(null);remember(ctx);
+      ctx.go(route.edit||d.iouId&&d.amount>0?paymentReviewRoute(d):payRoute('amount',{backTo:d.amountBackTo}),{replace:!!route.edit});
+    }});
     ctx.$$('[name="recipientName"], [name="recipientNumber"], [name="recipientNetwork"], [name="recipientBank"]').forEach(el => { el.addEventListener('input', () => capturePayment(ctx, route)); el.addEventListener('change', () => capturePayment(ctx, route)); });
     ctx.$('#recipient-search')?.addEventListener('input', event => { d.recipientSearch = event.target.value; remember(ctx); const term = event.target.value.toLowerCase(); ctx.$$('[data-person]').forEach(el => { el.hidden = !el.dataset.person.includes(term); }); });
     on(ctx, 'pay-recipient-next',  () => {return runActionFlow(function*(){

@@ -186,6 +186,10 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
       if (!value) return failure('Enter their exact Lumo username or registered phone number.', 'INVALID_INPUT');
       return request({ action: 'resolve', query: value });
     },
+    searchPeople(query='') {
+      if(typeof query!=='string'||query.length>80||/[\u0000-\u001f\u007f]/.test(query))return Promise.resolve(failure('Use a name, Lumo username or full registered phone number.', 'INVALID_INPUT'));
+      return request({action:'searchPeople',query:query.trim()});
+    },
     action(type, payload = {}, { pin } = {}) {
       const owner = currentOwner(), epoch = authEpoch;
       if (!owner) return Promise.resolve(failure('Sign in to your shared Lumo account to continue.', 'UNAUTHENTICATED'));

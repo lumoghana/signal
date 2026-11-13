@@ -117,6 +117,10 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    if(body.action==='partnerRespond')return respond(await partnerRespond({body,identity,repo}));
    if(body.action==='snapshot')return respond(envelope(await runAutomatic(repo,requireOk(await repo.service('load')))));
    if(body.action==='resolve')return respond(requireOk(await repo.resolve(body.query)));
+   if(body.action==='searchPeople'){
+    if(Object.keys(body).some(k=>!['action','query'].includes(k))||typeof body.query!=='string'||body.query.length>80||/[\u0000-\u001f\u007f]/.test(body.query))throw failure('INVALID_INPUT');
+    return respond(requireOk(await serviceRpc('lumo_approved_people_search',{p_payload:{actor:identity.userId,session:identity.sessionId,query:body.query.trim()}})));
+   }
    if(body.action==='quote'){let shopId=body.shopId;if(!shopId&&body.query){const lookup=requireOk(await serviceRpc('lumo_approved_merchant_lookup',{p_query:body.query}));shopId=lookup.shopId;}return respond(requireOk(await repo.quote({shopId,requestId:body.requestId,testKey:body.testKey})));}
    if(body.action==='pinRepairStatus')return respond(requireOk(await repo.repair('status')));
    if(body.action==='repairTestPin'){
