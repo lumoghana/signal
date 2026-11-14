@@ -27,7 +27,7 @@
 .cashier-shift-summary strong { color:var(--ink); font-weight:600; margin-left:8px; }
 .cashier-amount { text-align:center; padding:9px 0 0; }
 .cashier-amount label { display:block; color:var(--muted); font-size:13px; }
-.cashier-amount input { display:block; width:100%; text-align:center; min-width:0; border:0; border-radius:12px; color:var(--ink); background:transparent; padding:8px 0 0; line-height:1.2; font-size:clamp(38px,12vw,62px); font-weight:500; letter-spacing:-.055em; font-variant-numeric:tabular-nums; }
+.cashier-amount input { display:block; width:100%; text-align:center; min-width:0; border:0; border-radius:12px; color:var(--ink); background:transparent; padding:8px 0 0; line-height:1.2; font-size:clamp(38px,12vw,62px)!important; font-weight:500; letter-spacing:-.055em; font-variant-numeric:tabular-nums; }
 .cashier-amount input::placeholder { color:var(--ink); opacity:1; }
 .cashier-note { width:100%; display:block; text-align:center; background:transparent; color:var(--ink); border:0; border-radius:9px; padding:12px 5px; font-size:13px; margin:0 0 8px; }
 .cashier-note::placeholder { color:var(--muted); }
@@ -142,7 +142,7 @@
   .cashier-operator { margin-bottom:12px; }
   .cashier-shift-summary { margin-bottom:10px; padding:10px 12px; }
   .cashier-amount { padding-top:2px; }
-  .cashier-amount input { font-size:46px; }
+  .cashier-amount input { font-size:46px!important; }
   .cashier-note { margin-bottom:0; padding:9px 5px; }
   .cashier-keypad { gap:3px 8px; margin-bottom:10px; }
   .cashier-keypad button { min-height:46px; font-size:25px; }
