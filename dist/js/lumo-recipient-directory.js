@@ -26,19 +26,22 @@ export function bindLumoRecipientDirectory(ctx,route,{onContinue,delay=250}={}){
  const payment=ctx.draft.payment,root=ctx.$('.pay-recipient'),input=ctx.$('#recipient-search'),list=ctx.$('#lumo-people'),status=ctx.$('#lumo-people-status'),retry=ctx.$('#lumo-people-retry'),error=ctx.$('#payment-error'),next=ctx.$('[data-action="pay-recipient-next"]');
  if(!root||!input||!list||!status||!next)return()=>{};
  const view=directory(ctx,payment),owner=view.owner;let alive=true,timer=null;
+ const scope=value=>[value?.section||'pay',value?.page||'recipient',value?.id||'',value?.edit===true].join('|');
+ const sameRoute=()=>!ctx.route||scope(ctx.route)===scope(route);
  const current=()=>ctx.draft.payment===payment&&payment.rail==='lumo'&&ctx.shared?.user?.id===owner&&ctx.connected===true&&directory(ctx,payment)===view;
- const valid=()=>alive&&root.isConnected!==false&&current();
+ const valid=()=>alive&&root.isConnected!==false&&sameRoute()&&current();
+ const binding={valid,onContinue};view.binding=binding;
  const notify=()=>{for(const listener of [...view.listeners])listener();};
  const message=text=>{view.error=text;notify();};
  function draw(){
   if(!valid())return;
   if(input.value!==view.query)input.value=view.query;
-  input.disabled=view.busy;next.disabled=view.busy||!view.selected&&view.query.trim().replace(/^@/,'').length<2;next.setAttribute('aria-busy',view.busy?'true':'false');
+  input.disabled=view.busy;list.hidden=view.busy;next.textContent=view.busy?'Checking recipient…':'Continue';next.disabled=view.busy||!view.selected&&view.query.trim().replace(/^@/,'').length<2;next.setAttribute('aria-busy',view.busy?'true':'false');
   if(error){error.textContent=view.error;error.hidden=!view.error;}
-  retry.hidden=view.status!=='error';list.setAttribute('aria-busy',view.status==='loading'?'true':'false');
-  const rows=view.people.map(p=>`<button type="button" class="row${view.selected?.id===p.id?' selected':''}" data-lumo-person="${esc(p.id)}" aria-pressed="${view.selected?.id===p.id}"><span class="person-avatar violet" aria-hidden="true">${esc(p.name.charAt(0).toUpperCase())}</span><span class="row-copy"><span class="row-title">${esc(p.name)}</span><span class="row-sub">@${esc(p.handle)} · Lumo</span></span><span class="row-right">${icon(view.selected?.id===p.id?'check':'chevron')}</span></button>`).join('');
+  retry.hidden=view.busy||view.status!=='error';list.setAttribute('aria-busy',view.status==='loading'?'true':'false');
+  const rows=view.busy?'':view.people.map(p=>`<button type="button" class="row${view.selected?.id===p.id?' selected':''}" data-lumo-person="${esc(p.id)}" aria-pressed="${view.selected?.id===p.id}"><span class="person-avatar violet" aria-hidden="true">${esc(p.name.charAt(0).toUpperCase())}</span><span class="row-copy"><span class="row-title">${esc(p.name)}</span><span class="row-sub">@${esc(p.handle)} · Lumo</span></span><span class="row-right">${icon(view.selected?.id===p.id?'check':'chevron')}</span></button>`).join('');
   if(list.innerHTML!==rows)list.innerHTML=rows;
-  status.textContent=view.status==='loading'?'Finding people on Lumo…':view.status==='error'?view.error:view.status==='short'?'Type at least two letters of their name or @username.':view.selected?`Selected ${view.selected.name} · @${view.selected.handle}.`:view.people.length?view.hasMore?'Showing the first 20 people. Type a name or @username to narrow it down.':`${view.people.length} ${view.people.length===1?'person':'people'} on Lumo${view.query.trim()?' matched':' to choose from'}.`:view.query.trim()?'No registered Lumo user matches. Check the @username or full phone number.':'No other registered Lumo users are available yet.';
+  status.textContent=view.busy?`Opening ${view.selected?.name||view.query}…`:view.status==='loading'?'Finding people on Lumo…':view.status==='error'?view.error:view.status==='short'?'Type at least two letters of their name or @username.':view.selected?`Selected ${view.selected.name} · @${view.selected.handle}.`:view.people.length?view.hasMore?'Showing the first 20 people. Type a name or @username to narrow it down.':`${view.people.length} ${view.people.length===1?'person':'people'} on Lumo${view.query.trim()?' matched':' to choose from'}.`:view.query.trim()?'No registered Lumo user matches. Check the @username or full phone number.':'No other registered Lumo users are available yet.';
  }
  async function load(token){
   if(!current()||token!==view.serial)return;
@@ -58,16 +61,16 @@ export function bindLumoRecipientDirectory(ctx,route,{onContinue,delay=250}={}){
  }
  function choose(event){
   const button=event.target.closest?.('[data-lumo-person]');if(!valid()||view.busy||!button)return;const person=view.people.find(p=>p.id===button.dataset.lumoPerson);if(!person)return;
-  ++view.serial;clearTimeout(timer);view.pending=null;view.selected=person;view.query='@'+person.handle;view.status='loaded';payment.recipientSearch=view.query;ctx.saveDraft?.();message('');
+  ++view.serial;clearTimeout(timer);view.pending=null;view.selected=person;view.query='@'+person.handle;view.status='loaded';payment.recipientSearch=view.query;ctx.saveDraft?.();message('');return proceed();
  }
  async function proceed(){
   if(!valid()||view.busy)return;const query=view.selected?.handle||input.value.trim();view.query=input.value;if(query.replace(/^@/,'').length<2){message('Choose a person or enter their exact Lumo username.');return;}
   const person=view.selected,token=++view.serial;clearTimeout(timer);view.busy=true;message('');
-  try{const result=await ctx.shared.resolve(query);if(!valid()||view.serial!==token)return;if(!result?.ok)throw Error(result?.message||'Choose a person from the matches, or check their exact @username.');
+  try{const result=await ctx.shared.resolve(query);if(!current()||view.serial!==token||!view.binding?.valid())return;if(!result?.ok)throw Error(result?.message||'Choose a person from the matches, or check their exact @username.');
    const p=result.recipient;const verified=lumoDirectoryPeople({ok:true,people:[{...p,id:p?.id||p?.userId,userId:p?.userId||p?.id,rail:'lumo'}]},owner)[0];
    if(person&&person.id!==verified.id)throw Error('That username changed. Search again and check the person before continuing.');
-   onContinue({...verified,number:'@'+verified.handle,emoji:verified.name.charAt(0).toUpperCase(),network:'Lumo'});
-  }catch(failure){if(valid()&&view.serial===token)message(failure.message||'Lumo could not verify this recipient. Try again.');}
+   view.binding.onContinue({...verified,number:'@'+verified.handle,emoji:verified.name.charAt(0).toUpperCase(),network:'Lumo'});
+  }catch(failure){if(current()&&view.serial===token&&view.binding?.valid())message(failure.message||'Lumo could not verify this recipient. Try again.');}
   finally{if(current()&&view.serial===token){view.busy=false;notify();}}
  }
  const retryLoad=()=>{if(valid()){clearTimeout(timer);void load(++view.serial);}};
@@ -75,5 +78,5 @@ export function bindLumoRecipientDirectory(ctx,route,{onContinue,delay=250}={}){
  if(view.status==='idle')void load(++view.serial);
  // A debounced search whose old DOM was replaced still needs exactly one load.
  else if(view.status==='loading'&&!view.pending)void load(view.serial);
- return()=>{alive=false;clearTimeout(timer);view.listeners.delete(draw);input.removeEventListener('input',search);list.removeEventListener('click',choose);retry?.removeEventListener('click',retryLoad);next.removeEventListener('click',proceed);};
+ return()=>{alive=false;if(view.binding===binding)view.binding=null;clearTimeout(timer);view.listeners.delete(draw);input.removeEventListener('input',search);list.removeEventListener('click',choose);retry?.removeEventListener('click',retryLoad);next.removeEventListener('click',proceed);};
 }

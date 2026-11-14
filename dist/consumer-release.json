@@ -1,0 +1,17 @@
+{
+  "consumerExperience": "2.10.6",
+  "apkVersion": "2.10.6",
+  "apkVersionCode": 21006,
+  "apkSha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
+  "apkDownload": "/downloads/Lumo-Test-Android.apk",
+  "lookupMode": "sandbox-sample-only",
+  "changes": [
+    "Lumo row tap opens selected person and amount without another Continue",
+    "MoMo phone-only sample network/name lookup then recipient confirmation",
+    "Bank plus account sample name lookup then recipient confirmation"
+  ],
+  "webValidation": {
+    "testsPassed": 1590,
+    "browserJourneys": "Synthetic MoMo and bank PIN-approved virtual debits plus direct Lumo selection verified"
+  }
+}

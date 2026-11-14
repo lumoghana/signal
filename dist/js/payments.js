@@ -317,7 +317,7 @@ function conversation(ctx, route) {
 function amount(ctx) {
   const d = draft(ctx), sum = getSummary(ctx.state);
   return `<div class="page pay-amount">${taskHead(`To ${recipientLabel(d).split(' ')[0]}`,{editing:!!ctx.route?.edit})}
-    <div class="content"><h1 class="large-question">How much?</h1>
+    <div class="content"><h1 class="large-question">How much?</h1><div class="review-person amount-recipient">${recipientAvatar(d.recipient, 'small')}<div><strong>${esc(recipientLabel(d))}</strong><p class="muted">${esc(destinationLabel(d))}${d.recipient?.number ? ` · ${esc(d.recipient.number)}` : ''}</p></div></div>
     <label class="money-entry"><span>GH₵</span><input class="money-input" id="payment-amount" name="paymentAmount" type="text" inputmode="decimal" autocomplete="off" maxlength="12" placeholder="0" value="${esc(d.amountText ?? amountInput(d.amount))}" aria-label="Payment amount in Ghana cedis"></label>
     <p class="muted balance-hint">${cash(sum.available)} available · <span class="accent">${cash(sum.spendable)} left after plan</span></p>
     <details class="payment-optional-details" ${d.detailsOpen ? 'open' : ''}><summary><span>Plan & note <small>Optional</small></span>${icon('chevron', 18)}</summary><div class="payment-optional-content">

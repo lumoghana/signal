@@ -9,16 +9,31 @@ class Node{constructor(value=''){this.value=value;this.isConnected=true;this.hid
 const tick=()=>new Promise(r=>setTimeout(r,5));
 function harness(search=async()=>({ok:true,people:[person]}),resolve=async()=>({ok:true,recipient:person})){
  const nodes=new Map(['.pay-recipient','#recipient-search','#lumo-people','#lumo-people-status','#lumo-people-retry','#payment-error','[data-action="pay-recipient-next"]'].map(s=>[s,new Node()])),calls=[],routes=[];
- const ctx={connected:true,draft:{payment:{rail:'lumo',idempotencyKey:'unchanged-payment-reference',amount:1500}},shared:{user:{id:owner},async searchPeople(q){calls.push(q);return search(q)},resolve},$:s=>nodes.get(s),saveDraft(){}};
- let dispose=bindLumoRecipientDirectory(ctx,{page:'recipient'},{delay:0,onContinue:p=>routes.push(p)});
- return{ctx,nodes,calls,routes,dispose(){dispose()},rebind(){dispose();dispose=bindLumoRecipientDirectory(ctx,{page:'recipient'},{delay:0,onContinue:p=>routes.push(p)});},input:nodes.get('#recipient-search'),list:nodes.get('#lumo-people'),status:nodes.get('#lumo-people-status'),next:nodes.get('[data-action="pay-recipient-next"]'),error:nodes.get('#payment-error')};
+ const ctx={route:{section:'pay',page:'recipient'},connected:true,draft:{payment:{rail:'lumo',idempotencyKey:'unchanged-payment-reference',amount:1500}},shared:{user:{id:owner},async searchPeople(q){calls.push(q);return search(q)},resolve},$:s=>nodes.get(s),saveDraft(){}};
+ const accept=p=>{routes.push(p);ctx.route={section:'pay',page:'amount'};};
+ let dispose=bindLumoRecipientDirectory(ctx,ctx.route,{delay:0,onContinue:accept});
+ return{ctx,nodes,calls,routes,dispose(){dispose()},rebind(){dispose();dispose=bindLumoRecipientDirectory(ctx,ctx.route,{delay:0,onContinue:accept});},input:nodes.get('#recipient-search'),list:nodes.get('#lumo-people'),status:nodes.get('#lumo-people-status'),next:nodes.get('[data-action="pay-recipient-next"]'),error:nodes.get('#payment-error')};
 }
 test('connected Lumo shows an actual search field and no sample-recipient fallback',()=>{const html=renderLumoRecipientDirectory({recipientSearch:'@oness'});assert.match(html,/Search Lumo users/);assert.match(html,/Find people by their Lumo @username or name/);assert.doesNotMatch(html,/Demo recipients|recipientName|@kofi/);});
 test('opening the picker populates registered people and partial @handles query the server',async()=>{const f=harness();await tick();assert.deepEqual(f.calls,['']);assert.match(f.list.innerHTML,/@oness15/);f.input.value='@oness';await f.input.emit('input');await tick();assert.deepEqual(f.calls,['','@oness']);assert.equal(f.ctx.draft.payment.idempotencyKey,'unchanged-payment-reference');f.dispose();});
 test('one-letter queries clear stale matches and never enumerate an unrelated list',async()=>{const f=harness();await tick();f.input.value='@o';await f.input.emit('input');await tick();assert.deepEqual(f.calls,['']);assert.equal(f.list.innerHTML,'');assert.match(f.status.textContent,/at least two/);f.dispose();});
 test('late search results cannot overwrite a newer query or a different account',async()=>{const old=deferred(),fresh=deferred();const f=harness(q=>q?fresh.promise:old.promise);f.input.value='oness';await f.input.emit('input');await tick();fresh.resolve({ok:true,people:[person]});await tick();old.resolve({ok:true,people:[]});await tick();assert.match(f.list.innerHTML,/@oness15/);f.ctx.shared.user.id='33333333-3333-4333-8333-333333333333';f.input.value='other';await f.input.emit('input');assert.deepEqual(f.calls,['','oness']);f.dispose();});
-test('selecting a person fills the handle and Continue rechecks the immutable identity',async()=>{let received;const f=harness(undefined,async q=>{received=q;return{ok:true,recipient:person}});await tick();await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});assert.equal(f.input.value,'@oness15');assert.equal(f.next.disabled,false);await f.next.emit('click');assert.equal(received,'oness15');assert.equal(f.routes[0].id,id);assert.equal(f.routes[0].number,'@oness15');assert.equal(f.ctx.draft.payment.amount,1500);f.dispose();});
-test('a reassigned username cannot substitute another recipient at Continue',async()=>{const f=harness(undefined,async()=>({ok:true,recipient:{...person,id:'33333333-3333-4333-8333-333333333333',userId:'33333333-3333-4333-8333-333333333333'}}));await tick();await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});await f.next.emit('click');assert.equal(f.routes.length,0);assert.match(f.error.textContent,/username changed/);f.dispose();});
+test('tapping a person immediately verifies identity and opens their amount details without Continue',async()=>{
+ let received;const f=harness(undefined,async q=>{received=q;return{ok:true,recipient:person}});await tick();
+ await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});
+ assert.equal(f.input.value,'@oness15');assert.equal(received,'oness15');assert.equal(f.routes.length,1);assert.equal(f.routes[0].id,id);assert.equal(f.routes[0].number,'@oness15');assert.equal(f.ctx.route.page,'amount');assert.equal(f.ctx.draft.payment.amount,1500);f.dispose();
+});
+test('checking a chosen person hides the directory and repeated taps cause only one identity read',async()=>{
+ const pending=deferred();let calls=0;const f=harness(undefined,()=>{calls++;return pending.promise});await tick();
+ const event={target:{closest:()=>({dataset:{lumoPerson:id}})}};const first=f.list.emit('click',event);
+ assert.equal(f.list.hidden,true);assert.equal(f.list.innerHTML,'');assert.equal(f.input.disabled,true);assert.equal(f.next.disabled,true);assert.equal(f.next.textContent,'Checking recipient…');assert.match(f.status.textContent,/Opening Synthetic Person/);
+ await f.list.emit('click',event);await f.next.emit('click');assert.equal(calls,1);
+ pending.resolve({ok:true,recipient:person});await first;assert.equal(f.routes.length,1);f.dispose();
+});
+test('an exact typed handle still supports Continue',async()=>{
+ let query;const f=harness(undefined,async value=>{query=value;return{ok:true,recipient:person}});await tick();f.input.value='@oness15';await f.input.emit('input');await f.next.emit('click');assert.equal(query,'@oness15');assert.equal(f.routes.length,1);assert.equal(f.ctx.route.page,'amount');f.dispose();
+});
+test('a reassigned username cannot substitute another recipient after a row tap',async()=>{const f=harness(undefined,async()=>({ok:true,recipient:{...person,id:'33333333-3333-4333-8333-333333333333',userId:'33333333-3333-4333-8333-333333333333'}}));await tick();await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});assert.equal(f.routes.length,0);assert.match(f.error.textContent,/username changed/);assert.equal(f.list.hidden,false);assert.equal(f.next.disabled,false);f.dispose();});
 test('no matches and connection failures are different states with a usable retry',async()=>{const f=harness(async()=>({ok:true,people:[]}));await tick();assert.match(f.status.textContent,/No other registered/);f.dispose();const g=harness(async()=>{throw Error('Connection unavailable')});await tick();assert.match(g.status.textContent,/Connection unavailable/);assert.equal(g.nodes.get('#lumo-people-retry').hidden,false);g.dispose();});
 test('dispose and duplicate Continue discard callbacks and never submit money',async()=>{const pending=deferred();let count=0;const f=harness(undefined,async()=>{count++;return pending.promise});await tick();f.input.value='oness15';const first=f.next.emit('click');await f.next.emit('click');assert.equal(count,1);f.dispose();pending.resolve({ok:true,recipient:person});await first;assert.equal(f.routes.length,0);});
 test('directory responses reject self, duplicates and invalid identities; extra private data is dropped',()=>{assert.deepEqual(lumoDirectoryPeople({ok:true,people:[{...person,phone:'private',balance:999}]},owner),[person]);for(const people of [[{...person,id:owner,userId:owner}],[person,person],[{...person,handle:'bad<script>'}],[{...person,userId:owner}],Array(21).fill(person)])assert.throws(()=>lumoDirectoryPeople({ok:true,people},owner));});
@@ -36,14 +51,30 @@ test('repeated same-page remounts reuse one slow lookup and its eventual list',a
  assert.deepEqual(f.calls,['']);pending.resolve({ok:true,people:[person]});await tick();assert.match(f.list.innerHTML,/@oness15/);
  for(let i=0;i<8;i++)f.rebind();assert.deepEqual(f.calls,['']);assert.match(f.list.innerHTML,/@oness15/);f.dispose();
 });
-test('same-payment redraw retains chosen identity and still re-verifies before navigating',async()=>{
- const f=harness();await tick();await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});
- f.rebind();assert.equal(f.input.value,'@oness15');assert.match(f.status.textContent,/Selected Synthetic Person/);assert.equal(f.next.disabled,false);
- await f.next.emit('click');assert.equal(f.routes.length,1);assert.equal(f.routes[0].userId,id);assert.deepEqual(f.calls,['']);f.dispose();
+test('same-payment redraw retains the in-flight selected identity and opens details once',async()=>{
+ const pending=deferred();let resolves=0;const f=harness(undefined,()=>{resolves++;return pending.promise});await tick();
+ const selection=f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});f.rebind();
+ assert.equal(f.input.value,'@oness15');assert.match(f.status.textContent,/Opening Synthetic Person/);assert.equal(f.next.disabled,true);assert.equal(f.list.hidden,true);
+ await f.next.emit('click');pending.resolve({ok:true,recipient:person});await selection;assert.equal(resolves,1);assert.equal(f.routes.length,1);assert.equal(f.routes[0].userId,id);assert.deepEqual(f.calls,['']);f.dispose();
 });
-test('a disposed recipient verification cannot navigate a replacement page',async()=>{
+test('a disposed recipient verification cannot navigate without an active picker',async()=>{
  const pending=deferred(),f=harness(undefined,()=>pending.promise);await tick();f.input.value='oness15';const original=f.next.emit('click');
- f.rebind();pending.resolve({ok:true,recipient:person});await original;assert.equal(f.routes.length,0);assert.equal(f.next.disabled,false);f.dispose();
+ f.dispose();pending.resolve({ok:true,recipient:person});await original;assert.equal(f.routes.length,0);
+});
+test('route changes reject a delayed identity reply even before disposal',async()=>{
+ const pending=deferred(),f=harness(undefined,()=>pending.promise);await tick();
+ const original=f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});f.ctx.route={section:'plan',page:'home'};
+ pending.resolve({ok:true,recipient:person});await original;assert.equal(f.routes.length,0);assert.equal(f.ctx.route.section,'plan');f.dispose();
+});
+test('a failed identity check restores the directory for retry without selecting a replacement',async()=>{
+ let attempt=0;const f=harness(undefined,async()=>++attempt===1?{ok:false,message:'Please reconnect'}:{ok:true,recipient:person});await tick();
+ await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});assert.equal(f.routes.length,0);assert.match(f.error.textContent,/Please reconnect/);assert.equal(f.list.hidden,false);assert.equal(f.input.disabled,false);
+ await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});assert.equal(f.routes.length,1);assert.equal(f.routes[0].userId,id);f.dispose();
+});
+test('switching account, auth generation or payment draft during resolution cannot navigate',async()=>{
+ for(const change of [f=>f.ctx.shared.user={id:'33333333-3333-4333-8333-333333333333'},f=>f.ctx.shared.authVersion=2,f=>f.ctx.draft.payment={rail:'lumo'}]){
+  const pending=deferred(),f=harness(undefined,()=>pending.promise);await tick();const original=f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});change(f);pending.resolve({ok:true,recipient:person});await original;assert.equal(f.routes.length,0);f.dispose();
+ }
 });
 
 test('rebind between changing a query and its debounce cannot strand a superseded lookup',async()=>{

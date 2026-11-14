@@ -12,6 +12,16 @@ This repository contains the user-approved Lumo live build, version 66, exported
 - Keep privacy controls, accessible labels, actual camera permission/lifecycle handling, safe-area behavior and reduced-motion support. Long text and short/keyboard-height screens must remain reachable through natural scrolling.
 - Clearly distinguish sample provider/member activity from live services. No live bank, MoMo or NIA connection is present.
 
+## Consumer web and Android parity
+
+Every consumer update must be applied to both the consumer website and the native Android APK. Both must carry the same user experience and financial behaviour. Keeping the native application source separately does not exempt either version from an update.
+
+For each consumer release:
+
+- Check the changed journeys on both the website and Android, including recipient selection, details, review and authorisation where affected.
+- Publish the updated consumer site and deliver the matching signed APK. Record the web commit/deployment and APK version together in the release evidence.
+- State precisely which versions were updated and checked. Do not describe a consumer update as complete or both versions as aligned when only one was updated; identify any remaining work directly.
+
 ## Checks and packaging
 
 Run `npm test` for the current ES-module test suite. Regenerate the public offline shell with `node scripts/build-offline-shell.mjs` after shipped asset changes. Inspect relevant phone layouts in both themes when changing UI. Never replace behavior tests with generated hash baselines to hide a regression.
@@ -21,3 +31,5 @@ Run `npm test` for the current ES-module test suite. Regenerate the public offli
 Remove temporary QA fixtures before committing or deploying. Never commit private browser records, uploads, credentials, environment files, Android signing material, APKs or local build/cache outputs. The native Android application is maintained and delivered separately.
 
 Saved demo records belong to each browser and origin. Do not import older product namespaces or another user's records without explicit authorization.
+
+Keep `dist/consumer-release.json` paired with the delivered APK version and checksum. Include the matching signed APK at `dist/downloads/Lumo-Test-Android.apk` in file-based Vercel deployments, retaining it outside Git. Verify the public download hash after deployment.

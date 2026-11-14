@@ -67,13 +67,10 @@ export function validateRecipientLookup(rail, form = {}, {sandbox=false} = {}) {
     request.bank = bank.label;
   }
   if(sandbox){
-    if(rail==='momo'){
-      if(!['MTN MoMo','Telecel Cash','AT Money'].includes(details.network))return invalid('network','Choose the network for this test MoMo transfer.');
-      request.network=details.network;
-    }
-    const name=typeof details.name==='string'?details.name.trim().replace(/\s+/g,' '):'';
-    if(name.length>60||/[<>\u0000-\u001f\u007f]/.test(name))return invalid('name','Use a recipient label of up to 60 characters.');
-    if(name)request.name=name;
+    const sample=resolveSandboxRecipient(request);
+    if(!sample.ok)return sample;
+    if(rail==='momo')request.network=sample.recipient.network;
+    request.name=sample.recipient.name;
   }
   return { ok: true, key: JSON.stringify(sandbox?[rail,number,request.bank||'',request.network||'',request.name||'']:[rail, number, request.bank || '']), request };
 }
@@ -89,6 +86,21 @@ export function resolveDemoRecipient(request) {
     : bankAccounts.find(item => item.number === number && item.bank === bank);
   if (!account) return { ok: false, code: 'not_found', message: rail === 'momo' ? 'We couldn’t find that number in this demo. Check it, or try a sample number.' : 'That account and bank don’t match a demo account. Check both, or try a sample account.' };
   return { ok: true, recipient: { ...account, emoji: account.name.charAt(0), lookupSource: 'demo' } };
+}
+
+/** Sandbox-only destination data, matching native 2.10.6. Prefixes supply sample
+ * routing for unknown test numbers, never a real network or registered identity. */
+export function resolveSandboxRecipient(request){
+  const checked=validateRecipientLookup(request?.rail,request);
+  if(!checked.ok)return checked;
+  const {rail,number,bank}=checked.request;
+  if(rail==='momo'&&number===DEMO_LOOKUP_UNAVAILABLE_NUMBER)return unavailable();
+  const known=resolveDemoRecipient(checked.request);
+  if(known.ok)return {ok:true,recipient:{...known.recipient,rail,lookupSource:'sandbox'}};
+  if(rail==='bank')return {ok:true,recipient:{rail,number,bank,name:'Test bank recipient',lookupSource:'sandbox'}};
+  if(!/^0(?:2[034567]|5[0345679])\d{7}$/.test(number))return invalid('number','Use a valid Ghana MoMo number.');
+  const prefix=number.slice(0,3),network=['020','050'].includes(prefix)?'Telecel Cash':['026','027','056','057'].includes(prefix)?'AT Money':'MTN MoMo';
+  return {ok:true,recipient:{rail,number,network,name:'Test MoMo recipient',lookupSource:'sandbox'}};
 }
 
 /** A lookup belongs only to the exact rail and details currently on the form. */
