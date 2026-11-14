@@ -7,7 +7,7 @@ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const phone=value=>String(value||'').replace(/[\s()-]/g,'').replace(/^\+233/,'0');
 const failure=(code,message,status=400)=>Object.assign(new Error(message||code),{code,status});
-const messages={AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
+const messages={HANDLE_TAKEN:'That Lumo username is already taken. Choose another.',HANDLE_UNAVAILABLE:'That Lumo username is already taken. Choose another.',REGISTRATION_PENDING:'That username is temporarily reserved. Try again shortly or choose another.',PERSONAL_ACCOUNT_REQUIRED:'This login is for merchant staff access. Open the merchant app, or create your own personal Lumo account to send and receive money.',AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
 Object.assign(messages,{ACCOUNT_CLOSED:'This Lumo account is closed. Its records remain available to view and export.',CLOSURE_REVIEW_CHANGED:'The group returns changed. Open the current amounts and approve them again.',CLOSURE_BLOCKED:'Leave or close your open groups, resolve contribution returns and move remaining funds before closing Lumo.',REPORT_UNAVAILABLE:'This report could not be saved. Open the current member message and try again.',EXISTING_ACCOUNT:'This account already exists. Sign in instead. If its legacy test PIN needs repair, choose Repair test PIN after signing in.',PIN_REPAIR_UNAVAILABLE:'This one-time repair is available only to eligible legacy test accounts. Your existing PIN is unchanged.',PIN_REPAIR_EXPIRED:'This PIN repair check expired or was already used. Start a fresh password check.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.'});
 Object.assign(messages,{REQUEST_PROCESSING:'A mobile money payment is already awaiting confirmation for this request. Keep its original reference.',SHOP_UNAVAILABLE:'This shop is not accepting payments right now.',LINK_UNAVAILABLE:'This merchant payment link is unavailable.'});
 const b64url=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -69,13 +69,13 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  }
  async function revoke(session){try{await upstream('/auth/v1/logout?scope=local',{}, {token:session.access_token,allowFailure:true});}catch{}}
  async function authenticate(body,request){
-  const handle=String(body.handle||'').trim().toLowerCase(),password=body.password;
+  const handle=String(body.handle||'').trim().replace(/^@/,'').toLowerCase(),password=body.password;
   if(!HANDLE.test(handle)||typeof password!=='string'||password.length<(body.action==='register'?10:8)||password.length>128||!password.trim())throw failure('INVALID_INPUT');
   const ip=(request.headers.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';const ipHash=await sha256('lumo-pilot-auth:'+ip,cryptoApi);
   const bootstrap=async(action,payload)=>requireOk(await serviceRpc('lumo_pilot_bootstrap',{p_action:action,p_payload:payload}));
   if(body.action==='login'){
    await bootstrap('login.check',{handle,ipHash});const session=await passwordSession(handle,password),identity=await identify(session.access_token),repo=repository(identity);
-   try{return {...envelope(requireOk(await repo.service('load'))),session};}catch(error){await revoke(session);throw error;}
+   try{return body.mode==='merchant'?{ok:true,session}:{...envelope(requireOk(await repo.service('load'))),session};}catch(error){await revoke(session);throw error;}
   }
   const displayName=typeof body.displayName==='string'?body.displayName.trim():'',registeredPhone=phone(body.phone);
   const isMerchant=body.mode==='merchant';let pin=body.pin;
@@ -86,13 +86,13 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    const created=await upstream('/auth/v1/admin/users',{email:`${handle}@pilot.lumo.invalid`,password:await passwordValue(handle,password),email_confirm:true,app_metadata:{lumo_pilot:true,lumo_approved_password:true,contact_verified:false}},{allowFailure:true});
    if(!created.ok){const aborted=await bootstrap('register.abort',{handle,registrationId:reservation.registrationId});if(!aborted.identityPresent)throw failure(created.status===429?'RATE_LIMITED':'INVALID_INPUT');}
   }
-  const session=await passwordSession(handle,password),identity=await identify(session.access_token),repo=repository(identity);
+  const session=await passwordSession(handle,password).catch(error=>{if(error.code==='CREDENTIALS_INCORRECT')throw failure('HANDLE_TAKEN',messages.HANDLE_TAKEN);throw error;}),identity=await identify(session.access_token),repo=repository(identity);
   try{
    await bootstrap('register.bind',{handle,registrationId:reservation.registrationId,userId:identity.userId});
-   const snapshot=requireOk(await repo.service('provision',{handle,displayName,phone:registeredPhone||null,pin}));
+   const snapshot=requireOk(await repo.service('provision',{handle,displayName,phone:registeredPhone||null,pin,mode:isMerchant?'merchant':'consumer'}));
    await bootstrap('register.complete',{handle,registrationId:reservation.registrationId,userId:identity.userId});
-   return {...envelope(snapshot),session};
-  }catch(error){await revoke(session);throw error;}
+   return isMerchant?{ok:true,session}:{...envelope(snapshot),session};
+  }catch(error){await revoke(session);if(error.code==='EXISTING_ACCOUNT')throw failure('HANDLE_TAKEN',messages.HANDLE_TAKEN);throw error;}
  }
  async function runAutomatic(repo,snapshot){
   for(let n=0;n<4;n++){

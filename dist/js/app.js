@@ -25,7 +25,7 @@ import {renderGroupChat,bindGroupChat} from './group-chat.js';
 import {routeKey,routeLabel,sectionForRoute,parentRoute,safeRoute,chatReturnRoute} from './navigation.js';
 import {bindChatGestures,canOpenChatBySwipe} from './chat-gestures.js';
 import {createRouter} from './router.js';
-import {renderOnboarding,bindOnboarding,clearOnboardingMedia} from './onboarding.js';
+import {renderOnboarding,bindOnboarding,clearOnboardingMedia,signupUsernameMessage} from './onboarding.js';
 import {renderActivation,bindActivation} from './activation.js';
 import {renderTour,bindTour} from './tour.js';
 import {createTourDraft,normalizeTourDraft,loadTourRecord,saveTourRecord,shouldOfferTour} from './tour-model.js';
@@ -298,7 +298,7 @@ async function completeSignup(){
     completingSignup=true;
     const registered=await shared.register({handle:d.login.username,displayName:d.name.trim(),phone:d.phone.trim(),password:signupPassword,pin:d.pin});
     completingSignup=false;
-    if(!registered.ok){d.completed=false;toast(registered.message);render();return;}
+    if(!registered.ok){d.completed=false;const usernameIssue=signupUsernameMessage(registered);if(usernameIssue){d.usernameError=usernameIssue;d.pin='';d.pinConfirm='';d.completedSteps=(d.completedSteps||[]).filter(step=>!['login','pin','pin-confirm'].includes(step));d.currentStep='login';persistSession();toast(usernameIssue);go({section:'onboarding',step:'login'},{replace:true});return;}toast(registered.message);render();return;}
     signupPassword='';
     clearOnboardingMedia(d);
     draft.activation=createActivationDraft({state,preview:false});draft.activation.shared=true;draft.activation.sharedUserId=shared.user?.id;

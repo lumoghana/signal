@@ -259,7 +259,7 @@ test('login and transaction PIN pages clearly explain their separate jobs', () =
   const draft = through(createOnboardingDraft(), 'identity-review');
   const ctx = { draft: { onboarding: draft } };
   const login = renderOnboarding(ctx, { step: 'login' });
-  assert.match(login, /username and password for signing in/);
+  assert.match(login, /Your password signs you in/);
   assert.match(login, /Never use a real password/);
   assert.match(login, /data-onb-login="password"/);
   assert.doesNotMatch(login, /data-onb-field="password"/);

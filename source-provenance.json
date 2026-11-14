@@ -12,24 +12,24 @@
   "shipped_dist": "Approved consumer and merchant design extended with connected shop discovery, repeat payments, public guest checkout, payment-link sharing and permissioned business planning.",
   "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
   "android": {
-    "version": "2.10.2",
-    "version_code": 21002,
+    "version": "2.10.3",
+    "version_code": 21003,
     "package": "com.lumo.nativeapp.test",
     "delivered_separately": true,
     "assets_and_resources_preserved": true,
     "physical_device_verified": false,
-    "apk_sha256": "d3e1360e89ddc65c3728820e3b18eea2b8418faf374ccf4e824aef409a688d03"
+    "apk_sha256": "4fea703ed24e61d4343dc51ad41102bb131f5dfc1131a9d16b04dc24d4ae688a"
   },
   "validation": {
-    "consumer_tests": 1565,
+    "consumer_tests": 1571,
     "merchant_tests": 560,
-    "shared_boundary_and_guest_tests": 33,
+    "shared_boundary_and_guest_tests": 37,
     "guest_http_concurrency_checks": 5,
     "failures": 0,
     "consumer_design_preserved": true,
     "asset_manifest": "dist-sha256.json",
     "android_pure_java_suites": 60,
-    "android_framework_cases": 126,
+    "android_framework_cases": 132,
     "browser_verified": [
       "guest fixed quote and own-number review",
       "pending reference survives refresh",
@@ -45,7 +45,7 @@
   "merchant": {
     "source_commit": "3f4ba078f354e63ebc7069ad53d2bef29b042672",
     "site_project": "appgprj_6af5be2c38548191822030bb895d6d3d",
-    "shared_backend_function_version": 11,
+    "shared_backend_function_version": 12,
     "features": [
       "Dedicated and shared counter phones",
       "Individual cashier PIN access",
@@ -76,5 +76,11 @@
     "recipient_delayed_query_rebind_verified": true,
     "merchant_retained_dom_browser_verified": true,
     "physical_device_verified": false
+  },
+  "personal_payment_identity": {
+    "username_copy_and_conflict_handling": true,
+    "database_migration_applied": false,
+    "recipient_filter_pending_database_confirmation": true,
+    "existing_staff_balances_preserved": true
   }
 }
