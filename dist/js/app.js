@@ -1,3 +1,4 @@
+import {availabilitySignature,refreshAvailabilityControls} from './service-availability.js';
 import {guestMerchantCheckoutURL} from './approved-qr.js';
 import {consumerViewSnapshot,canRenderConsumerBackground,captureReadingPosition,restoreReadingPosition} from './quiet-sync.js';
 import { installExperienceClarity } from './experience-clarity.js';
@@ -46,7 +47,7 @@ let sharedHydrated=!shared.connected||!shared.signedIn,sharedConnectionError='';
 let state=shared.connected?createEmptyState():opened.state||createEmptyState(), route=state.onboardingDone?{section:'home',page:'home'}:{section:'welcome'}, cleanup=null, toastTimer=null, overlayCleanup=null, router=null, captureCurrent=null, overlayMeta=null, pendingPageNavigation=false, pendingModalPop=false, lastRenderedKey='';
 let authorizationPin='',signupPassword='',refreshingShared=false,pendingSharedRender=false,sharedInteraction=false,lastShellMarkup='';
 // Compare record values, not JSON property insertion order or transport metadata.
-const sharedViewSignature=()=>consumerViewSnapshot(state,shared.partnerRequests);
+const sharedViewSignature=()=>consumerViewSnapshot(state,shared.partnerRequests)+availabilitySignature(shared.capabilities);
 let tourRecord=loadTourRecord();
 const draft={}, view=document.querySelector('#view'), shell=document.querySelector('#shell'), app=document.querySelector('#app'), overlays=document.querySelector('#overlay-root');
 const daysFromNow=n=>new Date(Date.now()+n*86400000).toISOString().slice(0,10);
@@ -399,6 +400,7 @@ async function refreshShared({initial=false}={}){
     if(shared.user?.id!==owner){if(!shared.signedIn){sharedHydrated=true;sharedConnectionError='';reconcileState(state,createEmptyState());for(const key of Object.keys(draft))delete draft[key];route={section:'life',page:'account-access'};router=makeRouter();router.initialise();toast('Sign in again to open your account.');}return;}
     if(result.ok){
       sharedHydrated=true;sharedConnectionError='';persistence.release();
+      refreshAvailabilityControls(ctx,[view,overlays]);
       const setupFinished=(wasSetupOpen||draft.activation?.shared)&&['complete','waiting'].includes(state.activation?.step);
       if(setupFinished){delete draft.activation;persistSession();}
       if(initial){route=draft.activation?{section:'activation',step:draft.activation.step}:readPaymentLink(ctx)||{section:'home',page:'home'};router=makeRouter();router.initialise();}

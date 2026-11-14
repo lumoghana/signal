@@ -1,3 +1,4 @@
+import {availabilityMessage,applyAvailabilityControls} from './service-availability.js';
 import {externalSandboxEnabled} from './external-sandbox.js';
 import { cash, esc, icon } from './ui.js';
 import { PAYMENT_SERVICES } from './payment-catalog.js';
@@ -47,6 +48,7 @@ export function renderPaymentsHub(ctx, route = {}) {
 export function bindPaymentsHub(ctx, route = {}) {
   const root = ctx.$('.payments-hub');
   if (!root) return () => {};
+  applyAvailabilityControls(ctx,root);
   let alive = true, merchantCodeCleanup = null;
   const tab = paymentHubTab(route.hubTab), origin = hubRoute(tab), current = () => alive && root.isConnected !== false;
   const connectedCleanup=tab==='campus'&&ctx.connected===true?bindConnectedCampus(ctx,root):null;
@@ -70,6 +72,7 @@ export function bindPaymentsHub(ctx, route = {}) {
     if (!current() || !button || button.disabled) return;
     if (button.dataset.hubTab) return ctx.go(hubRoute(button.dataset.hubTab), { replace: true });
     const action = button.dataset.hubAction;
+    const unavailable=availabilityMessage(ctx,['scan','merchant-code'].includes(action)?'merchant':action);if(unavailable){ctx.toast?.(unavailable);return;}
     const service = action === 'service' ? PAYMENT_SERVICES.find(service => service.id === button.dataset.serviceId) : null;
     if (ctx.connected === true && (['momo', 'bank'].includes(action)&&!externalSandboxEnabled(ctx) || service && service.type !== 'campus' || action === 'resume' && savedProviderUnavailable(ctx))) {
       ctx.toast?.('This provider is not connected in the shared test. You can pay a Lumo user or scan a merchant’s Lumo QR.');

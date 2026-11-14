@@ -429,3 +429,8 @@ enabled = true
 # Every authenticated branch verifies GoTrue user + the live database session.
 [functions.lumo-approved]
 verify_jwt = false
+
+# Staff setup/login are public entry points; every private admin operation validates
+# GoTrue identity, current session, dedicated staff membership and MFA in the handler.
+[functions.lumo-admin]
+verify_jwt = false

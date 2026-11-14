@@ -1,3 +1,4 @@
+import {availabilityMessage} from './service-availability.js';
 import {externalRail,externalSandboxEnabled,isExternalSandboxTransfer,externalSimulationNotice} from './external-sandbox.js';
 import {encodeSharedQrLink} from './approved-qr.js';
 import {parseQrPayload} from './qr-decoder.js';
@@ -111,6 +112,7 @@ function resumePayment(ctx) {
 }
 function startPayment(ctx, person = null, rail = 'lumo', force = false, origin = null) {
   if(originalPaymentFirst(ctx))return;
+  const availabilityProblem=availabilityMessage(ctx,rail);if(availabilityProblem){ctx.toast(availabilityProblem);return;}
   if(ctx.connected&&['momo','bank'].includes(rail)&&!externalSandboxEnabled(ctx)){ctx.toast('This provider is not connected. Choose a Lumo person or scan a connected merchant.');return;}
   const fresh = () => {
     ctx.setCapture?.(null); const d=resetDraft(ctx, person, rail);if(origin)d.flowOrigin=origin;remember(ctx);
@@ -215,6 +217,7 @@ export function payMerchantAgain(ctx,tx) {
 
 export function openSharedMerchant(ctx,input,{isCurrent=()=>true}={}){return runActionFlow(function*(){
   if(originalPaymentFirst(ctx))return {ok:false,message:'Check your original payment first.'};
+  const unavailable=availabilityMessage(ctx,'merchant');if(unavailable){ctx.toast(unavailable);return {ok:false,message:unavailable};}
   const origin=ctx.route,previous=ctx.draft.payment,version=ctx.shared.authVersion;
   const unchanged=()=>ctx.route===origin&&ctx.draft.payment===previous&&ctx.shared.authVersion===version;
   const current=()=>isCurrent()&&unchanged();
@@ -742,6 +745,7 @@ function trackCollection(ctx) {
 }
 
 export function openFunding(ctx, restored = null) {
+  const unavailable=availabilityMessage(ctx,'fund');if(unavailable&&!restored){ctx.toast(unavailable);return;}
   const current = ctx.route || { section: 'home', page: 'home' };
   const f = restored || { source: 'MTN MoMo', number: accountFundingPhone(ctx.state), amountText: '', idempotencyKey: nonce('fund'), returnTo: { ...current } };
   f.number = accountFundingPhone(ctx.state);

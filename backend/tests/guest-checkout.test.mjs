@@ -12,10 +12,31 @@ test('public quote uses only a public link and service rate hash',async()=>{
  const f=fixture();assert.deepEqual(await f.checkout({action:'guestCheckout',operation:'quote',link:token},request()),quote);
  const {name,args}=f.calls[0];assert.equal(name,'lumo_guest_checkout');assert.equal(args.p_operation,'quote');assert.equal(args.p_payload.link,token);assert.match(args.p_payload.rateKey,/^[a-f0-9]{64}$/);assert.ok(!JSON.stringify(args).includes('203.0.113.1'));assert.equal(args.p_payload.phone,undefined);
 });
-test('guest entry reuses phone format normalization without using an account profile',async()=>{
+test('guest entry normalizes its own phone and uses the server lookup rather than a caller network',async()=>{
  const f=fixture();await f.checkout(valid(),request());const payload=f.calls[0].args.p_payload;
- assert.equal(payload.phone,'0241234567');assert.equal(payload.network,'telecel');assert.equal(payload.amount,1200);assert.equal(payload.attemptId,id);
+ assert.equal(payload.phone,'0241234567');assert.equal(payload.network,'telecel','The synthetic directory intentionally maps this MTN-looking prefix to Telecel.');assert.equal(payload.amount,1200);assert.equal(payload.attemptId,id);
  assert.equal(payload.recoveryHash,await guestHash('lumo-guest-recovery-v1:'+secret));assert.ok(!JSON.stringify(payload).includes(secret));
+});
+test('legacy, missing, and unsupported caller networks cannot choose the guest provider route',async()=>{
+ for(const network of ['mtn','airteltigo','unknown',undefined]){
+  const f=fixture();await f.checkout({...valid(),network},request());
+  assert.equal(f.calls[0].args.p_payload.network,'telecel');assert.equal(f.calls[0].args.p_payload.phone,'0241234567');
+ }
+});
+test('guest number lookup first validates the public link and returns masked, explicitly synthetic details',async()=>{
+ const f=fixture(),out=await f.checkout({action:'guestCheckout',operation:'lookup',link:token,phone:'+233 (24) 123-4567'},request());
+ assert.equal(f.calls.length,1);assert.equal(f.calls[0].name,'lumo_guest_checkout');assert.equal(f.calls[0].args.p_operation,'lookup');
+ assert.deepEqual(Object.keys(f.calls[0].args.p_payload).sort(),['link','rateKey']);
+ assert.equal(out.payer.network,'telecel');assert.equal(out.payer.networkLabel,'Telecel Cash');assert.equal(out.payer.phoneMasked,'••••••4567');assert.equal(out.payer.registeredName,'Test customer 4567');
+ assert.equal(out.payer.lookupSource,'sandbox-directory');assert.equal(out.payer.providerMode,'sandbox');assert.equal(out.payer.networkVerified,false);assert.equal(out.payer.nameVerified,false);assert.equal(out.payer.phone,undefined);
+ const denied=fixture({ok:false,code:'LINK_UNAVAILABLE',noMutation:true});await assert.rejects(denied.checkout({action:'guestCheckout',operation:'lookup',link:token,phone:'not a phone'},request()),{code:'LINK_UNAVAILABLE'});
+});
+test('public QR destination resolution forwards only validated shop and request identities',async()=>{
+ const shopId='10000000-0000-4000-8000-000000000001',requestId='20000000-0000-4000-8000-000000000001',f=fixture();
+ await f.checkout({action:'guestCheckout',operation:'resolve',shopId,requestId},request());const args=f.calls[0].args;
+ assert.equal(args.p_operation,'resolve');assert.equal(args.p_payload.shopId,shopId);assert.equal(args.p_payload.requestId,requestId);assert.match(args.p_payload.rateKey,/^[a-f0-9]{64}$/);assert.equal(args.p_payload.phone,undefined);
+ for(const patch of [{shopId:'not-a-shop-uuid'},{requestId:'not-a-request-uuid'},{profile:{phone:'0551234567'}},{phone:'0241234567'}])await assert.rejects(f.checkout({action:'guestCheckout',operation:'resolve',shopId,requestId,...patch},request()),{code:'INVALID_INPUT'});
+ assert.equal(f.calls.length,1);
 });
 for(const [title,patch] of [
  ['missing own phone',{phone:undefined}],['invalid phone',{phone:'0312345678'}],['fractional pesewas',{amount:1200.1}],['zero amount',{amount:0}],['above pilot limit',{amount:1000001}],['string amount',{amount:'1200'}],['weak receipt secret',{recoveryToken:'123456'}],['weak attempt reference',{attemptId:'x'}],['invalid link',{link:'x'}],['unexpected payer profile',{profile:{phone:'0555555555'}}],['unexpected consumer wallet',{walletId:'wallet-other'}],['untrusted provider result',{providerResult:{status:'approved'}}]

@@ -12,25 +12,26 @@
   "shipped_dist": "Approved consumer and merchant design extended with connected shop discovery, repeat payments, public guest checkout, payment-link sharing and permissioned business planning.",
   "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
   "android": {
-    "version": "2.10.6",
-    "version_code": 21006,
+    "version": "2.11.0",
+    "version_code": 21100,
     "package": "com.lumo.nativeapp.test",
     "delivered_separately": true,
     "assets_and_resources_preserved": true,
     "physical_device_verified": false,
-    "apk_sha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
+    "apk_sha256": "558893158d31a47778f79d2354dd4dbad0c81ad6c0cd7fd30b4b56d47aaa6b3f",
     "signing_certificate_sha256": "64f2301aa4b55db94c2748d67bf66b56bda7569f528455969c575b8603338a6c",
     "signing_certificate_matches_previous_release": true,
     "apk_executed_on_art": false,
-    "live_provider_lookup": false
+    "live_provider_lookup": false,
+    "baseline_version": "2.10.6"
   },
   "validation": {
-    "consumer_tests": 1603,
+    "consumer_tests": 1618,
     "failures": 0,
     "consumer_design_preserved": true,
     "asset_manifest": "dist-sha256.json",
-    "android_pure_java_suites": 62,
-    "android_framework_cases": 164,
+    "android_pure_java_suites": 63,
+    "android_framework_cases": 172,
     "android_framework_failures": 0,
     "android_framework_errors": 0,
     "android_framework_skipped": 0,
@@ -58,8 +59,8 @@
       "dark"
     ],
     "android_layout_scope": "Synthetic data rendered through the native showTask shell using Robolectric native graphics. Physical keyboard and device behaviour remain unverified.",
-    "web_test_evidence": "Full npm test passed on the resumed merged source: 1,603 tests, zero failures, cancellations, skips or todo cases. The public offline shell was regenerated before the run.",
-    "android_test_evidence": "The full Android run passed 162 behaviour cases. After correcting the layout-test qualifier order, the two layout cases passed in a separate run; the latest XML reports total 164 cases.",
+    "web_test_evidence": "Full npm test passed on the resumed release source: 1,618 tests, zero failures, cancellations or skips, including service shutdown and recovery on retained payment forms.",
+    "android_test_evidence": "Saved 2.11.0 verification: 63 pure-Java suites and 172 Robolectric framework cases, zero framework failures, errors or skips. Independently verified APK package, signing, checksum and alignment during release continuation.",
     "browser_verified": [
       "Synthetic registered Lumo row tap opened the selected person\u2019s named amount screen directly in the dark theme.",
       "Synthetic MoMo phone-only lookup showed sample network/name confirmation, then GH\u20b525 principal plus GH\u20b50.50 fee review, synthetic PIN approval, virtual debit and successful receipt.",
@@ -73,7 +74,10 @@
     ],
     "external_transfer_rollback_checks": true,
     "consumer_tests_skipped": 0,
-    "browser_verification_scope": "The existing consumer payment components were rendered with synthetic account, service and PIN fixtures. These checks did not write production account records or move real money."
+    "browser_verification_scope": "The existing consumer payment components were rendered with synthetic account, service and PIN fixtures. These checks did not write production account records or move real money.",
+    "backend_tests": 233,
+    "merchant_tests": 611,
+    "admin_sql_checks": 89
   },
   "release_date": "2026-11-14",
   "merchant": {
@@ -200,5 +204,26 @@
       "Existing review, conditional Pause, PIN authorisation, virtual debit, idempotency and receipt rules remain in force."
     ],
     "source_reconciliation": "Preserved the later approved familiar guest checkout, network/name review, QR guest redirection and post-receipt Lumo invitation alongside the 2.10.6 recipient-flow changes."
+  },
+  "admin_portal": {
+    "url": "https://lumo-admin-operations.oness15.chatgpt.site",
+    "source_commit": "87ddda9cb316365ffd1ca2060f7b9225589ee258",
+    "staff_access": "invitation plus TOTP MFA; initial invitation pending explicit owner authorisation",
+    "backend_function": "lumo-admin",
+    "backend_function_version": 3
+  },
+  "shared_gateway_release": {
+    "function": "lumo-approved",
+    "version": 16,
+    "bundle_sha256": "6878211494f21bb482e49fef01a1ca0f7eed33bcbb3e88298700f3e770517f05",
+    "preserved_guest_baseline": 15
+  },
+  "parity_release_continuation": {
+    "date": "2026-11-14",
+    "base_commit": "79dfbed",
+    "consumer_version": "2.11.0",
+    "changes": "Refresh affected payment controls in place without losing recipient input or draft; publish matching APK at the declared download path.",
+    "browser_preview": "Unavailable during continuation because the shared preview is occupied; prior browser fixture checks retained.",
+    "physical_device_verified": false
   }
 }

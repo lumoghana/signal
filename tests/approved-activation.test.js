@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import {createEmptyState} from '../dist/js/model.js';
 import {resumeSharedActivationDraft,safeActivationStep} from '../dist/js/activation-model.js';
 import {renderActivation} from '../dist/js/activation.js';
+import {refreshAvailabilityControls} from '../dist/js/service-availability.js';
 
 const owner='11111111-1111-4111-8111-111111111111';
 const copy=value=>JSON.parse(JSON.stringify(value));
@@ -54,7 +55,7 @@ function harness(state=stateAt()){
  const calls={saved:0,rendered:0,captured:0,initialised:0,posted:[],toasts:[]};
  const shared={connected:true,signedIn:true,user:{id:owner},authVersion:1,account:{userId:owner},partnerRequests:[]};
  const context=vm.createContext({state:copy(state),draft:{},shared,refreshingShared:false,sharedHydrated:true,sharedConnectionError:'',persistence:{release(){}},renderSharedReconnect(){},overlayMeta:null,route:{section:'activity',page:'home'},ctx:{},router:null,
-  JSON,structuredClone,resumeSharedActivationDraft,consumerViewSnapshot,canRenderConsumerBackground,closeSheet(){},
+  JSON,structuredClone,resumeSharedActivationDraft,consumerViewSnapshot,canRenderConsumerBackground,refreshAvailabilityControls,overlays:{querySelectorAll(){return[];}},closeSheet(){},
   reconcileState(target,next){for(const key of Object.keys(target))delete target[key];Object.assign(target,copy(next));},
   captureCurrent(){calls.captured++;},persistSession(){calls.saved++;},render(){calls.rendered++;},readPaymentLink(){return null;},toast(message){calls.toasts.push(message);},
   makeRouter(){return {initialise(){calls.initialised++;}}},view:{querySelector(){return null;}},

@@ -25,6 +25,8 @@ test('registered app QR links keep shop, private access and fixed request while 
  for(const link of [reusable,fixed]){assert.equal(link.origin,'https://lumo-connected-pilot.vercel.app');assert.equal(link.searchParams.get('pay'),selected.id);assert.equal(link.searchParams.get('testKey'),selected.testAcceptanceToken);assert.equal(link.searchParams.has('workspace'),false);assert.equal(link.searchParams.has('amount'),false);}
  assert.equal(reusable.searchParams.has('request'),false);assert.equal(fixed.searchParams.get('request'),charge.id);
  const publicLink=generatedLink({selected:{...selected,published:true}});assert.equal(publicLink.searchParams.has('testKey'),false);assert.deepEqual([...publicLink.searchParams.keys()],['pay']);
+ assert.equal(publicLink.origin,origin,'public QR must use the checkout shipped with this merchant deployment');assert.equal(publicLink.pathname,'/checkout.html','published shop QR must open the public checkout rather than consumer signup');
+ const publicFixed=generatedLink({selected:{...selected,published:true},request:{...charge,amount:1,note:'untrusted'}});assert.equal(publicFixed.origin,origin);assert.equal(publicFixed.pathname,'/checkout.html');assert.equal(publicFixed.searchParams.get('request'),charge.id);assert.equal(publicFixed.searchParams.has('amount'),false);assert.deepEqual([...publicFixed.searchParams.keys()],['pay','request']);
  const intent=parseMerchantPaymentLink(fixed,{origin:fixed.origin});assert.equal(intent.workspace,'registered');assert.equal(intent.amount,null);assert.equal(intent.requestId,charge.id);assert.equal(merchantQuoteParams(intent).get('testKey'),selected.testAcceptanceToken);
 });
 
@@ -77,4 +79,11 @@ test('ambiguous, malformed and external links fail before any quote or payment o
 test('quote parameters retain request and private test key but do not trust the URL amount',()=>{
  const intent=parse('/?pay=night-market&request=request-25&amount=2500&testKey='+'a'.repeat(64));
  const query=merchantQuoteParams(intent);assert.equal(query.get('requestId'),request.id);assert.equal(query.get('shopId'),shop.id);assert.equal(query.get('testKey'),'a'.repeat(64));assert.equal(query.has('amount'),false);
+});
+
+test('downloaded shop posters encode the same guest checkout destination as the visible QR',()=>{
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),body=app.match(/case'download-poster':\{([\s\S]*?);break\}/)?.[1];assert.ok(body);
+ const selected={id:'3eef5917-2c4c-4bb9-aa2b-983d453eac6a',published:true,code:'LUM101',name:'Night Counter'};let encoded,poster;
+ const run=runInNewContext('(function(){'+body+'})',{id:selected.id,shop:()=>selected,state:{business:{name:'Campus Kitchen'}},getWorkspaceMode:()=> 'registered',paymentLink:(_id,request)=>generatedLink({selected,request}).href,E:value=>value,qrSvg:link=>{encoded=new URL(link);return '<svg></svg>'},download:(contents,filename,mime)=>{poster={contents,filename,mime}}});run();
+ assert.equal(encoded.origin,origin);assert.equal(encoded.pathname,'/checkout.html');assert.equal(encoded.searchParams.get('pay'),selected.id);assert.equal(encoded.searchParams.has('amount'),false);assert.match(poster.contents,/Lumo or test MoMo/);assert.equal(poster.mime,'image/svg+xml');
 });

@@ -1,14 +1,17 @@
 const E=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const UUID=()=>globalThis.crypto?.randomUUID?.()||`share-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-const ORIGIN='https://lumo-connected-pilot.vercel.app';
+const ORIGIN='https://lumo-merchant-mobile.oness15.chatgpt.site';
+const CHECKOUT_ORIGINS=new Set([ORIGIN,'https://lumo-connected-pilot.vercel.app']);
 const money=value=>`GH₵${(value/100).toFixed(2)}`;
 
 // A checkout capability deliberately intended for public sharing. Account,
 // test-acceptance and session credentials never belong in these URLs.
 export function publicCheckoutURL(value) {
  const url=new URL(String(value||''));
- if(url.origin!==ORIGIN||url.pathname!=='/checkout.html'||url.username||url.password||url.hash||[...url.searchParams.keys()].some(key=>key!=='link')||url.searchParams.getAll('link').length!==1||!/^[a-f0-9]{64}$/.test(url.searchParams.get('link')||''))throw Error('Lumo did not return a public checkout link. Reopen this request before sharing.');
- return url.href;
+ if(!CHECKOUT_ORIGINS.has(url.origin)||url.pathname!=='/checkout.html'||url.username||url.password||url.hash||[...url.searchParams.keys()].some(key=>key!=='link')||url.searchParams.getAll('link').length!==1||!/^[a-f0-9]{64}$/.test(url.searchParams.get('link')||''))throw Error('Lumo did not return a public checkout link. Reopen this request before sharing.');
+ // Both server-issued legacy links and already-normalized links open the
+ // checkout shipped with the merchant app. The payment capability is unchanged.
+ const checkout=new URL('/checkout.html',ORIGIN);checkout.searchParams.set('link',url.searchParams.get('link'));return checkout.href;
 }
 
 export function paymentShareMessage(link) {

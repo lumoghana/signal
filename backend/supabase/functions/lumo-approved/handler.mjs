@@ -1,3 +1,4 @@
+import {createAvailability,servicesForAction} from './availability.mjs';
 import {externalRecipient,EXTERNAL_SIMULATION_FEES} from './external-transfer.mjs';
 import {createGuestCheckout} from './guest-checkout.mjs';
 import {savingsAutomaticWork} from './domain/savings-parity-model.js';
@@ -10,7 +11,7 @@ const phone=value=>String(value||'').replace(/[\s()-]/g,'').replace(/^\+233/,'0'
 const failure=(code,message,status=400)=>Object.assign(new Error(message||code),{code,status});
 const messages={HANDLE_TAKEN:'That Lumo username is already taken. Choose another.',HANDLE_UNAVAILABLE:'That Lumo username is already taken. Choose another.',REGISTRATION_PENDING:'That username is temporarily reserved. Try again shortly or choose another.',PERSONAL_ACCOUNT_REQUIRED:'This login is for merchant staff access. Open the merchant app, or create your own personal Lumo account to send and receive money.',AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
 Object.assign(messages,{ACCOUNT_CLOSED:'This Lumo account is closed. Its records remain available to view and export.',CLOSURE_REVIEW_CHANGED:'The group returns changed. Open the current amounts and approve them again.',CLOSURE_BLOCKED:'Leave or close your open groups, resolve contribution returns and move remaining funds before closing Lumo.',REPORT_UNAVAILABLE:'This report could not be saved. Open the current member message and try again.',EXISTING_ACCOUNT:'This account already exists. Sign in instead. If its legacy test PIN needs repair, choose Repair test PIN after signing in.',PIN_REPAIR_UNAVAILABLE:'This one-time repair is available only to eligible legacy test accounts. Your existing PIN is unchanged.',PIN_REPAIR_EXPIRED:'This PIN repair check expired or was already used. Start a fresh password check.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.'});
-Object.assign(messages,{REQUEST_PROCESSING:'A mobile money payment is already awaiting confirmation for this request. Keep its original reference.',SHOP_UNAVAILABLE:'This shop is not accepting payments right now.',LINK_UNAVAILABLE:'This merchant payment link is unavailable.'});
+Object.assign(messages,{SERVICE_PAUSED:'This payment option is temporarily unavailable. Please use another method or try again later.',REQUEST_PROCESSING:'A mobile money payment is already awaiting confirmation for this request. Keep its original reference.',SHOP_UNAVAILABLE:'This shop is not accepting payments right now.',LINK_UNAVAILABLE:'This merchant payment link is unavailable.'});
 const b64url=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unbase64=value=>{if(typeof value!=='string'||!/^[A-Za-z0-9_+/-]+={0,2}$/.test(value)||value.length>8192)throw failure('DEVICE_PROOF_INVALID');return Uint8Array.from(atob(value.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));};
 const jwtClaims=token=>{try{return JSON.parse(new TextDecoder().decode(unbase64(token.split('.')[1])));}catch{throw failure('AUTH_REQUIRED',null,401);}};
@@ -33,7 +34,7 @@ async function boundedJson(request){
  const bytes=new Uint8Array(size);let n=0;for(const part of parts){bytes.set(part,n);n+=part.byteLength;}
  let body;try{body=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw failure('INVALID_INPUT');}if(!plain(body))throw failure('INVALID_INPUT');return body;
 }
-export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,merchantHandler=null}={}){
+export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,merchantHandler=null,availabilityEnabled=false}={}){
  const base=new URL(supabaseUrl);if(base.protocol!=='https:'||base.pathname!=='/'||!serviceRoleKey)throw Error('Invalid gateway configuration');
  const origins=new Set(allowedOrigins);
  async function upstream(path,body,{token=serviceRoleKey,method='POST',allowFailure=false}={}){
@@ -42,8 +43,9 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
   if(!response.ok&&!allowFailure)throw failure('SERVICE_UNAVAILABLE',null,503);return {ok:response.ok,status:response.status,data};
  }
  async function serviceRpc(name,args){const {data}=await upstream('/rest/v1/rpc/'+name,args);if(!plain(data))throw failure('SERVICE_UNAVAILABLE',null,503);return data;}
+ const availability=availabilityEnabled?createAvailability({serviceRpc}):null;
  async function service(command,payload){return serviceRpc('lumo_approved_service',{p_command:command,p_payload:payload});}
- const requireOk=value=>{if(!value?.ok)throw failure(value?.code||'SERVICE_UNAVAILABLE',messages[value?.code],value?.code==='SESSION_REVOKED'?401:400);return value;};
+ const requireOk=value=>{if(!value?.ok){const error=failure(value?.code||'SERVICE_UNAVAILABLE',messages[value?.code],value?.code==='SESSION_REVOKED'?401:400);if(value?.code==='SERVICE_PAUSED')error.noMutation=true;throw error;}return value;};
  async function identify(token){
   if(!token)throw failure('AUTH_REQUIRED',null,401);const {ok,data:user}=await upstream('/auth/v1/user',undefined,{token,method:'GET',allowFailure:true});
   if(!ok||!UUID.test(user?.id)||user?.app_metadata?.lumo_pilot!==true)throw failure('AUTH_REQUIRED',null,401);
@@ -110,10 +112,11 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  let merchant=null;
  return async request=>{
   const origin=request.headers.get('origin');const cors={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',Vary:'Origin',...(origin&&origins.has(origin)?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'apikey, authorization, content-type, x-client-info','Access-Control-Max-Age':'600'}:{})};
-  const respond=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{...cors,'Content-Type':'application/json'}});
+  const respond=async(value,status=200)=>{if(availability&&value?.state&&value.ok!==false){try{const health=await availability.status({probe:true,probeServices:['lumo_transfer','test_funding','merchant_payment','momo_send','momo_send_mtn','momo_send_telecel','momo_send_at','bank_send','momo_collection','momo_collection_mtn','momo_collection_telecel','momo_collection_at']});value={...value,capabilities:{...value.capabilities,serviceAvailability:health.services}};}catch{value={...value,capabilities:{...value.capabilities,serviceAvailabilityUnknown:true}};}}return new Response(JSON.stringify(value),{status,headers:{...cors,'Content-Type':'application/json','X-Lumo-Outcome':value?.ok===true?'ok':value?.ok===false?'rejected':'unknown','X-Lumo-Error-Code':/^[A-Z_]{1,80}$/.test(value?.code||'')?value.code:'','X-Lumo-No-Mutation':value?.noMutation===true?'true':'false'}});};
+  let monitored=[];
   try{
    if(origin&&!origins.has(origin))throw failure('ORIGIN_NOT_ALLOWED',null,403);if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});if(request.method!=='POST')throw failure('METHOD_NOT_ALLOWED',null,405);
-   const body=await boundedJson(request);if(body.action==='guestCheckout')return respond(await guestCheckout(body,request));if(body.action==='register'||body.action==='login')return respond(await authenticate(body,request));
+   const body=await boundedJson(request);if(body.action==='serviceStatus'){if(Object.keys(body).some(key=>key!=='action'))throw failure('INVALID_INPUT');return respond(availability?await availability.status():{ok:true,services:[]});}monitored=servicesForAction(body);if(body.action==='guestCheckout'){const out=await guestCheckout(body,request);if(availability&&monitored.length)await availability.observe(monitored);if(availability&&body.operation==='quote'){const health=await availability.status({probe:true,probeServices:['momo_collection','momo_collection_mtn','momo_collection_telecel','momo_collection_at','merchant_payment']});return respond({...out,serviceAvailability:health.services});}return respond(out);}if(body.action==='register'||body.action==='login')return respond(await authenticate(body,request));
    const token=request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
    if(body.action==='merchant'&&!token&&merchantHandler){merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity:null}));}
    const identity=await identify(token),repo=repository(identity);
@@ -127,6 +130,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
     const sender=await repo.resolve(identity.userId);if(!sender?.ok||sender.recipient?.userId!==identity.userId)throw failure('PERSONAL_ACCOUNT_REQUIRED');
     if(loaded.account?.status!==undefined&&loaded.account.status!=='active'||loaded.state?.account?.status==='closed')throw failure('ACCOUNT_CLOSED');
     const recipient=externalRecipient(body);
+    if(availability)await availability.status({probe:true,probeServices:[body.rail+'_send',...['mtn','telecel','at'].map(n=>body.rail+'_send_'+n)]});
     return respond({ok:true,simulation:true,providerMode:'sandbox',fee:EXTERNAL_SIMULATION_FEES[recipient.rail],recipient,labelUnverified:true});
    }
    if(body.action==='resolve')return respond(requireOk(await repo.resolve(body.query)));
@@ -180,6 +184,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    const cached=await repo.service('attempt',{attemptId:body.attemptId,fingerprint});
    if(cached?.ok&&cached.found)return respond(envelope(cached.snapshot,cached.result.result,{replayed:true,postedReceipts:cached.result.receipts||[]}));
    if(cached?.code==='IDEMPOTENCY_CONFLICT')requireOk(cached);
+   if(availability)await availability.gate(body);
    let verifiedChallengeId;
    if(body.deviceProof){
     const record=requireOk(await repo.service('device.get',{deviceId:body.deviceProof.deviceId,challengeId:body.deviceProof.challengeId}));
@@ -194,9 +199,9 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
     if(!prepared.ok)return respond({...envelope(snapshot),ok:false,code:'DOMAIN_REJECTED',message:prepared.result.message,result:prepared.result});
     const committed=await repo.service('commit',{attemptId:body.attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:prepared.expectedWallet,state:prepared.durableState,groups:prepared.groups,boxes:prepared.boxes,intents:prepared.intents,requiresAuth:prepared.requiresAuth,requests:prepared.requests,privateReports:prepared.privateReports,closeAccount:prepared.closeAccount,partners:prepared.partners,profileChange:prepared.profileChange,result:prepared.result,pin:body.pin,...(verifiedChallengeId?{verifiedChallengeId}:{})});
     if(committed.code==='REVISION_CONFLICT')continue;
-    requireOk(committed);return respond(envelope(committed.snapshot,committed.result,{postedReceipts:committed.receipts||[],replayed:committed.replayed===true}));
+    requireOk(committed);if(availability&&monitored.length)await availability.observe(monitored);return respond(envelope(committed.snapshot,committed.result,{postedReceipts:committed.receipts||[],replayed:committed.replayed===true}));
    }
    throw failure('REVISION_CONFLICT',null,409);
-  }catch(error){const code=error?.code||'SERVICE_UNAVAILABLE',message=messages[code]||error?.message||messages.SERVICE_UNAVAILABLE;return respond({ok:false,sandbox:true,currency:'GHS',code,message,...(error?.noMutation===true?{noMutation:true}:{}),result:{ok:false,message},error:{code,message}},error?.status||400);}
+  }catch(error){if(availability&&monitored.length)await availability.observe(monitored,error);const code=error?.code||'SERVICE_UNAVAILABLE',message=(code==='SERVICE_PAUSED'?error?.message:null)||messages[code]||error?.message||messages.SERVICE_UNAVAILABLE;return respond({ok:false,sandbox:true,currency:'GHS',code,message,...(error?.noMutation===true?{noMutation:true}:{}),result:{ok:false,message},error:{code,message}},error?.status||400);}
  };
 }

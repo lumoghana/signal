@@ -84,7 +84,7 @@ test('browser-supplied actor/proof flags, numeric or malformed PINs cannot reach
 
 test('repeated signup with an existing profile cannot claim a newly chosen PIN was installed',async()=>{
  const f=fixture({existing:true}),out=await f.request({action:'register',handle:'legacy.test',password,displayName:'Fixture only',phone:'0249999901',pin:newPin});
- assert.equal(out.data.code,'EXISTING_ACCOUNT');assert.equal(out.data.session,undefined);assert.equal(f.calls.at(-1).path,'/auth/v1/logout');assert.equal(f.calls.some(c=>c.body?.p_action==='register.complete'),false);
+ assert.equal(out.data.code,'HANDLE_TAKEN');assert.equal(out.data.session,undefined);assert.equal(f.calls.at(-1).path,'/auth/v1/logout');assert.equal(f.calls.some(c=>c.body?.p_action==='register.complete'),false);
 });
 
 test('a genuinely new registration still accepts the supplied four-digit PIN and returns its session',async()=>{

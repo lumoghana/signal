@@ -54,8 +54,12 @@ test('verified transfer and merchant intents carry presentation metadata without
  const saved=snapshot(10000),recipient={id:'other-user',userId:'other-user',name:'Kojo Mensah',handle:'kojo.2'};
  const transfer=await prepareMutation(saved,'payment',{amount:2300,rail:'lumo',recipient:{id:recipient.id,name:'untrusted label'},note:'Lunch share'},'transfer-metadata',{resolve:async()=>({ok:true,recipient})});
  assert.equal(transfer.intents[0].destination.id,recipient.id);assert.equal(transfer.intents[0].metadata.payerName,'Ama Mensah');assert.equal(transfer.intents[0].metadata.payeeName,'Kojo Mensah');assert.equal(transfer.intents[0].metadata.note,'Lunch share');assert.equal(transfer.state.wallet,7700);
- const merchant=await prepareMutation(saved,'payment',{amount:2500,rail:'merchant',shopId:'shop-1',merchant:'forged merchant',category:'Food',note:'Lunch'},'merchant-metadata',{quote:async()=>({ok:true,merchant:{name:'Akua’s Kitchen'},shop:{id:'shop-1',name:'Night Market'},merchantAccessApproved:true})});
+ const merchantQuote={ok:true,merchant:{name:'Akua’s Kitchen'},shop:{id:'shop-1',name:'Night Market',code:'NM-01'},merchantAccessApproved:true};
+ const merchantDetails={amount:2500,rail:'merchant',shopId:'shop-1',merchant:'Akua’s Kitchen',shopName:'Night Market',shopCode:'NM-01',category:'Food',note:'Lunch'};
+ const merchant=await prepareMutation(saved,'payment',merchantDetails,'merchant-metadata',{quote:async()=>merchantQuote});
  assert.equal(merchant.intents[0].destination.id,'shop-1');assert.equal(merchant.intents[0].metadata.merchantName,'Akua’s Kitchen');assert.equal(merchant.intents[0].metadata.shopName,'Night Market');assert.equal(merchant.intents[0].metadata.category,'Food');assert.equal(merchant.intents[0].metadata.merchantAccessApproved,true);assert.equal(merchant.state.wallet,7500);
+ for(const patch of [{merchant:'forged merchant'},{shopName:'Another receiving shop'},{shopCode:'WRONG-CODE'}])await assert.rejects(prepareMutation(saved,'payment',{...merchantDetails,...patch},'changed-merchant-details',{quote:async()=>merchantQuote}),error=>error.code==='MERCHANT_DETAILS_CHANGED');
+ assert.equal(saved.account.balance,10000);assert.equal(saved.state.wallet,10000);assert.equal(saved.state.transactions.length,0,'A changed quoted identity never mutates the saved state.');
 });
 
 test('snapshots without a first-run marker remain eligible legacy accounts without forced setup',()=>{

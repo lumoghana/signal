@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createPaymentLinkSharing,publicCheckoutURL,paymentShareMessage,shareTargets,paymentCardSVG} from '../dist/share-payment-link.js';
 
-const token='a'.repeat(64),url=`https://lumo-connected-pilot.vercel.app/checkout.html?link=${token}`;
-const link={id:'link-a',url,publicToken:token,merchantName:'Ama’s Kitchen',shopName:'Night Market',shopId:'shop-a',description:'Order 204 · Lunch',amount:2500,expiresAt:'2099-11-14T10:15:00Z',status:'open',kind:'request',requestId:'request-a'};
+const token='a'.repeat(64),url=`https://lumo-merchant-mobile.oness15.chatgpt.site/checkout.html?link=${token}`,legacyURL=`https://lumo-connected-pilot.vercel.app/checkout.html?link=${token}`;
+const link={id:'link-a',url:legacyURL,publicToken:token,merchantName:'Ama’s Kitchen',shopName:'Night Market',shopId:'shop-a',description:'Order 204 · Lunch',amount:2500,expiresAt:'2099-11-14T10:15:00Z',status:'open',kind:'request',requestId:'request-a'};
 const click=(view,action,extra={})=>view.handleClick({dataset:{action:'share-'+action,...extra}});
 function fixture(extra={}) {
  const data=new Map(),calls=[],opened=[],shares=[];let identity='owner-a';
@@ -15,7 +15,9 @@ function fixture(extra={}) {
 
 test('only canonical public checkout capabilities can be shared',()=>{
  assert.equal(publicCheckoutURL(url),url);
- for(const value of [url+'&testKey=private',url+'&phone=0245550100',url+'&link='+token,url+'#private',url.replace('https:','http:'),url.replace('/checkout.html','/'),url.replace('lumo-connected-pilot.vercel.app','example.test'),'javascript:alert(1)'])assert.throws(()=>publicCheckoutURL(value));
+ assert.equal(publicCheckoutURL(legacyURL),url);
+ assert.equal(publicCheckoutURL(publicCheckoutURL(legacyURL)),url);
+ for(const approved of [url,legacyURL])for(const value of [approved+'&testKey=private',approved+'&phone=0245550100',approved+'&link='+token,approved+'#private',approved.replace('https:','http:'),approved.replace('/checkout.html','/'),approved.replace(new URL(approved).hostname,'example.test'),approved.replace('https://','https://user:pass@'),'javascript:alert(1)'])assert.throws(()=>publicCheckoutURL(value));
 });
 
 test('editable share messages and destination fallbacks retain merchant, purpose, fixed amount and public URL',()=>{

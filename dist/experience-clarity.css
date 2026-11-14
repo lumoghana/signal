@@ -34,3 +34,5 @@
 .lumo-keyboard-open .activation-step-purpose .activation-budget-actions>p{grid-column:1/-1;margin:0}
 .lumo-keyboard-open .activation-step-purpose .activation-footer>.button,.lumo-keyboard-open .activation-step-purpose .activation-add-essential{min-width:0;min-height:48px;padding:8px;font-size:13px;line-height:1.3;gap:6px}
 @media(prefers-reduced-motion:reduce){.entry-first-confetti{display:none}.first-meet-enter .entry-hello-lux,.activation-step-account-created.activation-enter .activation-first-win img{animation:none}}
+.service-temporarily-unavailable{opacity:.52;cursor:not-allowed;filter:grayscale(1)}
+.service-availability-message{display:block;font-size:12px;line-height:1.4;font-weight:500;white-space:normal;margin-top:5px}

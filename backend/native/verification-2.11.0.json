@@ -1,0 +1,49 @@
+{
+  "version": "2.11.0",
+  "version_code": 21100,
+  "package": "com.lumo.nativeapp.test",
+  "apk_sha256": "558893158d31a47778f79d2354dd4dbad0c81ad6c0cd7fd30b4b56d47aaa6b3f",
+  "baseline_native_version": "2.10.6",
+  "baseline_native_apk_sha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
+  "pure_java_suites": 63,
+  "new_operational_checks": 21,
+  "android_framework": {
+    "tests": 172,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "new_framework_cases": 8,
+  "android_api_levels": [
+    28,
+    35
+  ],
+  "signing_certificate_sha256": "64f2301aa4b55db94c2748d67bf66b56bda7569f528455969c575b8603338a6c",
+  "signing_certificate_matches_2_10_6": true,
+  "assets_preserved": 273,
+  "android_resources_preserved": 54,
+  "bundled_library_files_preserved": 3,
+  "consumer_2_10_6_changes_preserved": [
+    "Immediate identity resolution after tapping a registered Lumo person, with recipient directory hidden during the check.",
+    "Phone-only MoMo lookup, bank account plus bank lookup, sample-name confirmation, named amount screen and bank displayed on review.",
+    "No manual MoMo network selector or recipient-name field restored.",
+    "NativeLumoRecipientPicker.java and NativeExternalTransfer.java byte-identical to2.10.6 baseline."
+  ],
+  "changes": [
+    "Public serviceStatus reads without customer tokens while foregrounded, plus status from authorised snapshots.",
+    "Payment choices and review/funding/merchant controls grey unavailable services and show public messages.",
+    "Network-specific MoMo controls use the same disclosed sample lookup as the preserved2.10.6 payment journey.",
+    "Manual shutdown, maintenance, recovering, unknown and stale statuses do not enable new payments.",
+    "Updates change existing controls without replacing recipient inputs or drafts.",
+    "History, receipts, status and original-reference recovery remain reachable.",
+    "Only SERVICE_PAUSED with explicit noMutation evidence clears a local pending attempt. Unknown outcomes retain the original reference.",
+    "Health-check timestamp changes do not rebuild read screens."
+  ],
+  "backend_contract": "lumo-approved action serviceStatus; services rows id/serviceId, available, mode, status, message, providerMode, updatedAt, lastCheckedAt; authenticated capabilities.serviceAvailability uses same rows.",
+  "financial_boundary": "Test money only. No live bank or MoMo provider configured by this build. Backend guards remain final authority.",
+  "physical_device_verified": false,
+  "apk_executed_on_art": false,
+  "os_app_link_routing_verified": false,
+  "physical_biometric_hardware_verified": false,
+  "validation_scope": "Actual production Java classes and Android framework shadows, plus signed APK integrity/alignment/package/SDK/permission checks. No physical handset or live external provider acceptance."
+}

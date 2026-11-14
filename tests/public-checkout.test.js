@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {webcrypto} from 'node:crypto';
-import {parseGuestAmount,normalizeGuestPhone,parseGuestLocation,guestReceiptURL,lumoCheckoutURL,createGuestJournal,createGuestAPI,createGuestCheckout,renderGuestCheckout} from '../dist/public-checkout.js';
+import {parseGuestAmount,normalizeGuestPhone,parseGuestLocation,guestReceiptURL,lumoCheckoutURL,createGuestJournal,createGuestAPI,createGuestCheckout,renderGuestCheckout,guestAvailabilityMessage} from '../dist/public-checkout.js';
 
 const token='a'.repeat(64),otherToken='b'.repeat(64),shopId='11111111-1111-4111-8111-111111111111',requestId='22222222-2222-4222-8222-222222222222';
 const location=`https://lumo-connected-pilot.vercel.app/checkout.html?link=${token}`;
@@ -294,4 +294,44 @@ test('a changed phone cannot reuse the previous account-name review to initiate 
  const f=fixture();await review(f);f.checkout.setField('phone','0551234568');assert.equal(f.checkout.view().payer,null);
  await f.checkout.initiate();assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
  await f.checkout.reviewPayment({phone:'0551234568'});assert.equal(f.calls.filter(call=>call.operation==='lookup').length,2);assert.equal(f.checkout.view().phase,'review');
+});
+
+
+const pausedServices=(id='momo_collection',message='MoMo is temporarily unavailable.')=>[{serviceId:id,available:false,status:'manual_off',mode:'manual_off',message}];
+test('global MoMo outage disables only new MoMo entry while preserving automatic lookup and the Lumo alternative',async()=>{
+ const f=fixture({current:{...quote(),serviceAvailability:pausedServices()}});await f.checkout.start();
+ const html=renderGuestCheckout(f.checkout.view());assert.match(html,/role="status">MoMo is temporarily unavailable/);assert.match(html,/<button[^>]+disabled[^>]*>Mobile money temporarily unavailable/);assert.match(html,/Already with Lumo/);assert.doesNotMatch(html,/name="network"|<select/);
+ await f.checkout.reviewPayment({phone:'0241234567'});assert.equal(f.checkout.view().phase,'overview');assert.match(f.checkout.view().error,/temporarily unavailable/);assert.equal(f.calls.filter(c=>c.operation==='lookup'||c.operation==='initiate').length,0);
+});
+test('network-specific availability uses the detected network and cannot reuse a previous number network',async()=>{
+ const f=fixture({current:{...quote(),serviceAvailability:pausedServices('momo_collection_telecel')}});await f.checkout.start();await f.checkout.reviewPayment({phone:'0241234567'});
+ assert.equal(f.checkout.view().phase,'overview');assert.equal(f.checkout.view().network,'telecel');assert.equal(f.calls.filter(c=>c.operation==='initiate').length,0);assert.match(renderGuestCheckout(f.checkout.view()),/disabled/);
+ f.checkout.setField('phone','0551234568');assert.equal(f.checkout.view().network,'');assert.equal(f.checkout.view().payer,null);
+ assert.match(renderGuestCheckout(f.checkout.view()),/>Continue<\/button>/);
+});
+test('an outage appearing after payer review prevents initiation before a payment reference is created',async()=>{
+ const f=fixture();await review(f);f.setQuote({...quote(),serviceAvailability:pausedServices()});await f.checkout.initiate();
+ assert.equal(f.checkout.view().reference,null);assert.equal(f.calls.filter(c=>c.operation==='initiate').length,0);assert.match(f.checkout.view().error,/temporarily unavailable/);
+});
+test('availability refresh enables a recovered option without rebuilding for heartbeat-only changes',async()=>{
+ let emissions=0;const f=fixture({current:{...quote(),serviceAvailability:pausedServices()},onChange:()=>{emissions++}});await f.checkout.start();
+ await f.checkout.reviewPayment({phone:'0241234567'});assert.match(f.checkout.view().error,/temporarily unavailable/);
+ f.setQuote({...quote(),serviceAvailability:[{serviceId:'momo_collection',available:true,status:'healthy',mode:'automatic',message:'',lastCheckedAt:'2026-11-14T12:00:00Z'}]});await f.checkout.refreshAvailability();
+ assert.equal(f.checkout.view().error,'');assert.doesNotMatch(renderGuestCheckout(f.checkout.view()),/temporarily unavailable/);
+ const before=emissions;f.setQuote({...quote(),serviceAvailability:[{serviceId:'momo_collection',available:true,status:'healthy',mode:'automatic',message:'',lastCheckedAt:'2026-11-14T12:01:00Z'}]});await f.checkout.refreshAvailability();assert.equal(emissions,before);
+});
+test('pending payments retain recovery and can confirm during a newly disabled service',async()=>{
+ const f=fixture();const ref=await initiate(f);f.setQuote({...quote(),serviceAvailability:pausedServices('merchant_payment')});await f.checkout.refreshAvailability();await f.checkout.check();
+ assert.equal(f.checkout.view().reference.attemptId,ref.attemptId);assert.equal(f.checkout.view().phase,'pending');await f.checkout.simulate('approve');assert.equal(f.checkout.view().phase,'receipt');assert.match(renderGuestCheckout(f.checkout.view()),/Payment confirmed|Test payment confirmed/);
+});
+test('only authoritative no-mutation SERVICE_PAUSED frees a new attempt reference',async()=>{
+ for(const noMutation of [true,false]){const f=fixture({apiOverride(operation){if(operation==='initiate')throw Object.assign(Error('Temporarily unavailable.'),{code:'SERVICE_PAUSED',noMutation});}});await review(f);await f.checkout.initiate();assert.equal(!!f.checkout.view().reference,!noMutation);assert.equal(f.checkout.view().phase,noMutation?'overview':'pending');}
+});
+test('merchant-wide pause also disables the Lumo handoff without hiding the payment explanation',async()=>{
+ const f=fixture({current:{...quote(),serviceAvailability:pausedServices('merchant_payment','Collections are paused.')}});await f.checkout.start();const html=renderGuestCheckout(f.checkout.view());
+ assert.match(html,/Collections are paused/);assert.match(html,/aria-disabled="true">Lumo payments temporarily unavailable/);assert.doesNotMatch(html,/<a class="checkout-lumo-option"/);
+});
+test('missing outage copy gets a readable fallback and server messages are escaped',async()=>{
+ assert.match(guestAvailabilityMessage({serviceAvailability:[{id:'momo_collection',available:false}]}),/temporarily unavailable/);
+ const f=fixture({current:{...quote(),serviceAvailability:pausedServices('momo_collection','<img src=x onerror=alert(1)>')}});await f.checkout.start();const html=renderGuestCheckout(f.checkout.view());assert.match(html,/&lt;img/);assert.doesNotMatch(html,/<img src=x/);
 });
