@@ -11,7 +11,8 @@ import {handleAPI} from '../server/api.js';
 // A minimal DOM is sufficient for checking event wiring, role gates and rendered data.
 class Storage { constructor(){this.data=new Map()} getItem(k){return this.data.get(k)??null} setItem(k,v){this.data.set(k,String(v))} removeItem(k){this.data.delete(k)} clear(){this.data.clear()} }
 class Element {
- constructor(){this.innerHTML='';this.dataset={};this.children=[];this.inert=false;this.disabled=false;this.value='';this.classList={add(){},remove(){},toggle(){},contains(){return false}}}
+ constructor(){this.htmlWrites=0;this.innerHTML='';this.dataset={};this.children=[];this.inert=false;this.disabled=false;this.value='';this.classList={add(){},remove(){},toggle(){},contains(){return false}}}
+ get innerHTML(){return this._html||''}set innerHTML(value){this.htmlWrites++;this._html=value}
  querySelector(){return null} querySelectorAll(){return []} append(child){this.children.push(child)} remove(){} focus(){} scrollTo(){} scrollIntoView(){} setAttribute(){} contains(){return false} matches(){return false}
 }
 
@@ -104,6 +105,20 @@ test('legacy D1 compatibility: app modules connect signup, team access, campus w
    await click('go-home');await click('collect-shortcut',{mode:'amount'});assert.match(html(),/Generate payment QR/);assert.match(html(),/collect-keypad/);assert.doesNotMatch(html(),/static-qr/);
    await click('go-administration');assert.match(html(),/Business overview/);assert.match(html(),/Settle to bank/);assert.match(html(),/Team & access/);
    await click('go-checkout');assert.match(html(),/Generate payment QR/);assert.doesNotMatch(html(),/Merchant balance|Net collected · since last close|Confirmed payments|Still processing|Your receiving phone|data-change="collectShop"|data-action="collection-requests"/);assert.match(html(),/Shared Night Market Counter/);
+  });
+  await t.test('quiet account polling keeps owner pages and open dialogs in place across the workspace',async()=>{
+   for(const page of ['home','activity','team','reports','settings','lux','business-plan','devices']){
+    await click('nav',{page});await new Promise(resolve=>original.setTimeout(resolve,35));
+    const before=nodes.get('app').htmlWrites,modalBefore=nodes.get('modal-root').htmlWrites;
+    for(let i=0;i<3;i++){await Shared.refresh();await new Promise(resolve=>setImmediate(resolve))}
+    assert.equal(nodes.get('app').htmlWrites,before,page+' should not replace the screen after unchanged polls');
+    assert.equal(nodes.get('modal-root').htmlWrites,modalBefore,page+' should not rebuild a closed overlay');
+   }
+   await click('go-checkout');await click('shop-qr');
+   const modalBefore=nodes.get('modal-root').htmlWrites;
+   for(let i=0;i<3;i++){await Shared.refresh();await new Promise(resolve=>setImmediate(resolve))}
+   assert.equal(nodes.get('modal-root').htmlWrites,modalBefore,'open QR dialog is not rebuilt by account polling');
+   await click('dismiss');await click('go-checkout');
   });
   await t.test('rapid QR generation taps create one fixed-amount request, and a lost response retrieves that same request',async()=>{
    const receivingShop=store.getState().shops[0].id,before=store.getState().requests.length;

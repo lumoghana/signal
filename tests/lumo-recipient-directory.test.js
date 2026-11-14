@@ -10,8 +10,8 @@ const tick=()=>new Promise(r=>setTimeout(r,5));
 function harness(search=async()=>({ok:true,people:[person]}),resolve=async()=>({ok:true,recipient:person})){
  const nodes=new Map(['.pay-recipient','#recipient-search','#lumo-people','#lumo-people-status','#lumo-people-retry','#payment-error','[data-action="pay-recipient-next"]'].map(s=>[s,new Node()])),calls=[],routes=[];
  const ctx={connected:true,draft:{payment:{rail:'lumo',idempotencyKey:'unchanged-payment-reference',amount:1500}},shared:{user:{id:owner},async searchPeople(q){calls.push(q);return search(q)},resolve},$:s=>nodes.get(s),saveDraft(){}};
- const dispose=bindLumoRecipientDirectory(ctx,{page:'recipient'},{delay:0,onContinue:p=>routes.push(p)});
- return{ctx,nodes,calls,routes,dispose,input:nodes.get('#recipient-search'),list:nodes.get('#lumo-people'),status:nodes.get('#lumo-people-status'),next:nodes.get('[data-action="pay-recipient-next"]'),error:nodes.get('#payment-error')};
+ let dispose=bindLumoRecipientDirectory(ctx,{page:'recipient'},{delay:0,onContinue:p=>routes.push(p)});
+ return{ctx,nodes,calls,routes,dispose(){dispose()},rebind(){dispose();dispose=bindLumoRecipientDirectory(ctx,{page:'recipient'},{delay:0,onContinue:p=>routes.push(p)});},input:nodes.get('#recipient-search'),list:nodes.get('#lumo-people'),status:nodes.get('#lumo-people-status'),next:nodes.get('[data-action="pay-recipient-next"]'),error:nodes.get('#payment-error')};
 }
 test('connected Lumo shows an actual search field and no sample-recipient fallback',()=>{const html=renderLumoRecipientDirectory({recipientSearch:'@oness'});assert.match(html,/Search Lumo users/);assert.match(html,/Registered Lumo accounts/);assert.doesNotMatch(html,/Demo recipients|recipientName|@kofi/);});
 test('opening the picker populates registered people and partial @handles query the server',async()=>{const f=harness();await tick();assert.deepEqual(f.calls,['']);assert.match(f.list.innerHTML,/@oness15/);f.input.value='@oness';await f.input.emit('input');await tick();assert.deepEqual(f.calls,['','@oness']);assert.equal(f.ctx.draft.payment.idempotencyKey,'unchanged-payment-reference');f.dispose();});
@@ -27,4 +27,27 @@ test('the transport sends a read-only directory query and discards a response af
  const signed=id=>({ok:true,session:{access_token:'fixture-access',refresh_token:'fixture-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id}},account:{userId:id},state:{wallet:0}});
  const service=createApprovedService({storage,modeStorage:storage,fetch:async(url,init)=>{const body=JSON.parse(init.body);calls.push(body);return{ok:true,status:200,json:async()=>body.action==='login'?signed(body.handle==='first'?owner:id):pending.promise}}});
  await service.login('first','fixture-password');const old=service.searchPeople('@oness');await service.login('other','fixture-password');pending.resolve({ok:true,people:[person]});assert.equal((await old).code,'ACCOUNT_CHANGED');assert.deepEqual(calls.find(c=>c.action==='searchPeople'),{action:'searchPeople',query:'@oness'});assert.equal(calls.some(c=>c.action==='action'),false);
+});
+
+
+test('repeated same-page remounts reuse one slow lookup and its eventual list',async()=>{
+ const pending=deferred(),f=harness(()=>pending.promise);
+ for(let i=0;i<8;i++){f.ctx.state={unrelatedBalance:i};f.rebind();}
+ assert.deepEqual(f.calls,['']);pending.resolve({ok:true,people:[person]});await tick();assert.match(f.list.innerHTML,/@oness15/);
+ for(let i=0;i<8;i++)f.rebind();assert.deepEqual(f.calls,['']);assert.match(f.list.innerHTML,/@oness15/);f.dispose();
+});
+test('same-payment redraw retains chosen identity and still re-verifies before navigating',async()=>{
+ const f=harness();await tick();await f.list.emit('click',{target:{closest:()=>({dataset:{lumoPerson:id}})}});
+ f.rebind();assert.equal(f.input.value,'@oness15');assert.match(f.status.textContent,/Selected Synthetic Person/);assert.equal(f.next.disabled,false);
+ await f.next.emit('click');assert.equal(f.routes.length,1);assert.equal(f.routes[0].userId,id);assert.deepEqual(f.calls,['']);f.dispose();
+});
+test('a disposed recipient verification cannot navigate a replacement page',async()=>{
+ const pending=deferred(),f=harness(undefined,()=>pending.promise);await tick();f.input.value='oness15';const original=f.next.emit('click');
+ f.rebind();pending.resolve({ok:true,recipient:person});await original;assert.equal(f.routes.length,0);assert.equal(f.next.disabled,false);f.dispose();
+});
+
+test('rebind between changing a query and its debounce cannot strand a superseded lookup',async()=>{
+ const old=deferred(),fresh=deferred(),f=harness(q=>q?fresh.promise:old.promise);
+ f.input.value='ama';await f.input.emit('input');f.rebind();assert.deepEqual(f.calls,['','ama']);
+ old.resolve({ok:true,people:[]});await tick();fresh.resolve({ok:true,people:[person]});await tick();assert.match(f.list.innerHTML,/@oness15/);assert.notEqual(f.list.attrs['aria-busy'],'true');f.dispose();
 });

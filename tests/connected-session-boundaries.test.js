@@ -8,7 +8,8 @@ import {createEmptyState} from '../dist/js/model.js';
 import {savePaymentRecovery,loadPaymentRecovery,clearPaymentRecovery,ownsSavedSession} from '../dist/js/payment-recovery.js';
 
 const app=await readFile(new URL('../dist/js/app.js',import.meta.url),'utf8');
-function functionSource(start,end){const from=app.indexOf(start),to=app.indexOf(end,from+start.length);assert.ok(from>=0&&to>from);return app.slice(from,to)}
+function functionSource(start,end){const from=app.indexOf(start),to=app.indexOf(end,from+start.length);assert.ok(from>=0&&to>from);return (start.startsWith('async function refreshShared')?`let pendingSharedRender=false; const sharedViewSignature=()=>JSON.stringify([state,shared.partnerRequests]);
+`:'')+app.slice(from,to)}
 const memory=entries=>{const values=new Map(entries);return {getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value)),removeItem:key=>values.delete(key)}};
 
 test('global sign-out from a sample clears a retained shared session and cannot hydrate it again',async()=>{

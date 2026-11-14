@@ -1,3 +1,4 @@
+import {consumerViewSnapshot,canRenderConsumerBackground} from '../dist/js/quiet-sync.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -48,12 +49,12 @@ const app=await readFile(new URL('../dist/js/app.js',import.meta.url),'utf8');
 function source(start,end){const a=app.indexOf(start),b=app.indexOf(end,a);assert.ok(a>=0&&b>a);return app.slice(a,b);}
 const syncSource=source('function syncSharedActivation(', '\nasync function checkpointActivation(');
 const checkpointSource=source('async function checkpointActivation(', '\nfunction installLoadedState(');
-const refreshSource=source('async function refreshShared(', '\nvoid refreshShared(');
+const refreshSource=`let pendingSharedRender=false; const sharedViewSignature=()=>consumerViewSnapshot(state,shared.partnerRequests);\n`+source('async function refreshShared(', '\nvoid refreshShared(');
 function harness(state=stateAt()){
  const calls={saved:0,rendered:0,captured:0,initialised:0,posted:[],toasts:[]};
  const shared={connected:true,signedIn:true,user:{id:owner},authVersion:1,account:{userId:owner},partnerRequests:[]};
  const context=vm.createContext({state:copy(state),draft:{},shared,refreshingShared:false,sharedHydrated:true,sharedConnectionError:'',persistence:{release(){}},renderSharedReconnect(){},overlayMeta:null,route:{section:'activity',page:'home'},ctx:{},router:null,
-  JSON,structuredClone,resumeSharedActivationDraft,
+  JSON,structuredClone,resumeSharedActivationDraft,consumerViewSnapshot,canRenderConsumerBackground,closeSheet(){},
   reconcileState(target,next){for(const key of Object.keys(target))delete target[key];Object.assign(target,copy(next));},
   captureCurrent(){calls.captured++;},persistSession(){calls.saved++;},render(){calls.rendered++;},readPaymentLink(){return null;},toast(message){calls.toasts.push(message);},
   makeRouter(){return {initialise(){calls.initialised++;}}},view:{querySelector(){return null;}},
@@ -115,4 +116,28 @@ test('an older local shared setup migrates only when both confirmed account alia
   if(mismatch==='phone')draft.state.profile.phone='0550000000';else draft.state.account.login.username='another.test';
   other.context.draft.activation=draft;other.context.sync(owner);assert.equal(other.context.draft.activation,undefined);
  }
+});
+
+test('consumer transport-only account changes do not redraw the current page',async()=>{
+ const h=harness(stateAt('complete'));h.shared.snapshot=async()=>{h.shared.account={...h.shared.account,checkedAt:new Date().toISOString()};return {ok:true};};
+ for(let i=0;i<5;i++)await h.context.refresh();assert.equal(h.calls.rendered,0);
+ h.shared.snapshot=async()=>{h.context.state.wallet+=100;return {ok:true};};await h.context.refresh();assert.equal(h.calls.rendered,1);
+});
+
+test('a real incoming update is deferred while typing and flushed after focus leaves',async()=>{
+ const h=harness(stateAt('complete'));let editing=true;h.context.view.querySelector=()=>editing?{}:null;
+ h.shared.snapshot=async()=>{h.context.state.wallet+=100;return {ok:true};};await h.context.refresh();assert.equal(h.calls.rendered,0);assert.equal(h.context.pendingSharedRender,undefined);
+ editing=false;vm.runInContext('flushSharedRender()',h.context);assert.equal(h.calls.rendered,1);
+});
+
+test('unrelated updates on Pay recipient, review, search, camera and plan tasks do not remount their controls',async()=>{
+ for(const [section,page] of [['pay','recipient'],['pay','review'],['pay','scan'],['pay','home'],['plan','create'],['boxes','create'],['learn','money-iq']]){
+  const h=harness(stateAt('complete'));h.context.route={section,page};h.shared.snapshot=async()=>{h.context.state.wallet+=100;return{ok:true};};
+  for(let i=0;i<6;i++)await h.context.refresh();assert.equal(h.calls.rendered,0,section+'/'+page);
+  h.context.route={section:'home',page:'home'};vm.runInContext('flushSharedRender()',h.context);assert.equal(h.calls.rendered,1);
+ }
+});
+test('remote closure interrupts a protected payment page immediately',async()=>{
+ const h=harness(stateAt('complete'));h.context.route={section:'pay',page:'review'};
+ h.shared.snapshot=async()=>{h.context.state.account.status='closed';return{ok:true};};await h.context.refresh();assert.equal(h.context.route.page,'account-close');assert.equal(h.calls.rendered,1);
 });

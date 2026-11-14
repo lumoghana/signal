@@ -12,24 +12,24 @@
   "shipped_dist": "Approved consumer and merchant design extended with connected shop discovery, repeat payments, public guest checkout, payment-link sharing and permissioned business planning.",
   "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
   "android": {
-    "version": "2.10.0",
-    "version_code": 21000,
+    "version": "2.10.2",
+    "version_code": 21002,
     "package": "com.lumo.nativeapp.test",
     "delivered_separately": true,
     "assets_and_resources_preserved": true,
     "physical_device_verified": false,
-    "apk_sha256": "e0d25b3604cfbd565193fa4e6c3b54a1aa645bf97485f6d32ab0f349f6b974fa"
+    "apk_sha256": "d3e1360e89ddc65c3728820e3b18eea2b8418faf374ccf4e824aef409a688d03"
   },
   "validation": {
-    "consumer_tests": 1548,
-    "merchant_tests": 549,
+    "consumer_tests": 1565,
+    "merchant_tests": 560,
     "shared_boundary_and_guest_tests": 33,
     "guest_http_concurrency_checks": 5,
     "failures": 0,
     "consumer_design_preserved": true,
     "asset_manifest": "dist-sha256.json",
-    "android_pure_java_suites": 59,
-    "android_framework_cases": 110,
+    "android_pure_java_suites": 60,
+    "android_framework_cases": 126,
     "browser_verified": [
       "guest fixed quote and own-number review",
       "pending reference survives refresh",
@@ -43,7 +43,7 @@
   },
   "release_date": "2026-11-14",
   "merchant": {
-    "source_commit": "50dfe74fd160a42d11a72997a05325e37d38c807",
+    "source_commit": "3f4ba078f354e63ebc7069ad53d2bef29b042672",
     "site_project": "appgprj_6af5be2c38548191822030bb895d6d3d",
     "shared_backend_function_version": 11,
     "features": [
@@ -58,7 +58,7 @@
       "Shared planning calculations in merchant Lux",
       "Shop-attributed online receipts"
     ],
-    "site_version": 18
+    "site_version": 20
   },
   "guest_checkout": {
     "provider_mode": "sandbox",
@@ -68,5 +68,13 @@
       "20261114082729_lumo_reusable_link_purposes.sql"
     ],
     "shared_link_revenue_coverage": "Guest MoMo link payments only; Lumo QR versus link source is not inferred."
+  },
+  "quiet_sync": {
+    "consumer_and_merchant": true,
+    "base_commit": "4072e5d2b788cdff0fdea49ebd7d193ca6df626c",
+    "deep_fix": true,
+    "recipient_delayed_query_rebind_verified": true,
+    "merchant_retained_dom_browser_verified": true,
+    "physical_device_verified": false
   }
 }

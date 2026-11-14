@@ -40,3 +40,6 @@
 /* Keep the menu as easy to reach as the neighbouring camera and chat actions. */
 .top-actions .profile-button{width:44px;height:44px;flex-basis:44px}
 #view h1[tabindex="-1"]:focus,#view h2[tabindex="-1"]:focus{outline:none}
+
+/* Same-page updates must not replay the page entrance. */
+#view.quiet-update > .page,#view.quiet-update > .home-page{animation:none!important}

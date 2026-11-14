@@ -8,7 +8,7 @@ const location=`https://lumo-connected-pilot.vercel.app/checkout.html?link=${tok
 const quote=overrides=>({ok:true,sandbox:true,currency:'GHS',fee:0,provider:{mode:'sandbox',name:'Lumo MoMo test provider',live:false},networks:['mtn','telecel','airteltigo'],link:{id:requestId,publicToken:token,shopId,shopName:'Night Market counter',merchantName:'Akua’s Kitchen',description:'Order 24',amount:2500,expiresAt:'2027-12-31T22:00:00Z',status:'open',kind:'request',requestId,...overrides}});
 const storage=()=>{const values=new Map();return {values,getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,String(value)),removeItem:key=>values.delete(key)}};
 const deferred=()=>{let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no});return {promise,resolve,reject}};
-function fixture({current=quote(),stored=storage(),apiOverride,online=()=>true,url=location}={}){
+function fixture({current=quote(),stored=storage(),apiOverride,online=()=>true,url=location,onChange=()=>{}}={}){
  const calls=[],records=new Map();let q=current;
  const respond=record=>({ok:true,sandbox:true,provider:{mode:'sandbox',live:false},currency:'GHS',fee:0,attempt:structuredClone(record)});
  async function api(operation,payload){
@@ -25,7 +25,7 @@ function fixture({current=quote(),stored=storage(),apiOverride,online=()=>true,u
   }
   return respond(record);
  }
- const checkout=createGuestCheckout({api,location:url,journal:createGuestJournal(stored),crypto:webcrypto,online});
+ const checkout=createGuestCheckout({api,location:url,journal:createGuestJournal(stored),crypto:webcrypto,online,onChange});
  return {checkout,calls,records,stored,setQuote:value=>{q=value},respond,api};
 }
 async function review(f){await f.checkout.start();f.checkout.chooseMoMo();await f.checkout.reviewPayment({phone:'0241234567',network:'mtn'});assert.equal(f.checkout.view().phase,'review');}
@@ -157,4 +157,24 @@ test('only a definitive no-mutation initiation rejection releases the new local 
 
 test('corrupt stored references cannot silently become permission to start another payment',async()=>{
  const saved=storage();saved.setItem('lumo-guest-checkout-references-v1','{broken');const f=fixture({stored:saved});await f.checkout.start();assert.equal(f.checkout.view().phase,'unavailable');assert.match(f.checkout.view().error,/saved payment references/);assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
+});
+
+
+test('background guest status checks do not replay loading or unchanged pending UI',async()=>{
+ const changes=[];const f=fixture({onChange:view=>changes.push(view)});await initiate(f);const before=changes.length;
+ for(let i=0;i<4;i++)await f.checkout.check({background:true});assert.equal(changes.length,before);
+ const record=[...f.records.values()][0];record.status='processing';await f.checkout.check({background:true});assert.equal(changes.length,before+1);assert.equal(changes.at(-1).busy,false);
+ record.status='confirmed';record.receipt={reference:record.reference,amount:record.amount,currency:'GHS',shopId,merchantName:'Shop',shopName:'Counter',confirmedAt:new Date().toISOString(),providerReference:'TEST-ONLY'};await f.checkout.check({background:true});assert.equal(changes.at(-1).phase,'receipt');assert.equal(changes.at(-1).busy,false);
+});
+
+test('only one background check runs and a failure remains visible without restarting payment',async()=>{
+ const wait=deferred();let hold=false;const changes=[];const f=fixture({onChange:view=>changes.push(view),apiOverride(operation){if(operation==='status'&&hold)return wait.promise}});await initiate(f);hold=true;const ref=f.checkout.view().reference.attemptId,before=changes.length;
+ const checking=f.checkout.check({background:true});await f.checkout.check({background:true});assert.equal(changes.length,before);wait.reject(Error('Connection interrupted'));await checking;assert.equal(changes.at(-1).error,'Connection interrupted');assert.equal(f.checkout.view().reference.attemptId,ref);assert.equal(f.calls.filter(call=>call.operation==='initiate').length,1);
+});
+
+
+test('an explicit guest action waits for a quiet status check instead of being silently discarded',async()=>{
+ const wait=deferred();let hold=false;const f=fixture({apiOverride(operation){if(operation==='status'&&hold)return wait.promise}});const ref=await initiate(f);hold=true;
+ const polling=f.checkout.check({background:true}),approving=f.checkout.simulate('approve');assert.equal(f.calls.filter(call=>call.operation==='sandboxResult').length,0);
+ hold=false;wait.resolve(f.respond(f.records.get(ref.attemptId)));await polling;await approving;assert.equal(f.calls.filter(call=>call.operation==='sandboxResult').length,1);assert.equal(f.checkout.view().phase,'receipt');
 });

@@ -93,7 +93,7 @@ function checkedAttempt(value,journal,quote){
 
 export function createGuestCheckout({api=createGuestAPI(),location=globalThis.location?.href||CONSUMER_ORIGIN+'/checkout.html',journal=createGuestJournal(),crypto:cryptoApi=globalThis.crypto,onChange=()=>{},online=()=>globalThis.navigator?.onLine!==false}={}){
  let link='',fragment=null,quote=null,provider=null,attempt=null,reference=null,phase='loading',busy=false,error='',notice='',amount='',phone='',network='',generation=0,disposed=false;
- let review=null,copyReceipt=false,resuming=false;
+ let review=null,copyReceipt=false,resuming=false,backgroundPending=null;
  const emit=()=>{if(!disposed)onChange(view())};
  const active=n=>!disposed&&n===generation;
  function view(){return clone({link,quote,provider,attempt,reference,phase,busy,error,notice,amount,phone:['momo','review'].includes(phase)?phone:'',network,review,copyReceipt,resuming,online:online(),recoveryURL:reference?guestReceiptURL(location,reference):''});}
@@ -102,11 +102,11 @@ export function createGuestCheckout({api=createGuestAPI(),location=globalThis.lo
  const scope=q=>JSON.stringify([q?.link?.id,q?.link?.shopId,q?.link?.merchantName,q?.link?.shopName,q?.link?.amount,q?.link?.requestId,q?.currency,q?.fee]);
  async function loadQuote(){const value=checkedQuote(await api('quote',{link}));if(value.link.publicToken!==link)throw problem('The merchant link changed. Ask for a fresh link.','LINK_CHANGED');return value;}
  function installAttempt(value){attempt=checkedAttempt(value,reference,quote);provider=value.provider||quote?.provider||(value.sandbox===true?{mode:'sandbox',live:false}:null);phase=attempt.status==='confirmed'?'receipt':TERMINAL.has(attempt.status)?'result':'pending';phone='';review=null;resuming=false;error='';}
- async function perform(work){
+ async function perform(work,{quiet=false}={}){
   if(busy||disposed)return;
-  const epoch=generation;busy=true;error='';notice='';emit();
+  const epoch=generation,before=quiet?JSON.stringify(view()):null;busy=true;if(!quiet){error='';notice='';emit();}
   try{return await work(epoch)}catch(failure){if(active(epoch)){error=failure?.message||'Lumo could not complete that request.';if(reference&&(failure?.unknown||['RECEIPT_MISMATCH','ATTEMPT_NOT_FOUND','CHECKOUT_ATTEMPT_NOT_FOUND'].includes(failure.code)))phase='pending';}return null}
-  finally{if(active(epoch)){busy=false;emit()}}
+  finally{if(active(epoch)){busy=false;if(!quiet||before!==JSON.stringify(view()))emit()}}
  }
  async function start(){
   generation++;const epoch=generation;phase='loading';busy=true;error='';emit();
@@ -149,8 +149,15 @@ export function createGuestCheckout({api=createGuestAPI(),location=globalThis.lo
    catch(failure){if(active(epoch)&&!resuming&&failure.noMutation===true&&['INVALID_INPUT','AMOUNT_CHANGED','LINK_UNAVAILABLE','SHOP_UNAVAILABLE','REQUEST_PROCESSING'].includes(failure.code)&&journal.clear(link)){reference=null;attempt=null;review=null;phase=['LINK_UNAVAILABLE','SHOP_UNAVAILABLE'].includes(failure.code)?'unavailable':'overview';}throw failure;}
   });
  }
- async function check(){if(!reference)return;return perform(async epoch=>{const result=await api('status',{attemptId:reference.attemptId,recoveryToken:reference.recoveryToken});if(active(epoch))installAttempt(result);});}
+ async function check({background=false}={}){
+  if(!reference||disposed)return;
+  if(backgroundPending){if(background)return;await backgroundPending;if(!disposed)return check();return;}
+  const operation=perform(async epoch=>{const result=await api('status',{attemptId:reference.attemptId,recoveryToken:reference.recoveryToken});if(active(epoch))installAttempt(result);},{quiet:background});
+  if(!background)return operation;
+  backgroundPending=operation;try{return await operation}finally{if(backgroundPending===operation)backgroundPending=null;}
+ }
  async function simulate(outcome){
+  if(backgroundPending){await backgroundPending;if(!disposed)return simulate(outcome);return;}
   if(!reference||!attempt||!['pending','processing'].includes(attempt.status)||quote?.provider?.mode!=='sandbox'||!['approve','decline','delay','cancel'].includes(outcome))return;
   return perform(async epoch=>{const result=await api('sandboxResult',{attemptId:reference.attemptId,recoveryToken:reference.recoveryToken,outcome});if(active(epoch))installAttempt(result);});
  }
@@ -201,11 +208,12 @@ export function renderGuestCheckout(view){
 }
 
 export function mountGuestCheckout(root,options={}){
- let timer=null,lastPhase='',controller;
+ let timer=null,lastPhase='',lastHTML='',controller;
  const render=view=>{
+  const html=renderGuestCheckout(view);root.setAttribute('aria-busy',view.busy?'true':'false');if(html===lastHTML)return;lastHTML=html;
   const focused=root.ownerDocument.activeElement,focusedName=focused?.name,caret=focused?.selectionStart;
   const drafts={};for(const input of root.querySelectorAll('input,select'))if(input.name&&input.name!=='phone')drafts[input.name]=input.value;
-  root.innerHTML=renderGuestCheckout(view);root.setAttribute('aria-busy',view.busy?'true':'false');
+  root.innerHTML=html;
   if(view.copyReceipt){const copy=root.querySelector('[data-receipt-copy]');if(copy)copy.textContent=controller.receiptText();}
   if(lastPhase===view.phase)for(const [name,value] of Object.entries(drafts)){const input=root.querySelector(`[name="${name}"]`);if(input)input.value=value;}
   if(lastPhase===view.phase&&focusedName&&focusedName!=='phone'){const input=root.querySelector(`[name="${focusedName}"]`);if(input){input.focus({preventScroll:true});try{input.setSelectionRange(caret,caret)}catch{}}}
@@ -235,10 +243,10 @@ export function mountGuestCheckout(root,options={}){
  }
  async function submit(event){const form=event.target;if(form.dataset.checkoutForm!=='momo')return;event.preventDefault();const values=Object.fromEntries(new FormData(form));await controller.reviewPayment(values);}
  function input(event){if(event.target.name)controller.setField(event.target.name,event.target.value);}
- const online=()=>{controller.refreshOnline();if(controller.isPending())controller.check();};
+ const online=()=>{controller.refreshOnline();if(controller.isPending())controller.check({background:true});};
  root.addEventListener('click',click);root.addEventListener('submit',submit);root.addEventListener('input',input);root.addEventListener('change',input);
  globalThis.addEventListener?.('online',online);globalThis.addEventListener?.('offline',online);
- timer=setInterval(()=>{if(controller.isPending()&&globalThis.navigator?.onLine!==false&&root.ownerDocument.visibilityState!=='hidden')controller.check();},5000);timer?.unref?.();
+ timer=setInterval(()=>{if(controller.isPending()&&globalThis.navigator?.onLine!==false&&root.ownerDocument.visibilityState!=='hidden')controller.check({background:true});},5000);timer?.unref?.();
  controller.start();
  return {controller,dispose(){clearInterval(timer);controller.dispose();root.removeEventListener('click',click);root.removeEventListener('submit',submit);root.removeEventListener('input',input);root.removeEventListener('change',input);globalThis.removeEventListener?.('online',online);globalThis.removeEventListener?.('offline',online);}};
 }

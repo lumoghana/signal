@@ -1,3 +1,4 @@
+import {stableSnapshot} from './quiet-sync.js';
 import {merchantFetch} from './connected-service.js';
 import {replaceRegisteredState,clearRegisteredState,getWorkspaceMode} from './store.js';
 const listeners=new Set(),AUTH_KEY='lumo-shared-auth-state-v2',controllers=new Set();
@@ -33,7 +34,7 @@ function authState(){
 }
 let observedEpoch=authState().epoch,observedStamp=authStamp(authState()),cache=emptyCache(),available=false,connection='connecting',lastError='',recoveryKey='',recoveryKeyReference='',busyRefresh=false,authSignature='',stateSignature='';
 let revisions={auth:-1,student:-1,devices:-1},logoutRetry=false,transitionBackup=null;
-let requestSequence=0,studentResponseOrder=0;
+let requestSequence=0,studentResponseOrder=0,stopSync=null;
 export function getCache(){return cache}
 export function isAvailable(){return available}
 export function connectionStatus(){return {status:connection,error:lastError}}
@@ -62,7 +63,7 @@ function snapshotSignature(value){
  if(!value)return JSON.stringify(value);
  const strip=entry=>{if(!entry||typeof entry!=='object')return entry;const {checkedAt,...rest}=entry;return rest};
  const readiness=value.shopReadiness;
- return JSON.stringify(readiness===undefined?value:{...value,shopReadiness:Array.isArray(readiness)?readiness.map(strip):readiness&&typeof readiness==='object'?Object.fromEntries(Object.entries(readiness).map(([key,entry])=>[key,strip(entry)])):readiness});
+ return stableSnapshot(readiness===undefined?value:{...value,shopReadiness:Array.isArray(readiness)?readiness.map(strip):readiness&&typeof readiness==='object'?Object.fromEntries(Object.entries(readiness).map(([key,entry])=>[key,strip(entry)])):readiness});
 }
 
 export function lockLocal(reason='signed-out'){
@@ -74,12 +75,14 @@ export function beginAuthTransition(kind='login'){
 function finishLogout(epoch){const current=authState();if(current.epoch===epoch)writeAuth({...current,locked:true,pendingLogout:false,kind:'logged-out'},{expectedEpoch:epoch})}
 function failChanged(){const error=new Error('Your account changed while this request was running. Continue with the current sign-in.');error.status=409;error.code='AUTH_CHANGED';return error}
 function responseRevision(result){return Number.isSafeInteger(result.revision)?result.revision:null}
-function signature(){return JSON.stringify([cache.session,cache.users,cache.invitations,cache.sessions,cache.audit,cache.counter])}
+function sessionDisplay(value){if(!value)return value;const {lastSeen,...visible}=value;return visible}
+function signature(){return stableSnapshot([sessionDisplay(cache.session),cache.users,cache.invitations,cache.sessions.map(sessionDisplay),cache.audit,cache.counter])}
+function dataSignature(){return stableSnapshot([snapshotSignature(cache.state),cache.counter,cache.student])}
 export function applyResponse(result={},options={}){
  const epoch=options.authEpoch||getAuthEpoch();if(epoch!==getAuthEpoch())throw failChanged();
  if(options.expectedWalletId&&Object.hasOwn(result,'student')&&result.student?.id!==options.expectedWalletId)throw Object.assign(new Error('This payment belongs to another student wallet. Reopen the original wallet before checking its outcome.'),{status:409,code:'WALLET_CHANGED'});
  const revision=responseRevision(result),unlocked=Boolean(options.unlockOnSuccess&&result.session),locked=isLocallyLocked();
- const oldSignature=signature(),hadSharedSnapshot=Boolean(cache.state);
+ const oldDataSignature=dataSignature(),oldSignature=signature(),hadSharedSnapshot=Boolean(cache.state);
  const hasIdentity=['session','state','users','invitations','sessions','audit','user','counter'].some(key=>Object.hasOwn(result,key));
  if(unlocked){transitionBackup=null;writeAuth({...authState(),locked:false,pendingLogout:false,kind:'authenticated'},{expectedEpoch:epoch});revisions.auth=-1;revisions.devices=-1}
  const acceptAuth=hasIdentity&&(!locked||unlocked||result.session===null)&&(unlocked||revision===null||revision>=revisions.auth);
@@ -105,7 +108,7 @@ export function applyResponse(result={},options={}){
  if(result.recoveryKey&&!isLocallyLocked()&&(acceptAuth||!hasIdentity)&&(!cache.session?.recoveryKeyReference||incomingKeyReference===cache.session.recoveryKeyReference)){recoveryKey=result.recoveryKey;recoveryKeyReference=incomingKeyReference;}
  else if(recoveryKeyReference&&cache.session?.recoveryKeyReference&&recoveryKeyReference!==cache.session.recoveryKeyReference){recoveryKey='';recoveryKeyReference='';}
  const nextSignature=signature();if(oldSignature!==nextSignature||authSignature!==nextSignature){authSignature=nextSignature;emit('account')}
- emit('data');return result;
+ if(oldDataSignature!==dataSignature())emit('data');return result;
 }
 const publicPath=path=>/^\/api\/(?:health|directory|lookup|payments(?:\/quote)?|student(?:\/|$)|sandbox-fund|signup|auth\/(?:login|logout|recovery(?:\/|$)|username)|invitations(?:\/accept|\/[^/]+$))/.test(path);
 function localLockedError(){const error=new Error('This device is signed out. Sign in again to continue.');error.status=401;error.code='LOCAL_LOCKED';return error}
@@ -154,7 +157,7 @@ export async function refresh(){
 export function getRecoveryKey(){return recoveryKey}
 export function getRecoveryKeyReference(){return recoveryKeyReference}
 export function clearRecoveryKey(){recoveryKey='';recoveryKeyReference=''}
-export function startSync(){const timer=setInterval(()=>refresh(),4000);timer.unref?.();return()=>clearInterval(timer)}
+export function startSync(){if(stopSync)return stopSync;const visible=()=>globalThis.document?.visibilityState!=='hidden';const resume=()=>{if(visible())void refresh()};const timer=setInterval(resume,4000);timer.unref?.();globalThis.document?.addEventListener?.('visibilitychange',resume);stopSync=()=>{clearInterval(timer);globalThis.document?.removeEventListener?.('visibilitychange',resume);stopSync=null};return stopSync}
 function acceptExternalAuth(value){
  const selected=newestAuth([authState(),value]);if(!selected||authStamp(selected)===observedStamp)return;
  memoryAuth=selected;observedEpoch=selected.epoch;observedStamp=authStamp(selected);

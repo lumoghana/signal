@@ -98,3 +98,9 @@ test('existing native merchant reviews remain compatible while new clients verif
  await assert.rejects(prepareMutation(snapshot,'payment',{...base,shopName:published.name},'modern-wrong-business',{quote:async()=>quote()}),{code:'MERCHANT_DETAILS_CHANGED'});
  await assert.rejects(prepareMutation(snapshot,'payment',{...base,merchant:'A different merchant'},'wrong-legacy-name',{quote:async()=>quote()}),{code:'MERCHANT_DETAILS_CHANGED'});
 });
+
+test('merchant directory load, search and filter notifications never remount the consumer page',async()=>{
+ const h=directoryHarness();await flush();await flush();assert.equal(h.refreshes,0);
+ h.input('connectedMerchantSearch','library');h.change('merchantCategory','Food');h.change('merchantArea','Pentagon');await h.click('favorites');
+ assert.equal(h.refreshes,0);assert.match(h.html(),/value="library"/);h.dispose();
+});

@@ -30,12 +30,25 @@ export function renderGroupOverview(ctx,route){
 }
 function renderPayoutCard(g,p){return `<article class="panel group-payout-card"><div><strong>${cash(p.amount+(p.fee||0))}</strong><span class="group-payout-status ${esc(groupPayoutStatus(p))}">${esc(statusName(groupPayoutStatus(p)))}</span></div><h3>${esc(p.recipient)}</h3>${p.fee?`<p>${cash(p.amount)} to recipient + ${cash(p.fee)} demo fee</p>`:''}<p>${esc(p.note||p.purpose||'Group expense')}</p><div class="group-payout-progress"><span>${p.approvals?.length||0} of ${p.requiredApprovals||summary(g).requiredApprovals} approvals</span>${progress(p.approvals?.length||0,p.requiredApprovals||summary(g).requiredApprovals)}</div>${actionButton(p.status==='success'?'View payment':'Review payout','review',`data-group-payout="${esc(p.id)}"`,true)}</article>`;}
 
+const expiryChecks=new WeakMap();
 export function bindGroupOverview(ctx,route){
   const root=ctx.$?.('[data-group-overview]')||ctx.$?.('.group-access-page')||document.querySelector('[data-group-overview],.group-access-page');
   if(!root)return()=>{};
   const g=ctx.state.groups?.find(g=>g.id===route.id);if(!g)return()=>{};
-  if(g.payouts.some(p=>p.status!=='expired'&&groupPayoutStatus(p)==='expired')){const result=(ctx.actAsync||ctx.act).call(ctx,'expireGroupPayouts',{groupId:g.id});if(result?.then)void result.then(value=>{if(value?.ok)ctx.refresh();});else if(result?.ok)ctx.refresh();}
   let alive=true;const valid=()=>alive&&root.isConnected!==false&&ctx.route?.id===g.id&&ctx.route?.page==='group-detail';
+  const overdue=g.payouts.filter(p=>p.status!=='expired'&&groupPayoutStatus(p)==='expired');
+  if(overdue.length){
+   const key=JSON.stringify([g.id,overdue.map(p=>[p.id,p.status,p.revision])]);
+   if(expiryChecks.get(ctx)!==key){expiryChecks.set(ctx,key);queueMicrotask(()=>{
+    if(!valid()){if(expiryChecks.get(ctx)===key)expiryChecks.delete(ctx);return;}
+    Promise.resolve().then(()=>(ctx.actAsync||ctx.act).call(ctx,'expireGroupPayouts',{groupId:g.id})).then(result=>{
+     // Refresh only a current page whose records actually changed. Rebinding
+     // cannot keep posting the same unchanged expiration request.
+     if(valid()&&result?.ok&&overdue.some(p=>p.status==='expired'))ctx.refresh();
+     if(!result?.ok&&expiryChecks.get(ctx)===key)expiryChecks.delete(ctx);
+    },()=>{if(expiryChecks.get(ctx)===key)expiryChecks.delete(ctx);});
+   });}
+  }
   const click=event=>{const b=event.target?.closest?.('button');if(!b||!valid())return;
     if(b.dataset.groupTab||b.dataset.groupAction==='chat'){ctx.go({section:'life',page:b.dataset.groupTab==='overview'?'group-detail':'group-chat',id:g.id},{replace:!!b.dataset.groupTab});return;}
     const a=b.dataset.groupAction;if(a==='home'){ctx.go({section:'home',page:'home'},{root:true});return;}

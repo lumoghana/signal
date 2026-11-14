@@ -1,3 +1,4 @@
+import {updateMarkup} from './stable-dom.js';
 import {CONNECTED_CONSUMER_ORIGIN,MERCHANT_CAPABILITIES} from './connected-service.js';
 import {parseMerchantPaymentLink,resolveSamplePaymentLink} from './payment-link-intent.js';
 import {createAppNavigation} from './app-navigation.js';
@@ -77,7 +78,7 @@ function luxActor(){
  if(getWorkspaceMode()==='registered')return session?{id:session.userId,role:session.role,shopIds:session.shopIds||[],businessId:session.businessId}:{id:'signed-out',role:'none',shopIds:[],businessId:state.business.id};
  return{id:ui.role==='owner'?'sample-owner':'sample-'+ui.role+'-'+(ui.staffId||'member'),role:ui.role,shopIds:ui.role==='owner'?state.shops.map(s=>s.id):[ui.shopId],businessId:luxState().business.id};
 }
-const merchantChat=createMerchantLuxConversation({getState:luxState,getActor:luxActor,getShopId:()=>scoped(),getIdentity:()=>[getWorkspaceMode(),Shared.getAuthEpoch(),Auth.getSession()?.id||'sample'],isConnected:()=>getWorkspaceMode()==='registered',request:(question,context,signal)=>Shared.api('/api/lux',{method:'POST',body:{question,context,shopId:scoped()},signal}),onChange:()=>{if(appReady&&ui.page==='lux'){render();requestAnimationFrame(()=>{const log=document.querySelector('.lux-panel .chat-log');if(log)log.scrollTop=log.scrollHeight;});}}});
+const merchantChat=createMerchantLuxConversation({getState:luxState,getActor:luxActor,getShopId:()=>scoped(),getIdentity:()=>[getWorkspaceMode(),Shared.getAuthEpoch(),Auth.getSession()?.id||'sample',Auth.getSession()?.userId,Auth.getSession()?.role,JSON.stringify(Auth.getSession()?.shopIds||[]),Shared.getCache().counter?.staffId,Shared.getCache().counter?.shiftId],isConnected:()=>getWorkspaceMode()==='registered',request:(question,context,signal)=>Shared.api('/api/lux',{method:'POST',body:{question,context,shopId:scoped()},signal}),onChange:()=>{if(appReady&&ui.page==='lux'){render();requestAnimationFrame(()=>{const log=document.querySelector('.lux-panel .chat-log');if(log)log.scrollTop=log.scrollHeight;});}}});
 
 const url=new URL(location.href);
 if((url.searchParams.has('pay')||url.searchParams.has('request'))&&['sample','registered'].includes(url.searchParams.get('workspace'))){
@@ -95,7 +96,7 @@ function ownerWorkspace(snapshot){
  ui.modal=null;ui.charge='';ui.chat=[];ui.detailShop=null;ui.activitySearch='';ui.activityStatus='all';ui.activityPeriod='today';
  resetReceiptBaseline();navigation?.reset({page:ui.page,shopId:ui.shopId});persist();
 }
-let appReady=false,lastSignupStage='',access=null,people=null,identitySyncing=false;
+let appReady=false,lastSignupStage='',access=null,people=null,identitySyncing=false,sharedRenderQueued=false,sharedRenderPending=false,lastExpiredQR='';
 let sampleCounter=null;
 const counterView=()=>{const value=getWorkspaceMode()==='registered'?Shared.getCache().counter:sampleCounter;return value&&getWorkspaceMode()==='registered'&&CounterLock.isLocked(value,Auth.getSession())?{...value,locked:true,staffId:null,staffName:null,localLock:true}:value};
 const cashierMode=()=>ui.role==='cashier'||Boolean(getWorkspaceMode()==='registered'&&counterView());
@@ -156,7 +157,7 @@ access=createAccess({
 });
 people=createPeople({
  auth:Auth,getState:()=>getState(),getSession:()=>Auth.getSession(),getPreferredShopId:()=>ui.shopId,
- onRender:()=>{if(appReady)render()},
+ onRender:()=>{if(appReady&&ui.page==='team')render()},
  onUsersChanged:()=>{syncIdentity();render()},
  onInvitation:token=>{dismiss();signup.setActive(false);access.show('invite',{token})},
  onPasswordReset:challenge=>toast('Recovery is ready. The user completes Forgot password with their private recovery key.'),
@@ -164,9 +165,9 @@ people=createPeople({
  toast
 });
 signup.setActive(!(url.searchParams.has('pay')||url.searchParams.has('request')||url.searchParams.has('code')));
-const reporting=createReporting({getState,getScope:scoped,isOwner:()=>ui.role==='owner',getContextKey:()=>[getWorkspaceMode(),state.business.id,Auth.getSession()?.userId,Auth.getSession()?.id].join(':'),onRender:render,onExport:csv,onOpenTransaction:id=>modal('transaction',{id}),onOpenClosing:id=>modal('closing-detail',{id})});
-const devices=createDevices({api:Shared.api,getState,getSession:Auth.getSession,getShopId:()=>ui.shopId,onRender:()=>{if(appReady&&getWorkspaceMode()==='registered'&&!access.isActive()&&!signup.isActive())render()},toast,onTestVoice:amount=>testVoice(amount),onOpenTransaction:id=>{if(cashierMode()){dismiss();cashier.openReceipt(id)}else modal('transaction',{id})}});
-const counterSetup=createCounterSetup({getSession:Auth.getSession,getUsers:()=>Shared.getCache().users||[],getState,getShopId:()=>ui.shopId,getDeviceId:devices.getDeviceId,api:Shared.api,onChange:()=>{if(appReady)render()},onSetup:()=>{ui.role='cashier';ui.modal=null;ui.page='checkout';signup.setActive(false);access.hide();cashier.reset();devices.stop();window.speechSynthesis?.cancel();navigation?.reset({page:'checkout',shopId:ui.shopId});render()}});
+const reporting=createReporting({getState,getScope:scoped,isOwner:()=>ui.role==='owner',getContextKey:()=>[getWorkspaceMode(),state.business.id,Auth.getSession()?.userId,Auth.getSession()?.id].join(':'),onRender:()=>{if(appReady&&['activity','reports'].includes(ui.page))render()},onExport:csv,onOpenTransaction:id=>modal('transaction',{id}),onOpenClosing:id=>modal('closing-detail',{id})});
+const devices=createDevices({api:Shared.api,getState,getSession:Auth.getSession,getShopId:()=>ui.shopId,onRender:()=>{if(appReady&&getWorkspaceMode()==='registered'&&!access.isActive()&&!signup.isActive())queueSharedRender()},toast,onTestVoice:amount=>testVoice(amount),onOpenTransaction:id=>{if(cashierMode()){dismiss();cashier.openReceipt(id)}else modal('transaction',{id})}});
+const counterSetup=createCounterSetup({getSession:Auth.getSession,getUsers:()=>Shared.getCache().users||[],getState,getShopId:()=>ui.shopId,getDeviceId:devices.getDeviceId,api:Shared.api,onChange:()=>{if(appReady&&ui.page==='counter-setup')render()},onSetup:()=>{ui.role='cashier';ui.modal=null;ui.page='checkout';signup.setActive(false);access.hide();cashier.reset();devices.stop();window.speechSynthesis?.cancel();navigation?.reset({page:'checkout',shopId:ui.shopId});render()}});
 function sampleCounterView(){
  const selected=currentShop(),eligible=state.staff.filter(person=>person.active&&person.role==='cashier'&&(person.shopIds||[person.shopId]).includes(selected?.id));
  if(!sampleCounter||sampleCounter.shopId!==selected?.id)sampleCounter={id:'sample-counter-'+selected?.id,label:'Front counter',shopId:selected?.id,shopName:selected?.name,shopCode:selected?.code,mode:ui.cashierPhoneMode==='dedicated'?'dedicated':'shared',locked:false};
@@ -190,13 +191,13 @@ const paymentSharing=createPaymentLinkSharing({getIdentity:()=>[getWorkspaceMode
 },listLinks:()=>Shared.api('/api/payment-links'),openExternal:url=>{if(url.startsWith('mailto:'))location.href=url;else window.open(url,'_blank','noopener,noreferrer')}});
 function openPaymentSharing({shopId=ui.shopId,requestId,amount,description}={}){const selected=shop(shopId);if(!selected){toast('Choose an assigned shop before sharing.',true);return}const request=requestId?state.requests.find(value=>value.id===requestId&&value.shopId===selected.id):null;if(requestId&&!request){toast('That request is no longer available to your account.',true);return}paymentSharing.open({shop:selected,request,amount,description});modal('payment-share')}
 function openSharedPaymentLinks(id){paymentSharing.openList({shop:currentShop()},id);modal('payment-share')}
-const businessPlan=createBusinessPlan({getState,getSession:Auth.getSession,getShopId:()=>ui.shopId,getRole:()=>ui.role,isSample:()=>getWorkspaceMode()==='sample',api:Shared.api,onChange:()=>{if(appReady)render()}});
+const businessPlan=createBusinessPlan({getState,getSession:Auth.getSession,getShopId:()=>ui.shopId,getRole:()=>ui.role,isSample:()=>getWorkspaceMode()==='sample',api:Shared.api,onChange:()=>{if(appReady&&ui.page==='business-plan')render()}});
 const cashier=createCashier({getState,getActor:()=>{try{return actor()}catch{return {role:'cashier',shopId:counterView()?.shopId,staffId:null}}},getShop:()=>currentShop()||counterView(),getSession:Auth.getSession,getCounter:()=>getWorkspaceMode()==='sample'?sampleCounterView():counterView(),getConnectivity:()=>getWorkspaceMode()==='sample'?(navigator.onLine===false?'offline':'online'):Shared.connectionStatus().status,getReceiver:()=>receiverStatus(),money,E,icon,time,qrSvg,paymentLink,onChange:()=>{if(appReady)render()},act:performAction,api:Shared.api,
  onSharePayment:options=>openPaymentSharing({shopId:ui.shopId,...options}),onSharedLinks:()=>openSharedPaymentLinks(),onPreviewPayment:request=>modal('student-pay',{id:request.shopId,request:request.id,method:'qr'}),onCreateRequest:payload=>performAction('CREATE_REQUEST',payload),onRefundRequest:payload=>performAction('REFUND',payload),onHelp:payload=>performAction('ADD_TICKET',payload),onUnlock:cashierUnlock,onLock:cashierLock,onHandover:async payload=>{if(counterView()||getWorkspaceMode()==='sample')return cashierLock({...payload,endShift:true});const shift=(state.shifts||[]).find(value=>value.staffId===ui.staffId&&value.status==='open');if(shift)return performAction('END_SHIFT',{id:shift.id,note:payload.note||''})},onSound:()=>modal('cashier-sound'),onDemoRoles:()=>modal('role-switch'),onExit:()=>access.handleClick('access-sign-out'),onSignOut:()=>access.handleClick('access-sign-out'),isSample:()=>getWorkspaceMode()==='sample'});
 const campusPay=createCampusPay({api:Shared.api,onRender:()=>renderCampusPay(),toast,onReturnMerchant:()=>{campusPay.hide();if(Auth.getSession())enterAuthenticated(Auth.getSession());else showLogin()}});
 const directory=createDirectory({api:Shared.api,onRender:()=>{if(appReady&&ui.role==='student'&&!access.isActive()&&!signup.isActive())render()},onPay:(shop,options)=>campusPay.open(shop,options),onLogin:showLogin,onStudent:()=>campusPay.openWallet(),getStudent:()=>Shared.getCache().student,onScan:()=>modal('student-scan'),formatMoney:money});
 const operations=createOperations({getState,getSession:Auth.getSession,getRole:()=>ui.role,getStaffId:()=>ui.staffId,getShopId:()=>ui.shopId,getDevices:()=>Shared.getCache().devices,getDeviceReadiness:()=>Shared.getCache().state?.shopReadiness||[],getConnectionStatus:()=>Shared.connectionStatus().status,onSelectShop:selectShop,isShared:()=>getWorkspaceMode()==='registered',act,api:Shared.api,onRender:render,toast,onNavigate:navigate,onApprovals:()=>modal('approvals'),onSound:id=>navigate('devices',id),onInvite:id=>{navigate('team',id);people.openInvite?.(id)},onQR:id=>modal('shop-qr',{id}),onClose:id=>modal('open-close',{id}),onOpenTransaction:id=>modal('transaction',{id})});
-function renderCampusPay(){if(campusPay?.isActive()&&!campusOverlayActive){campusOverlayActive=true;if(!restoringNavigation)navigation?.openModal({kind:'campus-payment'})}else if(!campusPay?.isActive()&&campusOverlayActive){campusOverlayActive=false;if(!restoringNavigation)navigation?.dismissModal()}if(!campusPay?.isActive()){$('#modal-root').innerHTML='';$('#app').inert=false;document.body.classList.remove('modal-open');return}const result=campusPay.render();$('#modal-root').innerHTML=result;$('#app').inert=true;document.body.classList.add('modal-open')}
+function renderCampusPay(){if(campusPay?.isActive()&&!campusOverlayActive){campusOverlayActive=true;if(!restoringNavigation)navigation?.openModal({kind:'campus-payment'})}else if(!campusPay?.isActive()&&campusOverlayActive){campusOverlayActive=false;if(!restoringNavigation)navigation?.dismissModal()}if(!campusPay?.isActive()){$('#modal-root').innerHTML='';$('#app').inert=false;document.body.classList.remove('modal-open');return}const result=campusPay.render();updateMarkup($('#modal-root'),result,{preserveFields:backgroundRender});$('#app').inert=true;document.body.classList.add('modal-open')}
 
 
 let lastModalTrigger=null;
@@ -457,23 +458,25 @@ function topbarAccess(student,owner,manager){
  const registered=getWorkspaceMode()==='registered',session=registered?Auth.getSession():null;
  return `<button class="icon-btn" data-action="notifications" aria-label="Notifications">${icon('bell')}<span class="notification-dot"></span></button><button class="user-chip" data-action="${registered?'account-menu':'role-switch'}" aria-label="${registered?'Your account':'Switch experience'}"><span class="avatar">${session?E(initial(session.name)):owner?E(initial(state.business.ownerName)):manager?'AM':'KM'}</span><span>${session?E(session.username):owner?'Owner':manager?'Manager':'Cashier'}</span>${icon('down')}</button>`;
 }
-let renderedFormContext='';
-function formContext(){return [getWorkspaceMode(),state.business.id,Auth.getSession()?.id||ui.role,ui.page,ui.shopId].join(':')}
-function render(){
- state=getState();merchantChat.sync();
+let renderedFormContext='',markupContext='',backgroundRender=false,lastRenderedActor='',renderedModalActor='';
+function writeAppMarkup(html){const next=[formContext(),signup.isActive()?'signup':access?.isActive()?'access':'workspace'].join(':');updateMarkup($('#app'),html,{replace:next!==markupContext,preserveFields:backgroundRender});markupContext=next;}
+function actorContext(){const session=Auth.getSession(),counter=counterView();return JSON.stringify([getWorkspaceMode(),Shared.getAuthEpoch(),state.business.id,session?.id,session?.userId,session?.role||ui.role,[...(session?.shopIds||[])].sort(),counter?.staffId,counter?.shiftId,counter?.locked])}
+function formContext(){return JSON.stringify([actorContext(),ui.page,ui.shopId])}
+function render(options={}){const previous=backgroundRender;backgroundRender=options.background===true;try{return renderPage()}finally{backgroundRender=previous}}
+function renderPage(){
+ state=getState();const actor=actorContext();if(lastRenderedActor&&actor!==lastRenderedActor){stopScanner();ui.modal=null}lastRenderedActor=actor;merchantChat.sync();
  if(getWorkspaceMode()==='registered'&&counterView()){ui.role='cashier';if(signup.isActive())signup.setActive(false);if(access?.isActive())access.hide()}
  if(getWorkspaceMode()==='registered'&&ui.role!=='student'&&!signup.isActive())access?.enforceRecoveryCheckpoint?.();
  if(cashierMode()&&!signup.isActive()&&!access?.isActive()){
   const session=Auth.getSession();
   if(getWorkspaceMode()==='registered'&&!session){access.show('login');return}
   if(session){ui.role='cashier';ui.shopId=counterView()?.shopId||session.shopIds?.[0]||ui.shopId;ui.staffId=session.staffId||state.staff.find(person=>person.authUserId===session.userId)?.id||''}
-  const focus=captureFocus($('#app'));$('#app').innerHTML=cashier.render();renderModal();restoreFocus($('#app'),focus);cashier.afterRender?.();return;
+  const focus=captureFocus($('#app'));writeAppMarkup(cashier.render());renderModal();restoreFocus($('#app'),focus);cashier.afterRender?.();return;
  }
- const formDrafts=renderedFormContext===formContext()?[...document.querySelectorAll('#app form[data-form="business"],#app form[data-form="lux"]')].map(form=>({type:form.dataset.form,fields:[...form.querySelectorAll('input,select,textarea')].filter(el=>el.name&&el.type!=='password').map(el=>({name:el.name,value:el.value,focused:el===document.activeElement,caret:el.selectionStart}))})):[];
  const draftContext=formContext(),mainFocus=renderedFormContext===formContext()?captureFocus($('#app')):null;
  const homePanels=renderedFormContext===draftContext&&ui.page==='home'?[...document.querySelectorAll('#app details[data-home-panel]')].map(panel=>({id:panel.dataset.homePanel,open:panel.open})):[];
  if(access?.isActive()){
-  stopScanner();$('#app').inert=false;$('#app').innerHTML=access.render();$('#modal-root').innerHTML='';document.body.classList.remove('modal-open');return;
+  stopScanner();$('#app').inert=false;writeAppMarkup(access.render());$('#modal-root').innerHTML='';document.body.classList.remove('modal-open');return;
  }
  if(!signup.isActive()&&getWorkspaceMode()==='registered'&&ui.role!=='student'){
   const session=Auth.getSession();
@@ -487,7 +490,7 @@ function render(){
  }
  if(signup.isActive()){
   const focused=document.activeElement,focusedName=focused?.name,caret=focused?.selectionStart;
-  stopScanner();$('#app').inert=false;$('#app').innerHTML=signup.render();$('#modal-root').innerHTML='';document.body.classList.remove('modal-open');
+  stopScanner();$('#app').inert=false;writeAppMarkup(signup.render());$('#modal-root').innerHTML='';document.body.classList.remove('modal-open');
   const stage=$('#app form[data-signup-step]')?.dataset.signupStep||($('.signup-shell')?.classList.contains('is-success')?'success':'welcome');
   if(stage!==lastSignupStage){lastSignupStage=stage;requestAnimationFrame(()=>{($('#app [autofocus]')||$('#signup-heading'))?.focus({preventScroll:true});window.scrollTo(0,0);$('.signup-main')?.scrollTo(0,0)})}
   else if(focusedName){const restored=[...$('#app').querySelectorAll('input,select,textarea')].find(x=>x.name===focusedName);if(restored){restored.focus({preventScroll:true});try{restored.setSelectionRange(caret,caret)}catch{}}}
@@ -502,11 +505,10 @@ function render(){
  const activeNav=page=>page===(inHome?'home':inCollect?'checkout':'administration');
  const currentTitle=({home:'Home',checkout:'Collect',administration:'Administration',overview:'Business overview',activity:'Payments & refunds',shops:'Shops',settlements:'Settlements',team:'Team & access',reports:'Reports',lux:'Ask Lux',close:'Close shop day',settings:'Business settings',support:'Help & support','shop-detail':'Shop details',nearby:'Campus Pay',security:'Account & security',activation:'Get shop ready','shop-operations':'Run this shop',operations:'Operations',devices:'Receiving phones','counter-setup':'Counter phones','business-plan':'Business plan'})[ui.page]||'Administration';
  const pages={home,overview,administration,shops:shopsPage,'shop-detail':shopDetail,activity,settlements,team,reports,checkout,close:closePage,support,settings,nearby,lux,security,activation:()=>operations.render('activation'),'shop-operations':()=>operations.render('shop-operations'),operations:()=>operations.render('operations'),devices:()=>devices.render(),'counter-setup':()=>counterSetup.render(),'business-plan':()=>businessPlan.render()};
- $('#app').innerHTML=`<div class="app-shell ${student?'student-mode':'collections-app'}">${!student?`<aside class="sidebar"><a class="brand" href="#" data-action="go-home"><span class="canonical-wordmark">lumo</span><span class="brand-qualifier">merchant</span></a><button class="business-switch" data-action="${getWorkspaceMode()==='registered'?'account-menu':'role-switch'}"><span class="avatar">${E(initial(state.business.name))}</span><span><strong>${E(state.business.name)}</strong><small>${owner?'Business owner':ui.role==='manager'?'Shop manager':'Cashier'}</small></span>${icon('down')}</button><div class="nav-label">YOUR WORKSPACE</div><nav class="sidebar-nav" aria-label="Main navigation">${nav.map(([p,i,t])=>`<button class="nav-item ${activeNav(p)?'active':''}" data-action="nav" data-page="${p}" ${activeNav(p)?'aria-current="page"':''}>${icon(i)}<span>${t}</span>${icon('chevron')}</button>`).join('')}</nav><div class="collections-sidebar-note"><span>${icon('qr')}</span><h2>Made for the next customer.</h2><p>Enter an amount, show your QR and keep things moving.</p></div><div class="sidebar-foot"><div class="demo-card"><span class="demo-label"><span class="dot"></span> TEST MONEY PROTOTYPE</span><p>${getWorkspaceMode()==='sample'?'Explore a sample business.':'Your access follows your account.'}</p><button class="text-btn" data-action="${getWorkspaceMode()==='sample'?'demo-console':'open-sample'}">${getWorkspaceMode()==='sample'?'Demo controls':'Open sample business'} ${icon('arrow')}</button></div><div class="sidebar-signature"><span class="live-dot"></span> A little clearer. Every day.</div></div></aside>`:''}<div class="main-shell"><header class="topbar"><a class="mobile-brand" href="#" data-action="go-home"><strong class="canonical-wordmark">lumo</strong><span class="brand-qualifier">merchant</span></a><div class="breadcrumb">${student?'Lumo / Campus Pay':`${E(state.business.name)} <span>/</span> ${currentTitle}`}</div><div class="topbar-actions"><span class="live-status"><span class="live-dot"></span>${getWorkspaceMode()==='registered'?'Shared test workspace':'Sample workspace'}</span>${topbarAccess(student,owner,manager)}</div></header><main class="page ${student?'student-page':inCollect?`checkout-page ${(ui.collectMode||'amount')==='amount'?'collect-amount-page':''}`:inHome?'home-page':ui.page==='administration'?'administration-page':''}">${getWorkspaceMode()==='registered'?connectionBanner():''}${!student&&!inCollect&&!inHome&&ui.page!=='administration'?`<button class="admin-back text-btn" data-action="go-administration">${icon('back')} Administration</button>`:''}${pages[ui.page]()}</main><footer class="page-footer"><span>© ${new Date().getFullYear()} Lumo Merchant</span><span>Test money · Bank and SMS not connected</span><button data-action="privacy">About this prototype</button></footer></div>${!student?`<nav class="bottom-nav" aria-label="Mobile navigation">${nav.map(([p,i,t])=>`<button class="${activeNav(p)?'active':''}" data-action="nav" data-page="${p}" ${activeNav(p)?'aria-current="page"':''}>${icon(i)}<span>${t}</span></button>`).join('')}</nav>`:getWorkspaceMode()==='sample'?`<button class="floating-demo" data-action="demo-console">${icon('refresh')}Switch experience</button>`:''}</div>`;
+ writeAppMarkup(`<div class="app-shell ${student?'student-mode':'collections-app'}">${!student?`<aside class="sidebar"><a class="brand" href="#" data-action="go-home"><span class="canonical-wordmark">lumo</span><span class="brand-qualifier">merchant</span></a><button class="business-switch" data-action="${getWorkspaceMode()==='registered'?'account-menu':'role-switch'}"><span class="avatar">${E(initial(state.business.name))}</span><span><strong>${E(state.business.name)}</strong><small>${owner?'Business owner':ui.role==='manager'?'Shop manager':'Cashier'}</small></span>${icon('down')}</button><div class="nav-label">YOUR WORKSPACE</div><nav class="sidebar-nav" aria-label="Main navigation">${nav.map(([p,i,t])=>`<button class="nav-item ${activeNav(p)?'active':''}" data-action="nav" data-page="${p}" ${activeNav(p)?'aria-current="page"':''}>${icon(i)}<span>${t}</span>${icon('chevron')}</button>`).join('')}</nav><div class="collections-sidebar-note"><span>${icon('qr')}</span><h2>Made for the next customer.</h2><p>Enter an amount, show your QR and keep things moving.</p></div><div class="sidebar-foot"><div class="demo-card"><span class="demo-label"><span class="dot"></span> TEST MONEY PROTOTYPE</span><p>${getWorkspaceMode()==='sample'?'Explore a sample business.':'Your access follows your account.'}</p><button class="text-btn" data-action="${getWorkspaceMode()==='sample'?'demo-console':'open-sample'}">${getWorkspaceMode()==='sample'?'Demo controls':'Open sample business'} ${icon('arrow')}</button></div><div class="sidebar-signature"><span class="live-dot"></span> A little clearer. Every day.</div></div></aside>`:''}<div class="main-shell"><header class="topbar"><a class="mobile-brand" href="#" data-action="go-home"><strong class="canonical-wordmark">lumo</strong><span class="brand-qualifier">merchant</span></a><div class="breadcrumb">${student?'Lumo / Campus Pay':`${E(state.business.name)} <span>/</span> ${currentTitle}`}</div><div class="topbar-actions"><span class="live-status"><span class="live-dot"></span>${getWorkspaceMode()==='registered'?'Shared test workspace':'Sample workspace'}</span>${topbarAccess(student,owner,manager)}</div></header><main class="page ${student?'student-page':inCollect?`checkout-page ${(ui.collectMode||'amount')==='amount'?'collect-amount-page':''}`:inHome?'home-page':ui.page==='administration'?'administration-page':''}">${getWorkspaceMode()==='registered'?connectionBanner():''}${!student&&!inCollect&&!inHome&&ui.page!=='administration'?`<button class="admin-back text-btn" data-action="go-administration">${icon('back')} Administration</button>`:''}${pages[ui.page]()}</main><footer class="page-footer"><span>© ${new Date().getFullYear()} Lumo Merchant</span><span>Test money · Bank and SMS not connected</span><button data-action="privacy">About this prototype</button></footer></div>${!student?`<nav class="bottom-nav" aria-label="Mobile navigation">${nav.map(([p,i,t])=>`<button class="${activeNav(p)?'active':''}" data-action="nav" data-page="${p}" ${activeNav(p)?'aria-current="page"':''}>${icon(i)}<span>${t}</span></button>`).join('')}</nav>`:getWorkspaceMode()==='sample'?`<button class="floating-demo" data-action="demo-console">${icon('refresh')}Switch experience</button>`:''}</div>`);
 
  renderModal();if(campusPay.isActive())renderCampusPay();
  if(draftContext===formContext())for(const panel of homePanels){const restored=[...document.querySelectorAll('#app details[data-home-panel]')].find(node=>node.dataset.homePanel===panel.id);if(restored)restored.open=panel.open}
- if(draftContext===formContext())for(const draft of formDrafts){const form=[...document.querySelectorAll('#app form')].find(form=>form.dataset.form===draft.type);if(form)for(const field of draft.fields){const input=[...form.querySelectorAll('input,select,textarea')].find(input=>input.name===field.name);if(input){input.value=field.value;if(field.focused){input.focus({preventScroll:true});try{input.setSelectionRange(field.caret,field.caret)}catch{}}}}}
  if(draftContext===formContext()&&!ui.modal&&!campusPay.isActive())restoreFocus($('#app'),mainFocus);
  renderedFormContext=formContext();
 }
@@ -515,10 +517,9 @@ function field(label,name,value='',extra=''){return `<label class="field"><span 
 function shopOptions(selected=ui.shopId){return state.shops.map(s=>`<option value="${s.id}" ${s.id===selected?'selected':''}>${E(s.name)}</option>`).join('')}
 function modalShell(title,body,footer='',wide=false){return `<div class="modal-backdrop" data-action="backdrop"><section class="modal ${wide?'wide':''} ${ui.modal.kind==='appearance-settings'?'appearance-modal':''}" role="dialog" aria-modal="true" aria-labelledby="modal-title" data-modal-key="${ui.modal.key}"><header class="modal-header"><h2 id="modal-title" tabindex="-1">${title}</h2><button class="icon-btn close-btn" data-action="dismiss" aria-label="Close dialog">${icon('close')}</button></header><div class="modal-body">${body}</div>${footer?`<footer class="modal-footer">${footer}</footer>`:''}</section></div>`}
 function renderModal(){
- if(!ui.modal){$('#app').inert=false;$('#modal-root').innerHTML='';document.body.classList.remove('modal-open');return}
- const old=$('[data-modal-key]'),same=old?.dataset.modalKey===ui.modal.key,modalFocus=captureFocus($('#modal-root')),previousReceipt=$('#modal-root [data-receipt-id]')?.dataset.receiptId;
- const drafts=same?[...old.querySelectorAll('input,select,textarea')].map(e=>({name:e.name,value:e.value,checked:e.checked})):null;
- const focus=document.activeElement?.name,selection=document.activeElement?.selectionStart;
+ if(!ui.modal){renderedModalActor='';$('#app').inert=false;updateMarkup($('#modal-root'),'');document.body.classList.remove('modal-open');return}
+ const modalActor=actorContext(),old=$('[data-modal-key]'),same=old?.dataset.modalKey===ui.modal.key&&renderedModalActor===modalActor,modalFocus=same?captureFocus($('#modal-root')):null,previousReceipt=same?$('#modal-root [data-receipt-id]')?.dataset.receiptId:null;if(renderedModalActor&&renderedModalActor!==modalActor)stopScanner();renderedModalActor=modalActor;
+
  const d=ui.modal;let title='',body='',footer='',wide=false;
  if((d.kind==='role-switch'||d.kind==='demo-console')&&getWorkspaceMode()==='sample'){
   title=d.kind==='demo-console'?'Explore Lumo Merchant':'Choose your experience';wide=true;
@@ -658,10 +659,8 @@ function renderModal(){
   title='Restore the sample business?';body='<p>This restores the original sample business and its demo records. Any business created through merchant signup is preserved separately.</p>';footer=btn('Keep my changes','dismiss','secondary')+btn('Reset demo','reset-demo','danger');
  }
  if(!title){dismiss();return}
- $('#modal-root').innerHTML=modalShell(title,body,footer,wide);$('#app').inert=true;document.body.classList.add('modal-open');if(scanStream&&d.kind==='student-scan'){const video=$('#scan-video');if(video){video.srcObject=scanStream;video.play().catch(()=>{})}}
- if(drafts&&d.kind!=='appearance-settings')for(const saved of drafts){const e=[...$('#modal-root').querySelectorAll('input,select,textarea')].find(e=>e.name===saved.name);if(e){e.value=saved.value;e.checked=saved.checked}}
+ updateMarkup($('#modal-root'),modalShell(title,body,footer,wide),{replace:!same,preserveFields:same});$('#app').inert=true;document.body.classList.add('modal-open');if(scanStream&&d.kind==='student-scan'){const video=$('#scan-video');if(video){if(video.srcObject!==scanStream)video.srcObject=scanStream;if(video.paused)video.play().catch(()=>{})}}
  if(['edit-shop','add-shop'].includes(d.kind))syncShopLocationFields();
- if(same&&focus){const e=[...$('#modal-root').querySelectorAll('input,select,textarea')].find(e=>e.name===focus);if(e){e.focus({preventScroll:true});try{e.setSelectionRange(selection,selection)}catch{}}}
  const receiptNode=$('#modal-root [data-receipt-id]');
  if(receiptNode?.dataset.receiptId&&receiptNode.dataset.receiptId!==previousReceipt){const payment=state.transactions.find(t=>t.id===receiptNode.dataset.receiptId);if(payment)announceReceipt(payment);requestAnimationFrame(()=>$('#modal-title')?.focus({preventScroll:true}))}
  else if(same)restoreFocus($('#modal-root'),modalFocus);
@@ -899,7 +898,7 @@ subscribe(event=>{
  for(const payment of newConfirmed){knownPaid.add(payment.id);if(ui.role!=='student'&&!signup.isActive()&&!access.isActive()){freshReceipts.set(payment.shopId,payment.id);if(payment.shopId===ui.shopId)announceReceipt(payment)}}
  if(getWorkspaceMode()==='registered'){
   if(Auth.getSession()&&ui.role!=='student'&&!signup.isActive())for(const payment of devices.consumePayments(receivingPayments(state)))say(payment.amount,false,payment.shopId,payment);
-  if(!access.isActive()&&!signup.isActive())render();return;
+  if(!access.isActive()&&!signup.isActive()){if(event.type==='REMOTE_SYNC')queueSharedRender();else render();}return;
  }
  if(access.isActive()||signup.isActive())return;
  if(!switchEvent){const sound=soundConfig();for(const t of newConfirmed){if(receivingEnabled(sound)&&sound.shopId===t.shopId)say(t.amount)}}
@@ -909,7 +908,7 @@ let previousSession=Auth.getSession();
 Auth.subscribeAuth(()=>{
  if(!appReady)return;
  state=getState();
- const currentSession=Auth.getSession(),ended=Boolean(previousSession&&!currentSession),operatorChanged=previousSession?.userId!==currentSession?.userId;previousSession=currentSession;if(operatorChanged){paymentSharing.reset();businessPlan.reset?.();cashier.reset();counterSetup.reset();devices.stop();window.speechSynthesis?.cancel();freshReceipts.clear();if(currentSession&&!counterView()?.locked)devices.start()}
+ const currentSession=Auth.getSession(),ended=Boolean(previousSession&&!currentSession),operatorChanged=previousSession?.userId!==currentSession?.userId,authorityChanged=JSON.stringify([previousSession?.id,previousSession?.role,previousSession?.shopIds,previousSession?.expiresAt,previousSession?.recoveryKeyPending,previousSession?.recoveryKeyReference])!==JSON.stringify([currentSession?.id,currentSession?.role,currentSession?.shopIds,currentSession?.expiresAt,currentSession?.recoveryKeyPending,currentSession?.recoveryKeyReference]);previousSession=currentSession;if(operatorChanged){paymentSharing.reset();businessPlan.reset?.();cashier.reset();counterSetup.reset();devices.stop();window.speechSynthesis?.cancel();freshReceipts.clear();if(currentSession&&!counterView()?.locked)devices.start()}
  if(ended){paymentSharing.reset();businessPlan.reset?.();CounterLock.reset();cashier.reset();counterSetup.reset();navigation?.reset({page:'home',shopId:''});freshReceipts.clear();receiptContext='';const announcement=document.getElementById('payment-announcement');if(announcement)announcement.textContent='';devices.clearAnnouncementFailures?.();operations.reset();people?.reset();reporting.reset()}
  if(ended&&!Shared.isAuthTransitionPending()&&!signup.isActive()&&ui.role!=='student'){devices.stop();ui.modal=null;access.show('login',{notice:'Your session ended. Sign in again to continue.'});return}
  if(!receivingEnabled())window.speechSynthesis?.cancel();
@@ -919,13 +918,13 @@ Auth.subscribeAuth(()=>{
   const session=Auth.getSession();if(!session){ui.modal=null;access.show('login');return}
   ui.role=session.role;ui.staffId=state.staff.find(st=>st.authUserId===session.userId&&st.active)?.id||'';
  }}
- render();
+ if(authorityChanged||operatorChanged||ended||counterView()?.locked)render();else queueSharedRender();
 });
 setInterval(()=>{if(appReady&&getWorkspaceMode()==='registered'&&ui.role!=='student'&&!signup.isActive()&&!access.isActive()&&!Auth.getSession())render()},30000);
 document.addEventListener('focusin',event=>{if(/INPUT|TEXTAREA|SELECT/.test(event.target?.tagName||''))requestAnimationFrame(()=>event.target?.scrollIntoView?.({block:'nearest',behavior:'smooth'}))});
 window.addEventListener('pagehide',stopScanner);
 window.addEventListener('storage',e=>{if(e.key==='lumo-sound'||e.key==='lumo-counter-screen-lock-v1'){if(counterView()?.locked){devices.stop();window.speechSynthesis?.cancel()}render()}});
-setInterval(()=>{if(!appReady||signup.isActive()||access.isActive()||campusPay.isActive())return;const countdown=document.querySelector('[data-qr-expires]');if(countdown){const seconds=Math.max(0,Math.ceil((Date.parse(countdown.dataset.qrExpires)-Date.now())/1000));if(seconds===0)renderModal();else countdown.textContent=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')}},1000);
+setInterval(()=>{if(!appReady||signup.isActive()||access.isActive()||campusPay.isActive())return;const countdown=document.querySelector('[data-qr-expires]');if(countdown){const seconds=Math.max(0,Math.ceil((Date.parse(countdown.dataset.qrExpires)-Date.now())/1000));if(seconds===0){const key=[ui.modal?.key,countdown.dataset.qrExpires].join(':');if(key!==lastExpiredQR){lastExpiredQR=key;renderModal()}}else countdown.textContent=Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')}},1000);
 
 function closeOverlayWithBack(){const fallback=()=>{if(campusPay.isActive())campusPay.hide();else dismiss()};if(navigation)navigation.backOrDismiss(fallback);else fallback()}
 function historyModalAvailable(value){
@@ -961,8 +960,17 @@ Shared.startSync();directory.refresh();
 function connectionBanner(){const status=Shared.connectionStatus();return status.status==='offline'?'<div class="callout warning" role="status">Connection lost. Displayed receipts may be out of date. A pending screen or customer screenshot is not payment confirmation.</div>':'<div class="shared-indicator"><span class="live-dot"></span>Shared sandbox · Test money · Bank and SMS not connected</div>'}
 function testVoice(amount){return new Promise((resolve,reject)=>{if(!window.speechSynthesis)throw Error('Voice is unavailable on this browser.');const value=amount/100;const utter=new SpeechSynthesisUtterance('Lumo voice test. Twenty-five cedis. This is a test.');utter.lang='en-GH';utter.rate=.9;utter.onend=()=>resolve(true);utter.onerror=()=>reject(Error('Voice could not play. Check your phone volume and browser sound permission.'));speechSynthesis.speak(utter);setTimeout(()=>reject(Error('Voice test did not finish. Tap to test again.')),15000)})}
 
+function queueSharedRender(){
+ sharedRenderPending=true;if(sharedRenderQueued)return;sharedRenderQueued=true;
+ queueMicrotask(()=>{sharedRenderQueued=false;flushSharedRender()});
+}
+function flushSharedRender(){
+ if(!sharedRenderPending||!appReady||signup.isActive()||access.isActive())return;
+ sharedRenderPending=false;const x=window.scrollX,y=window.scrollY;render({background:true});if(window.scrollX!==x||window.scrollY!==y)window.scrollTo(x,y);
+}
+document.addEventListener('focusout',()=>setTimeout(flushSharedRender,0));
 Shared.subscribeShared(type=>{
- if(type==='data'&&appReady&&counterView()&&!signup.isActive())render();
+ if(type==='data'&&appReady&&counterView()&&!signup.isActive())queueSharedRender();
  if(type==='authority')devices.applyDevices(Shared.getCache().devices,{revision:Shared.getRevisions().devices,connection:Shared.connectionStatus().status});
- if(type==='connection'){devices.setConnection(Shared.connectionStatus().status);if(appReady&&!signup.isActive()&&!access.isActive())render()}
+ if(type==='connection'){devices.setConnection(Shared.connectionStatus().status);if(appReady&&!signup.isActive()&&!access.isActive())queueSharedRender()}
 });

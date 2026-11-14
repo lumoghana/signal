@@ -116,7 +116,8 @@ export function createDevices(config={}){
   if(Number.isFinite(revision)&&revision<lastRevision)return false;
   if(Number.isFinite(revision))lastRevision=revision;
   const list=Array.isArray(value)?value:Array.isArray(value?.devices)?value.devices:[];
-  const previousConnection=connection,changed=JSON.stringify(devices)!==JSON.stringify(list);devices=list.map(device=>({...device}));authorityVersion++;
+  const display=list=>JSON.stringify(list.map(device=>{const {lastSeen,...visible}=device;return {...visible,connection:deviceConnection(device,now())}}));
+  const previousConnection=connection,changed=display(devices)!==display(list);devices=list.map(device=>({...device}));authorityVersion++;
   if(options.connection)connectivity(options.connection);else connection='online';
   if(!deviceCanReceive(own(),session(),own()?.shopId,shopList())||audioUnlocked&&(own()?.soundReady===false||own()?.announcementFailed===true))stopVoice();
   if(changed||previousConnection!==connection)redraw();return true;

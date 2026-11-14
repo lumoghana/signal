@@ -86,3 +86,20 @@ test('readiness checkedAt refreshes cached metadata without replaying a business
  const shared=await client(),Store=await import('../dist/store.js'),first=state();first.shopReadiness=[{shopId:first.shops[0].id,phoneReady:true,readyCount:1,phoneCount:1,offlineCount:0,checkedAt:'2026-11-11T10:00:00.000Z',readyUntil:'2026-11-11T10:01:30.000Z'}];shared.applyResponse({...bundle(1),state:first});Store.switchWorkspace('registered');let updates=0;const unsubscribe=Store.subscribe(event=>{if(event.type==='REMOTE_SYNC')updates++});
  try{const next=structuredClone(first);next.shopReadiness[0].checkedAt='2026-11-11T10:00:04.000Z';shared.applyResponse({...bundle(2),state:next});assert.equal(updates,0);assert.equal(shared.getCache().state.shopReadiness[0].checkedAt,next.shopReadiness[0].checkedAt);assert.equal(Store.getState().shopReadiness[0].checkedAt,next.shopReadiness[0].checkedAt);next.shopReadiness[0].readyUntil='2026-11-11T10:02:00.000Z';shared.applyResponse({...bundle(3),state:next});assert.equal(updates,1,'an actual ready-until change must remain observable');}finally{unsubscribe()}
 });
+
+test('unchanged counter polling does not emit data or repaint, but lock and payment changes do',async()=>{
+ const shared=await client(),first=bundle(1);first.counter={id:'counter',locked:false,staffId:'cashier',shiftId:'shift-1'};
+ shared.applyResponse(first);let data=0;const off=shared.subscribeShared(type=>{if(type==='data')data++});
+ try{
+  for(let i=0;i<5;i++)shared.applyResponse({...structuredClone(first),revision:i+2});
+  assert.equal(data,0,'unchanged polls must leave the counter DOM alone');
+  const payment=structuredClone(first);payment.state.transactions.push({id:'received',amount:2500,status:'paid'});payment.revision=10;shared.applyResponse(payment);assert.equal(data,1);
+  const locked=structuredClone(payment);locked.counter.locked=true;locked.revision=11;shared.applyResponse(locked);assert.equal(data,2,'lock changes must remain immediate');
+ }finally{off()}
+});
+
+test('session heartbeat updates are silent while expiry and role changes notify immediately',async()=>{
+ const shared=await client(),first=bundle(1);first.session={...owner,lastSeen:'2026-11-14T10:00:00Z'};shared.applyResponse(first);
+ let accounts=0;const off=shared.subscribeShared(type=>{if(type==='account')accounts++});
+ try{shared.applyResponse({...first,revision:2,session:{...first.session,lastSeen:'2026-11-14T10:00:04Z'}});assert.equal(accounts,0);assert.equal(shared.getCache().session.lastSeen,'2026-11-14T10:00:04Z');shared.applyResponse({...first,revision:3,session:{...first.session,role:'cashier'}});assert.equal(accounts,1);shared.applyResponse({...first,revision:4,session:{...first.session,expiresAt:'2026-11-14T10:01:00Z'}});assert.equal(accounts,2);}finally{off()}
+});
