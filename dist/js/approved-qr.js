@@ -89,3 +89,19 @@ export function parseSharedQr(raw) {
   } catch { throw invalid(); }
 }
 
+
+/** Older published merchant QRs open the same guest checkout as shared links. */
+export function guestMerchantCheckoutURL(raw,{signedIn=false,origin=SHARED_CONSUMER_ORIGIN}={}){
+  if(signedIn)return '';
+  try{
+    const url=new URL(raw),base=new URL(origin);
+    if(!['https:','http:'].includes(url.protocol)||![base.origin,SHARED_CONSUMER_ORIGIN].includes(url.origin)||url.pathname!=='/'||url.username||url.password||url.hash||url.searchParams.has('testKey'))return '';
+    // This explicit choice is the sign-in path from the guest checkout itself.
+    if(url.searchParams.getAll('lumo').length===1&&url.searchParams.get('lumo')==='1')return '';
+    let payment;
+    if(url.searchParams.has('lumoCode'))payment=parseSharedQrLink(url.href);
+    else {const shopId=url.searchParams.get('pay'),requestId=url.searchParams.get('request');if(url.searchParams.getAll('pay').length!==1||url.searchParams.getAll('request').length>1||!UUID.test(shopId||'')||requestId!==null&&!UUID.test(requestId))return '';payment={kind:'merchant',shopId,...(requestId?{requestId}:{})};}
+    if(payment.kind!=='merchant')return '';
+    const checkout=new URL('/checkout.html',base.origin);checkout.searchParams.set('pay',payment.shopId);if(payment.requestId)checkout.searchParams.set('request',payment.requestId);return checkout.href;
+  }catch{return '';}
+}

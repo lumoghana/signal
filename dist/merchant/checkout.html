@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en-GH">
+<html lang="en-GH" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
@@ -7,16 +7,13 @@
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex,nofollow">
   <meta name="description" content="Check the shop. Review the amount. Pay with clarity through Lumo.">
-  <title>Pay a merchant · Lumo</title>
-  <script>
-    (() => { let preference='dark';try{preference=localStorage.getItem('lumo-appearance-v1')||'dark'}catch{}const light=preference==='light'||preference==='system'&&matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.dataset.theme=light?'light':'dark';document.documentElement.style.colorScheme=light?'light':'dark'; })();
-  </script>
+  <title>Pay with Lumo</title>
   <link rel="stylesheet" href="./public-checkout.css">
 </head>
 <body>
   <main id="guest-checkout" class="guest-checkout" aria-live="polite" aria-busy="true">
-    <header class="checkout-brand"><a href="https://lumo-connected-pilot.vercel.app/" aria-label="Explore Lumo">lumo</a><span>Merchant checkout</span></header>
-    <section class="checkout-loading"><span class="checkout-spinner" aria-hidden="true"></span><h1>Opening this payment.</h1><p>Checking the receiving shop and amount.</p></section>
+    <header class="checkout-brand"><a href="https://lumo-connected-pilot.vercel.app/" aria-label="Explore Lumo">lumo</a><span>Pay with Lumo</span></header>
+    <section class="checkout-loading"><span class="checkout-spinner" aria-hidden="true"></span><h1>A moment, please.</h1><p>Getting your payment ready.</p></section>
   </main>
   <noscript><p class="checkout-noscript">Turn on JavaScript to check this payment link. You never need to enter a mobile money PIN on this page.</p></noscript>
   <script type="module" src="./public-checkout.js"></script>

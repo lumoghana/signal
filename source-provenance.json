@@ -12,35 +12,68 @@
   "shipped_dist": "Approved consumer and merchant design extended with connected shop discovery, repeat payments, public guest checkout, payment-link sharing and permissioned business planning.",
   "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
   "android": {
-    "version": "2.10.4",
-    "version_code": 21004,
+    "version": "2.10.6",
+    "version_code": 21006,
     "package": "com.lumo.nativeapp.test",
     "delivered_separately": true,
     "assets_and_resources_preserved": true,
     "physical_device_verified": false,
-    "apk_sha256": "40e63fd613bb8c7546113e03f2850ee2a2d2318be83ce64c6efb6bce1f2dbaad"
+    "apk_sha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
+    "signing_certificate_sha256": "64f2301aa4b55db94c2748d67bf66b56bda7569f528455969c575b8603338a6c",
+    "signing_certificate_matches_previous_release": true,
+    "apk_executed_on_art": false,
+    "live_provider_lookup": false
   },
   "validation": {
-    "consumer_tests": 1581,
-    "merchant_tests": 560,
-    "shared_boundary_and_guest_tests": 67,
-    "guest_http_concurrency_checks": 5,
+    "consumer_tests": 1603,
     "failures": 0,
     "consumer_design_preserved": true,
     "asset_manifest": "dist-sha256.json",
-    "android_pure_java_suites": 61,
-    "android_framework_cases": 142,
+    "android_pure_java_suites": 62,
+    "android_framework_cases": 164,
+    "android_framework_failures": 0,
+    "android_framework_errors": 0,
+    "android_framework_skipped": 0,
+    "android_api_levels": [
+      28,
+      35
+    ],
+    "android_layout_scenarios": 30,
+    "android_layout_viewports": [
+      [
+        360,
+        740
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        360,
+        440
+      ]
+    ],
+    "android_layout_themes": [
+      "light",
+      "dark"
+    ],
+    "android_layout_scope": "Synthetic data rendered through the native showTask shell using Robolectric native graphics. Physical keyboard and device behaviour remain unverified.",
+    "web_test_evidence": "Full npm test passed on the resumed merged source: 1,603 tests, zero failures, cancellations, skips or todo cases. The public offline shell was regenerated before the run.",
+    "android_test_evidence": "The full Android run passed 162 behaviour cases. After correcting the layout-test qualifier order, the two layout cases passed in a separate run; the latest XML reports total 164 cases.",
     "browser_verified": [
-      "guest fixed quote and own-number review",
-      "pending reference survives refresh",
-      "explicit sandbox confirmation and receipt",
-      "published merchant navigation and sample Lux planning"
+      "Synthetic registered Lumo row tap opened the selected person\u2019s named amount screen directly in the dark theme.",
+      "Synthetic MoMo phone-only lookup showed sample network/name confirmation, then GH\u20b525 principal plus GH\u20b50.50 fee review, synthetic PIN approval, virtual debit and successful receipt.",
+      "Synthetic bank/account lookup showed sample name and bank confirmation, then GH\u20b540 principal plus GH\u20b51.00 fee review, synthetic PIN approval, virtual debit and successful receipt.",
+      "After both synthetic transfers, the fixture available balance decreased from GH\u20b51,000.00 to GH\u20b5933.50.",
+      "Controls remained reachable in the 440px-high light-theme fixture. Dark-theme Lumo and MoMo screens were also inspected."
     ],
     "limitations": [
-      "Connected owner and cashier journeys verified via service and automated tests; browser role sign-in was not automated.",
-      "Physical-phone installation and hardware checks remain."
+      "The native APK has not been installed on a physical handset or executed on ART in this release verification.",
+      "Sample MoMo routing and account names demonstrate the lookup journey. No live network or account-name provider is connected."
     ],
-    "external_transfer_rollback_checks": true
+    "external_transfer_rollback_checks": true,
+    "consumer_tests_skipped": 0,
+    "browser_verification_scope": "The existing consumer payment components were rendered with synthetic account, service and PIN fixtures. These checks did not write production account records or move real money."
   },
   "release_date": "2026-11-14",
   "merchant": {
@@ -59,7 +92,8 @@
       "Shared planning calculations in merchant Lux",
       "Shop-attributed online receipts"
     ],
-    "site_version": 20
+    "site_version": 20,
+    "metadata_scope": "Historical merchant baseline retained from the earlier packaged export; not a claim about the current merchant deployment. The resumed consumer release also preserves the later familiar guest checkout source."
   },
   "guest_checkout": {
     "provider_mode": "sandbox",
@@ -105,12 +139,66 @@
     "outcome": "immediate confirmed success",
     "ledger_journal_kind": "external_simulation",
     "ledger_debit": "principal plus test fee",
-    "recipient_name": "unverified optional user label",
+    "recipient_name": "Unverified sample account name from known test fixtures or a generic sandbox recipient; never a live provider-verified identity.",
     "migration_applied": "20261114112311_personal_external_simulation.sql",
     "rollback_database_tests_passed": true,
     "live_persistent_http_qa": "blocked by automatic review; no persistent fixture created",
     "ledger_total_zero": true,
     "negative_owned_accounts": 0,
-    "unbalanced_journals": 0
+    "unbalanced_journals": 0,
+    "network_lookup": "Known sandbox fixtures, including a ported-number example, take precedence. Other valid test MoMo numbers use sample prefix routing; no live network verification."
+  },
+  "original_export": {
+    "approved_live_url": "https://lumo-new-experience.oness15.chatgpt.site/",
+    "site_version": 66,
+    "source_commit": "ac79d2622925e96bf72316b76295f0ab7330a3ca",
+    "source_date": "2026-11-09"
+  },
+  "source_metadata_scope": "The top-level approved_live_url, site_version, source_commit and source_date describe the original version-66 approved export. Later consumer release evidence is recorded separately below.",
+  "previous_release_evidence": {
+    "android": {
+      "version": "2.10.4",
+      "version_code": 21004,
+      "package": "com.lumo.nativeapp.test",
+      "delivered_separately": true,
+      "assets_and_resources_preserved": true,
+      "physical_device_verified": false,
+      "apk_sha256": "40e63fd613bb8c7546113e03f2850ee2a2d2318be83ce64c6efb6bce1f2dbaad"
+    },
+    "validation": {
+      "consumer_tests": 1581,
+      "merchant_tests": 560,
+      "shared_boundary_and_guest_tests": 67,
+      "guest_http_concurrency_checks": 5,
+      "failures": 0,
+      "consumer_design_preserved": true,
+      "asset_manifest": "dist-sha256.json",
+      "android_pure_java_suites": 61,
+      "android_framework_cases": 142,
+      "browser_verified": [
+        "guest fixed quote and own-number review",
+        "pending reference survives refresh",
+        "explicit sandbox confirmation and receipt",
+        "published merchant navigation and sample Lux planning"
+      ],
+      "limitations": [
+        "Connected owner and cashier journeys verified via service and automated tests; browser role sign-in was not automated.",
+        "Physical-phone installation and hardware checks remain."
+      ],
+      "external_transfer_rollback_checks": true
+    }
+  },
+  "consumer_release": {
+    "version": "2.10.6",
+    "base_commit": "6d54340a134f7116b57cf87af2793731674b7b18",
+    "release_manifest": "dist/consumer-release.json",
+    "lookup_mode": "sandbox-sample-only",
+    "changes": [
+      "Selecting a registered Lumo user verifies the selected identity and opens their named amount screen without another Continue action.",
+      "MoMo asks for a phone number; sample network and name details are confirmed before amount entry.",
+      "Bank transfers ask for the bank and account number; sample account details are confirmed before amount entry.",
+      "Existing review, conditional Pause, PIN authorisation, virtual debit, idempotency and receipt rules remain in force."
+    ],
+    "source_reconciliation": "Preserved the later approved familiar guest checkout, network/name review, QR guest redirection and post-receipt Lumo invitation alongside the 2.10.6 recipient-flow changes."
   }
 }

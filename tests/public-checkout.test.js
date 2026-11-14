@@ -14,9 +14,10 @@ function fixture({current=quote(),stored=storage(),apiOverride,online=()=>true,u
  async function api(operation,payload){
   calls.push({operation,payload:structuredClone(payload)});
   if(apiOverride){const overridden=await apiOverride(operation,payload,{records,respond,getQuote:()=>q});if(overridden!==undefined)return overridden;}
-  if(operation==='quote')return structuredClone(q);
+  if(operation==='quote'||operation==='resolve')return structuredClone(q);
+  if(operation==='lookup')return {ok:true,sandbox:q.provider.mode==='sandbox',provider:q.provider,payer:{phoneMasked:'024•••4567',network:'telecel',networkLabel:'Telecel Cash',registeredName:'Sample Guest',lookupSource:'sandbox-directory',networkVerified:false,nameVerified:false}};
   if(operation==='initiate'){
-   const record={id:payload.attemptId,status:'pending',reference:'LM-GUEST-1',providerReference:null,amount:q.link.amount??payload.amount,currency:'GHS',fee:0,phoneMasked:'024•••4567',network:payload.network,shopId:q.link.shopId,merchantId:'33333333-3333-4333-8333-333333333333',createdAt:new Date().toISOString(),expiresAt:null,receipt:null};records.set(record.id,record);return respond(record);
+   const record={id:payload.attemptId,status:'pending',reference:'LM-GUEST-1',providerReference:null,amount:q.link.amount??payload.amount,currency:'GHS',fee:0,phoneMasked:'024•••4567',network:'telecel',shopId:q.link.shopId,merchantId:'33333333-3333-4333-8333-333333333333',createdAt:new Date().toISOString(),expiresAt:null,receipt:null};records.set(record.id,record);return respond(record);
   }
   const record=records.get(payload.attemptId);if(!record)throw Object.assign(Error('Payment reference is not available yet. Check again.'),{code:'ATTEMPT_NOT_FOUND'});
   if(operation==='sandboxResult'){
@@ -40,7 +41,7 @@ test('guest amounts use integer pesewas and Ghana phone input comes only from th
 
 test('public links carry only an opaque link; URL amount tampering never sets a fixed payable amount',async()=>{
  const f=fixture({url:location+'&amount=1&phone=0551111111'});await f.checkout.start();const view=f.checkout.view();assert.equal(view.quote.link.amount,2500);assert.equal(view.phone,'');assert.equal(view.amount,'');
- const html=renderGuestCheckout(view);assert.match(html,/GH₵25\.00/);assert.doesNotMatch(html,/name="amount"|0551111111/);assert.match(html,/Fixed by the merchant/);
+ const html=renderGuestCheckout(view);assert.match(html,/GH₵25\.00/);assert.doesNotMatch(html,/name="amount"|0551111111/);assert.match(html,/Amount set by the merchant/);
  for(const invalid of ['https://example.com/checkout.html','https://example.com/?link=bad','https://example.com/?link='+token+'#receipt=broken'])assert.throws(()=>parseGuestLocation(invalid));
 });
 
@@ -49,9 +50,10 @@ test('a reusable shop link takes a new amount before review, with no consumer ph
  f.checkout.setField('amount','13.29');f.checkout.chooseMoMo();await f.checkout.reviewPayment({phone:'055 123 4567',network:'telecel'});assert.equal(f.checkout.view().review.amount,1329);assert.equal(f.checkout.view().review.total,1329);await f.checkout.initiate();assert.equal(f.calls.find(call=>call.operation==='initiate').payload.amount,1329);
 });
 
-test('invalid guest numbers and missing networks never reach provider initiation',async()=>{
- const f=fixture();await f.checkout.start();f.checkout.chooseMoMo();await f.checkout.reviewPayment({phone:'123',network:'mtn'});assert.equal(f.checkout.view().phase,'momo');assert.match(f.checkout.view().error,/own valid Ghana/);
- await f.checkout.reviewPayment({phone:'0241234567',network:''});assert.match(f.checkout.view().error,/Choose the network/);assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
+test('invalid guest numbers never reach lookup or provider initiation; valid numbers need no network selection',async()=>{
+ const f=fixture();await f.checkout.start();await f.checkout.reviewPayment({phone:'123'});assert.equal(f.checkout.view().phase,'overview');assert.match(f.checkout.view().error,/own valid Ghana/);assert.equal(f.calls.filter(call=>call.operation==='lookup').length,0);
+ await f.checkout.reviewPayment({phone:'0241234567'});assert.equal(f.checkout.view().phase,'review');assert.equal(f.checkout.view().network,'telecel');assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
+ const html=renderGuestCheckout(f.checkout.view());assert.match(html,/Telecel Cash/);assert.match(html,/Network and account name are sample test data, not verified customer details/);
 });
 
 test('review rechecks authoritative eligibility and initiation rejects changed merchant details or charges',async()=>{
@@ -60,7 +62,7 @@ test('review rechecks authoritative eligibility and initiation rejects changed m
 });
 
 test('only an exact server-confirmed receipt can complete a guest checkout',async()=>{
- const f=fixture(),ref=await initiate(f);assert.equal(f.checkout.view().attempt.status,'pending');assert.doesNotMatch(renderGuestCheckout(f.checkout.view()),/<h1[^>]*>Payment received/);
+ const f=fixture(),ref=await initiate(f);assert.equal(f.checkout.view().attempt.status,'pending');assert.doesNotMatch(renderGuestCheckout(f.checkout.view()),/checkout-celebration|checkout-welcome-card|data-checkout-action="invite"/);
  await f.checkout.check();assert.equal(f.checkout.view().phase,'pending');await f.checkout.simulate('approve');assert.equal(f.checkout.view().phase,'receipt');assert.match(renderGuestCheckout(f.checkout.view()),/Test payment|No money will be taken/);assert.match(f.checkout.receiptText(),/SANDBOX/);assert.match(f.checkout.receiptText(),/MOMO-TEST-1/);assert.equal(f.checkout.view().attempt.id,ref.attemptId);
 });
 
@@ -98,7 +100,7 @@ test('a receipt remains recoverable when merchant link details cannot be refresh
 
 test('wrong receipt amount, currency, attempt or destination never displays a success state',async()=>{
  for(const tamper of [a=>{a.amount=1},a=>{a.currency='USD'},a=>{a.id='44444444-4444-4444-8444-444444444444'},a=>{a.shopId='55555555-5555-4555-8555-555555555555'},a=>{a.receipt.amount=1},a=>{a.receipt.shopId='55555555-5555-4555-8555-555555555555'}]){
-  let malformed=false;const f=fixture({apiOverride(operation,payload,{records,respond}){if(operation==='status'&&malformed){const a=structuredClone(records.get(payload.attemptId));a.status='confirmed';a.receipt={reference:'LM-1',amount:2500,currency:'GHS',shopId,merchantName:'Akua’s Kitchen',shopName:'Night Market counter',confirmedAt:new Date().toISOString(),providerReference:'MOMO1'};tamper(a);return respond(a)}}});await initiate(f);malformed=true;await f.checkout.check();assert.equal(f.checkout.view().phase,'pending');assert.match(f.checkout.view().error,/did not match|another receiving shop|matching confirmed receipt/);
+  let malformed=false;const f=fixture({apiOverride(operation,payload,{records,respond}){if(operation==='status'&&malformed){const a=structuredClone(records.get(payload.attemptId));a.status='confirmed';a.receipt={reference:'LM-1',amount:2500,currency:'GHS',shopId,merchantName:'Akua’s Kitchen',shopName:'Night Market counter',confirmedAt:new Date().toISOString(),providerReference:'MOMO1'};tamper(a);return respond(a)}}});await initiate(f);malformed=true;await f.checkout.check();assert.equal(f.checkout.view().phase,'pending');assert.match(f.checkout.view().error,/did not match|another receiving shop|matching confirmed receipt/);f.checkout.showInvite();assert.equal(f.checkout.view().phase,'pending');assert.doesNotMatch(renderGuestCheckout(f.checkout.view()),/checkout-celebration|checkout-welcome-card|data-checkout-action="invite"/);
  }
 });
 
@@ -108,11 +110,11 @@ test('only explicit sandbox provider outcomes change a waiting payment',async()=
 });
 
 test('late provider reversals show the original provider and reversal references without a merchant success receipt',async()=>{
- const f=fixture({apiOverride(operation,payload,{records,respond}){if(operation==='sandboxResult'){const a=records.get(payload.attemptId);Object.assign(a,{status:'reversed',providerReference:'PROVIDER-ORIGINAL',reversalReference:'RETURN-ORIGINAL',reversal:{amount:2500,status:'completed'},receipt:null});return respond(a)}}});await initiate(f);await f.checkout.simulate('approve');assert.equal(f.checkout.view().phase,'result');const html=renderGuestCheckout(f.checkout.view());assert.match(html,/Payment reversed|merchant was not credited/);assert.match(html,/PROVIDER-ORIGINAL/);assert.match(html,/RETURN-ORIGINAL/);assert.doesNotMatch(html,/Payment received\./);
+ const f=fixture({apiOverride(operation,payload,{records,respond}){if(operation==='sandboxResult'){const a=records.get(payload.attemptId);Object.assign(a,{status:'reversed',providerReference:'PROVIDER-ORIGINAL',reversalReference:'RETURN-ORIGINAL',reversal:{amount:2500,status:'completed'},receipt:null});return respond(a)}}});await initiate(f);await f.checkout.simulate('approve');assert.equal(f.checkout.view().phase,'result');const html=renderGuestCheckout(f.checkout.view());assert.match(html,/Payment returned|provider returned it/);assert.match(html,/PROVIDER-ORIGINAL/);assert.match(html,/RETURN-ORIGINAL/);assert.doesNotMatch(html,/checkout-celebration|checkout-welcome-card|data-checkout-action="invite"/);
 });
 
 test('paid, expired, cancelled and paused links cannot start a new guest payment',async()=>{
- for(const status of ['paid','expired','cancelled','paused']){const f=fixture({current:quote({status})});await f.checkout.start();assert.equal(f.checkout.view().phase,'unavailable');f.checkout.chooseMoMo();await f.checkout.initiate();assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);assert.match(renderGuestCheckout(f.checkout.view()),/cannot be paid again|fresh payment link|paused payments|cancelled|expired/);}
+ for(const status of ['paid','expired','cancelled','paused']){const f=fixture({current:quote({status})});await f.checkout.start();assert.equal(f.checkout.view().phase,'unavailable');f.checkout.chooseMoMo();await f.checkout.initiate();assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);assert.match(renderGuestCheckout(f.checkout.view()),/already been paid|current payment link|paused payments|cancelled|expired/);}
 });
 
 test('a terminal reusable payment may start afresh, while fixed paid requests cannot be reused',async()=>{
@@ -121,11 +123,11 @@ test('a terminal reusable payment may start afresh, while fixed paid requests ca
 });
 
 test('refunds stay on the original guest receipt and never invite a wallet refund',async()=>{
- const f=fixture();await initiate(f);await f.checkout.simulate('approve');const record=[...f.records.values()][0];record.receipt.refunds=[{amount:500,status:'confirmed',reference:'RETURN-MOMO-1'}];await f.checkout.check();const html=renderGuestCheckout(f.checkout.view());assert.match(html,/Refund · Returned/);assert.match(html,/GH₵5\.00/);assert.match(html,/original mobile money transaction/);assert.match(f.checkout.receiptText(),/RETURN-MOMO-1/);
+ const f=fixture();await initiate(f);await f.checkout.simulate('approve');const record=[...f.records.values()][0];record.receipt.refunds=[{amount:500,status:'confirmed',reference:'RETURN-MOMO-1'}];await f.checkout.check();const html=renderGuestCheckout(f.checkout.view());assert.match(html,/Refund · Returned/);assert.match(html,/GH₵5\.00/);assert.match(html,/original MoMo payment/);assert.match(f.checkout.receiptText(),/RETURN-MOMO-1/);
 });
 
 test('Lumo account handoff carries shop and fresh request identities without guest details or old approvals',()=>{
- const url=new URL(lumoCheckoutURL(quote()));assert.equal(url.origin,'https://lumo-connected-pilot.vercel.app');assert.equal(url.searchParams.get('pay'),shopId);assert.equal(url.searchParams.get('request'),requestId);assert.deepEqual([...url.searchParams.keys()],['pay','request']);assert.equal(lumoCheckoutURL(quote({shopId:'javascript:alert(1)'})),'');
+ const url=new URL(lumoCheckoutURL(quote()));assert.equal(url.origin,'https://lumo-connected-pilot.vercel.app');assert.equal(url.searchParams.get('pay'),shopId);assert.equal(url.searchParams.get('request'),requestId);assert.deepEqual([...url.searchParams.keys()],['pay','lumo','request']);assert.equal(url.searchParams.get('lumo'),'1');assert.equal(lumoCheckoutURL(quote({shopId:'javascript:alert(1)'})),'');
 });
 
 test('public checkout transport omits sessions and credentials and labels uncertain responses conservatively',async()=>{
@@ -177,4 +179,119 @@ test('an explicit guest action waits for a quiet status check instead of being s
  const wait=deferred();let hold=false;const f=fixture({apiOverride(operation){if(operation==='status'&&hold)return wait.promise}});const ref=await initiate(f);hold=true;
  const polling=f.checkout.check({background:true}),approving=f.checkout.simulate('approve');assert.equal(f.calls.filter(call=>call.operation==='sandboxResult').length,0);
  hold=false;wait.resolve(f.respond(f.records.get(ref.attemptId)));await polling;await approving;assert.equal(f.calls.filter(call=>call.operation==='sandboxResult').length,1);assert.equal(f.checkout.view().phase,'receipt');
+});
+
+
+test('confirmed payment immediately invites the guest while keeping the original receipt available',async()=>{
+ const f=fixture();await initiate(f);await f.checkout.simulate('approve');
+ const view=f.checkout.view(),html=renderGuestCheckout(view);
+ assert.equal(view.phase,'receipt');assert.match(html,/aria-label="You’re invited to Lumo"/);assert.match(html,/data-checkout-action="invite"/);assert.match(html,/checkout-celebration/);
+ assert.match(html,/Know what’s yours to spend/);assert.match(html,/next money decision with clarity/);assert.match(html,/View your receipt/);assert.doesNotMatch(html,/<details[^>]*checkout-receipt-detail[^>]*\sopen(?:\s|>)/);assert.match(html,/LM-GUEST-1/);
+ assert.equal(view.phone,'');assert.doesNotMatch(html,/0241234567|name="phone"/);
+});
+
+test('Lumo invitation offers Android and browser access without starting another payment or losing the receipt',async()=>{
+ const f=fixture();await initiate(f);await f.checkout.simulate('approve');
+ const reference=structuredClone(f.checkout.view().reference),calls=f.calls.length;
+ f.checkout.showInvite();assert.equal(f.checkout.view().phase,'invite');const html=renderGuestCheckout(f.checkout.view());
+ assert.match(html,/href="https:\/\/lumo-connected-pilot\.vercel\.app\/downloads\/Lumo-Test-Android\.apk" download="Lumo-Test-Android\.apk"/);
+ assert.match(html,/Clear before you spend/);assert.match(html,/See what’s really available/);assert.match(html,/Ask Lux about your money/);assert.match(html,/Pause when it matters/);assert.match(html,/Android pilot · Test money · APK download/);assert.match(html,/href="https:\/\/lumo-connected-pilot\.vercel\.app\/">Try Lumo in your browser/);assert.match(html,/Maybe later\. Back to my receipt\./);
+ assert.equal(f.checkout.view().phone,'');assert.doesNotMatch(html,/0241234567|name="phone"/);assert.equal(f.calls.length,calls);
+ f.checkout.showReceipt();assert.equal(f.checkout.view().phase,'receipt');assert.deepEqual(f.checkout.view().reference,reference);assert.match(f.checkout.receiptText(),/LM-GUEST-1/);assert.equal(f.calls.length,calls);assert.equal(f.calls.filter(call=>call.operation==='initiate').length,1);
+});
+
+test('pending, declined, cancelled and failed payments cannot show celebration or enter the Lumo invitation',async()=>{
+ for(const outcome of ['pending','declined','cancelled','failed']){
+  const f=fixture({apiOverride(operation,payload,{records,respond}){if(operation==='status'){const record=records.get(payload.attemptId);record.status=outcome;return respond(record)}}});
+  await initiate(f);await f.checkout.check();const before=f.checkout.view().phase;
+  f.checkout.showInvite();assert.equal(f.checkout.view().phase,before);assert.doesNotMatch(renderGuestCheckout(f.checkout.view()),/checkout-celebration|checkout-welcome-card|data-checkout-action="invite"/);
+ }
+});
+
+
+test('Ghana phone input accepts the national number after the displayed +233 prefix',()=>{
+ assert.equal(normalizeGuestPhone('24 123 4567'),'0241234567');
+ assert.equal(normalizeGuestPhone('+233 24 123 4567'),'0241234567');
+ assert.equal(normalizeGuestPhone('024 123 4567'),'0241234567');
+ assert.equal(normalizeGuestPhone('123456789'),'');
+});
+
+
+function accountLookup(name,{provider={mode:'sandbox',live:false},...extra}={}){
+ return {ok:true,provider,payer:{phoneMasked:'024•••4567',network:'telecel',networkLabel:'Telecel Cash',registeredName:name,lookupSource:'sandbox-directory',networkVerified:false,nameVerified:false,...extra}};
+}
+
+test('review puts the returned account name immediately after the detected network with honest sample disclosure',async()=>{
+ const f=fixture({apiOverride:operation=>operation==='lookup'?accountLookup('Akosua Owusu'):undefined});await review(f);
+ const html=renderGuestCheckout(f.checkout.view());
+ assert.deepEqual([...html.matchAll(/<dt>([^<]*)<\/dt>/g)].slice(0,3).map(match=>match[1]),['Paying from','Network','Account name']);
+ assert.match(html,/<dd>Akosua Owusu<\/dd>/);assert.match(html,/Telecel Cash/);
+ assert.match(html,/Network and account name are sample test data, not verified customer details/);
+ assert.doesNotMatch(html,/name="network"|<select|Verified account/);
+});
+
+test('provider account names are escaped and long supported names remain intact without adding markup',async()=>{
+ for(const name of ['Ama <img src=x onerror=alert(1)> & Sons','A'.repeat(120)]){
+  const f=fixture({apiOverride:operation=>operation==='lookup'?accountLookup(name):undefined});await review(f);
+  const html=renderGuestCheckout(f.checkout.view());assert.doesNotMatch(html,/<img src=x|onerror="|<script>/);
+  assert.equal(f.checkout.view().payer.registeredName,name);
+  if(name.length===120)assert.match(html,new RegExp('<dd>'+name+'<\\/dd>'));
+  else{assert.match(html,/Ama &lt;img src=x onerror=alert\(1\)&gt; &amp; Sons/);assert.doesNotMatch(html,/<dd>Ama <img/);}
+ }
+});
+
+test('account names appear only after lookup and stay out of waiting, successful and invitation screens and saved references',async()=>{
+ const name='Private Account Holder';
+ const f=fixture({apiOverride:operation=>operation==='lookup'?accountLookup(name):undefined});await f.checkout.start();
+ assert.equal(f.checkout.view().payer,null);assert.equal(renderGuestCheckout(f.checkout.view()).includes(name),false);
+ await f.checkout.reviewPayment({phone:'0241234567'});assert.equal(renderGuestCheckout(f.checkout.view()).includes(name),true);
+ await f.checkout.initiate();assert.equal(f.checkout.view().phase,'pending');assert.equal(f.checkout.view().payer,null);assert.equal(renderGuestCheckout(f.checkout.view()).includes(name),false);
+ assert.equal([...f.stored.values.values()].join('').includes(name),false);
+ await f.checkout.simulate('approve');assert.equal(renderGuestCheckout(f.checkout.view()).includes(name),false);assert.equal(f.checkout.view().payer,null);
+ f.checkout.showInvite();assert.equal(renderGuestCheckout(f.checkout.view()).includes(name),false);assert.equal(f.checkout.view().payer,null);
+});
+
+test('missing or invalid returned account names cannot reach payment review or start a charge',async()=>{
+ for(const name of [undefined,null,'','   ',25,{},'A'.repeat(121)]){
+  const f=fixture({apiOverride:operation=>operation==='lookup'?accountLookup(name):undefined});await f.checkout.start();await f.checkout.reviewPayment({phone:'0241234567'});
+  assert.notEqual(f.checkout.view().phase,'review');assert.equal(f.checkout.view().payer,null);assert.match(f.checkout.view().error,/could not check that number/);
+  await f.checkout.initiate();assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
+ }
+});
+
+test('changing the number clears the old account name and requires a new lookup before payment',async()=>{
+ const f=fixture({apiOverride:(operation,payload)=>operation==='lookup'?accountLookup('Account '+payload.phone.slice(-4)):undefined});await review(f);
+ assert.equal(f.checkout.view().payer.registeredName,'Account 4567');f.checkout.back();f.checkout.setField('phone','0551234568');
+ assert.equal(f.checkout.view().payer,null);assert.equal(renderGuestCheckout(f.checkout.view()).includes('Account 4567'),false);
+ await f.checkout.initiate();assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
+ await f.checkout.reviewPayment({phone:'0551234568'});assert.equal(f.checkout.view().payer.registeredName,'Account 4568');
+ assert.deepEqual(f.calls.filter(call=>call.operation==='lookup').map(call=>call.payload.phone),['0241234567','0551234568']);
+});
+
+test('live lookup names are labelled unverified unless the provider actually verifies the name',async()=>{
+ const provider={mode:'live',live:true};
+ for(const nameVerified of [false,true]){
+  const f=fixture({current:{...quote(),sandbox:false,provider},apiOverride:operation=>operation==='lookup'?accountLookup('Live Account Holder',{provider,lookupSource:'provider-directory',networkVerified:true,nameVerified}):undefined});await review(f);
+  const html=renderGuestCheckout(f.checkout.view());assert.match(html,/<dd>Live Account Holder<\/dd>/);assert.equal(html.includes('Account name (unverified)'),!nameVerified);assert.doesNotMatch(html,/sample test data/);
+ }
+});
+
+test('Familiar Lumo uses the existing plain wordmark without a typed period or decorative dot',async()=>{
+ const f=fixture();await f.checkout.start();const html=renderGuestCheckout(f.checkout.view());
+ assert.match(html,/<a[^>]*aria-label="Explore Lumo">lumo<\/a>/);assert.doesNotMatch(html,/checkout-wordmark-dot|>lumo\.<|>lumo<span/);
+});
+
+test('an unresolved initiation clears the account name before it emits the waiting state',async()=>{
+ const waiting=deferred();let started;const begun=new Promise(resolve=>{started=resolve}),name='Private Pending Holder',states=[];
+ const f=fixture({onChange:view=>states.push(view),apiOverride(operation){if(operation==='lookup')return accountLookup(name);if(operation==='initiate'){started();return waiting.promise;}}});
+ await review(f);const sending=f.checkout.initiate();await begun;
+ const view=f.checkout.view();assert.equal(view.phase,'pending');assert.equal(view.payer,null);assert.equal(JSON.stringify(view).includes(name),false);
+ assert.equal(states.filter(state=>state.phase==='pending').every(state=>state.payer===null),true);assert.equal([...f.stored.values.values()].join('').includes(name),false);
+ const ref=view.reference;waiting.resolve({ok:true,sandbox:true,provider:{mode:'sandbox',live:false},attempt:{id:ref.attemptId,status:'pending',reference:'LM-PENDING',amount:2500,currency:'GHS',fee:0,shopId,receipt:null}});await sending;
+});
+
+test('a changed phone cannot reuse the previous account-name review to initiate payment',async()=>{
+ const f=fixture();await review(f);f.checkout.setField('phone','0551234568');assert.equal(f.checkout.view().payer,null);
+ await f.checkout.initiate();assert.equal(f.calls.filter(call=>call.operation==='initiate').length,0);
+ await f.checkout.reviewPayment({phone:'0551234568'});assert.equal(f.calls.filter(call=>call.operation==='lookup').length,2);assert.equal(f.checkout.view().phase,'review');
 });

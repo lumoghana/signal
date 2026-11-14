@@ -1,3 +1,4 @@
+import {guestMerchantCheckoutURL} from './approved-qr.js';
 import {consumerViewSnapshot,canRenderConsumerBackground,captureReadingPosition,restoreReadingPosition} from './quiet-sync.js';
 import { installExperienceClarity } from './experience-clarity.js';
 import {appearanceRow,openAppearance} from './appearance-ui.js';
@@ -37,6 +38,8 @@ import {recoveryPending,savePaymentRecovery,loadPaymentRecovery,clearPaymentReco
 
 const persistence=createPersistence({key:STORAGE_KEY,validate:validStoredState,empty:createEmptyState,migrate:migrateState});
 const shared=createApprovedService({onSnapshot:installSharedSnapshot});
+const guestCheckout=guestMerchantCheckoutURL(window.location.href,{signedIn:shared.signedIn,origin:window.location.origin});
+if(guestCheckout)window.location.replace(guestCheckout);
 let sharedDraftOwner=shared.user?.id||null;
 const opened=shared.connected?{state:null}:persistence.load();
 let sharedHydrated=!shared.connected||!shared.signedIn,sharedConnectionError='';

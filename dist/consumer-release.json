@@ -11,7 +11,41 @@
     "Bank plus account sample name lookup then recipient confirmation"
   ],
   "webValidation": {
-    "testsPassed": 1590,
-    "browserJourneys": "Synthetic MoMo and bank PIN-approved virtual debits plus direct Lumo selection verified"
-  }
+    "testsPassed": 1603,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "browserJourneys": "Synthetic UI fixture: direct Lumo person selection; phone-only MoMo sample lookup and bank/account sample lookup; recipient confirmation, review, synthetic PIN, virtual debits and successful receipts.",
+    "syntheticFixtureAmountsPesewas": {
+      "openingAvailable": 100000,
+      "momoPrincipal": 2500,
+      "momoFee": 50,
+      "bankPrincipal": 4000,
+      "bankFee": 100,
+      "closingAvailable": 93350
+    },
+    "layoutChecks": {
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "shortHeightPx": 440,
+      "scope": "Dark Lumo/MoMo screens and controls reachable in the short light fixture."
+    },
+    "productionWrites": false,
+    "physicalDeviceVerified": false
+  },
+  "androidValidation": {
+    "pureJavaSuites": 62,
+    "frameworkCases": 164,
+    "frameworkFailures": 0,
+    "frameworkErrors": 0,
+    "apiLevels": [
+      28,
+      35
+    ],
+    "layoutScenarios": 30,
+    "scope": "Robolectric framework and native-graphics layout checks; physical handset and ART execution remain unverified."
+  },
+  "providerMode": "sandbox",
+  "liveProviderLookup": false
 }
