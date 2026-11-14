@@ -23,7 +23,7 @@
   },
   "release_date": "2026-11-14",
   "merchant": {
-    "source_commit": "17f1b55357e31da4f0d4409c74540ad81c9b1bd7",
+    "source_commit": "80cc95dc21343ddb89404bf0b8f094bbf014ce49",
     "site_project": "appgprj_6af5be2c38548191822030bb895d6d3d",
     "shared_backend_function_version": 9,
     "features": [
@@ -33,6 +33,6 @@
       "Staff handover and immutable receipt attribution",
       "Restricted counter capability without owner sign-in credentials"
     ],
-    "site_version": 16
+    "site_version": 17
   }
 }

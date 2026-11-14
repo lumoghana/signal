@@ -153,7 +153,7 @@
   "dist/merchant/assets/lux-chat-2d.webp": "291c59b39d3349c28841608856f8963a032643845f0f93b7a9b2fd5baa50dd87",
   "dist/merchant/campus-pay.css": "ac2538ab5c408411e5d912de15a531b806bf96fe8afbcd39adb4df98e52d13ea",
   "dist/merchant/campus-pay.js": "f4f3eff17baf234abc59ca6cf2645801973c286408cbb6b355cc4674bbc3ecf0",
-  "dist/merchant/cashier.css": "95ce36467fd529d65f4b2b5792864c320ffe9f97906c69cfe868007c10596c16",
+  "dist/merchant/cashier.css": "ee6617ecb47a5de007640e0f8e53187bc64b7c6ae759ae1767f367dbcce56abe",
   "dist/merchant/cashier.js": "790f5bd4835b77286588e9ccb86a4f999c51fb484fd454057f33c3470c7e8d7c",
   "dist/merchant/collections-ui.js": "e7e43d43baa8324202b1c5bf335e21e5c8083a8f484d239b6bae744392ae9488",
   "dist/merchant/collections.css": "9bfaa2dfbb7507237eb421302a0946892fe31ba0f74e86c27359f8e40d58ab34",
@@ -214,7 +214,7 @@
   "dist/qr-screen.css": "81ea41ab61019d52bd135ec3b22e3f25ee603660f13adad8351a79f499bf292b",
   "dist/setup-terms.css": "bcece25dcc4cc0ab4ee1cb9ac3655a84cc1ca8da8f31409088b618cb0f17cf93",
   "dist/style.css": "d4d45416c950198865d872526eaa11cfdd8fa67b36b6ba8ac9d350d4093b873b",
-  "dist/sw.js": "93f3070b08f20c7853207eda8a5a6aee6571b26c9038dfb41e7f8d10f1bb7032",
+  "dist/sw.js": "fc9610d61bf5c6152578a937dbeb96c03ecf9ad70ddc3fc6d51ea3fb0f83dd53",
   "dist/tour.css": "1ea09bcac5119469e13ec3ee2f88a3910973a6d13c8208c45c984ddffd789735",
   "dist/welcome-photo.css": "b19f8641956553156650918527af2387eb80bbda9d0ddb5488307fcfdd933121",
   "dist/welcome.css": "58eb0102daa4e5891c35787b6cbb1d06a6cbeadd9f63d06e1260d3896ec564c6"
