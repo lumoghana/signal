@@ -1,3 +1,4 @@
+import {receivingPayments} from './merchant-receipts.js';
 const E=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const drawings={phone:'<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',sound:'<path d="m4 9 4 0 5-4v14l-5-4H4zM17 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>',shield:'<path d="m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6z"/><path d="m8 12 3 3 5-6"/>',refresh:'<path d="M20 7a9 9 0 1 0 1 9M20 2v6h-6"/>',check:'<path d="m5 12 4 4L19 6"/>',shop:'<path d="M3 10h18M4 10v11h16V10M2 10l3-7h14l3 7M9 21v-7h6v7"/>',alert:'<path d="m12 3 10 18H2zM12 9v5m0 3v.01"/>',off:'<path d="m3 3 18 18M4 9h4l5-4v8m0 4v2l-5-4H4zM17 8a6 6 0 0 1 1 6"/>'};
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${drawings[name]||drawings.phone}</svg>`;
@@ -68,7 +69,7 @@ export function createDevices(config={}){
  function canAnnounce(shopId){ensureIdentity();return connection==='online'&&audioUnlocked&&!announcementFailures.some(entry=>entry.needsRetest)&&own()?.announcementFailed!==true&&own()?.soundReady!==false&&ownsLease()&&globalThis.navigator?.onLine!==false&&deviceCanReceive(own(),session(),shopId,shopList())}
  function establishBaseline(force=false){
   ensureIdentity();if(baseline&&!force)return;
-  (state().transactions||[]).filter(payment=>payment.status==='paid').forEach(payment=>localBaseline.add(payment.reference||payment.id));
+  receivingPayments(state()).filter(payment=>payment.status==='paid').forEach(payment=>localBaseline.add(payment.reference||payment.id));
   baseline=true;seen=loadReceipts();
  }
  function rememberReceipt(payment){

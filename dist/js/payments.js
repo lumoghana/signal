@@ -200,6 +200,15 @@ function paymentContext(ctx) {
   child.copyQrCode = () => {const link=collectLink(ctx);return link?copyText(ctx,link):ctx.toast('Reconnect to open your signed-in code.');};
   return child;
 }
+/** A return visit starts a fresh shop payment. Old requests and approvals are never copied. */
+export function merchantReturnDestination(tx) {
+  return tx?.type==='payment'&&tx.status==='success'&&tx.direction!=='in'&&typeof tx.shopId==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.shopId)?{shopId:tx.shopId}:null;
+}
+export function payMerchantAgain(ctx,tx) {
+  const destination=merchantReturnDestination(tx);if(!ctx.connected||!destination){ctx.toast('Choose a completed merchant payment.');return {ok:false};}
+  return openSharedMerchant(ctx,destination);
+}
+
 export function openSharedMerchant(ctx,input,{isCurrent=()=>true}={}){return runActionFlow(function*(){
   if(originalPaymentFirst(ctx))return {ok:false,message:'Check your original payment first.'};
   const origin=ctx.route,previous=ctx.draft.payment,version=ctx.shared.authVersion;
@@ -399,7 +408,7 @@ function transaction(ctx, route) {
     ${tx.status === 'reversed' ? `<div class="notice"><span>The payment amount has returned to your everyday account.${tx.savingTransfers?.length ? ' Money moved by a Savings Hack stays saved in its Money Box. You can move it back separately.' : ''}</span></div>` : ''}
     ${tx.note ? `<div class="payment-note">“${esc(tx.note)}”</div>` : ''}
     <div class="section-label"><span>A little reply</span><span class="muted small">${tx.reaction ? 'Tap to change' : 'Make it personal'}</span></div><div class="reaction-chips">${['👍', '❤️', '🙌', '🙏'].map(r => `<button class="reaction-button ${tx.reaction === r ? 'selected' : ''}" data-reaction="${r}" aria-label="React ${r}" aria-pressed="${tx.reaction === r}">${r}</button>`).join('')}</div>
-    ${tx.type==='payment'&&success?'<button class="button secondary" data-action="pay-split-receipt">Split this expense</button>':''}${paymentOutcomeControls(tx)}${serviceDeliveryControls(tx)}<p class="muted small transaction-reference">Reference ${esc(tx.id)}</p><div class="inline-actions"><button class="button secondary" data-action="pay-share-receipt">${icon('share', 18)} Share receipt</button><button class="button ghost" data-action="pay-help">Need help?</button></div></div></div>`;
+    ${ctx.connected&&merchantReturnDestination(tx)?`<div class="stack"><button class="button primary" data-action="pay-merchant-again">Pay this shop again</button><button class="button ghost" data-action="pay-save-merchant">${(ctx.state.merchantFavorites||[]).some(item=>item.shopId===tx.shopId)?'Remove from favourite shops':'Save this shop'}</button></div>`:''}${tx.type==='payment'&&success?'<button class="button secondary" data-action="pay-split-receipt">Split this expense</button>':''}${paymentOutcomeControls(tx)}${serviceDeliveryControls(tx)}<p class="muted small transaction-reference">Reference ${esc(tx.id)}</p><div class="inline-actions"><button class="button secondary" data-action="pay-share-receipt">${icon('share', 18)} Share receipt</button><button class="button ghost" data-action="pay-help">Need help?</button></div></div></div>`;
 }
 const outsideRepaymentRail = rail => ({ cash: 'Cash', momo: 'MoMo outside Lumo', bank: 'Bank account outside Lumo', other: 'Another bank or MoMo outside Lumo' })[rail] || 'Outside Lumo';
 const isOutsideRepayment = tx => ['iou-manual-receipt','split-manual-receipt','iou-manual-repayment'].includes(tx?.type);
@@ -605,14 +614,21 @@ export function bindPayments(ctx, route) {
   if (route.page === 'review') ctx.$('#payment-outcome')?.addEventListener('change', e => { draft(ctx).outcome=e.target.value; remember(ctx); });
   if (route.page === 'review') on(ctx, 'pay-save-favourite', () => {return runActionFlow(function*(){ const d=draft(ctx), result=(yield (ctx.actAsync||ctx.act).call(ctx,'savePaymentFavorite',{rail:d.rail,recipient:d.recipient}));ctx.toast(result.ok?'Saved to Favourites.':result.message); });});
   if (route.page === 'review') on(ctx, 'pay-edit-recipient', () => { if(draft(ctx).rail==='merchant'){ctx.toast('Start a different payment to choose another receiving shop.');return;}beginPaymentEdit(ctx); ctx.go(payRoute('recipient', { edit: true, backTo: payRoute('review') }), { replace: true }); });
-  if (route.page === 'review') on(ctx, 'pay-review-next', () => {
-    const d = draft(ctx);
+  if (route.page === 'review') on(ctx, 'pay-review-next', () => {return runActionFlow(function*(){
+    const d = draft(ctx),version=ctx.shared?.authVersion;
+    if(ctx.connected&&d.rail==='merchant'){
+      const selected=ctx.draft.payment,quote=yield ctx.shared.quote({shopId:d.shopId,...(d.requestId?{requestId:d.requestId}:{}),...(d.testKey?{testKey:d.testKey}:{})});
+      if(ctx.draft.payment!==selected||ctx.shared.authVersion!==version||ctx.route!==route)return;
+      if(!quote?.ok||quote.shop?.id!==d.shopId)return formError(ctx,quote?.message||'This shop or payment request is unavailable. Open the merchant again.');
+      const name=quote.merchant?.name||quote.shop.name;
+      if(name!==d.recipient?.name||quote.shop.name!==(d.shopName||'')||(quote.shop.code||'')!==(d.shopCode||'')||!!quote.request!==!!d.requestId||quote.request&&quote.request.amount!==d.amount)return formError(ctx,'This merchant’s details changed. Open the shop again and review the current details.');
+    }
     if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
     if (d.amount + paymentFee(d.rail) > ctx.state.wallet) return formError(ctx, 'Add enough money before continuing.');
     const check = evaluatePayment(ctx.state, { ...d, fee: paymentFee(d.rail), merchant: recipientLabel(d) });
     if (check.needed) { d.pauseStarted = Date.now(); ctx.go(payRoute('pause', { backTo: paymentReviewRoute(d) })); }
     else authenticatePayment(ctx);
-  });
+  });});
   if (route.page === 'pause') {
     const pauseDraft=draft(ctx), pauseEvaluation=evaluatePayment(ctx.state,{...pauseDraft,fee:paymentFee(pauseDraft.rail),merchant:recipientLabel(pauseDraft)});
     bindPauseAlternatives(ctx,ctx.$('.pause-screen'),{draft:pauseDraft,evaluation:pauseEvaluation,onFund:shortfall=>openFunding(ctx,{source:'MTN MoMo',number:ctx.state.profile.phone,amountText:(shortfall/100).toFixed(2),idempotencyKey:nonce('fund'),returnTo:payRoute('review')})});
@@ -633,6 +649,7 @@ export function bindPayments(ctx, route) {
     on(ctx, 'pay-retry', () => {
       const tx=getTransaction(ctx,route.id||ctx.draft.lastPayment?.id);if(!tx||tx.status!=='failed')return ctx.toast('Only an unsuccessful payment can be retried.');
       if(tx.iouId&&!ctx.state.ious?.some(i=>i.id===tx.iouId&&i.type==='owedByMe'&&i.status==='open')){ctx.toast('This IOU has changed. Review it before paying again.');return ctx.go({section:'life',page:'iou-detail',id:tx.iouId});}
+      if(ctx.connected&&tx.shopId)return openSharedMerchant(ctx,{shopId:tx.shopId});
       const d=prepareFailedPaymentRetry(tx);ctx.draft.payment=d;
       remember(ctx);finish(ctx,d.lookupRequired?payRoute('recipient',{backTo:payRoute('status',{id:tx.id})}):paymentReviewRoute(d));
     });
@@ -651,6 +668,8 @@ export function bindPayments(ctx, route) {
   }
   if (route.page === 'transaction' || (route.page === 'status' && isOutsideRepayment(getTransaction(ctx, route.id)))) {
     const tx = getTransaction(ctx, route.id);
+    on(ctx,'pay-merchant-again',()=>payMerchantAgain(ctx,tx));
+    on(ctx,'pay-save-merchant',()=>runActionFlow(function*(){if(!merchantReturnDestination(tx))return;const saved=(ctx.state.merchantFavorites||[]).some(item=>item.shopId===tx.shopId),result=yield (ctx.actAsync||ctx.act).call(ctx,saved?'removeMerchantFavorite':'saveMerchantFavorite',{shopId:tx.shopId});ctx.toast(result.message);if(result.ok)ctx.refresh();}));
     on(ctx,'pay-split-receipt',()=>createSplitSheet(ctx,{transactionId:tx?.id}));
     ctx.$$('[data-reaction]').forEach(el => el.addEventListener('click', () => {return runActionFlow(function*(){ const result = (yield (ctx.actAsync||ctx.act).call(ctx,'reactPayment', { id: route.id, reaction: el.dataset.reaction })); if (result.ok) ctx.refresh(); else ctx.toast(result.message || 'Try that again.'); });}));
     on(ctx, 'pay-share-receipt', () => { if (tx) shareText(ctx, paymentReceiptText(tx), isOutsideRepayment(tx) ? 'Outside repayment record' : 'Lumo payment receipt'); });

@@ -1,0 +1,30 @@
+.payment-share { display:grid; gap:16px; }
+.payment-share form { display:grid; gap:17px; }
+.share-identity { display:grid; gap:5px; border-bottom:1px solid var(--line); padding-bottom:16px; }
+.share-identity strong { font-size:21px; font-weight:600; letter-spacing:-.025em; }
+.share-identity small,.share-link-summary small { color:var(--muted); font-size:12px; line-height:1.5; }
+.share-link-summary { padding:18px; background:var(--paper-soft); border:1px solid var(--line); border-radius:15px; }
+.share-link-summary>strong { font-size:29px; font-weight:500; letter-spacing:-.04em; }
+.share-link-summary p { color:var(--muted); font-size:14px; line-height:1.5; margin:8px 0; }
+.share-kind-options { display:grid; gap:12px; margin:0; padding:0; border:0; }
+.share-kind-options label { display:flex; align-items:center; gap:9px; font-size:14px; min-height:34px; }
+.share-kind-options input { width:18px; height:18px; accent-color:var(--lime); }
+.share-kind-options p { font-size:14px; color:var(--muted); line-height:1.55; }
+.share-fallbacks { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.share-social-help { border:1px solid var(--line); border-radius:14px; padding:14px; }
+.share-social-help summary { color:var(--ink); font-size:14px; cursor:pointer; }
+.share-social-help p,.share-notice { font-size:13px; line-height:1.55; color:var(--muted); }
+.share-social-help p { margin:14px 0; }
+.payment-share .hint { margin:0; font-size:12px; line-height:1.55; color:var(--muted); }
+.payment-share .share-url { font-size:12px!important; overflow-wrap:anywhere; }
+.payment-share textarea { min-height:145px; font-size:15px; line-height:1.5; }
+.share-collect-entry { width:100%; margin-top:9px; min-height:44px; font-size:13px; }
+.cashier-share-entry { margin-top:7px; width:100%; }
+@media(max-width:350px){ .share-fallbacks{grid-template-columns:1fr;} }
+
+.share-link-list { display:grid; gap:0; }
+.share-link-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:17px 0; color:var(--ink); background:transparent; border:0; border-bottom:1px solid var(--line); text-align:left; font-size:14px; }
+.share-link-row span { display:grid; gap:5px; min-width:0; }
+.share-link-row span strong { overflow-wrap:anywhere; font-weight:500; }
+.share-link-row small { color:var(--muted); font-size:12px; }
+.share-link-row>strong { white-space:nowrap; font-size:13px; font-weight:500; }

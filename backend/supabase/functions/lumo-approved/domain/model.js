@@ -71,6 +71,9 @@ export function favoriteRecipientKey(value) {
   return `${value.rail}:${value.rail === 'bank' ? normalized(recipient.bank) + ':' : ''}${String(destination).normalize('NFKC').replace(/\s+/g, '').replace(/^@/, '').toLowerCase()}`;
 }
 
+const merchantShopId = value => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+export function validMerchantFavorite(value) { return record(value) && merchantShopId(value.shopId) && typeof value.savedAt === 'string' && Number.isFinite(Date.parse(value.savedAt)) && Object.keys(value).every(key => ['shopId','savedAt'].includes(key)); }
+
 function validPaymentFavorite(value) {
   return record(value) && typeof value.id === 'string' && !!text(value.id, 100) && !!favoriteRecipientKey(value);
 }
@@ -124,7 +127,7 @@ export function createEmptyState(profile = {}) {
     version: 1, onboardingDone: false,
     profile: { name: text(profile.name || 'Ama', 60), phone: text(profile.phone, 30), campus: text(profile.campus || 'University of Ghana', 80) },
     wallet: 0, buffer: 10000, income: { amount: 0, nextDate: '' },
-    budget: { items: [], created: false }, boxes: [], transactions: [], ious: [], groups: [], externalBalances: [], paymentFavorites: [], virtualCard: null,
+    budget: { items: [], created: false }, boxes: [], transactions: [], ious: [], groups: [], externalBalances: [], paymentFavorites: [], merchantFavorites: [], virtualCard: null,
     settings: { hideBalance: true, notifications: true, pin: '1234' }, recovery: null,
     _appliedActions: {},
   };
@@ -184,6 +187,7 @@ export function validStoredState(s) {
     && (s.paymentFavorites === undefined || Array.isArray(s.paymentFavorites) && s.paymentFavorites.length <= 30 && s.paymentFavorites.every(validPaymentFavorite)
       && new Set(s.paymentFavorites.map(item => item.id)).size === s.paymentFavorites.length
       && new Set(s.paymentFavorites.map(favoriteRecipientKey)).size === s.paymentFavorites.length)
+    && (s.merchantFavorites === undefined || Array.isArray(s.merchantFavorites) && s.merchantFavorites.length <= 30 && s.merchantFavorites.every(validMerchantFavorite) && new Set(s.merchantFavorites.map(item => item.shopId)).size === s.merchantFavorites.length)
     && (s.virtualCard === undefined || validDemoVirtualCard(s.virtualCard))
     && Array.isArray(s.externalBalances)
     && s.externalBalances.every(item => item && typeof item.id === 'string' && text(item.id)
@@ -208,6 +212,7 @@ export function migrateState(s) {
   if (!s || typeof s !== 'object' || Array.isArray(s)) return s;
   if (s.version === 1 && s.externalBalances === undefined) s.externalBalances=[];
   if(s.version===1){
+    const merchantIds=new Set();s.merchantFavorites=(Array.isArray(s.merchantFavorites)?s.merchantFavorites:[]).filter(validMerchantFavorite).filter(value=>{if(merchantIds.has(value.shopId)||merchantIds.size>=30)return false;merchantIds.add(value.shopId);return true;}).map(value=>({shopId:value.shopId,savedAt:value.savedAt}));
     const favorites=Array.isArray(s.paymentFavorites)?s.paymentFavorites:[],ids=new Set(),destinations=new Set();
     s.paymentFavorites=favorites.filter(validPaymentFavorite).flatMap(value=>{const key=favoriteRecipientKey(value),id=text(value.id,100);if(ids.has(id)||destinations.has(key)||ids.size>=30)return [];ids.add(id);destinations.add(key);return [{id,rail:value.rail,recipient:normalizePaymentRecipient(value.recipient,value.rail,{destinationRequired:true})}];});
     // An invalid old display-only card may be discarded. Funded card records must
@@ -420,6 +425,20 @@ function perform(s, type, p) {
   if (protectionResult) return protectionResult;
   const groupResult = handleGroupLedgerAction(s, type, p) || handleGroupChatAction(s, type, p);
   if (groupResult) { if (groupResult.ok) s.groups.forEach(ensureGroupChat); return groupResult; }
+  if (type === 'saveMerchantFavorite') {
+    if (!merchantShopId(p.shopId)) return fail('Choose a connected Lumo shop.');
+    const favorites = s.merchantFavorites ||= [];
+    if (favorites.some(item => item.shopId === p.shopId)) return good('This shop is already saved.', { shopId: p.shopId, duplicate: true });
+    if (favorites.length >= 30) return fail('You can save up to thirty shops.');
+    favorites.push({ shopId: p.shopId, savedAt: new Date().toISOString() });
+    return good('Shop saved to your favourites.', { shopId: p.shopId });
+  }
+  if (type === 'removeMerchantFavorite') {
+    if (!merchantShopId(p.shopId)) return fail('Choose a saved shop.');
+    const favorites = s.merchantFavorites ||= [], index = favorites.findIndex(item => item.shopId === p.shopId);
+    if (index < 0) return good('This shop is no longer saved.', { shopId: p.shopId, duplicate: true });
+    favorites.splice(index, 1); return good('Shop removed from your favourites.', { shopId: p.shopId });
+  }
   if (type === 'savePaymentFavorite') {
     if (!['lumo', 'momo', 'bank'].includes(p.rail)) return fail('Choose Lumo, mobile money or a bank account.');
     const recipient = normalizePaymentRecipient(p.recipient, p.rail, { destinationRequired: true });

@@ -1,3 +1,4 @@
+import {createGuestCheckout} from './guest-checkout.mjs';
 import {savingsAutomaticWork} from './domain/savings-parity-model.js';
 import {partnerRespond,publicPartnerInbox} from './partners.mjs';
 import {actionFingerprint,buildState,clone,envelope,prepareMutation,sha256,canonicalJson} from './engine.mjs';
@@ -8,6 +9,7 @@ const phone=value=>String(value||'').replace(/[\s()-]/g,'').replace(/^\+233/,'0'
 const failure=(code,message,status=400)=>Object.assign(new Error(message||code),{code,status});
 const messages={AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
 Object.assign(messages,{ACCOUNT_CLOSED:'This Lumo account is closed. Its records remain available to view and export.',CLOSURE_REVIEW_CHANGED:'The group returns changed. Open the current amounts and approve them again.',CLOSURE_BLOCKED:'Leave or close your open groups, resolve contribution returns and move remaining funds before closing Lumo.',REPORT_UNAVAILABLE:'This report could not be saved. Open the current member message and try again.',EXISTING_ACCOUNT:'This account already exists. Sign in instead. If its legacy test PIN needs repair, choose Repair test PIN after signing in.',PIN_REPAIR_UNAVAILABLE:'This one-time repair is available only to eligible legacy test accounts. Your existing PIN is unchanged.',PIN_REPAIR_EXPIRED:'This PIN repair check expired or was already used. Start a fresh password check.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.'});
+Object.assign(messages,{REQUEST_PROCESSING:'A mobile money payment is already awaiting confirmation for this request. Keep its original reference.',SHOP_UNAVAILABLE:'This shop is not accepting payments right now.',LINK_UNAVAILABLE:'This merchant payment link is unavailable.'});
 const b64url=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unbase64=value=>{if(typeof value!=='string'||!/^[A-Za-z0-9_+/-]+={0,2}$/.test(value)||value.length>8192)throw failure('DEVICE_PROOF_INVALID');return Uint8Array.from(atob(value.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));};
 const jwtClaims=token=>{try{return JSON.parse(new TextDecoder().decode(unbase64(token.split('.')[1])));}catch{throw failure('AUTH_REQUIRED',null,401);}};
@@ -103,15 +105,16 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    if(committed.code==='REVISION_CONFLICT'){snapshot=requireOk(await repo.service('load'));continue;}requireOk(committed);return committed.snapshot;
   }return requireOk(await repo.service('load'));
  }
+ const guestCheckout=createGuestCheckout({serviceRpc,crypto:cryptoApi});
  let merchant=null;
  return async request=>{
   const origin=request.headers.get('origin');const cors={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',Vary:'Origin',...(origin&&origins.has(origin)?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'apikey, authorization, content-type, x-client-info','Access-Control-Max-Age':'600'}:{})};
   const respond=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{...cors,'Content-Type':'application/json'}});
   try{
    if(origin&&!origins.has(origin))throw failure('ORIGIN_NOT_ALLOWED',null,403);if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});if(request.method!=='POST')throw failure('METHOD_NOT_ALLOWED',null,405);
-   const body=await boundedJson(request);if(body.action==='register'||body.action==='login')return respond(await authenticate(body,request));
+   const body=await boundedJson(request);if(body.action==='guestCheckout')return respond(await guestCheckout(body,request));if(body.action==='register'||body.action==='login')return respond(await authenticate(body,request));
    const token=request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
-   if(body.action==='merchant'&&!token&&merchantHandler){merchant||=merchantHandler({serviceRpc});return respond(await merchant({body,identity:null}));}
+   if(body.action==='merchant'&&!token&&merchantHandler){merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity:null}));}
    const identity=await identify(token),repo=repository(identity);
    if(body.action==='partnerInbox'){const loaded=requireOk(await repo.service('load'));return respond({ok:true,inbox:publicPartnerInbox(loaded.partners||[],identity.userId)});}
    if(body.action==='partnerRespond')return respond(await partnerRespond({body,identity,repo}));
@@ -158,7 +161,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    }
    if(body.action==='merchant'){
     if(body.password){const stepup=await passwordSession(identity.user.email.split('@')[0],body.password);if(stepup.user?.id!==identity.userId){await revoke(stepup);throw failure('FORBIDDEN');}identity.passwordVerified=true;await revoke(stepup);}
-    if(!merchantHandler)throw failure('SERVICE_UNAVAILABLE',null,503);merchant||=merchantHandler({serviceRpc});return respond(await merchant({body,identity,repo}));
+    if(!merchantHandler)throw failure('SERVICE_UNAVAILABLE',null,503);merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity,repo}));
    }
    if(body.action==='recover'){if(typeof body.type!=='string'||!plain(body.payload)||!/^[A-Za-z0-9_.:-]{10,100}$/.test(body.attemptId||''))throw failure('INVALID_INPUT');const fingerprint=await actionFingerprint(body.type,body.payload,body.attemptId),replay=requireOk(await repo.service('attempt',{attemptId:body.attemptId,fingerprint}));return respond(envelope(replay.found?replay.snapshot:requireOk(await repo.service('load')),replay.found?replay.result.result:{ok:true,message:'This reference is still being checked. Retry only these same details.'},{found:replay.found===true,replayed:replay.found===true,postedReceipts:replay.result?.receipts||[]}));}
    if(body.action!=='action'||typeof body.type!=='string'||body.type.length>80||!plain(body.payload)||!/^[A-Za-z0-9_.:-]{10,100}$/.test(body.attemptId||''))throw failure('INVALID_INPUT');
@@ -184,6 +187,6 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
     requireOk(committed);return respond(envelope(committed.snapshot,committed.result,{postedReceipts:committed.receipts||[],replayed:committed.replayed===true}));
    }
    throw failure('REVISION_CONFLICT',null,409);
-  }catch(error){const code=error?.code||'SERVICE_UNAVAILABLE',message=messages[code]||error?.message||messages.SERVICE_UNAVAILABLE;return respond({ok:false,sandbox:true,currency:'GHS',code,message,result:{ok:false,message},error:{code,message}},error?.status||400);}
+  }catch(error){const code=error?.code||'SERVICE_UNAVAILABLE',message=messages[code]||error?.message||messages.SERVICE_UNAVAILABLE;return respond({ok:false,sandbox:true,currency:'GHS',code,message,...(error?.noMutation===true?{noMutation:true}:{}),result:{ok:false,message},error:{code,message}},error?.status||400);}
  };
 }

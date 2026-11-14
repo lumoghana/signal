@@ -153,3 +153,7 @@
 @media (prefers-reduced-motion:reduce) {
   .cashier-workspace * { animation:none!important; transition:none!important; }
 }
+
+.cashier-shop-receipt-button { display:block; width:100%; color:var(--ink); background:transparent; border:0; border-bottom:1px solid var(--line); text-align:left; cursor:pointer; }
+.cashier-shop-receipt-button>small:last-child { color:var(--green); display:flex; align-items:center; gap:4px; margin-top:10px; }
+.cashier-shop-receipt-button>small:last-child .icon { width:13px; height:13px; }

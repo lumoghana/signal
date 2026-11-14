@@ -46,4 +46,3 @@ export function evaluatePauseHistory(state, payload = {}, { now = new Date(), su
   const show = amount > 0 && amount + fee <= cents(state.wallet) && signals.length > 0;
   return { show, signals, reason: !show ? '' : signals[0].id === 'repeat-recipient' ? `You have already made ${same.length} payments to ${destinationLabel} in the last 10 minutes. Check this is another payment you intended.` : signals[0].id === 'daily-frequency' ? `You have made ${todays.length} payments today. Together with this one, spending is above two days of your flex guide.` : 'This late-night payment is above your daily flex guide. Take a moment to check the amount.' };
 }
-

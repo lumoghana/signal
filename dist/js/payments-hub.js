@@ -1,5 +1,6 @@
 import { cash, esc, icon } from './ui.js';
 import { PAYMENT_SERVICES } from './payment-catalog.js';
+import {renderConnectedCampus,bindConnectedCampus} from './consumer-merchant-directory.js';
 
 const tabs = [{ id: 'send', label: 'Send money' }, { id: 'campus', label: 'Campus Pay' }, { id: 'bills', label: 'Top-ups & bills' }];
 const titles = { send: 'Payments', campus: 'Campus Pay', bills: 'Top-ups & bills' };
@@ -26,6 +27,7 @@ function sendMoney(ctx) {
   return `<div class="payments-hub-rails" role="group" aria-label="Send money to">${hubRow({ action: 'lumo', title: 'Lumo user', symbol: 'users' })}${hubRow({ action: 'momo', title: 'Mobile money', symbol: 'phone', ...availability })}${hubRow({ action: 'bank', title: 'Bank account', symbol: 'bank', ...availability })}</div><div class="payments-hub-shortcuts" role="group" aria-label="Your recipients"><button type="button" data-hub-action="recent">${icon('clock', 18)} Recent</button><button type="button" data-hub-action="favourites">${icon('heart', 18)} Favourites</button></div><div class="payments-hub-tools" role="group" aria-label="More payment tools">${tools.map(tool => `<button type="button" data-hub-action="${tool.action}">${icon(tool.symbol, 19)}<span>${tool.title}</span>${icon('chevron', 14)}</button>`).join('')}</div>`;
 }
 function campusPay(ctx) {
+  if(ctx.connected===true)return `<div class="campus-quick-pay" aria-label="Quick campus payment"><button type="button" class="campus-scan-now" data-hub-action="scan">${icon('scan',27)}<span><strong>Scan QR</strong><small>Point. Check. Pay.</small></span>${icon('arrow',19)}</button><button type="button" class="campus-enter-code" data-hub-action="merchant-code">${icon('plan',22)}<span>Enter merchant<br>code</span>${icon('chevron',15)}</button></div>${renderConnectedCampus(ctx)}`;
   const services = PAYMENT_SERVICES.filter(service => service.type === 'campus');
   const query = String(ctx.draft.campusMerchantQuery || '').slice(0, 80), count = services.filter(service => merchantMatches(service, query)).length;
   return `<div class="campus-quick-pay" aria-label="Quick campus payment"><button type="button" class="campus-scan-now" data-hub-action="scan">${icon('scan', 27)}<span><strong>Scan QR</strong><small>Point. Check. Pay.</small></span>${icon('arrow', 19)}</button><button type="button" class="campus-enter-code" data-hub-action="merchant-code">${icon('plan', 22)}<span>Enter merchant<br>code</span>${icon('chevron', 15)}</button></div><label class="campus-merchant-search" for="campus-merchant-search">${icon('search', 19)}<input id="campus-merchant-search" type="search" placeholder="Find your campus spot" aria-label="Search campus merchants" autocomplete="off" maxlength="80" value="${esc(query)}"><button type="button" data-hub-action="clear-search" aria-label="Clear merchant search"${query ? '' : ' hidden'}>${icon('close', 17)}</button></label><div class="payments-hub-section-title"><h2>Your campus spots</h2><small data-campus-result-count role="status" aria-live="polite">${count} ${count === 1 ? 'spot' : 'spots'} · demo</small></div><div class="payments-hub-services campus-merchant-results">${services.map(service => serviceRow(service, { merchant: service, query })).join('')}</div><div class="campus-search-empty"${count ? ' hidden' : ''}><strong>No spot by that name.</strong><p>Try another name, or use a merchant code above.</p></div>`;
@@ -46,7 +48,8 @@ export function bindPaymentsHub(ctx, route = {}) {
   if (!root) return () => {};
   let alive = true, merchantCodeCleanup = null;
   const tab = paymentHubTab(route.hubTab), origin = hubRoute(tab), current = () => alive && root.isConnected !== false;
-  const search = root.querySelector?.('#campus-merchant-search');
+  const connectedCleanup=tab==='campus'&&ctx.connected===true?bindConnectedCampus(ctx,root):null;
+  const search = ctx.connected===true?null:root.querySelector?.('#campus-merchant-search');
   const filter = () => {
     if (!current() || !search) return;
     const query = search.value.slice(0, 80); ctx.draft.campusMerchantQuery = query;
@@ -84,5 +87,5 @@ export function bindPaymentsHub(ctx, route = {}) {
     if (action === 'ious') return ctx.go({ section: 'life', page: 'ious', backTo: origin });
   };
   root.addEventListener('click', click); search?.addEventListener('input', filter); utilities?.addEventListener('toggle', toggleUtilities);
-  return () => { alive = false; merchantCodeCleanup?.(); root.removeEventListener('click', click); search?.removeEventListener('input', filter); utilities?.removeEventListener('toggle', toggleUtilities); };
+  return () => { alive = false; connectedCleanup?.(); merchantCodeCleanup?.(); root.removeEventListener('click', click); search?.removeEventListener('input', filter); utilities?.removeEventListener('toggle', toggleUtilities); };
 }

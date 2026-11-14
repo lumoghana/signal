@@ -1,3 +1,4 @@
+import {mutateBusinessPlan,prepareImportedBusinessPlan} from './planning.js';
 import {counterAction,publicCounter,counterScope,cashierRoster,lockedCounterState} from './counter.js';
 import {createBusiness,reduceBusiness,metricsFor,applyAutomaticClosings} from '../dist/domain.js';
 import {APIError,readNetwork,updateNetwork,uid,iso,randomToken,hashToken,makePassword,matchesPassword,validatePassword,username,text,phone,publicUser,audit,rateLimit,cookieToken,sessionCookie,clearCookie,resolveSession,publicSession,requireSession,revokeSessions,newSession,assigned,validateShops,projectUsers,scopedBusiness,publicShop,publicInvitation,walletInfo} from './network.js';
@@ -90,7 +91,9 @@ function cleanMigrationEntity(value,kind){
  return out;
 }
 function prepareMigration(snapshot){
- const allowed=new Set('version revision updatedAt mutationId mode business openingBalance shops staff transactions requests closings refunds settlements tickets audit shifts reconciliations'.split(' '));
+ // Server-derived planning views are never trusted as imported money or access.
+ if(snapshot&&typeof snapshot==='object'&&!Array.isArray(snapshot)){const {businessPlanAccess,businessPlanSummary,businessPlanDebits,...source}=snapshot;snapshot=source;}
+ const allowed=new Set('version revision updatedAt mutationId mode business openingBalance shops staff transactions requests closings refunds settlements tickets audit shifts reconciliations businessPlan'.split(' '));
  if(!snapshot||typeof snapshot!=='object'||Array.isArray(snapshot)||Object.keys(snapshot).some(k=>!allowed.has(k)))throw new APIError('The saved workspace contains unsupported fields.');
  if(!snapshot.business||!Array.isArray(snapshot.shops)||!snapshot.shops.length||snapshot.shops.length>100)throw new APIError('Choose a valid saved owner workspace.');
  if(!Number.isSafeInteger(snapshot.openingBalance)||Math.abs(snapshot.openingBalance)>9999999999)throw new APIError('The saved opening balance is invalid.');
@@ -137,6 +140,7 @@ function prepareMigration(snapshot){
  for(const r of b.refunds)if(!['paid','processing','requested','rejected'].includes(r.status))throw new APIError('A saved refund status is invalid.');
  for(const s of b.settlements)if(!['paid','processing','requested','failed'].includes(s.status))throw new APIError('A saved settlement status is invalid.');
  b.business={...b.business,id:uid('legacy'),name:text(b.business.name,'Business name',70),ownerName:text(b.business.ownerName,'Owner name',60),phone:phone(b.business.phone),destination:text(b.business.destination||'Sandbox destination not set','Settlement destination',160),registeredAt:b.business.registeredAt||iso(),importedAt:iso()};
+ if(snapshot.businessPlan!==undefined)b.businessPlan=prepareImportedBusinessPlan(snapshot.businessPlan,b,remap);
  const balance=metricsFor(b);if(balance.balance<0||balance.available<0)throw new APIError('This saved workspace does not reconcile to a non-negative available balance.');
  return b;
 }
@@ -233,6 +237,15 @@ export async function handleAPI(request,env){
   }
   const activeContext=resolveSession((await readNetwork(env)).state,tokenHash);
   if(activeContext?.counter&&!['/api/session','/api/business','/api/logout','/api/auth/logout','/api/counter','/api/counter/unlock','/api/counter/lock','/api/action','/api/devices','/api/health'].includes(path)&&!/^\/api\/devices\/[^/]+$/.test(path))throw new APIError('This phone is restricted to cashier collections. Sign in separately for business management.',403,'COUNTER_ONLY');
+  if(path==='/api/business-plan'&&method==='GET'){
+   const {state:n,revision}=await readNetwork(env),c=requireSession(n,tokenHash);
+   if(c.counter||!['owner','manager'].includes(c.user.role))throw new APIError('Cashier access does not include business planning.',403,'PLANNING_FORBIDDEN');
+   return response({...bundle(n,tokenHash,studentHash),revision});
+  }
+  if(path==='/api/business-plan'&&method==='POST'){
+   const out=await updateNetwork(env,n=>{const c=requireSession(n,tokenHash),result=mutateBusinessPlan(n,c,p);c.session.lastSeen=iso();return {...(result.unchanged?{unchanged:true}:{}),data:bundle(n,tokenHash,studentHash,result)};});
+   return response({...out.data,revision:out.revision});
+  }
   if(method==='GET'&&path==='/api/counter'){
    const {state:n,revision}=await readNetwork(env),c=resolveSession(n,tokenHash);if(!c)throw new APIError('Sign in to open this counter.',401,'SIGN_IN_REQUIRED');
    const management=!c.counter&&['owner','manager'].includes(c.user.role);
@@ -282,10 +295,11 @@ if(method==='POST'&&path==='/api/signup'){
     const prior=n.importAttempts[c.user.businessId];
     if(prior){if(prior.fingerprint!==bodyHash||prior.userId!==c.user.id)throw new APIError('History has already been imported into this business. Existing records were kept.',409,'IMPORT_ALREADY_APPLIED');return {unchanged:true,data:bundle(n,tokenHash,studentHash,{replayed:true,imported:true})}}
     const current=n.businesses[c.user.businessId];
-    if(['transactions','requests','closings','refunds','settlements','tickets','shifts','reconciliations'].some(k=>(current[k]||[]).length)||n.users.some(u=>u.businessId===c.user.businessId&&u.id!==c.user.id)||n.devices.some(d=>d.businessId===c.user.businessId&&!d.revokedAt)||n.invitations.some(i=>i.businessId===c.user.businessId&&i.status==='pending'))throw new APIError('Import only into your newly created empty shared business. Existing activity will not be overwritten.',409,'BUSINESS_NOT_EMPTY');
+    if((current.businessPlan?.expenses||[]).length||current.businessPlan?.stockReserve?.amount>0||['transactions','requests','closings','refunds','settlements','tickets','shifts','reconciliations'].some(k=>(current[k]||[]).length)||n.users.some(u=>u.businessId===c.user.businessId&&u.id!==c.user.id)||n.devices.some(d=>d.businessId===c.user.businessId&&!d.revokedAt)||n.invitations.some(i=>i.businessId===c.user.businessId&&i.status==='pending'))throw new APIError('Import only into your newly created empty shared business. Existing activity will not be overwritten.',409,'BUSINESS_NOT_EMPTY');
     const b=prepareMigration(p.snapshot),oldShopIds=new Map();
     for(const shop of b.shops){const old=shop.id;shop.id='shop-'+(++n.counters.shop);shop.code='LUM'+n.counters.shop;shop.published=false;shop.testAcceptanceToken=randomToken();oldShopIds.set(old,shop.id)}
     for(const key of ['staff','transactions','requests','closings','refunds','tickets','shifts','reconciliations','audit'])for(const item of b[key]||[]){if(item.shopId)item.shopId=oldShopIds.get(item.shopId)||null;if(item.shopIds)item.shopIds=item.shopIds.map(id=>oldShopIds.get(id)).filter(Boolean)}
+    if(b.businessPlan)for(const expense of b.businessPlan.expenses)if(expense.shopId)expense.shopId=oldShopIds.get(expense.shopId)||null;
     b.business={...b.business,id:current.business.id,accountNumber:current.business.accountNumber,bankName:current.business.bankName,ownerName:c.user.name,phone:c.user.phone,verificationStatus:'approved-sandbox',sandbox:true,legacyBusinessId:p.snapshot.business.id||null};
     c.user.shopIds=b.shops.map(s=>s.id);projectUsers(n,b);n.businesses[c.user.businessId]=b;
     n.importAttempts[c.user.businessId]={attemptId:attempt,userId:c.user.id,businessId:c.user.businessId,fingerprint:bodyHash,createdAt:iso()};audit(n,'BUSINESS_HISTORY_IMPORTED',b.business.id,c.user.id);
@@ -464,9 +478,10 @@ if(method==='POST'&&path==='/api/signup'){
      delete payload.counterStaffId;delete payload.counterShiftId;
      const request=b.requests.find(r=>r.id===payload.id),tx=b.transactions.find(t=>t.id===payload.transactionId);
      const belongs=record=>record&&(c.counter?record.counterId===c.counter.id:record.staffId==='access-'+c.user.id);
+     const permittedReceipt=record=>{if(belongs(record))return true;const confirmed=Date.parse(record?.confirmedAt||record?.createdAt||'');return !!record&&record.shopId===c.counter.shopId&&record.status==='paid'&&!record.counterId&&(record.attribution==='shop'||record.source==='guest-momo')&&Number.isFinite(confirmed)&&confirmed>=Date.now()-86400000&&confirmed<=Date.now()+30000;};
      if(type==='ADD_TICKET'&&!payload.transactionId&&payload.shopId!==c.counter.shopId)throw new APIError('Help requests must belong to this counter’s shop.',403,'COUNTER_SCOPE');
      if(type==='CANCEL_REQUEST'&&!belongs(request))throw new APIError('This request belongs to another counter.',403,'COUNTER_SCOPE');
-     if((type==='REFUND'||type==='ADD_TICKET'&&payload.transactionId)&&!belongs(tx))throw new APIError('Choose a receipt collected at this counter.',403,'COUNTER_SCOPE');
+     if((type==='REFUND'||type==='ADD_TICKET'&&payload.transactionId)&&!permittedReceipt(tx))throw new APIError('Choose a receipt collected at this counter.',403,'COUNTER_SCOPE');
     }
     if(['RESOLVE_PAYMENT','RESOLVE_SETTLEMENT'].includes(type)&&c.user.role!=='owner')throw new APIError('Only the sandbox owner can resolve simulated outcomes.',403);
     if(['REGISTER_BUSINESS','ADD_STAFF','UPDATE_STAFF'].includes(type))throw new APIError('Use account signup and user invitations to manage access.',403);

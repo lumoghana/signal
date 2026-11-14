@@ -153,6 +153,12 @@ export async function prepareMutation(snapshot,type,payload,attemptId,repo){
  }
 
  const requests=[],privateReports=[];let splitReceipt=null,splitMembers=[];
+ if(type==='saveMerchantFavorite'){
+  if(typeof p.shopId!=='string'||!/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.test(p.shopId)||Object.keys(p).some(key=>!['shopId'].includes(key)))throw fail('INVALID_INPUT','Choose a connected Lumo shop.');
+  const fresh=await repo.quote({shopId:p.shopId});
+  if(!fresh?.ok||fresh.shop?.id!==p.shopId||fresh.request)throw fail('REQUEST_UNAVAILABLE','This shop is not available to save. Refresh the merchant directory.');
+ }
+ if(type==='removeMerchantFavorite'&&Object.keys(p).some(key=>key!=='shopId'))throw fail('INVALID_INPUT','Choose the saved shop to remove.');
  if(type==='createExpenseSplit'){p.members=await Promise.all((p.members||[]).map(async member=>{if(member.isMe)return {...member,name:state.profile.name};const found=await resolved(repo,member.handle||member.phone||member.name);if(found.userId===snapshot.account.userId)throw fail('INVALID_MEMBER','You are already included in this split.');splitMembers.push({sourceId:member.id,...found});return {...member,name:found.name};}));}
  if(type==='settleSplitShare'&&(p.method||'lumo')==='lumo'){splitReceipt=state.transactions.find(t=>t.id===p.receiptTransactionId&&t.type==='income'&&t.direction==='in'&&t.status==='success'&&t.ledgerJournalId);if(!splitReceipt)throw fail('CONFIRMED_RECEIPT_REQUIRED','Choose a confirmed payment already received in Lumo.');const split=state.expenseSplits.find(x=>x.id===(p.splitId||p.id)),member=split?.members.find(m=>m.id===p.memberId&&!m.isMe);const amount=p.amount??((member?.amount||0)-(member?.paid||0));const allocated=(splitReceipt.iouId&&!splitReceipt.iouAllocations?splitReceipt.amount:(splitReceipt.iouAllocations||[]).reduce((n,a)=>n+a.amount,0))+(splitReceipt.splitAllocations||[]).reduce((n,a)=>n+a.amount,0);if(!Number.isSafeInteger(amount)||amount<=0||amount>splitReceipt.amount-allocated)throw fail('RECEIPT_ALREADY_MATCHED','This receipt has less unmatched money than that share.');p.amount=amount;p.method='cash';}
  if(type==='createMoneyRequest'){const found=await resolved(repo,p.recipient?.handle||p.recipient?.id||p.handle||p.userId||p.name);if(found.userId===snapshot.account.userId)throw fail('SELF_REQUEST','Choose another connected Lumo account.');recipient=found;p.name=found.name;}
@@ -179,7 +185,8 @@ export async function prepareMutation(snapshot,type,payload,attemptId,repo){
    merchantQuote=await repo.quote({shopId:p.shopId,requestId:p.requestId,testKey:p.testKey});
    if(!merchantQuote?.ok||!merchantQuote.shop?.id)throw fail('REQUEST_UNAVAILABLE','This shop or payment request is unavailable.');
    if(merchantQuote.request&&merchantQuote.request.amount!==p.amount)throw fail('AMOUNT_CHANGED','Review the merchant’s fixed request amount.');
-   p.merchant=merchantQuote.merchant?.name||merchantQuote.shop.name;p.rail='lumo';p.recipient={id:merchantQuote.shop.id,name:p.merchant};delete p.requestId;
+   const merchantName=merchantQuote.merchant?.name||merchantQuote.shop.name;if(p.merchant&&p.merchant!==merchantName&&!(p.shopName===undefined&&p.merchant===merchantQuote.shop.name)||p.shopName!==undefined&&p.shopName!==merchantQuote.shop.name||p.shopCode!==undefined&&p.shopCode!==(merchantQuote.shop.code||''))throw fail('MERCHANT_DETAILS_CHANGED','This merchant’s details changed. Open the shop again and review the current details.');
+   p.merchant=merchantName;p.rail='lumo';p.recipient={id:merchantQuote.shop.id,name:p.merchant};delete p.requestId;
   }else{
    recipient=await resolved(repo,p.destination||p.recipient?.handle||p.recipient?.id||p.recipient?.number||p.handle||p.merchant);
    if(recipient.userId===snapshot.account.userId)throw fail('SELF_TRANSFER','Choose another connected Lumo account.');

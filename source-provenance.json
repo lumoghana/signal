@@ -9,30 +9,64 @@
   "export_target": "GitHub / Vercel",
   "static_directory": "dist",
   "asset_manifest": "dist-sha256.json",
-  "shipped_dist": "Consumer journeys retain the approved shared-backend build. Merchant export adds role-specific cashier collection and counter access.",
+  "shipped_dist": "Approved consumer and merchant design extended with connected shop discovery, repeat payments, public guest checkout, payment-link sharing and permissioned business planning.",
   "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
-  "android": "Delivered separately; no Android binaries or signing material included.",
+  "android": {
+    "version": "2.10.0",
+    "version_code": 21000,
+    "package": "com.lumo.nativeapp.test",
+    "delivered_separately": true,
+    "assets_and_resources_preserved": true,
+    "physical_device_verified": false,
+    "apk_sha256": "e0d25b3604cfbd565193fa4e6c3b54a1aa645bf97485f6d32ab0f349f6b974fa"
+  },
   "validation": {
-    "consumer_tests": 1506,
-    "merchant_tests": 499,
-    "shared_boundary_tests": 1,
-    "live_shared_service_checks": 12,
+    "consumer_tests": 1548,
+    "merchant_tests": 549,
+    "shared_boundary_and_guest_tests": 33,
+    "guest_http_concurrency_checks": 5,
     "failures": 0,
-    "consumer_source_preserved": true,
-    "asset_manifest": "dist-sha256.json"
+    "consumer_design_preserved": true,
+    "asset_manifest": "dist-sha256.json",
+    "android_pure_java_suites": 59,
+    "android_framework_cases": 110,
+    "browser_verified": [
+      "guest fixed quote and own-number review",
+      "pending reference survives refresh",
+      "explicit sandbox confirmation and receipt",
+      "published merchant navigation and sample Lux planning"
+    ],
+    "limitations": [
+      "Connected owner and cashier journeys verified via service and automated tests; browser role sign-in was not automated.",
+      "Physical-phone installation and hardware checks remain."
+    ]
   },
   "release_date": "2026-11-14",
   "merchant": {
-    "source_commit": "80cc95dc21343ddb89404bf0b8f094bbf014ce49",
+    "source_commit": "50dfe74fd160a42d11a72997a05325e37d38c807",
     "site_project": "appgprj_6af5be2c38548191822030bb895d6d3d",
-    "shared_backend_function_version": 9,
+    "shared_backend_function_version": 11,
     "features": [
       "Dedicated and shared counter phones",
       "Individual cashier PIN access",
       "Server-confirmed QR receipts",
       "Staff handover and immutable receipt attribution",
-      "Restricted counter capability without owner sign-in credentials"
+      "Restricted counter capability without owner sign-in credentials",
+      "Public fixed and reusable payment links",
+      "Explicit sandbox guest MoMo collection and original-transaction refunds",
+      "Owner-led stock and expense planning with explicit manager scope",
+      "Shared planning calculations in merchant Lux",
+      "Shop-attributed online receipts"
     ],
-    "site_version": 17
+    "site_version": 18
+  },
+  "guest_checkout": {
+    "provider_mode": "sandbox",
+    "live_provider_configured": false,
+    "migrations": [
+      "20261114075619_lumo_guest_momo_and_payment_links.sql",
+      "20261114082729_lumo_reusable_link_purposes.sql"
+    ],
+    "shared_link_revenue_coverage": "Guest MoMo link payments only; Lumo QR versus link source is not inferred."
   }
 }

@@ -17,7 +17,7 @@ const journalFailure = () => failure('Lumo could not safely save this request re
 const accountChanged = () => failure('Your signed-in account changed. Return to the original account to check this request.', 'ACCOUNT_CHANGED', { unknown: true });
 const secretKeys = new Set(['pin','password','currentpassword','newpassword','currentpin','newpin','confirmpin','credential','passwordproof','currentpasswordproof','access_token','refresh_token','deviceproof','authorization','privatekey','servicerolekey']);
 const withoutSecrets = value => Array.isArray(value) ? value.map(withoutSecrets) : object(value) ? Object.fromEntries(Object.entries(value).filter(([key]) => !secretKeys.has(key.toLowerCase())).map(([key,item]) => [key,withoutSecrets(item)])) : value;
-const finalRejections = new Set(['DOMAIN_REJECTED','INVALID_INPUT','FORBIDDEN','AUTH_REQUIRED','SESSION_REVOKED','PILOT_REQUIRED','ACCOUNT_REQUIRED','ACCOUNT_UNAVAILABLE','PIN_REQUIRED','INSUFFICIENT_FUNDS','WALLET_LIMIT','RECIPIENT_NOT_FOUND','PROVIDER_UNAVAILABLE','PROVIDER_OUTCOME_FORBIDDEN','SELF_TRANSFER','SELF_REQUEST','INVALID_MEMBER','FEE_CHANGED','AMOUNT_CHANGED','REQUEST_UNAVAILABLE','PAYOUT_CHANGED','REFUND_SOURCE_UNAVAILABLE','PILOT_LIMIT','CONFIRMED_RECEIPT_REQUIRED','RECEIPT_ALREADY_MATCHED','PARTNER_NOT_FOUND','PARTNER_CHANGED','INVALID_PARTNER','DEVICE_PROOF_INVALID','UNBACKED_STATE','STATE_RECOVERY_REQUIRED','INVALID_ACTIVATION_CHECKPOINT','ACTIVATION_STEP_UNAVAILABLE','ACTIVATION_ALREADY_COMPLETE']);
+const finalRejections = new Set(['DOMAIN_REJECTED','INVALID_INPUT','FORBIDDEN','AUTH_REQUIRED','SESSION_REVOKED','PILOT_REQUIRED','ACCOUNT_REQUIRED','ACCOUNT_UNAVAILABLE','PIN_REQUIRED','INSUFFICIENT_FUNDS','WALLET_LIMIT','RECIPIENT_NOT_FOUND','PROVIDER_UNAVAILABLE','PROVIDER_OUTCOME_FORBIDDEN','SELF_TRANSFER','SELF_REQUEST','INVALID_MEMBER','FEE_CHANGED','AMOUNT_CHANGED','REQUEST_UNAVAILABLE','MERCHANT_DETAILS_CHANGED','PAYOUT_CHANGED','REFUND_SOURCE_UNAVAILABLE','PILOT_LIMIT','CONFIRMED_RECEIPT_REQUIRED','RECEIPT_ALREADY_MATCHED','PARTNER_NOT_FOUND','PARTNER_CHANGED','INVALID_PARTNER','DEVICE_PROOF_INVALID','UNBACKED_STATE','STATE_RECOVERY_REQUIRED','INVALID_ACTIVATION_CHECKPOINT','ACTIVATION_STEP_UNAVAILABLE','ACTIVATION_ALREADY_COMPLETE']);
 
 export function createApprovedService({ config = APPROVED_CONFIG, fetch: transport = globalThis.fetch, storage = globalThis.localStorage, modeStorage = globalThis.sessionStorage, lockManager = globalThis.navigator?.locks, onSnapshot = () => {} } = {}) {
   let session = read(storage, SESSION_KEY, null), sample = read(modeStorage, MODE_KEY, false) === true;
@@ -170,6 +170,7 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
       return data;
     },
     quote(values) { return request({ action: 'quote', ...values }); },
+    merchantDirectory() { return request({action:'merchant',path:'/api/directory',method:'GET'},{authenticated:false}); },
     readPartnerInbox() { return request({ action: 'partnerInbox' }); },
     respondPartner(id, decision) { return request({ action: 'partnerRespond', id, decision }); },
     verifyPin(pin) { return request({ action: 'verifyPin', pin }); },

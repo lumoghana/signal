@@ -172,3 +172,12 @@ test('sample collection explains its browser scope and offers preview only for a
   assert.doesNotMatch(connected.render(), /Sample in this browser|Sample QR ·|Preview customer payment/);
   assert.equal(previews.length, 1);
 });
+
+
+test('cashiers can prepare a shared online amount without posting or relabelling a counter QR',async()=>{
+ const f=fixture(),shared=[];f.config.onSharePayment=value=>shared.push(value);const view=createCashier(f.config);view.handleChange({name:'cashierAmount',value:'25.50'});view.handleChange({name:'cashierNote',value:'Order 40'});await click(view,'share-amount');assert.deepEqual(shared,[{amount:2550,description:'Order 40'}]);assert.equal(f.state.requests.length,0);assert.match(view.render(),/Share payment link/);
+});
+
+test('cashier sharing keeps a fixed request reference and stops for paid or locked requests',async()=>{
+ const f=fixture({requests:[request('current')]}),shared=[];f.config.onSharePayment=value=>shared.push(value);const view=createCashier(f.config);await click(view,'request',{id:'current'});await click(view,'share-request');assert.deepEqual(shared,[{requestId:'current'}]);f.state.transactions.push(payment('paid',{requestId:'current'}));await click(view,'share-request');assert.equal(shared.length,1);f.setCounter({...f.config.getCounter(),locked:true});await click(view,'share-shop');assert.equal(shared.length,1);
+});

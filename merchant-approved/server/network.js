@@ -1,3 +1,4 @@
+import {businessPlanProjection} from '../dist/business-plan-model.js';
 // D1 record shards isolate each merchant's history from other tenants.
 // A record-set guard plus one transactional batch commits related wallet,
 // business, access and idempotency changes together. Unrelated tenants can commit
@@ -232,7 +233,7 @@ export function projectUsers(n,b){
  for(const shop of b.shops){const manager=linked.find(u=>u.active&&u.role==='manager'&&u.shopIds.includes(shop.id));shop.manager=manager?.name||b.business.ownerName||'Unassigned'}
 }
 export function scopedBusiness(b,u){
- const c=clone(b);delete c.counterDevices;if(u.role==='owner')return c;
+ const c=clone(b);delete c.counterDevices;delete c.businessPlan;delete c.businessPlanAccess;delete c.businessPlanSummary;delete c.businessPlanDebits;Object.assign(c,businessPlanProjection(b,u));if(u.role==='owner')return c;
  const allowed=new Set(u.shopIds);
  c.shops=c.shops.filter(s=>allowed.has(s.id));
  for(const key of ['transactions','requests','closings','refunds','tickets','shifts','reconciliations'])c[key]=(c[key]||[]).filter(x=>allowed.has(x.shopId));

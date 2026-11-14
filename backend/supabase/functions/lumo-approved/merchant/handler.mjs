@@ -4,8 +4,8 @@ import {APIError,emptyNetwork,hashToken,resolveSession} from './server/network.j
 const clone=value=>structuredClone(value);
 const PUBLIC_GET=/^\/api\/(?:health|directory|lookup|payments\/quote|invitations\/[^/]+)(?:\?|$)/;
 const ALIASES={'/api/login':'/api/auth/login','/api/logout':'/api/auth/logout','/api/business':'/api/session','/api/password':'/api/auth/password','/api/recovery/start':'/api/auth/recovery/start','/api/recovery/complete':'/api/auth/recovery/complete','/api/auth/username/recover':'/api/auth/username','/api/ownership/transfer':'/api/auth/transfer','/api/step-up':'/api/auth/step-up','/api/auth/phone/change':'/api/auth/phone'};
-const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter|invitations\/[A-Za-z0-9_-]+)$/;
-const POST_ROUTE=/^\/api\/(?:signup|action|counter\/(?:setup|pin|unlock|lock|revoke)|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
+const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter|payment-links|business-plan|invitations\/[A-Za-z0-9_-]+)$/;
+const POST_ROUTE=/^\/api\/(?:signup|action|payment-links|business-plan|counter\/(?:setup|pin|unlock|lock|revoke)|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
 export function normalizeMerchantPath(value){
  const raw=String(value||'');if(raw.length>3000||!raw.startsWith('/api/')||raw.includes('#'))return null;
  const index=raw.indexOf('?'),rawPath=index<0?raw:raw.slice(0,index),query=index<0?'':raw.slice(index);
@@ -21,6 +21,7 @@ function failure(code,status=400){return {ok:false,status,code,error:message(cod
 // their original trading-day, operator and shift attribution once captured.
 export function hydrateMerchantNetwork(raw){
  const state=clone(raw.state||emptyNetwork());
+ const linkAttribution=new Map((raw.linkAttribution||[]).map(link=>[link.requestId,link]));
  for(const [businessId,b] of Object.entries(state.businesses||{})){
   const ledger=(raw.ledger||[]).filter(j=>j.merchantId===businessId),balance=raw.balances?.[businessId];
   const oldPayments=new Map((b.transactions||[]).map(t=>[t.id,t]));
@@ -32,10 +33,10 @@ export function hydrateMerchantNetwork(raw){
    const operator=state.users.find(u=>u._sharedUserId===request.createdBySharedUserId);
    requests.set(request.id,{...previous,...request,staffId:previous.staffId||(operator?.role==='owner'?'owner-'+operator.id:operator?'access-'+operator.id:null),staffName:previous.staffName||operator?.name||null,createdByUserId:previous.createdByUserId||operator?.id||null});
   }
-  b.requests=[...requests.values()];
+  b.requests=[...requests.values()].map(request=>{const link=linkAttribution.get(request.id);return link?.attribution==='shop'?{...request,staffId:null,staffName:null,shiftId:null,counterId:null,attribution:'shop',intentChannel:'online',publicPaymentLinkId:link.linkId}:request;});
   b.transactions=ledger.filter(j=>j.type==='merchant_payment').map(j=>{
-   const old=oldPayments.get(j.id)||{},request=requests.get(j.requestId);
-   return {...old,id:j.id,shopId:j.shopId,counterId:old.counterId||request?.counterId||null,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true};
+   const old=oldPayments.get(j.id)||{},request=requests.get(j.requestId),link=linkAttribution.get(j.requestId),shopAttributed=j.requestAttribution==='shop'||link?.attribution==='shop'||!!j.guestCollectionId&&!j.requestId;
+   return {...old,id:j.id,shopId:j.shopId,counterId:old.counterId||request?.counterId||null,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true,...(shopAttributed?{staffId:null,staffName:null,counterId:null,shiftId:null,attribution:'shop',intentChannel:j.requestId?'online':null,publicPaymentLinkId:j.publicPaymentLinkId||link?.linkId||null}:{}),...(j.guestCollectionId?{payer:j.payerName||'MoMo guest',rail:'momo',source:'guest-momo',linkId:j.guestLinkId,guestCollectionId:j.guestCollectionId,providerReference:j.providerReference,providerMode:'sandbox',settlementStatus:'sandbox-posted'}:{})};
   });
   const canonicalRefunds=ledger.filter(j=>j.type==='refund').map(j=>{
    const key=j.refundId||j.id,old=oldRefunds.get(key)||{};
@@ -56,7 +57,7 @@ export function hydrateMerchantNetwork(raw){
 /** Original v7 HTTP API behind the verified shared-auth boundary. No client state
  * is accepted: closures mutate a fresh service-only snapshot, committed with
  * canonical refund postings in one database transaction. */
-export function createMerchantHandler({serviceRpc}){
+export function createMerchantHandler({serviceRpc,commerceEnabled=false}){
  if(typeof serviceRpc!=='function')throw new Error('Merchant service RPC is required.');
  return async ({body,identity})=>{
   const path=normalizeMerchantPath(body.path),method=body.method||'GET',pathname=path?.split('?')[0],input=body.body||{};
@@ -123,13 +124,29 @@ export function createMerchantHandler({serviceRpc}){
    throw new APIError(message('CONCURRENT_UPDATE'),409,'CONCURRENT_UPDATE');
   }
   try{
+   if(pathname==='/api/payment-links'){
+    await read();
+    const commerce=await serviceRpc('lumo_guest_merchant',{p_actor:actor,p_session:sessionId,p_merchant_token_hash:tokenHash,p_operation:method==='GET'?'list':input.operation==='cancel'?'cancel':'create',p_payload:input});
+    if(!commerce?.ok)return {...failure(commerce?.code||'LINK_SERVICE_ERROR',commerce?.code==='SESSION_REVOKED'?401:commerce?.code==='FORBIDDEN'||commerce?.code==='COUNTER_LOCKED'?403:400),noMutation:true};
+    return {...commerce,status:200};
+   }
    const headers={'Accept':'application/json','Cookie':merchantToken?'lumo_session='+merchantToken:'','X-Lumo-Request':'1'};
    if(method==='POST')headers['Content-Type']='application/json';
    const response=await handleAPI(new Request('https://merchant.lumo.internal'+path,{method,headers,...(method==='POST'?{body:JSON.stringify(input)}:{})}),{approvedStore:{read,update}});
    if(!response)return failure('INVALID_REQUEST',404);
    const result=await response.json();
-   // Return only the merchant cookie token, never any upstream service credential.
    const cookie=response.headers.get('set-cookie')||'',match=cookie.match(/(?:^|,\s*)lumo_session=([^;]*)/);
+   const responseToken=match?decodeURIComponent(match[1]):merchantToken;
+   if(commerceEnabled&&response.ok&&result.session&&result.state){
+    const commerce=await serviceRpc('lumo_guest_merchant',{p_actor:actor,p_session:sessionId,p_merchant_token_hash:await hashToken(responseToken),p_operation:'summary',p_payload:{}});
+    if(!commerce?.ok)throw new APIError(message(commerce?.code),commerce?.code==='SESSION_REVOKED'?401:503,commerce?.code||'COMMERCE_UNAVAILABLE');
+    result.state.paymentLinks=commerce.paymentLinks||[];result.state.guestCollections=commerce.guestCollections||[];
+    const guests=new Map((commerce.guestCollections||[]).filter(g=>g.journalId).map(g=>[g.journalId,g]));
+    for(const transaction of [...(result.state.transactions||[]),...(result.state.shopQRReceipts||[]),...(result.state.shopLinkReceipts||[])]){const guest=guests.get(transaction.id);if(guest)Object.assign(transaction,{payer:'MoMo guest · '+guest.phoneMasked,rail:'momo',source:'guest-momo',linkId:guest.linkId,providerReference:guest.providerReference,providerMode:guest.providerMode,settlementStatus:guest.settlementStatus});}
+    for(const request of result.state.requests||[]){const link=(commerce.paymentLinks||[]).find(link=>link.requestId===request.id&&link.attribution==='shop');if(link)Object.assign(request,{staffId:null,staffName:null,counterId:null,shiftId:null,channel:'online'});}
+    for(const transaction of result.state.transactions||[]){const link=(commerce.paymentLinks||[]).find(link=>link.requestId===transaction.requestId&&link.attribution==='shop');if(link)Object.assign(transaction,{staffId:null,staffName:null,counterId:null,shiftId:null});}
+   }
+   // Return only the merchant cookie token, never any upstream service credential.
    return {...result,ok:response.ok,status:response.status,...(match?{merchantToken:decodeURIComponent(match[1])}:{})};
   }catch(error){return {...failure(error.code||'MERCHANT_SERVICE_ERROR',error.status||503),error:error.message,message:error.message};}
  };
