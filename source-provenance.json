@@ -79,8 +79,13 @@
   },
   "personal_payment_identity": {
     "username_copy_and_conflict_handling": true,
-    "database_migration_applied": false,
-    "recipient_filter_pending_database_confirmation": true,
-    "existing_staff_balances_preserved": true
+    "database_migration_applied": true,
+    "recipient_filter_pending_database_confirmation": false,
+    "existing_staff_balances_preserved": true,
+    "staff_only_logins_excluded": 9,
+    "eligible_personal_recipients": 23,
+    "approved_and_legacy_paths_verified": true,
+    "balance_fingerprint_unchanged": true,
+    "journal_count_unchanged": true
   }
 }

@@ -34,3 +34,21 @@ begin
  if not exists(select 1 from pg_constraint where conrelid='lumo_private.profiles'::regclass and conname='profiles_handle_key' and contype='u') then raise exception 'Global username uniqueness constraint missing';end if;
 end $identity_checks$;
 rollback;
+
+-- The older public endpoint must enforce the same recipient boundary.
+begin;
+do $legacy_recipient_checks$
+declare actor uuid;session_id uuid;staff_handle text;personal_handle text;r jsonb;
+begin
+ select ap.user_id,s.id into actor,session_id from lumo_private.approved_profiles ap join auth.sessions s on s.user_id=ap.user_id where ap.personal_account and lumo_private.approved_live(ap.user_id,s.id) and lumo_private.personal_recipient(ap.user_id) limit 1;
+ select p.handle into staff_handle from lumo_private.profiles p join lumo_private.approved_profiles ap on ap.user_id=p.user_id where not ap.personal_account limit 1;
+ select p.handle into personal_handle from lumo_private.profiles p where p.user_id<>actor and lumo_private.personal_recipient(p.user_id) limit 1;
+ perform set_config('request.jwt.claims',jsonb_build_object('role','authenticated','sub',actor,'session_id',session_id,'app_metadata',jsonb_build_object('lumo_pilot',true))::text,true);
+ r:=public.lumo_rpc('recipient.lookup',jsonb_build_object('handle',staff_handle));
+ if r->>'code'<>'RECIPIENT_NOT_FOUND' then raise exception 'Legacy staff lookup remains exposed: %',r->>'code';end if;
+ r:=public.lumo_rpc('transfer',jsonb_build_object('recipientHandle',staff_handle,'amount',1,'pin','0000','idempotencyKey',gen_random_uuid()));
+ if r->>'code'<>'RECIPIENT_NOT_FOUND' then raise exception 'Legacy staff transfer remains exposed: %',r->>'code';end if;
+ r:=public.lumo_rpc('recipient.lookup',jsonb_build_object('handle',personal_handle));
+ if r->>'ok'<>'true' then raise exception 'Legacy real personal recipient was hidden: %',r->>'code';end if;
+end $legacy_recipient_checks$;
+rollback;
