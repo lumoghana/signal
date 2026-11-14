@@ -81,7 +81,7 @@ test('repeated taps during an unresolved initiation send only one provider reque
 });
 
 test('an interrupted response keeps the original reference and blocks another charge',async()=>{
- const f=fixture({apiOverride(operation){if(operation==='initiate')throw Object.assign(Error('Response interrupted. Keep your reference.'),{unknown:true})}});await review(f);await f.checkout.initiate();const first=f.checkout.view().reference;assert.ok(first);assert.equal(f.checkout.view().phase,'pending');await f.checkout.restart();assert.equal(f.checkout.view().reference.attemptId,first.attemptId);f.checkout.chooseMoMo();assert.equal(f.checkout.view().phase,'pending');assert.equal(f.calls.filter(call=>call.operation==='initiate').length,1);
+ const f=fixture({apiOverride(operation){if(operation==='initiate')throw Object.assign(Error('Response interrupted. Keep your reference.'),{unknown:true})}});await review(f);await f.checkout.initiate();const first=f.checkout.view().reference;assert.ok(first);assert.equal(f.checkout.view().phase,'pending');const html=renderGuestCheckout(f.checkout.view());assert.match(html,/We could not confirm the outcome\. Check this original payment before trying again\./);assert.doesNotMatch(html,/Approve the request on your phone|data-checkout-action="invite"|checkout-celebration/);await f.checkout.restart();assert.equal(f.checkout.view().reference.attemptId,first.attemptId);f.checkout.chooseMoMo();assert.equal(f.checkout.view().phase,'pending');assert.equal(f.calls.filter(call=>call.operation==='initiate').length,1);
 });
 
 test('reopening a payment recovers its own receipt without signup or a phone number',async()=>{

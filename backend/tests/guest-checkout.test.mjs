@@ -14,11 +14,11 @@ test('public quote uses only a public link and service rate hash',async()=>{
 });
 test('guest entry reuses phone format normalization without using an account profile',async()=>{
  const f=fixture();await f.checkout(valid(),request());const payload=f.calls[0].args.p_payload;
- assert.equal(payload.phone,'0241234567');assert.equal(payload.network,'mtn');assert.equal(payload.amount,1200);assert.equal(payload.attemptId,id);
+ assert.equal(payload.phone,'0241234567');assert.equal(payload.network,'telecel');assert.equal(payload.amount,1200);assert.equal(payload.attemptId,id);
  assert.equal(payload.recoveryHash,await guestHash('lumo-guest-recovery-v1:'+secret));assert.ok(!JSON.stringify(payload).includes(secret));
 });
 for(const [title,patch] of [
- ['missing own phone',{phone:undefined}],['invalid phone',{phone:'0312345678'}],['unsupported network',{network:'unknown'}],['fractional pesewas',{amount:1200.1}],['zero amount',{amount:0}],['above pilot limit',{amount:1000001}],['string amount',{amount:'1200'}],['weak receipt secret',{recoveryToken:'123456'}],['weak attempt reference',{attemptId:'x'}],['invalid link',{link:'x'}],['unexpected payer profile',{profile:{phone:'0555555555'}}],['unexpected consumer wallet',{walletId:'wallet-other'}],['untrusted provider result',{providerResult:{status:'approved'}}]
+ ['missing own phone',{phone:undefined}],['invalid phone',{phone:'0312345678'}],['fractional pesewas',{amount:1200.1}],['zero amount',{amount:0}],['above pilot limit',{amount:1000001}],['string amount',{amount:'1200'}],['weak receipt secret',{recoveryToken:'123456'}],['weak attempt reference',{attemptId:'x'}],['invalid link',{link:'x'}],['unexpected payer profile',{profile:{phone:'0555555555'}}],['unexpected consumer wallet',{walletId:'wallet-other'}],['untrusted provider result',{providerResult:{status:'approved'}}]
 ])test('rejects '+title+' before creating any attempt',async()=>{const f=fixture();await assert.rejects(f.checkout({...valid(),...patch},request()),error=>error.code==='INVALID_INPUT'&&error.noMutation===true);assert.equal(f.calls.length,0);});
 test('status needs its private recovery proof and never accepts a number in a URL',async()=>{
  const f=fixture();await f.checkout({action:'guestCheckout',operation:'status',attemptId:id,recoveryToken:secret},request());assert.equal(f.calls[0].args.p_operation,'status');assert.equal(f.calls[0].args.p_payload.phone,undefined);assert.match(f.calls[0].args.p_payload.recoveryHash,/^[a-f0-9]{64}$/);
@@ -40,3 +40,10 @@ test('guest checkout ignores any signed-in browser bearer identity and never loa
  const calls=[];const handler=createApprovedHandler({supabaseUrl:'https://supabase.test',serviceRoleKey:'service-test',allowedOrigins:['https://checkout.test'],fetch:async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});assert.equal(new URL(url).pathname,'/rest/v1/rpc/lumo_guest_checkout');return new Response(JSON.stringify(quote),{headers:{'Content-Type':'application/json'}});}});
  const response=await handler(new Request('https://gateway.test',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://checkout.test',Authorization:'Bearer consumer-token'},body:JSON.stringify({action:'guestCheckout',operation:'quote',link:token})}));assert.equal(response.status,200);assert.equal((await response.json()).provider.live,false);assert.equal(calls.length,1);
 });
+
+ test('legacy caller network cannot override the server lookup, and number-only clients work',async()=>{
+  for(const network of [undefined,'mtn','unknown']){const f=fixture();await f.checkout({...valid(),network},request());assert.equal(f.calls[0].args.p_payload.network,'telecel');}
+ });
+ test('lookup validates destination first and never returns payer details for an unavailable link',async()=>{
+  const f=fixture({ok:false,code:'LINK_UNAVAILABLE'});await assert.rejects(f.checkout({action:'guestCheckout',operation:'lookup',link:token,phone:'0241234567'},request()),{code:'LINK_UNAVAILABLE'});
+ });
