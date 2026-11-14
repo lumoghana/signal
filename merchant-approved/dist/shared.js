@@ -1,7 +1,7 @@
 import {merchantFetch} from './connected-service.js';
 import {replaceRegisteredState,clearRegisteredState,getWorkspaceMode} from './store.js';
 const listeners=new Set(),AUTH_KEY='lumo-shared-auth-state-v2',controllers=new Set();
-const emptyCache=()=>({session:null,user:null,state:null,users:[],invitations:[],sessions:[],audit:[],devices:[],student:null});
+const emptyCache=()=>({session:null,user:null,state:null,users:[],invitations:[],sessions:[],audit:[],devices:[],counter:null,student:null});
 const clone=value=>JSON.parse(JSON.stringify(value));
 const token=()=>globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2);
 const AUTH_SESSION_KEY=AUTH_KEY+'-tab',AUTH_CHANNEL='lumo-shared-auth-events-v2';
@@ -74,18 +74,19 @@ export function beginAuthTransition(kind='login'){
 function finishLogout(epoch){const current=authState();if(current.epoch===epoch)writeAuth({...current,locked:true,pendingLogout:false,kind:'logged-out'},{expectedEpoch:epoch})}
 function failChanged(){const error=new Error('Your account changed while this request was running. Continue with the current sign-in.');error.status=409;error.code='AUTH_CHANGED';return error}
 function responseRevision(result){return Number.isSafeInteger(result.revision)?result.revision:null}
-function signature(){return JSON.stringify([cache.session,cache.users,cache.invitations,cache.sessions,cache.audit])}
+function signature(){return JSON.stringify([cache.session,cache.users,cache.invitations,cache.sessions,cache.audit,cache.counter])}
 export function applyResponse(result={},options={}){
  const epoch=options.authEpoch||getAuthEpoch();if(epoch!==getAuthEpoch())throw failChanged();
  if(options.expectedWalletId&&Object.hasOwn(result,'student')&&result.student?.id!==options.expectedWalletId)throw Object.assign(new Error('This payment belongs to another student wallet. Reopen the original wallet before checking its outcome.'),{status:409,code:'WALLET_CHANGED'});
  const revision=responseRevision(result),unlocked=Boolean(options.unlockOnSuccess&&result.session),locked=isLocallyLocked();
  const oldSignature=signature(),hadSharedSnapshot=Boolean(cache.state);
- const hasIdentity=['session','state','users','invitations','sessions','audit','user'].some(key=>Object.hasOwn(result,key));
+ const hasIdentity=['session','state','users','invitations','sessions','audit','user','counter'].some(key=>Object.hasOwn(result,key));
  if(unlocked){transitionBackup=null;writeAuth({...authState(),locked:false,pendingLogout:false,kind:'authenticated'},{expectedEpoch:epoch});revisions.auth=-1;revisions.devices=-1}
  const acceptAuth=hasIdentity&&(!locked||unlocked||result.session===null)&&(unlocked||revision===null||revision>=revisions.auth);
  if(acceptAuth){
+  if(Object.hasOwn(result,'session')&&!Object.hasOwn(result,'counter'))cache.counter=null;
   if(revision!==null)revisions.auth=revision;
-  for(const key of ['session','user','state','users','invitations','sessions','audit'])if(Object.hasOwn(result,key))cache[key]=result[key];
+  for(const key of ['session','user','state','users','invitations','sessions','audit','counter'])if(Object.hasOwn(result,key))cache[key]=result[key];
  }
  if(Object.hasOwn(result,'devices')&&(!isLocallyLocked()||result.session===null)&&(unlocked||revision===null||revision>=revisions.devices)){
   cache.devices=result.devices;if(revision!==null)revisions.devices=revision;
@@ -98,6 +99,7 @@ export function applyResponse(result={},options={}){
  if(acceptAuth&&result.session===null){cache={...emptyCache(),student:cache.student};recoveryKey='';recoveryKeyReference='';stateSignature='';clearRegisteredState({preserveLegacy:!hadSharedSnapshot});}
  // Apply revocations and mute authority before installing receipts into the store.
  emit('authority');
+ if(acceptAuth&&cache.counter){recoveryKey='';recoveryKeyReference='';}
  if(acceptAuth&&cache.state){const next=snapshotSignature(cache.state),changed=next!==stateSignature;stateSignature=next;replaceRegisteredState(cache.state,{activate:getWorkspaceMode()==='registered',eventType:'REMOTE_SYNC',notify:changed})}
  const incomingKeyReference=String(result.recoveryKeyReference||result.session?.recoveryKeyReference||'');
  if(result.recoveryKey&&!isLocallyLocked()&&(acceptAuth||!hasIdentity)&&(!cache.session?.recoveryKeyReference||incomingKeyReference===cache.session.recoveryKeyReference)){recoveryKey=result.recoveryKey;recoveryKeyReference=incomingKeyReference;}
@@ -107,7 +109,7 @@ export function applyResponse(result={},options={}){
 }
 const publicPath=path=>/^\/api\/(?:health|directory|lookup|payments(?:\/quote)?|student(?:\/|$)|sandbox-fund|signup|auth\/(?:login|logout|recovery(?:\/|$)|username)|invitations(?:\/accept|\/[^/]+$))/.test(path);
 function localLockedError(){const error=new Error('This device is signed out. Sign in again to continue.');error.status=401;error.code='LOCAL_LOCKED';return error}
-function isAuthFailure(path,result){return !/\/api\/(student|payments|sandbox-fund)/.test(path)&&['SIGN_IN_REQUIRED','SESSION_INVALID','SESSION_EXPIRED','AUTH_REQUIRED'].includes(result.code||result.error?.code)}
+function isAuthFailure(path,result){return !/\/api\/(student|payments|sandbox-fund)/.test(path)&&['SIGN_IN_REQUIRED','SESSION_INVALID','SESSION_EXPIRED','SESSION_REVOKED','AUTH_REQUIRED'].includes(result.code||result.error?.code)}
 export async function api(path,options={}){
  const method=options.method||'GET',epoch=options.authEpoch||getAuthEpoch();if(epoch!==getAuthEpoch())throw failChanged();
  const studentOrder=++requestSequence;

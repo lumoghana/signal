@@ -4,13 +4,13 @@ export const MERCHANT_CAPABILITIES=Object.freeze({passwordChange:false,passwordR
 export const CONNECTED_CONSUMER_ORIGIN='https://lumo-connected-pilot.vercel.app';
 const CONFIG={url:'https://iwutbrljiiodamtyoorg.supabase.co',key:'sb_publishable_4dmChQek8k-opkVhO4N_KA_TCGVjWi6'};
 const KEY='lumo-approved-merchant-session-v1',AUTH_KEY='lumo-shared-auth-state-v2';
-const empty=()=>({session:null,user:null,state:null,users:[],invitations:[],sessions:[],audit:[],devices:[],student:null});
-const read=()=>{for(const storage of [globalThis.sessionStorage,globalThis.localStorage])try{const value=JSON.parse(storage?.getItem(KEY)||'null');if(value?.session?.access_token)return value}catch{}return null};
+const empty=()=>({session:null,user:null,state:null,users:[],invitations:[],sessions:[],audit:[],devices:[],counter:null,student:null});
+const read=()=>{for(const storage of [globalThis.sessionStorage,globalThis.localStorage])try{const value=JSON.parse(storage?.getItem(KEY)||'null');if(value?.session?.access_token||value?.counterCredential===true&&/^[a-f0-9]{64}$/.test(value.merchantToken||''))return value}catch{}return null};
 function authState(){let best=null;for(const [storage,key] of [[globalThis.localStorage,AUTH_KEY],[globalThis.sessionStorage,AUTH_KEY+'-tab']])try{const value=JSON.parse(storage?.getItem(key)||'null');if(value?.epoch&&(!best||(value.authVersion||0)>(best.authVersion||0)||(value.authVersion||0)===(best.authVersion||0)&&(value.writtenAt||0)>(best.writtenAt||0)))best=value}catch{}return best;}
 let saved=read(),refreshing=null,invitation=null,authChannel=null,authGeneration=0;
 let transportEpoch=authState()?.epoch||saved?.authEpoch||null;
 const changed=()=>Object.assign(new Error('Your account changed while this request was running. Continue with the current sign-in.'),{status:409,code:'AUTH_CHANGED'});
-const signature=value=>JSON.stringify([value?.session?.user?.id,value?.session?.access_token,value?.session?.refresh_token,value?.merchantToken]);
+const signature=value=>JSON.stringify([value?.session?.user?.id,value?.session?.access_token,value?.session?.refresh_token,value?.merchantToken,value?.counterCredential===true]);
 function requireCurrent(generation,epoch){const current=authState()?.epoch||transportEpoch;if(generation!==authGeneration||epoch&&current&&epoch!==current)throw changed();}
 function persist(value,remember=saved?.remember===true,{broadcast=true,generation=authGeneration,epoch=authState()?.epoch}={}){
  requireCurrent(generation,epoch);saved=value?{...value,remember,authEpoch:epoch||value.authEpoch||null}:null;
@@ -25,7 +25,7 @@ try{if(typeof window!=='undefined'&&typeof BroadcastChannel!=='undefined'){
   if(incoming?.type==='request'){if(saved&&!locallySignedOut()&&saved.authEpoch===currentEpoch)authChannel.postMessage({type:'session',value:saved,epoch:saved.authEpoch});return}
   if(incoming?.type==='session'){
    const next=incoming.value;if(incoming.epoch&&currentEpoch&&incoming.epoch!==currentEpoch)return;
-   if(next&&(!next.session?.access_token||locallySignedOut()||next.authEpoch!==incoming.epoch))return;
+   if(next&&(!(next.session?.access_token||next.counterCredential===true&&/^[a-f0-9]{64}$/.test(next.merchantToken||''))||locallySignedOut()||next.authEpoch!==incoming.epoch))return;
    if(signature(next)===signature(saved))return;
    const generation=++authGeneration;refreshing=null;transportEpoch=incoming.epoch||currentEpoch;
    try{persist(next,next?.remember===true,{broadcast:false,generation,epoch:incoming.epoch||currentEpoch});window.dispatchEvent(new Event('lumo-merchant-session-change'));}catch{}
@@ -57,8 +57,8 @@ export async function merchantFetch(path,options={}){
  const generation=explicitAuth||logout?++authGeneration:authGeneration;if(explicitAuth||logout)refreshing=null;
  requireCurrent(generation,epoch);
  if(!explicitAuth&&!logout&&saved?.authEpoch&&epoch&&saved.authEpoch!==epoch)return response({ok:false,status:409,code:'AUTH_CHANGED',error:'Your account changed. Sign in again before continuing.'},409);
- if(pathname==='/api/session'&&!saved?.session?.access_token)return response(empty());
- if(logout&&!saved?.session?.access_token)return response(empty());
+ if(pathname==='/api/session'&&!saved?.session?.access_token&&!saved?.counterCredential)return response(empty());
+ if(logout&&!saved?.session?.access_token&&!saved?.counterCredential)return response(empty());
  if(pathname==='/api/signup'){
   const creds=input.credentials||input,business=input.business||input;
   const failure=await authenticate('register',{handle:creds.username,password:creds.password,displayName:business.ownerName,phone:business.phone,remember:input.remember===true},signal,generation,epoch);if(failure)return failure;
@@ -87,6 +87,7 @@ export async function merchantFetch(path,options={}){
  }
  if(ownerId!==saved?.session?.user?.id)throw changed();
  const data=result.data;
+ if(data.ok!==false&&data.counter&&data.counterTransport===true&&saved){persist({counterCredential:true,merchantToken:data.merchantToken||saved.merchantToken},true,{generation,epoch});delete data.merchantToken;}
  if(Object.hasOwn(data,'merchantToken')&&saved){persist({...saved,merchantToken:data.merchantToken||null},saved.remember,{generation,epoch});delete data.merchantToken;}
  if(data.invitation&&pathname.startsWith('/api/invitations/'))invitation=data.invitation;
  if(logout&&data.ok!==false){const token=saved?.session?.access_token;persist(null,false,{generation,epoch});if(token)post('/auth/v1/logout?scope=local',{},token).catch(()=>{});}

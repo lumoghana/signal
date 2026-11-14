@@ -1,3 +1,4 @@
+import {counterAction,publicCounter,counterScope,cashierRoster,lockedCounterState} from './counter.js';
 import {createBusiness,reduceBusiness,metricsFor,applyAutomaticClosings} from '../dist/domain.js';
 import {APIError,readNetwork,updateNetwork,uid,iso,randomToken,hashToken,makePassword,matchesPassword,validatePassword,username,text,phone,publicUser,audit,rateLimit,cookieToken,sessionCookie,clearCookie,resolveSession,publicSession,requireSession,revokeSessions,newSession,assigned,validateShops,projectUsers,scopedBusiness,publicShop,publicInvitation,walletInfo} from './network.js';
 const copy=x=>structuredClone(x);
@@ -27,13 +28,13 @@ function publicWallet(n,w,options){
 function ensureTestAcceptanceTokens(b){let changed=false;for(const shop of b.shops||[])if(typeof shop.testAcceptanceToken!=='string'||!/^[a-f0-9]{64}$/.test(shop.testAcceptanceToken)){shop.testAcceptanceToken=randomToken();changed=true}return changed}
 function bundle(n,tokenHash,studentHash,extra={}){
  const c=resolveSession(n,tokenHash),w=studentFor(n,studentHash);
- if(!c)return {session:null,user:null,state:null,users:[],invitations:[],sessions:[],audit:[],devices:[],student:publicWallet(n,w),...extra};
- const b=n.businesses[c.user.businessId],scoped=b?scopedBusiness(b,c.user):null;if(scoped)scoped.shopReadiness=readiness(n,b,new Set(c.user.role==='owner'?b.shops.map(s=>s.id):c.user.shopIds));
- return {session:publicSession(c.session,c.user),user:publicUser(c.user),state:scoped,metrics:b?c.user.role==='owner'?metricsFor(b):null:null,
+ if(!c)return {counterTransport:false,counter:null,session:null,user:null,state:null,users:[],invitations:[],sessions:[],audit:[],devices:[],student:publicWallet(n,w),...extra};
+ const b=n.businesses[c.user.businessId],scoped=c.locked?lockedCounterState(n,c):b?counterScope(n,c,scopedBusiness(b,c.user)):null;if(scoped)scoped.shopReadiness=readiness(n,b,new Set(c.user.role==='owner'?b.shops.map(s=>s.id):c.user.shopIds));
+ return {counterTransport:!!c.counter,counter:publicCounter(n,c),session:publicSession(c.session,c.user),user:publicUser(c.user),state:scoped,metrics:b?c.user.role==='owner'?metricsFor(b):null:null,
   users:n.users.filter(u=>u.businessId===c.user.businessId&&(c.user.role==='owner'||u.id===c.user.id)).map(publicUser),
   invitations:c.user.role==='owner'?n.invitations.filter(i=>i.businessId===c.user.businessId).map(publicInvitation):[],
-  sessions:publicSessions(n,c),audit:n.audit.filter(a=>a.businessId===c.user.businessId&&(c.user.role==='owner'||a.userId===c.user.id)).slice(0,300),
-  devices:n.devices.filter(d=>d.businessId===c.user.businessId&&(c.user.role==='owner'||d.userId===c.user.id)).map(d=>publicDevice(d,n)),
+  sessions:c.counter?[]:publicSessions(n,c),audit:c.counter?[]:n.audit.filter(a=>a.businessId===c.user.businessId&&(c.user.role==='owner'||a.userId===c.user.id)).slice(0,300),
+  devices:n.devices.filter(d=>d.businessId===c.user.businessId&&(c.counter?d.id===c.counter.deviceId:c.user.role==='owner'||d.userId===c.user.id)).map(d=>publicDevice(d,n)),
   student:publicWallet(n,w),...extra};
 }
 function publicDevice(d,n){return {id:d.id,businessId:d.businessId,shopId:d.shopId,userId:d.userId,label:d.label,enabled:d.enabled,revokedAt:d.revokedAt||null,lastSeen:d.lastSeen,testedAt:d.testedAt||null,createdAt:d.createdAt,pairedAt:d.pairedAt||d.createdAt,sessionId:d.sessionId||null,soundReady:d.soundReady===true,announcementFailed:d.announcementFailed===true,failureVersion:Number.isSafeInteger(d.failureVersion)?d.failureVersion:0,sessionValid:!!n&&deviceValid(n,d)}}
@@ -145,6 +146,7 @@ function requireFreshDeviceOwner(c,d){
 }
 function deviceValid(n,d){
  const s=n.sessions.find(s=>s.id===d.sessionId),u=n.users.find(u=>u.id===d.userId);
+ if(s?.counterId){const context=resolveSession(n,s.tokenHash);return !!context?.counter&&!context.locked&&context.user.id===d.userId&&context.counter.deviceId===d.id&&context.counter.shopId===d.shopId;}
  return !!s&&!!u?.active&&!s.revokedAt&&Date.parse(s.expiresAt)>Date.now()&&s.userVersion===(u.sessionVersion||1)&&s.userId===u.id&&s.businessId===d.businessId&&u.businessId===d.businessId&&(u.role==='owner'||u.shopIds.includes(d.shopId));
 }
 function readiness(n,b,allowed){
@@ -228,6 +230,18 @@ export async function handleAPI(request,env){
   const p=method==='POST'?await bodyJSON(request):Object.fromEntries(url.searchParams),ip=request.headers.get('cf-connecting-ip')||'unknown';
   if(method==='POST'&&(/\/(login|recovery|username|step-up|password|transfer|phone)/.test(path)||['/api/signup','/api/migrate','/api/invitations/accept'].includes(path))){
    const key=await hashToken(ip+':'+path);await updateNetwork(env,n=>{rateLimit(n,'request:'+key,path==='/api/signup'||path==='/api/migrate'?10:20,60000);return {}});
+  }
+  const activeContext=resolveSession((await readNetwork(env)).state,tokenHash);
+  if(activeContext?.counter&&!['/api/session','/api/business','/api/logout','/api/auth/logout','/api/counter','/api/counter/unlock','/api/counter/lock','/api/action','/api/devices','/api/health'].includes(path)&&!/^\/api\/devices\/[^/]+$/.test(path))throw new APIError('This phone is restricted to cashier collections. Sign in separately for business management.',403,'COUNTER_ONLY');
+  if(method==='GET'&&path==='/api/counter'){
+   const {state:n,revision}=await readNetwork(env),c=resolveSession(n,tokenHash);if(!c)throw new APIError('Sign in to open this counter.',401,'SIGN_IN_REQUIRED');
+   const management=!c.counter&&['owner','manager'].includes(c.user.role);
+   return response({...bundle(n,tokenHash,studentHash),revision,...(management?{counterStaff:cashierRoster(n,c.user.businessId).filter(p=>c.user.role==='owner'||p.shopIds.some(id=>c.user.shopIds.includes(id))),counters:(n.businesses[c.user.businessId].counterDevices||[]).filter(d=>c.user.role==='owner'||c.user.shopIds.includes(d.shopId)).map(d=>({id:d.id,deviceId:d.deviceId,label:d.label,mode:d.mode,shopId:d.shopId,revokedAt:d.revokedAt||null,staffUserId:d.staffUserId,createdAt:d.createdAt}))}: {})});
+  }
+  if(method==='POST'&&/^\/api\/counter\/(setup|pin|unlock|lock|revoke)$/.test(path)){
+   const out=await updateNetwork(env,async n=>{const result=await counterAction(n,tokenHash,path,p);return {data:{...bundle(n,tokenHash,studentHash),...result}};});
+   if(out.data.counterError){const error=out.data.counterError;return response({error:error.error,code:error.code,revision:out.revision},error.status);}
+   return response({...out.data,revision:out.revision});
   }
   if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,storage:'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
   if(method==='GET'&&['/api/session','/api/business'].includes(path)){
@@ -428,7 +442,7 @@ if(method==='POST'&&path==='/api/signup'){
     const auto=applyAutomaticClosings(q.b,iso()),b=auto.state;
     const change=reduceBusiness(b,'PAY',{shopId:q.s.id,amount,payer:w.name,requestId:q.r?.id,attemptId:w.id+':'+attempt,method:p.method|| (q.r?'request':'qr'),status:'paid'},{role:'student'});
     if(!change.changed||change.entity.status!=='paid')throw new APIError('This request already has a payment in progress. Ask the merchant to check its status before trying again.',409,'REQUEST_PROCESSING');
-    const t=change.entity;t.studentWalletId=w.id;t.sandbox=true;t.confirmedAt=t.confirmedAt||iso();
+    const t=change.entity;if(q.r?.counterId)t.counterId=q.r.counterId;t.studentWalletId=w.id;t.sandbox=true;t.confirmedAt=t.confirmedAt||iso();
     const stored=change.state.transactions.find(x=>x.id===t.id);Object.assign(stored,t);n.businesses[b.business.id]=change.state;
     w.balance-=amount;w.entries.unshift({id:uid('wallet-entry'),type:'merchant-payment',amount:-amount,attemptId:attempt,status:t.status,confirmedAt:t.confirmedAt,businessId:b.business.id,shopId:q.s.id,reference:t.reference,transactionId:t.id,createdAt:iso(),description:b.business.name+' · '+q.s.name});
     n.attempts[w.id+':'+attempt]={businessId:b.business.id,shopId:q.s.id,requestId:q.r?.id||null,transactionId:t.id,amount,createdAt:iso()};
@@ -443,6 +457,17 @@ if(method==='POST'&&path==='/api/signup'){
    const refundAttempt=type==='REFUND'?attemptValue(payload.attemptId):null,refundHash=type==='REFUND'?await fingerprint({transactionId:payload.transactionId,amount:payload.amount,reason:String(payload.reason||'Customer refund').trim()}):null,settlementAttempt=type==='SETTLE'?attemptValue(payload.attemptId):null;
    const out=await updateNetwork(env,n=>{
     const c=requireSession(n,tokenHash),b=n.businesses[c.user.businessId];
+    if(c.counter&&!['CREATE_REQUEST','CANCEL_REQUEST','REFUND','ADD_TICKET','START_SHIFT','END_SHIFT'].includes(type))throw new APIError('Cashiers can collect payments and raise receipt-linked requests only.',403,'CASHIER_ACTION_FORBIDDEN');
+    if(c.counter){
+     const currentShift=b.shifts.find(shift=>shift.shopId===c.counter.shopId&&shift.staffId==='access-'+c.user.id&&shift.status==='open');
+     if(payload.counterStaffId!=='access-'+c.user.id||(payload.counterShiftId||null)!==(currentShift?.id||null))throw new APIError('The cashier changed before this request arrived. Reopen the current counter before continuing.',409,'COUNTER_OPERATOR_CHANGED');
+     delete payload.counterStaffId;delete payload.counterShiftId;
+     const request=b.requests.find(r=>r.id===payload.id),tx=b.transactions.find(t=>t.id===payload.transactionId);
+     const belongs=record=>record&&(c.counter?record.counterId===c.counter.id:record.staffId==='access-'+c.user.id);
+     if(type==='ADD_TICKET'&&!payload.transactionId&&payload.shopId!==c.counter.shopId)throw new APIError('Help requests must belong to this counter’s shop.',403,'COUNTER_SCOPE');
+     if(type==='CANCEL_REQUEST'&&!belongs(request))throw new APIError('This request belongs to another counter.',403,'COUNTER_SCOPE');
+     if((type==='REFUND'||type==='ADD_TICKET'&&payload.transactionId)&&!belongs(tx))throw new APIError('Choose a receipt collected at this counter.',403,'COUNTER_SCOPE');
+    }
     if(['RESOLVE_PAYMENT','RESOLVE_SETTLEMENT'].includes(type)&&c.user.role!=='owner')throw new APIError('Only the sandbox owner can resolve simulated outcomes.',403);
     if(['REGISTER_BUSINESS','ADD_STAFF','UPDATE_STAFF'].includes(type))throw new APIError('Use account signup and user invitations to manage access.',403);
     const settlementKey=settlementAttempt?b.business.id+':'+settlementAttempt:null;
@@ -468,6 +493,10 @@ if(method==='POST'&&path==='/api/signup'){
     if(type==='UPDATE_SHOP'&&payload.published===true){const target=b.shops.find(s=>s.id===payload.id);if(!target||!publicationReady(n,b,target))throw new APIError('Confirm location, display the QR, assign a counter operator and test a connected receiving phone before publishing.',409,'SHOP_NOT_READY');}
     projectUsers(n,b);const auto=applyAutomaticClosings(b,iso()),prior=copy(auto.state),change=reduceBusiness(auto.state,type,payload,actor);
     if(type==='CREATE_REQUEST'&&change.changed){const previousId=change.entity.id;change.entity.id=crypto.randomUUID();const request=change.state.requests.find(r=>r.id===previousId);request.id=change.entity.id;}
+    if(type==='CREATE_REQUEST'&&c.counter){
+     if(change.entity.counterId&&change.entity.counterId!==c.counter.id)throw new APIError('This request belongs to a different counter.',409,'IDEMPOTENCY_MISMATCH');
+     const request=change.state.requests.find(r=>r.id===change.entity.id);request.counterId=c.counter.id;change.entity.counterId=c.counter.id;
+    }
     if(type==='ADD_SHOP'){const previousId=change.entity.id;change.entity.id=crypto.randomUUID();change.state.shops.find(s=>s.id===previousId).id=change.entity.id;change.entity.code='LUM'+(++n.counters.shop);const sh=change.state.shops.find(s=>s.id===change.entity.id);sh.code=change.entity.code;sh.testAcceptanceToken=randomToken();change.entity.testAcceptanceToken=sh.testAcceptanceToken;c.user.shopIds=change.state.shops.map(s=>s.id)}
     if(refundKey)n.refundAttempts[refundKey]={businessId:b.business.id,userId:c.user.id,refundId:change.entity.id,fingerprint:refundHash,createdAt:iso()};
     if(settlementKey)n.settlementAttempts[settlementKey]={businessId:b.business.id,userId:c.user.id,settlementId:change.entity.id,amount:change.entity.amount,destination:change.entity.destination,createdAt:iso()};
@@ -552,16 +581,16 @@ if(method==='POST'&&path==='/api/signup'){
    const out=await updateNetwork(env,n=>{
     const c=requireSession(n,tokenHash),s=n.sessions.find(s=>s.id===sessionPath[1]&&s.businessId===c.user.businessId);
     if(!s||c.user.role!=='owner'&&s.userId!==c.user.id)throw new APIError('This session is outside your access.',403);
-    s.revokedAt=iso();s.revokeReason='Session revoked';audit(n,'SESSION_REVOKED',c.user.businessId,c.user.id,{sessionId:s.id});return {data:bundle(n,tokenHash,studentHash,{success:true})};
+    s.revokedAt=iso();s.revokeReason='Session revoked';if(s.counterId){const counter=n.businesses[c.user.businessId]?.counterDevices?.find(d=>d.id===s.counterId);if(counter)counter.revokedAt=s.revokedAt;}audit(n,'SESSION_REVOKED',c.user.businessId,c.user.id,{sessionId:s.id});return {data:bundle(n,tokenHash,studentHash,{success:true})};
    });return response({...out.data,revision:out.revision});
   }
   if(method==='GET'&&path==='/api/devices'){
    const {state:n,revision}=await readNetwork(env),c=requireSession(n,tokenHash);
-   return response({revision,devices:n.devices.filter(d=>d.businessId===c.user.businessId&&(c.user.role==='owner'||d.userId===c.user.id)).map(d=>publicDevice(d,n))});
+   return response({revision,devices:n.devices.filter(d=>d.businessId===c.user.businessId&&(c.counter?d.id===c.counter.deviceId:c.user.role==='owner'||d.userId===c.user.id)).map(d=>publicDevice(d,n))});
   }
 if(method==='POST'&&path==='/api/devices'){
    const out=await updateNetwork(env,n=>{
-    const c=requireSession(n,tokenHash);assigned(n,c.user,p.shopId);
+    const c=requireSession(n,tokenHash);if(c.counter)throw new APIError('This counter is already paired. Ask the owner to change its setup.',403,'COUNTER_ONLY');assigned(n,c.user,p.shopId);
     const deviceId=text(p.deviceId,'Device identifier',100),previous=n.devices.find(d=>d.id===deviceId);
     if(previous?.revokedAt)requireFreshDeviceOwner(c,previous);
     if(previous&&(previous.businessId!==c.user.businessId||previous.userId!==c.user.id))throw new APIError('This browser was paired by another account. Use a new pairing identifier.',409);
@@ -575,6 +604,7 @@ if(method==='POST'&&path==='/api/devices'){
   if(method==='POST'&&devicePath){
    const out=await updateNetwork(env,n=>{
     const c=requireSession(n,tokenHash),d=n.devices.find(d=>d.id===decodeURIComponent(devicePath[1])&&d.businessId===c.user.businessId);
+    if(c.counter&&(!['heartbeat','test','disable','enable'].includes(p.action)||d?.id!==c.counter.deviceId))throw new APIError('This receiving phone is outside your counter access.',403,'COUNTER_ONLY');
     if(!d||c.user.role!=='owner'&&d.userId!==c.user.id)throw new APIError('This receiving phone is outside your access.',403);
     if(p.action!=='revoke')assigned(n,c.user,d.shopId);
     if(d.revokedAt&&p.action!=='enable'&&p.action!=='revoke')throw new APIError('This receiving phone was revoked. Pair it again.',403);
@@ -584,7 +614,7 @@ if(method==='POST'&&path==='/api/devices'){
     else if(p.action==='test'){if(!d.enabled||p.soundReady!==true)throw new APIError('Play and confirm the voice test on this phone first.');const version=Number.isSafeInteger(d.failureVersion)?d.failureVersion:0,expected=p.expectedFailureVersion===undefined&&version===0?0:p.expectedFailureVersion;if(!Number.isSafeInteger(expected)||expected!==version)throw new APIError('This sound test was completed before the latest announcement failure. Play a new test before serving.',409,'AUDIO_TEST_STALE');d.testedAt=iso();d.soundReady=true;d.announcementFailed=false;d.lastSeen=iso()}
     else if(p.action==='revoke'){
      const ids=d.sessionId?[d.sessionId]:n.sessions.filter(s=>s.userId===d.userId&&s.businessId===d.businessId&&!s.revokedAt).map(s=>s.id);
-     for(const s of n.sessions)if(ids.includes(s.id)&&!s.revokedAt){s.revokedAt=iso();s.revokeReason='Receiving phone revoked'}
+     for(const s of n.sessions)if(ids.includes(s.id)&&!s.revokedAt){s.revokedAt=iso();s.revokeReason='Receiving phone revoked';if(s.counterId){const counter=n.businesses[c.user.businessId]?.counterDevices?.find(counter=>counter.id===s.counterId);if(counter)counter.revokedAt=s.revokedAt;}}
      for(const device of n.devices)if(device.id===d.id||ids.includes(device.sessionId)){device.revokedAt=iso();device.enabled=false;device.soundReady=false}
      audit(n,'DEVICE_AND_SESSION_REVOKED',c.user.businessId,c.user.id,{deviceId:d.id});
     }
@@ -601,4 +631,3 @@ if(method==='POST'&&path==='/api/devices'){
   return response({error:internal?'The shared service is temporarily unavailable. Please retry when connected.':error?.message||'The request could not be completed.',code:internal?'SERVICE_UNAVAILABLE':error.code||'REQUEST_FAILED'},internal?503:error.status||400);
  }
 }
-

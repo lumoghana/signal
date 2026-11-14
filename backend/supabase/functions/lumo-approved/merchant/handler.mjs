@@ -4,8 +4,8 @@ import {APIError,emptyNetwork,hashToken,resolveSession} from './server/network.j
 const clone=value=>structuredClone(value);
 const PUBLIC_GET=/^\/api\/(?:health|directory|lookup|payments\/quote|invitations\/[^/]+)(?:\?|$)/;
 const ALIASES={'/api/login':'/api/auth/login','/api/logout':'/api/auth/logout','/api/business':'/api/session','/api/password':'/api/auth/password','/api/recovery/start':'/api/auth/recovery/start','/api/recovery/complete':'/api/auth/recovery/complete','/api/auth/username/recover':'/api/auth/username','/api/ownership/transfer':'/api/auth/transfer','/api/step-up':'/api/auth/step-up','/api/auth/phone/change':'/api/auth/phone'};
-const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|invitations\/[A-Za-z0-9_-]+)$/;
-const POST_ROUTE=/^\/api\/(?:signup|action|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
+const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter|invitations\/[A-Za-z0-9_-]+)$/;
+const POST_ROUTE=/^\/api\/(?:signup|action|counter\/(?:setup|pin|unlock|lock|revoke)|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
 export function normalizeMerchantPath(value){
  const raw=String(value||'');if(raw.length>3000||!raw.startsWith('/api/')||raw.includes('#'))return null;
  const index=raw.indexOf('?'),rawPath=index<0?raw:raw.slice(0,index),query=index<0?'':raw.slice(index);
@@ -35,7 +35,7 @@ export function hydrateMerchantNetwork(raw){
   b.requests=[...requests.values()];
   b.transactions=ledger.filter(j=>j.type==='merchant_payment').map(j=>{
    const old=oldPayments.get(j.id)||{},request=requests.get(j.requestId);
-   return {...old,id:j.id,shopId:j.shopId,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true};
+   return {...old,id:j.id,shopId:j.shopId,counterId:old.counterId||request?.counterId||null,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true};
   });
   const canonicalRefunds=ledger.filter(j=>j.type==='refund').map(j=>{
    const key=j.refundId||j.id,old=oldRefunds.get(key)||{};
@@ -61,26 +61,42 @@ export function createMerchantHandler({serviceRpc}){
  return async ({body,identity})=>{
   const path=normalizeMerchantPath(body.path),method=body.method||'GET',pathname=path?.split('?')[0],input=body.body||{};
   if(!path||!['GET','POST'].includes(method))return failure('INVALID_REQUEST');
-  if(!identity&&!PUBLIC_GET.test(path))return failure('SESSION_REVOKED',401);
+  if(!identity&&!PUBLIC_GET.test(path)&&!(typeof body.merchantToken==='string'&&/^[a-f0-9]{64}$/.test(body.merchantToken)))return failure('SESSION_REVOKED',401);
   if(UNAVAILABLE.has(pathname)||/^\/api\/users\/[^/]+\/reset$/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
   if(/^\/api\/(?:student|sandbox-fund|payments$)/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
   if(pathname==='/api/simulate'||pathname==='/api/action'&&['PAY','RESOLVE_PAYMENT','SETTLE','RESOLVE_SETTLEMENT'].includes(input.type))return failure('UNAVAILABLE_SERVICE',503);
   if(!(method==='GET'?GET_ROUTE:POST_ROUTE).test(pathname))return failure('INVALID_REQUEST',404);
-  const actor=identity?.userId||null,sessionId=identity?.sessionId||null;
+  let actor=identity?.userId||null,sessionId=identity?.sessionId||null;
   const merchantToken=typeof body.merchantToken==='string'&&/^[a-f0-9]{64}$/.test(body.merchantToken)?body.merchantToken:'';
   const tokenHash=await hashToken(merchantToken);
   let lastRead=null;
   async function read(){
-   const raw=await serviceRpc('lumo_approved_merchant_read',{p_actor:actor,p_session:sessionId});
+   let raw=await serviceRpc('lumo_approved_merchant_read',{p_actor:actor,p_session:sessionId});
    if(!raw?.ok)throw new APIError(message(raw?.code),raw?.code==='SESSION_REVOKED'?401:503,raw?.code||'STORAGE_UNAVAILABLE');
-   const state=hydrateMerchantNetwork(raw),current=resolveSession(state,tokenHash);
-   if(current&&current.user._sharedUserId!==actor)throw new APIError(message('FORBIDDEN'),403,'FORBIDDEN');
+   let state=hydrateMerchantNetwork(raw),current=resolveSession(state,tokenHash);
+   // A paired counter retains only its high-entropy merchant capability. The
+   // approving owner's Supabase bearer/refresh credentials leave the phone.
+   // Recover server-held approval identity only after resolving that capability,
+   // then recheck the original Auth session before reading or committing data.
+   if(!identity&&current?.counter){
+    const bound=current.session._counterSharedUserId,boundSession=current.session._counterSharedSessionId;
+    if(!bound||!boundSession||bound!==current.anchorUser?._sharedUserId)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');
+    if(!actor){actor=bound;sessionId=boundSession;raw=await serviceRpc('lumo_approved_merchant_read',{p_actor:actor,p_session:sessionId});if(!raw?.ok)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');state=hydrateMerchantNetwork(raw);current=resolveSession(state,tokenHash);}
+    if(!current?.counter||current.session._counterSharedUserId!==actor||current.session._counterSharedSessionId!==sessionId)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');
+   }
+   if(!identity&&!PUBLIC_GET.test(path)&&!current?.counter)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');
+   if(current&&(current.anchorUser||current.user)._sharedUserId!==actor)throw new APIError(message('FORBIDDEN'),403,'FORBIDDEN');
    lastRead={...raw,state};return {revision:raw.revision,state};
   }
   async function update(mutate){
-   if(!identity)throw new APIError('Sign in before changing a merchant record.',401,'SESSION_REVOKED');
+   if(!identity&&!merchantToken)throw new APIError('Sign in before changing a merchant record.',401,'SESSION_REVOKED');
    for(let attempt=0;attempt<12;attempt++){
     const {revision,state}=await read(),draft=clone(state),out=await mutate(draft,{revision});
+    if(pathname==='/api/counter/setup'){
+     const approved=resolveSession(draft,tokenHash);
+     if(!identity||!approved?.counter||(approved.anchorUser||approved.user)._sharedUserId!==actor)throw new APIError(message('FORBIDDEN'),403,'FORBIDDEN');
+     approved.session._counterSharedUserId=actor;approved.session._counterSharedSessionId=sessionId;
+    }
     const loginUser=out?.data?.user;
     if(LOGIN.has(pathname)&&loginUser){
      const linked=draft.users.find(u=>u.id===loginUser.id);

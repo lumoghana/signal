@@ -147,3 +147,40 @@ test('merchant Lux cancellation cannot return a late successful answer',async()=
 test('merchant Lux handles a malformed service reply with a focused retry',async()=>{
  const f=await setup();try{f.configure(()=>response(null));await assert.rejects(f.module.merchantFetch('/api/lux',luxRequest),/could not read a response/)}finally{f.cleanup()}
 });
+
+test('counter setup removes the owner access and refresh tokens from phone storage',async()=>{
+ const f=await setup();
+ try{
+  f.configure(call=>{
+   assert.equal(call.body.action,'merchant');
+   if(call.body.path==='/api/counter/setup')return response({ok:true,counterTransport:true,counter:{id:'counter-1',locked:true},session:{role:'cashier'}});
+   assert.equal(call.body.path,'/api/counter');
+   assert.equal(call.options.headers.Authorization,undefined,'counter requests carry no owner JWT');
+   assert.equal(call.body.merchantToken,'a'.repeat(64));
+   return response({ok:true,counterTransport:true,counter:{id:'counter-1',locked:true},session:{role:'cashier'}});
+  });
+  await f.module.merchantFetch('/api/counter/setup',{method:'POST',body:JSON.stringify({mode:'shared'})});
+  assert.equal(f.stored().counterCredential,true);
+  assert.equal(f.stored().session,undefined);
+  assert.equal(JSON.stringify(f.stored()).includes('a-access'),false);
+  assert.equal(JSON.stringify(f.stored()).includes('a-refresh'),false);
+  assert.equal((await f.module.merchantFetch('/api/counter')).status,200);
+ }finally{f.cleanup()}
+});
+
+test('counter sign-out ends only the scoped merchant credential without an owner JWT call',async()=>{
+ const f=await setup();
+ try{
+  f.configure(call=>{
+   assert.equal(call.body.action,'merchant');
+   if(call.body.path==='/api/counter/setup')return response({ok:true,counterTransport:true,counter:{id:'counter-1',locked:true},session:{role:'cashier'}});
+   assert.equal(call.body.path,'/api/auth/logout');
+   assert.equal(call.options.headers.Authorization,undefined);
+   return response({ok:true,session:null,merchantToken:''});
+  });
+  await f.module.merchantFetch('/api/counter/setup',{method:'POST',body:'{}'});
+  await f.module.merchantFetch('/api/auth/logout',{method:'POST',body:'{}'});
+  assert.equal(f.stored(),null);
+  assert.equal(f.calls.some(call=>call.url.includes('/auth/v1/logout')),false);
+ }finally{f.cleanup()}
+});

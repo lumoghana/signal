@@ -373,7 +373,7 @@ export function reduceBusiness(snapshot, type, payload = {}, actor = {role: 'own
       if (!shop.accepting || shop.open === false) throw new Error('This shop is not accepting payments right now. Resume payments before creating a QR.');
       const person = actor.role === 'owner' && staffId === actorDetails.staffId ? {name: actorDetails.performedBy} : getStaff(next, staffId, payload.shopId);
       const shift = next.shifts.find(shift => shift.shopId === payload.shopId && shift.staffId === staffId && shift.status === 'open');
-      entity = { id: id('request'), shopId: payload.shopId, staffId, staffName: person?.name || null, shiftId: shift?.id || null, createdByRole: actor.role, createdByUserId: actor.userId || null, amount, description, ...(attemptId ? {attemptId} : {}), createdAt: timestamp(), expiresAt: new Date(Date.parse(now) + 15 * 60000).toISOString(), status: 'open' };
+      entity = { id: id('request'), ...(actor.counterId?{counterId:actor.counterId}:{}), shopId: payload.shopId, staffId, staffName: person?.name || null, shiftId: shift?.id || null, createdByRole: actor.role, createdByUserId: actor.userId || null, amount, description, ...(attemptId ? {attemptId} : {}), createdAt: timestamp(), expiresAt: new Date(Date.parse(now) + 15 * 60000).toISOString(), status: 'open' };
       next.requests.unshift(entity);
       break;
     }
@@ -420,7 +420,7 @@ export function reduceBusiness(snapshot, type, payload = {}, actor = {role: 'own
       const status = payload.status || 'paid';
       if (!['paid', 'processing', 'failed'].includes(status)) throw new Error('Payment status is not valid.');
       const shift = next.shifts.find(shift => shift.shopId === shopId && shift.staffId === staffId && shift.status === 'open');
-      entity = { id: id('payment'), shopId, staffId, staffName: request?.staffName || receivingPerson?.name || null, shiftId: request?.shiftId || shift?.id || null, payer: requireText(payload.payer || 'Student customer', 'Customer name', 60), amount, status, createdAt: timestamp(), confirmedAt: status === 'paid' ? timestamp() : null, recordedTradingDay: businessDay(now,configuredCutoff(next,shopId)), recordedCutoff: configuredCutoff(next,shopId), tradingDay: status === 'paid' ? businessDay(now,configuredCutoff(next,shopId)) : null, tradingCutoff: status === 'paid' ? configuredCutoff(next,shopId) : null, reference: `LM${Date.parse(now).toString().slice(-7)}${id('ref').slice(-8)}`, method, requestId: request?.id || null, attemptId: payload.attemptId || null };
+      entity = { id: id('payment'), ...(request?.counterId?{counterId:request.counterId}:{}), shopId, staffId, staffName: request?.staffName || receivingPerson?.name || null, shiftId: request?.shiftId || shift?.id || null, payer: requireText(payload.payer || 'Student customer', 'Customer name', 60), amount, status, createdAt: timestamp(), confirmedAt: status === 'paid' ? timestamp() : null, recordedTradingDay: businessDay(now,configuredCutoff(next,shopId)), recordedCutoff: configuredCutoff(next,shopId), tradingDay: status === 'paid' ? businessDay(now,configuredCutoff(next,shopId)) : null, tradingCutoff: status === 'paid' ? configuredCutoff(next,shopId) : null, reference: `LM${Date.parse(now).toString().slice(-7)}${id('ref').slice(-8)}`, method, requestId: request?.id || null, attemptId: payload.attemptId || null };
       next.transactions.unshift(entity);
       if (request && status === 'paid') request.status = 'paid';
       break;

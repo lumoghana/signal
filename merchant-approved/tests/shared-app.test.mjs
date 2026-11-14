@@ -165,16 +165,16 @@ test('legacy D1 compatibility: app modules connect signup, team access, campus w
    await submit({username:'shared.ui.cashier',newPassword:'SharedCashier123',confirmPassword:'SharedCashier123'});
    await until(()=>Auth.getSession()?.role==='cashier','accepted cashier');
    await until(()=>html().includes('recovery-key')||html().includes('Keep a way back'),'cashier recovery key');await submit({keySaved:'on'});
-   await until(()=>html().includes('Your receiving phone'),'cashier Home');cashier=Auth.getSession();
+   await until(()=>html().includes('cashier-workspace')&&html().includes('Collect payment'),'cashier collection view');cashier=Auth.getSession();
    assert.doesNotMatch(html(),/Merchant balance|data-page="settlements"|data-page="team"|data-action="role-switch"/);
-   await click('go-settlements');assert.match(html(),/Your receiving phone/);
+   await click('go-settlements');assert.match(html(),/cashier-workspace/);assert.doesNotMatch(html(),/Merchant balance|Move confirmed proceeds/);
    await submit({name:'Unauthorised Rename'},'business');assert.equal(Shared.getCache().state.business.name,'Shared Campus Kitchen');
   });
   await t.test('a new merchant stays private until counter setup and explicit publication are complete',async()=>{
    const before=await (await rawFetch('/api/directory')).json();assert.ok(!before.shops.some(shop=>shop.id===shopId),'A new signup must not silently become a public campus listing');
-   await click('go-devices');await submit({label:'Night Market test phone',shopId},'devices');await until(()=>Shared.getCache().devices.some(device=>device.shopId===shopId),'cashier receiving phone paired');
+   await click('cashier-sound');await submit({label:'Night Market test phone',shopId},'devices');await until(()=>Shared.getCache().devices.some(device=>device.shopId===shopId),'cashier receiving phone paired');
    await click('device-test');await until(()=>Shared.getCache().devices.some(device=>device.shopId===shopId&&device.testedAt&&device.soundReady===true),'cashier receiving phone tested');
-   await click('go-home');await until(()=>html().includes('Announcements are on'),'registered Home receiving status');assert.match(html(),/This tab is the receiving device/);
+   assert.match(modal(),/This tab open|Keep this tab open|Voice test completed|Ready to announce/);await click('dismiss');await until(()=>html().includes('Ready to receive'),'cashier receiving status');
    await external('/api/action',{type:'UPDATE_ACTIVATION',payload:{shopId,locationConfirmed:true,qrReady:true}},ownerJar);
    await external('/api/action',{type:'UPDATE_SHOP',payload:{id:shopId,published:true}},ownerJar);
    const after=await (await rawFetch('/api/directory')).json();assert.ok(after.shops.some(shop=>shop.id===shopId));assert.ok(!after.shops.some(shop=>shop.id===secondShopId));
@@ -234,11 +234,11 @@ test('legacy D1 compatibility: app modules connect signup, team access, campus w
    await click('access-back');await Shared.api('/api/action',{method:'POST',body:{type:'UPDATE_BUSINESS',payload:{name:'Shared Campus Kitchen'}}});assert.equal(speech.spoken.length,baseline+3,'A protected-screen receipt must not replay after returning to the counter');
    await external('/api/simulate',{shopId,amount:1025,payer:'Active Counter Student',status:'paid',method:'qr',attemptId:'active-payment'},ownerJar);await Shared.refresh();assert.equal(speech.spoken.length,baseline+4,'A genuinely new active-counter receipt should still announce');assert.match(speech.spoken.at(-1).text,/10 cedis.*25 pesewas/);
   });
-  await t.test('the assigned shop can read the owner’s support response',async()=>{
+  await t.test('cashier collection view keeps unrelated owner support cases outside its scope',async()=>{
    const created=await Shared.api('/api/action',{method:'POST',body:{type:'ADD_TICKET',payload:{shopId,subject:'Receiving phone issue',message:'Please check the counter audio.'}}});const ticketId=created.entity.id;
    await Shared.api('/api/action',{method:'POST',body:{type:'UPDATE_TICKET',payload:{id:ticketId,status:'investigating',response:'Volume checked. Keep this phone connected.'}}});
-   await click('access-sign-out');await until(()=>!Auth.getSession()&&html().includes('Welcome back'),'owner signout before support view');await submit({username:'shared.ui.cashier',password:'SharedCashier123'});await until(()=>Auth.getSession()?.role==='cashier'&&html().includes('Your receiving phone'),'cashier support login');
-   await click('go-support');await click('ticket-detail',{id:ticketId});assert.match(modal(),/Volume checked\. Keep this phone connected\./);assert.match(modal(),/Investigating|investigating/);await click('dismiss');
+   await click('access-sign-out');await until(()=>!Auth.getSession()&&html().includes('Welcome back'),'owner signout before support view');await submit({username:'shared.ui.cashier',password:'SharedCashier123'});await until(()=>Auth.getSession()?.role==='cashier'&&html().includes('cashier-workspace'),'cashier support login');
+   assert.ok(!Shared.getCache().state.tickets.some(ticket=>ticket.id===ticketId));await click('go-support');assert.match(html(),/cashier-workspace/);assert.doesNotMatch(html(),/Volume checked\. Keep this phone connected\./);
    await click('access-sign-out');await until(()=>!Auth.getSession(),'cashier support signout');await submit({username,password});await until(()=>Auth.getSession()?.role==='owner','owner restored for role management');await click('go-overview');
   });
   await t.test('a lost settlement response retries the saved reference and reserves funds once without another password proof',async()=>{

@@ -190,11 +190,18 @@ export function clearCookie(name='lumo_session'){return `${name}=; Path=/; HttpO
 export function resolveSession(n,tokenHash){
  const s=n.sessions.find(s=>s.tokenHash===tokenHash),u=n.users.find(u=>u.id===s?.userId);
  if(!s||!u?.active||s.revokedAt||Date.parse(s.expiresAt)<=Date.now()||s.userVersion!==(u.sessionVersion||1))return null;
- return {session:s,user:u};
+ if(!s.counterId)return {session:s,user:u};
+ const counter=n.businesses[u.businessId]?.counterDevices?.find(d=>d.id===s.counterId);
+ if(!counter||counter.revokedAt||counter.sessionId!==s.id||counter.authorizedBy!==u.id||(u.role!=='owner'&&!u.shopIds.includes(counter.shopId)))return null;
+ const operator=n.users.find(person=>person.id===s.counterUserId&&person.businessId===u.businessId&&person.active&&person.role==='cashier'&&person.shopIds.includes(counter.shopId));
+ const unlocked=!!operator&&!s.counterLockedAt&&(!s.counterUnlockedUntil||Date.parse(s.counterUnlockedUntil)>Date.now());
+ const effective=unlocked?{...operator,shopIds:[counter.shopId]}:{id:'locked-'+counter.id,businessId:u.businessId,username:'',name:'Counter locked',phone:'',role:'cashier',shopIds:[counter.shopId],active:true};
+ return {session:s,user:effective,anchorUser:u,counter,locked:!unlocked};
 }
-export function publicSession(s,u){return {id:s.id,userId:u.id,businessId:u.businessId,role:u.role,shopIds:[...u.shopIds],username:u.username,name:u.name,phone:u.phone,createdAt:s.createdAt,lastSeen:s.lastSeen,expiresAt:s.expiresAt,remember:!!s.remember,deviceLabel:s.deviceLabel||'Browser',recoveryKeyPending:u.recoveryKeyPending===true,recoveryKeyReference:u.recoveryKeyPending===true?u.recoveryKeyReference||null:null}}
+export function publicSession(s,u){return {id:s.id,userId:u.id,businessId:u.businessId,role:u.role,shopIds:[...u.shopIds],username:u.username,name:u.name,phone:u.phone,createdAt:s.createdAt,lastSeen:s.lastSeen,expiresAt:s.expiresAt,remember:!!s.remember,deviceLabel:s.deviceLabel||'Browser',recoveryKeyPending:!s.counterId&&u.recoveryKeyPending===true,recoveryKeyReference:!s.counterId&&u.recoveryKeyPending===true?u.recoveryKeyReference||null:null,...(s.counterId?{counterId:s.counterId,staffId:u.id.startsWith('locked-')?null:'access-'+u.id}: {})}}
 export function requireSession(n,tokenHash,owner=false){
  const c=resolveSession(n,tokenHash);if(!c)throw new APIError('Sign in to continue.',401,'SIGN_IN_REQUIRED');
+ if(c.counter&&c.locked)throw new APIError('Unlock this counter with your cashier PIN.',423,'COUNTER_LOCKED');
  if(owner&&c.user.role!=='owner')throw new APIError('Only the business owner can do that.',403,'OWNER_REQUIRED');
  return c;
 }
@@ -225,14 +232,24 @@ export function projectUsers(n,b){
  for(const shop of b.shops){const manager=linked.find(u=>u.active&&u.role==='manager'&&u.shopIds.includes(shop.id));shop.manager=manager?.name||b.business.ownerName||'Unassigned'}
 }
 export function scopedBusiness(b,u){
- const c=clone(b);if(u.role==='owner')return c;
+ const c=clone(b);delete c.counterDevices;if(u.role==='owner')return c;
  const allowed=new Set(u.shopIds);
  c.shops=c.shops.filter(s=>allowed.has(s.id));
  for(const key of ['transactions','requests','closings','refunds','tickets','shifts','reconciliations'])c[key]=(c[key]||[]).filter(x=>allowed.has(x.shopId));
  c.staff=c.staff.filter(s=>(u.role!=='cashier'||s.active)&&(s.shopIds||[s.shopId]).some(id=>allowed.has(id))).map(s=>{const ids=(s.shopIds||[s.shopId]).filter(id=>allowed.has(id)),scope={shopIds:ids,shopId:allowed.has(s.shopId)?s.shopId:ids[0]};return u.role==='cashier'?{id:s.id,name:s.name,role:s.role,active:s.active,...scope,...(s.authUserId===u.id?{authUserId:s.authUserId}: {})}:{...s,...scope}});
  c.settlements=[];c.openingBalance=0;c.audit=[];
  c.business={id:c.business.id,name:c.business.name,accountNumber:c.business.accountNumber,bankName:c.business.bankName,verificationStatus:c.business.verificationStatus,registeredAt:c.business.registeredAt};
- c.accessScope='shops';return c;
+ if(u.role==='cashier'){
+  const staffId='access-'+u.id;
+  // Cashiers can check shop receipts without receiving financial reports.
+  c.transactions=c.transactions.map(t=>{const out={...t};delete out.studentWalletId;return out;});
+  const payments=new Set(c.transactions.map(t=>t.id));
+  c.refunds=c.refunds.filter(r=>payments.has(r.transactionId)||r.requestedStaffId===staffId);
+  c.shifts=c.shifts.filter(shift=>shift.staffId===staffId);c.closings=[];c.reconciliations=[];
+  c.tickets=c.tickets.filter(ticket=>payments.has(ticket.transactionId));
+  c.business.accountNumber='';c.business.bankName='';
+  c.accessScope='cashier';
+ }else c.accessScope='shops';return c;
 }
 export function publicShop(b,s){return {id:s.id,businessId:b.business.id,businessName:b.business.name,name:s.name,area:s.area,category:s.category,code:s.code,accountNumber:b.business.accountNumber,lat:s.lat,lng:s.lng,hours:s.hours||'',landmark:s.landmark||'',open:s.open!==false,accepting:!!s.accepting,published:s.published===true,sandbox:true}}
 export function publicInvitation(i){
