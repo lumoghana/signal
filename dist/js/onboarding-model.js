@@ -6,6 +6,7 @@ import { hasAcceptedSetupTerms, normalizeSetupTermsAcceptance } from './setup-te
 export const ONBOARDING_SCHEMA = 8;
 export const ONBOARDING_STEPS = Object.freeze(['name', 'phone', 'code', 'card-number', 'selfie', 'identity-review', 'login', 'pin', 'pin-confirm']);
 export const LIVENESS_PROMPTS = Object.freeze(['centre', 'turn', 'blink']);
+/** Immutable fictional signup fixtures inherited from approved v66. These constants are not a customer record or NIA response. SAMPLE_CARD_NUMBER is the all-zero demo identity placeholder, not a payment card or credential. */
 export const SAMPLE_CARD_NUMBER = 'GHA-000000000-0';
 export const SAMPLE_IDENTITY_DETAILS = Object.freeze({ fullName: 'Ama Mensah', dateOfBirth: '2005-04-15', nationality: 'Ghanaian', sex: 'Female' });
 export const DEMO_CODE_LIFETIME = 5 * 60 * 1000;
@@ -205,8 +206,8 @@ export function validateOnboardingStep(draft, step) {
     if (step === 'identity-review' && draft.identityConfirmed !== true) return 'Confirm the returned Ghana Card details before setting up sign-in.';
   }
   if (step === 'login' && (!object(draft.login) || !validUsername(draft.login.username) || !validLoginCredential(draft.login.credential))) return 'Create your username and demo password before continuing.';
-  if (step === 'pin' && draft.pin !== '1234') return 'Use the public demo PIN 1234. Never enter a real banking PIN.';
-  if (step === 'pin-confirm' && (draft.pin !== '1234' || draft.pinConfirm !== draft.pin)) return 'Confirm the same demo PIN: 1234.';
+  if (step === 'pin' && (typeof draft.pin !== 'string' || !/^\d{4}$/.test(draft.pin))) return 'Use four digits for your test transaction PIN.';
+  if (step === 'pin-confirm' && (typeof draft.pin !== 'string' || !/^\d{4}$/.test(draft.pin) || draft.pinConfirm !== draft.pin)) return 'Confirm the same four-digit transaction PIN.';
   return '';
 }
 
@@ -334,7 +335,7 @@ export function buildOnboardingState(draft) {
   if (!hasAcceptedSetupTerms(draft)) return fail('Accept the current setup terms before creating your demo account.');
   if (firstIncomplete(draft)) return fail('Finish setup before creating the demo account.');
   const state = createEmptyState({ name: draft.name.trim(), phone: draft.phone.trim(), campus: draft.campus });
-  state.onboardingDone = true; state.buffer = 0; state.settings.pin = '1234';
+  state.onboardingDone = true; state.buffer = 0; state.settings.pin = draft.pin;
   state.account ||= {};
   state.account.login = safeLogin(draft.login);
   state.termsAcceptance = normalizeSetupTermsAcceptance(draft);

@@ -73,7 +73,7 @@ test('budget period review keeps past actuals and a reused period starts fresh',
   run(s,'reuseBudgetPeriod',{periodId:period,startDate:date(0),endDate:date(20)});assert.equal(s.budgetHistory.length,2);assert.equal(s.budget.items[0].spent,0);assert.equal(s.transactions.filter(t=>t.type==='payment').length,1);
 });
 test('linked IOUs reserve overlapping costs once and repayments update their linked plan',()=>{
-  const s=state();run(s,'createBudget',{items:[{id:'fees',name:'Fees',amount:10000,spent:0,due:date(5)}]});
+  const s=state();run(s,'createBudget',{items:[{id:'fees',name:'Fees',amount:10000,spent:0,due:date(5)}],endDate:date(30)});
   const one=run(s,'createIOU',{name:'Esi',amount:8000,type:'owedByMe',due:date(5),budgetItemId:'fees'}).iou;
   run(s,'createIOU',{name:'Kojo',amount:8000,type:'owedByMe',due:date(5),budgetItemId:'fees'});assert.equal(getSummary(s).planned,16000);
   run(s,'settleIOU',{id:one.id,amount:3000});assert.equal(s.budget.items[0].spent,3000);assert.equal(getSummary(s).planned,13000);
@@ -91,5 +91,5 @@ test('saving dashboards and budget periods are connected from root pages',()=>{
   const s=state();box(s,{hack:{type:'fixed',value:100}});
   const boxes=renderPlanning({state:s,draft:{}},{section:'boxes',page:'home'});assert.match(boxes,/data-parity="hacks"/);assert.match(boxes,/data-parity="archives"/);
   const plan=renderPlanning({state:s,draft:{}},{section:'plan',page:'home'});assert.match(plan,/parity-periods/);assert.match(plan,/parity-guided/);assert.match(plan,/parity-categories/);
-  const dashboard=renderPlanning({state:s,draft:{}},{section:'boxes',page:'hacks'});assert.match(dashboard,/Scheduled rules run when checked/);
+  const dashboard=renderPlanning({state:s,draft:{}},{section:'boxes',page:'hacks'});assert.match(dashboard,/checked on app open, return and connected account sync/);
 });

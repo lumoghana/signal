@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-11-12T22:43:59.072Z",
+  "projectId": "iwutbrljiiodamtyoorg",
+  "checks": [
+    {
+      "name": "Exact CORS preflight https://lumo-connected-pilot.vercel.app",
+      "passed": true
+    },
+    {
+      "name": "Exact CORS preflight https://lumo-connected-pilot-williedark-6795.vercel.app",
+      "passed": true
+    },
+    {
+      "name": "Exact CORS preflight https://lumo-connected-pilot-o4z6ft2e8-williedark-6795.vercel.app",
+      "passed": true
+    },
+    {
+      "name": "Exact CORS preflight http://127.0.0.1:4173",
+      "passed": true
+    },
+    {
+      "name": "Web origin real Auth login",
+      "passed": true
+    },
+    {
+      "name": "Native no-Origin real Auth login",
+      "passed": true
+    },
+    {
+      "name": "Unapproved browser origin rejected",
+      "passed": true
+    }
+  ],
+  "realAuthHttp": true,
+  "browserSessionUsed": false
+}

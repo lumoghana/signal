@@ -1,0 +1,106 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {randomBytes,randomInt,randomUUID} from 'node:crypto';
+import {LumoClient} from '../src/client.mjs';
+
+// Explicit integration check: creates three labelled test accounts and posts test money.
+// It sends no emails/SMS and never prints credentials. Keep verification/private out of Git.
+let stdin='';for await(const chunk of process.stdin)stdin+=chunk;
+const {publishableKey}=JSON.parse(stdin);
+assert.ok(publishableKey?.startsWith('sb_publishable_'));
+const {supabaseUrl:url}=JSON.parse(await readFile(new URL('../deployment.json',import.meta.url),'utf8'));
+const suffix=randomBytes(4).toString('hex'),identities=[],checks=[];
+const check=(condition,name)=>{assert.ok(condition,name);checks.push(name);};
+async function checkedFetch(resource,options){const response=await fetch(resource,options);if(!response.ok&&String(resource).includes('/rpc/')){const detail=await response.clone().json().catch(()=>({}));console.error(JSON.stringify({failedCommand:JSON.parse(options.body).p_command,status:response.status,code:detail.code,message:detail.message,hint:detail.hint}));}return response;}
+const storage=()=>{const map=new Map();return {getItem:key=>map.get(key)||null,setItem:(key,value)=>map.set(key,value),removeItem:key=>map.delete(key)};};
+async function raw(command,payload,session){
+  const response=await fetch(url+'/rest/v1/rpc/lumo_rpc',{method:'POST',headers:{apikey:publishableKey,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({p_command:command,p_payload:payload}),signal:AbortSignal.timeout(20000)});
+  const value=await response.json();assert.ok(response.ok,'RPC transport');return value;
+}
+async function register(letter,name){
+  const credentials={handle:'qa_ext_'+letter+'_'+suffix,displayName:name,password:randomBytes(24).toString('base64url'),pin:String(randomInt(100000,1000000))};
+  const response=await fetch(url+'/functions/v1/lumo-pilot-auth/register',{method:'POST',headers:{apikey:publishableKey,'Content-Type':'application/json'},body:JSON.stringify(credentials),signal:AbortSignal.timeout(30000)});
+  const session=await response.json();assert.ok(response.ok,session.error?.code||'register failed');
+  check(session.sandbox===true&&session.contactVerified===false,'registration is test-only without contact verification');
+  const client=new LumoClient({url,publishableKey,pendingStorage:storage(),fetch:checkedFetch});await client.restoreSession(session);
+  const account=(await client.command('account.get',{})).account;
+  check(account.balance===0&&account.userId===session.user.id,'fresh zero account is bound to Auth identity');
+  identities.push({...credentials,userId:session.user.id,accountId:account.id});
+  await mkdir(new URL('../verification/private/',import.meta.url),{recursive:true,mode:0o700});
+  await writeFile(new URL('../verification/private/connected-experience-identities.json',import.meta.url),JSON.stringify(identities),{mode:0o600});
+  return {client,session,credentials,account};
+}
+
+const a=await register('a','QA Connected A'),b=await register('b','QA Connected B'),c=await register('c','QA Connected C'),m=await register('m','QA Connected Merchant');
+const cmd=(who,name,payload={})=>who.client.command(name,payload);
+await cmd(a,'wallet.fund',{amount:50000,confirmSandbox:true});
+await cmd(b,'wallet.fund',{amount:30000,confirmSandbox:true});
+await cmd(c,'wallet.fund',{amount:20000,confirmSandbox:true});
+const today=new Date().toISOString().slice(0,10),end=new Date(Date.now()+86400000*28).toISOString().slice(0,10);
+const plan=await cmd(a,'plan.save',{revision:0,periodStart:today,periodEnd:end,keepBack:2000,categories:[{name:'Food',amount:10000},{name:'Transport',amount:5000}]});
+check(plan.plan.keepBack===2000&&plan.plan.leftAfterPlan===33000,'shared plan protects Essentials and keep-back');
+const category=plan.plan.categories[0].id;
+const box=await cmd(a,'box.create',{name:'Fees',goal:20000});
+const save=await cmd(a,'box.save',{boxId:box.box.id,amount:5000,pin:a.credentials.pin});
+check(save.box.balance===5000&&save.account.balance===45000,'Money Box transfers actual shared funds out of Everyday');
+await cmd(a,'hack.save',{boxId:box.box.id,rule:'fixed',value:100,enabled:true});
+const transfer=await cmd(a,'transfer',{recipientHandle:b.credentials.handle,amount:1000,budgetCategoryId:category,pin:a.credentials.pin});
+const afterPlan=await cmd(a,'plan.get');
+check(afterPlan.plan.categories.find(x=>x.id===category).spent===1000,'source-aware transfer updates actual Essentials spending');
+check((await cmd(a,'box.list')).boxes.find(x=>x.id===box.box.id).balance===5100,'savings hack moves real surplus once');
+const created=await cmd(m,'merchant.create',{businessName:'QA Connected Kitchen',shopName:'QA Connected Night Market'}),shopId=created.shop.id;
+const request=await cmd(m,'request.create',{shopId,amount:2000});
+const fixed=await cmd(a,'payment.pay',{shopId,requestId:request.request.id,amount:2000,budgetCategoryId:category,pin:a.credentials.pin});
+await cmd(m,'payment.refund',{paymentId:fixed.receipt.id,amount:500,pin:m.credentials.pin});
+check((await cmd(a,'plan.get')).plan.categories.find(x=>x.id===category).spent===2500,'merchant refund restores original consumer budget category');
+const g=await cmd(a,'group.create',{name:'QA Campus collection',target:10000,approvalCount:2,approvalThreshold:10000});const groupId=g.groupId;
+await cmd(a,'group.invite',{groupId,handle:b.credentials.handle});
+check((await cmd(b,'group.list')).groups.find(x=>x.id===groupId).membershipStatus==='invited','group invitation arrives in other account');
+await cmd(b,'group.respond',{groupId,accept:true});
+await cmd(a,'group.invite',{groupId,handle:c.credentials.handle});await cmd(c,'group.respond',{groupId,accept:true});
+await cmd(a,'group.message',{groupId,text:'Meet at Night Market'});
+check((await cmd(b,'group.get',{groupId})).group.messages.some(x=>x.text==='Meet at Night Market'),'group chat is shared across accounts');
+await cmd(a,'group.contribute',{groupId,amount:2000,pin:a.credentials.pin});
+await cmd(b,'group.contribute',{groupId,amount:1000,pin:b.credentials.pin});
+check((await cmd(c,'group.get',{groupId})).group.balance===3000,'group contributions are held in a separate shared ledger account');
+const proposal=await cmd(a,'group.payout.request',{groupId,recipientHandle:m.credentials.handle,amount:1000,pin:a.credentials.pin});
+const approved=await cmd(b,'group.payout.approve',{groupId,proposalId:proposal.proposalId,pin:b.credentials.pin});
+check(approved.receipt?.type==='group_payout'&&(await cmd(c,'group.get',{groupId})).group.balance===2000,'another member authorises a real group payout');
+const cancelled=await cmd(a,'group.cancel',{groupId,pin:a.credentials.pin});
+check(cancelled.group.status==='cancelled'&&cancelled.receipts.reduce((sum,x)=>sum+x.amount,0)===2000,'cancellation refunds every remaining pesewa to original contributors');
+const debt=await cmd(a,'iou.create',{counterpartyHandle:b.credentials.handle,direction:'lend',amount:1000,dueDate:end,note:'QA agreed debt'});
+await cmd(b,'iou.respond',{iouId:debt.iou.id,accept:true});
+const paid=await cmd(b,'iou.pay',{iouId:debt.iou.id,amount:400,pin:b.credentials.pin});
+check(paid.iou.remaining===600&&paid.receipt.type==='iou_payment','accepted IOU repayment moves shared money and leaves exact remainder');
+await cmd(a,'money.record',{kind:'cash',name:'Cash in pocket',balance:1234});
+const overview=await cmd(a,'money.overview');
+check(JSON.stringify(overview).includes('1234'),'outside cash balance is saved centrally');
+const insight=await cmd(a,'insight.get');
+check(insight.insights.owedToYou===600,'expected IOU remains informational in shared insights');
+const chat=await cmd(a,'money.chat',{question:'How long will my money last?'});
+check(chat.grounded===true&&chat.engine==='ledger-calculations','Money Chat answers from actual ledger records');
+check((await cmd(a,'chat.history')).messages.some(x=>x.question==='How long will my money last?'),'Money Chat history follows the account');
+const fav=await cmd(a,'favourite.save',{handle:b.credentials.handle,label:'Campus friend'});
+check((await cmd(a,'favourite.list')).favourites.some(x=>x.handle===b.credentials.handle),'favourite recipients persist centrally');
+const personRequest=await cmd(a,'person.request.create',{payerHandle:b.credentials.handle,amount:300,note:'Lunch split'});
+const personPaid=await cmd(b,'person.request.pay',{requestId:personRequest.requestId,amount:300,pin:b.credentials.pin});
+check(personPaid.receipt.personalRequestId===personRequest.requestId,'targeted fixed request pays once with a common receipt');
+const staff=await cmd(m,'staff.invite',{shopId,handle:c.credentials.handle,role:'cashier'});
+await cmd(c,'staff.respond',{membershipId:staff.membership.id,accept:true});
+const staffMerchant=await cmd(c,'merchant.get');
+check(staffMerchant.merchants[0].balance===null&&staffMerchant.merchants[0].shops.length===1,'cashier sees assigned shop and no owner aggregate balance');
+await cmd(c,'shift.start',{shopId});
+const staffQR=await cmd(c,'request.create',{shopId,amount:200});
+check(staffQR.request.amount===200,'accepted cashier can generate the shop payment request');
+await cmd(c,'shift.end',{shopId,note:'QA handover'});
+await cmd(a,'learning.save',{moduleId:'test-money',completed:true,score:100,revision:0});
+check((await cmd(a,'learning.get')).progress.some(x=>x.moduleId==='test-money'&&x.completed),'learning progress follows the shared account');
+const second=new LumoClient({url,publishableKey,pendingStorage:storage(),fetch:checkedFetch});await second.restoreSession(a.session);
+check((await second.command('plan.get')).plan.revision===plan.plan.revision,'second session reads identical saved plan');
+const pair=await Promise.allSettled([cmd(a,'transfer',{recipientHandle:b.credentials.handle,amount:100,pin:a.credentials.pin}),cmd(b,'transfer',{recipientHandle:a.credentials.handle,amount:100,pin:b.credentials.pin})]);
+check(pair.every(x=>x.status==='fulfilled'),'opposite simultaneous payments with inbox notifications do not deadlock');
+const inbox=await cmd(b,'notification.list');check(inbox.notifications.length>0,'shared events reach the actual recipient inbox');
+const report={checkedAt:new Date().toISOString(),projectId:'iwutbrljiiodamtyoorg',checks:checks.map(name=>({name,passed:true})),realAuthHttp:true,phoneRuntimeTested:false,qaUserIds:identities.map(x=>x.userId),qaIdentitiesSuspended:false};
+await writeFile(new URL('../verification/connected-experience-http.json',import.meta.url),JSON.stringify(report,null,2)+'\n');
+for(const who of[a,b,c,m])await who.client.signOut();await second.signOut();
+console.log(JSON.stringify({liveConnectedChecks:checks.length,passed:true,qaUserIds:identities.map(x=>x.userId)}));

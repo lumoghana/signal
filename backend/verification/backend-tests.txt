@@ -1,0 +1,56 @@
+
+> lumo-shared-backend@0.1.0 test
+> node --test tests/*.test.mjs
+
+✔ client only accepts HTTPS origins and publishable or legacy anon keys (2.909783ms)
+✔ sign-in uses Auth and gives host a session without persisting passwords or PINs (5.364953ms)
+✔ restored sessions must be verified by Auth user endpoint and cannot trust an edited cached owner (1.199223ms)
+✔ concurrent 401 responses share one refresh and repeat the unchanged RPC body once (10.296076ms)
+✔ money command saves its reference before POST, removes credentials from journal and verifies receipt (3.726716ms)
+✔ lost committed response is retained and blocks another money move (4.004718ms)
+✔ lookup recovers exact committed receipt without requesting or storing PIN again (3.782936ms)
+✔ lookup absent attempt does not clear a potentially in-flight POST (1.624952ms)
+✔ retry uses original recipient amount and attempt with newly entered PIN (2.006546ms)
+✔ receipt attempt, type, target handle, money and actor mismatches keep the original request (7.451539ms)
+✔ only a definitive rejection bound to the exact saved attempt clears pending (1.534776ms)
+✔ static and fixed merchant receipts must match original shop and request (3.208603ms)
+✔ test funding requires explicit confirmation and validates credit into the current account (2.24897ms)
+✔ refund receipt must identify the original payment (1.948218ms)
+✔ corrupt saved journal fails closed before another POST (0.57867ms)
+✔ failed durable write prevents a payment POST and retains an unresolved marker (0.606181ms)
+✔ failure to clear committed receipt keeps pending until safe recovery succeeds (0.970279ms)
+✔ concurrent taps send only one money request (9.360188ms)
+✔ mutable caller payload is captured before asynchronous journal access (0.77209ms)
+✔ pending survives sign-out and is isolated by verified immutable account identity (0.963077ms)
+✔ an old delayed logout cannot clear a newer signed-in account from host session storage (1.178271ms)
+✔ account switches during journal clearing cannot return the old-account receipt (0.615926ms)
+✔ an RPC with an unverified response envelope never clears a pending request (1.510641ms)
+✔ handles are normalised and unsupported PINs and handles never reach the server (1.160133ms)
+✔ recovery cannot replace the verified account with malformed or another-user fresh account data (2.585971ms)
+✔ two clients sharing asynchronous storage cannot overwrite an unresolved money request (10.191914ms)
+✔ missing or failed cross-context lock providers fail closed before any money POST (2.302781ms)
+✔ injected exclusive lease covers storage, original POST, retry and PIN-free recovery (2.258354ms)
+✔ register creates only a synthetic test identity and opens a zero shared account under the user token (23.090755ms)
+✔ login uses the same handle identity and regular password token endpoint, without creating another user (2.970915ms)
+✔ rate rejection occurs before any Auth operation and reveals no underlying diagnostics (3.496715ms)
+✔ unknown browser origins fail before reading credentials; approved origins get exact CORS headers (3.252318ms)
+✔ native requests work without Origin while invalid methods and routes do not reach upstream (3.431598ms)
+✔ strict input and size validation rejects roles, real-contact substitutions and numeric PINs (2.098745ms)
+✔ partial Auth provisioning resumes using the same password and never deletes an identity or account (1.39697ms)
+✔ a committed Auth create with a lost response preserves the account and uses only a safe database abort check (1.034304ms)
+✔ a definitive rejected create releases an unused reservation before the user corrects its details (1.731963ms)
+✔ a create collision resumes only when the database confirms an existing canonical Auth identity (1.661918ms)
+✔ failed account opening revokes only the provisioning session, retaining its recoverable identity (1.621968ms)
+✔ login with an unfinished account requires setup and does not return its temporary session (1.51728ms)
+✔ wrong passwords have one safe error and cannot bind a registration or obtain an account (2.374279ms)
+✔ server-issued session and account identities must match before any credentials return (2.496602ms)
+✔ registration pending response does not launch a competing Auth create (0.678269ms)
+✔ every rate request contains only hashed ingress address and no user credentials (0.893914ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 211.655975

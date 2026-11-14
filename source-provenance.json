@@ -9,16 +9,30 @@
   "export_target": "GitHub / Vercel",
   "static_directory": "dist",
   "asset_manifest": "dist-sha256.json",
-  "shipped_dist": "Byte-exact copy of the approved source commit. No application behavior changed during export.",
-  "prototype_boundary": "Local sample money and participant/provider simulation; no live bank, MoMo or NIA connection.",
+  "shipped_dist": "Consumer journeys retain the approved shared-backend build. Merchant export adds role-specific cashier collection and counter access.",
+  "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
   "android": "Delivered separately; no Android binaries or signing material included.",
   "validation": {
-    "automated_tests": {
-      "passed": 1305,
-      "failed": 0
-    },
-    "approved_dist_file_count": 148,
-    "approved_dist_byte_parity": true,
-    "offline_rebuild_preserved_dist": true
+    "consumer_tests": 1506,
+    "merchant_tests": 499,
+    "shared_boundary_tests": 1,
+    "live_shared_service_checks": 12,
+    "failures": 0,
+    "consumer_source_preserved": true,
+    "asset_manifest": "dist-sha256.json"
+  },
+  "release_date": "2026-11-14",
+  "merchant": {
+    "source_commit": "80cc95dc21343ddb89404bf0b8f094bbf014ce49",
+    "site_project": "appgprj_6af5be2c38548191822030bb895d6d3d",
+    "shared_backend_function_version": 9,
+    "features": [
+      "Dedicated and shared counter phones",
+      "Individual cashier PIN access",
+      "Server-confirmed QR receipts",
+      "Staff handover and immutable receipt attribution",
+      "Restricted counter capability without owner sign-in credentials"
+    ],
+    "site_version": 17
   }
 }

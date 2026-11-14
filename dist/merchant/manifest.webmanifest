@@ -1,0 +1,27 @@
+{
+  "name": "Lumo Merchant Mobile",
+  "short_name": "Lumo Merchant",
+  "description": "QR collections and merchant administration, made for your phone.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#191a22",
+  "theme_color": "#191a22",
+  "lang": "en-GH",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

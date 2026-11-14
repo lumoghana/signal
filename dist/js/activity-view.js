@@ -19,8 +19,13 @@ export function filterActivity(transactions, filters = {}) {
 
 function filters(ctx) { return ctx.draft.activityFilters ||= {query:ctx.draft.activityQuery || '',direction:'all',status:'all',category:'',from:'',to:''}; }
 export function renderActivityEntries(ctx) {
-  const list = filterActivity(ctx.state.transactions, filters(ctx));
-  if (!list.length) return '<div class="empty"><h2>No moves in this view.</h2><p>Try another date, category or reference.</p></div>';
+  const f = filters(ctx), list = filterActivity(ctx.state.transactions, f);
+  if (!list.length) {
+    const narrowed = !!String(f.query || '').trim() || !!f.direction && f.direction !== 'all' || !!f.status && f.status !== 'all' || !!f.category || !!f.from || !!f.to || Number.isFinite(Date.parse(f.asOf));
+    return !ctx.state.transactions.length && !narrowed
+      ? '<div class="empty"><h2>Your activity starts here.</h2><p>When you add money or pay with Lumo, the details and status will appear here.</p></div>'
+      : '<div class="empty"><h2>No moves in this view.</h2><p>Try another date, category or reference.</p></div>';
+  }
   let previous = '';
   return list.map(t => {
     const date = String(t.at).slice(0,10), heading = date !== previous ? `<div class="feed-date">${esc(dateLabel(t.at))}</div>` : ''; previous = date;

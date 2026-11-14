@@ -1,0 +1,36 @@
+✔ client only accepts HTTPS origins and publishable or legacy anon keys (2.080748ms)
+✔ sign-in uses Auth and gives host a session without persisting passwords or PINs (4.133023ms)
+✔ restored sessions must be verified by Auth user endpoint and cannot trust an edited cached owner (0.916107ms)
+✔ concurrent 401 responses share one refresh and repeat the unchanged RPC body once (11.149487ms)
+✔ money command saves its reference before POST, removes credentials from journal and verifies receipt (2.310262ms)
+✔ lost committed response is retained and blocks another money move (0.886181ms)
+✔ lookup recovers exact committed receipt without requesting or storing PIN again (1.020013ms)
+✔ lookup absent attempt does not clear a potentially in-flight POST (0.8584ms)
+✔ retry uses original recipient amount and attempt with newly entered PIN (0.949978ms)
+✔ receipt attempt, type, target handle, money and actor mismatches keep the original request (8.70218ms)
+✔ only a definitive rejection bound to the exact saved attempt clears pending (1.515899ms)
+✔ static and fixed merchant receipts must match original shop and request (1.476699ms)
+✔ test funding requires explicit confirmation and validates credit into the current account (0.469676ms)
+✔ refund receipt must identify the original payment (0.464778ms)
+✔ corrupt saved journal fails closed before another POST (0.521444ms)
+✔ failed durable write prevents a payment POST and retains an unresolved marker (0.474574ms)
+✔ failure to clear committed receipt keeps pending until safe recovery succeeds (1.233003ms)
+✔ concurrent taps send only one money request (4.363889ms)
+✔ mutable caller payload is captured before asynchronous journal access (0.567844ms)
+✔ pending survives sign-out and is isolated by verified immutable account identity (0.664439ms)
+✔ an old delayed logout cannot clear a newer signed-in account from host session storage (0.775235ms)
+✔ account switches during journal clearing cannot return the old-account receipt (0.590528ms)
+✔ an RPC with an unverified response envelope never clears a pending request (1.24381ms)
+✔ handles are normalised and unsupported PINs and handles never reach the server (0.946763ms)
+✔ recovery cannot replace the verified account with malformed or another-user fresh account data (2.53479ms)
+✔ two clients sharing asynchronous storage cannot overwrite an unresolved money request (8.085782ms)
+✔ missing or failed cross-context lock providers fail closed before any money POST (1.213363ms)
+✔ injected exclusive lease covers storage, original POST, retry and PIN-free recovery (1.327566ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 150.84954

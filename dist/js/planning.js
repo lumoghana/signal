@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import {QUICK_ESSENTIALS,createQuickEssentials,prepareQuickEssentials} from './budget-quick.js';
 import {renderInitialPartnerSetup,handleInitialPartnerAction,partnerReady,initialPartnerReviewCopy} from './box-partner-setup.js';
 import { renderPlanningParity, bindPlanningParity, planningParityLinks, openHackEditor, budgetSuggestions, planningSheet, planningMoney } from './planning-parity-ui.js';
@@ -257,30 +258,30 @@ function editBudgetItem(ctx, id) {
   const item = ctx.state.budget?.items?.find(i => i.id === id);
   if (!item) return;
   planningSheet(ctx, `<div class="sheet-form"><h2>${icon(categorySymbol(item.name),20)} ${esc(item.name)}</h2><form id="plan-item-form" class="form-stack">${field({ label: 'Name', name: 'name', value: item.name, required: true })}${field({ label: 'Total budget (GH₵)', name: 'amount', type: 'number', value: (item.amount / 100).toFixed(2), min: ((item.spent || 0) / 100).toFixed(2), required: true })}${field({ label: 'Needed by', name: 'due', type: 'date', value: item.due || future(30), required: true })}<p class="muted">${planningMoney(ctx,item.spent || 0)} already used. Your new total must cover that.</p><p class="error" role="alert"></p><button class="button" type="submit">Save changes</button></form><button class="button ghost" data-delete-item style="margin-top:10px">Remove this essential</button></div>`, sheet => {
-    sheet.querySelector('form').addEventListener('submit', event => {
+    sheet.querySelector('form').addEventListener('submit', event => {return runActionFlow(function*(){
       event.preventDefault(); const data = new FormData(event.currentTarget), amount = parseAmount(data.get('amount')), name = String(data.get('name')).trim(), due = String(data.get('due'));
       if (!name || !validMoney(amount) || amount < (item.spent || 0) || !dateValid(due)) { sheet.querySelector('.error').textContent = 'Add a name, a valid date, and an amount that covers what you have used.'; return; }
       const items = ctx.state.budget.items.map(i => i.id === id ? { ...i, name: name.slice(0, 40), amount, due } : { ...i });
-      const result = ctx.act('updateBudget', { items });
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'updateBudget', { items }));
       if (!result.ok) { sheet.querySelector('.error').textContent = result.message; return; }
       ctx.closeSheet(); ctx.refresh(); ctx.toast('Your plan is up to date.');
-    });
-    sheet.querySelector('[data-delete-item]').addEventListener('click', () => {
-      const result = ctx.act('deleteBudgetItem', { id });
+    });});
+    sheet.querySelector('[data-delete-item]').addEventListener('click', () => {return runActionFlow(function*(){
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'deleteBudgetItem', { id }));
       if (displayResult(ctx, result, 'Essential removed. Your money stays in your account.')) { ctx.closeSheet(); ctx.refresh(); }
-    });
+    });});
   });
 }
 
 function editBox(ctx, b) {
   planningSheet(ctx, `<div class="sheet-form"><h2>${esc(b.emoji)} Make it yours</h2><form class="form-stack">${field({ label: 'Name', name: 'name', value: b.name, required: true })}${field({ label: 'Goal amount (GH₵)', name: 'target', type: 'number', value: b.target?(b.target / 100).toFixed(2):'', min: '0', required: false })}${field({ label: 'Goal date', name: 'deadline', type: 'date', value: b.deadline || '', min: future(1), required: false })}<p class="error" role="alert"></p><button type="submit" class="button">Save changes</button></form></div>`, sheet => {
-    sheet.querySelector('form').addEventListener('submit', event => {
+    sheet.querySelector('form').addEventListener('submit', event => {return runActionFlow(function*(){
       event.preventDefault(); const data = new FormData(event.currentTarget), target = data.get('target')?parseAmount(data.get('target')):0, name = String(data.get('name')).trim(), deadline = String(data.get('deadline'));
       if (!name || !Number.isSafeInteger(target) || target<0 || deadline&&(!dateValid(deadline) || deadline < future(1))) { sheet.querySelector('.error').textContent = 'Add a name. A target and future date are optional.'; return; }
-      const result = ctx.act('updateBox', { id: b.id, name: name.slice(0, 40), target, deadline });
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'updateBox', { id: b.id, name: name.slice(0, 40), target, deadline }));
       if (!result.ok) { sheet.querySelector('.error').textContent = result.message; return; }
       ctx.closeSheet(); ctx.refresh(); ctx.toast('A fresh plan for your goal.');
-    });
+    });});
   });
 }
 
@@ -303,15 +304,15 @@ function boxMoney(ctx, b, withdraw = false, suggested = null) {
       event.preventDefault(); const amount = parseAmount(input.value), status = sheet.querySelector('[name=outcome]')?.value||'success';
       if (!validMoney(amount) || amount > available) { sheet.querySelector('.error').textContent = `Choose an amount between GH₵0.01 and ${planningMoney(ctx,available)}.`; return; }
       ctx.closeSheet();
-      ctx.auth({ title: withdraw ? 'Confirm your transfer' : 'Back your goal', onCancel: () => boxMoney(ctx,b,withdraw,amount), onSuccess: () => {
+      ctx.auth({ title: withdraw ? 'Confirm your transfer' : 'Back your goal', onCancel: () => boxMoney(ctx,b,withdraw,amount), onSuccess: () => {return runActionFlow(function*(){
         const wasComplete = b.balance >= b.target;
-        const result = ctx.act(withdraw ? 'withdrawBox' : 'contributeBox', { id: b.id, amount, status, idempotencyKey: requestKey });
+        const result = (yield (ctx.actAsync||ctx.act).call(ctx,withdraw ? 'withdrawBox' : 'contributeBox', { id: b.id, amount, status, idempotencyKey: requestKey }));
         if (!displayResult(ctx, result)) return;
         if(result.transaction?.status!=='success'){ctx.go({section:'boxes',page:'transfer',id:result.transaction.id,boxId:b.id});return;}
         ctx.refresh();
         if (!withdraw && !wasComplete && b.balance >= b.target) ctx.celebrate({ title: `${b.name}. You did that.`, body: `${planningMoney(ctx,b.balance)} saved. Every little move brought you here.`, button: 'Look at my goal', onDone: () => ctx.go({ section: 'boxes', page: 'detail', id: b.id }) });
         else ctx.toast(withdraw ? `${cash(amount)} is back in everyday money.` : `${cash(amount)} closer. Nice move.`);
-      } });
+      });} });
     });
   });
 }
@@ -352,7 +353,7 @@ export function bindPlanning(ctx, route) {
   const planRoute = (step, extra = {}) => { ctx.setCapture?.(null); ctx.go({ section: 'plan', page: 'create', step, ...extra }); };
   const boxRoute = (step, extra = {}) => { ctx.setCapture?.(null); ctx.go({ section: 'boxes', page: 'create', step, ...extra }, { replace: !!route.edit || !!extra.edit }); };
   const refresh = () => { ctx.setCapture?.(null); remember(ctx); ctx.refresh(); };
-  ctx.$$('[data-action^="p:"]').forEach(button => listen(button, 'click', event => {
+  ctx.$$('[data-action^="p:"]').forEach(button => listen(button, 'click', event => {return runActionFlow(function*(){
     saveSetupCapture(ctx, route);
     const action = button.dataset.action.slice(2), b = foundBox(ctx, route);
     if (action === 'edit-cancel') { if(ctx.draft.boxEditBackup)Object.assign(ctx.draft.box,ctx.draft.boxEditBackup); delete ctx.draft.boxEditBackup; ctx.setCapture?.(null); ctx.go({section:'boxes',page:'create',step:'review'},{replace:true}); return; }
@@ -377,7 +378,7 @@ export function bindPlanning(ctx, route) {
     if (action === 'recovery') return ctx.go({ section: 'life', page: 'recovery' });
     if (action === 'buffer') {
       planningSheet(ctx, `<div class="sheet-form"><h2>A little breathing room.</h2><p class="muted">This stays in your account, outside what Lumo shows as spendable.</p><form class="form-stack">${field({ label: 'Keep untouched (GH₵)', name: 'buffer', type: 'number', value: ((ctx.state.buffer || 0) / 100).toFixed(2), min: '0', required: true })}<p class="error" role="alert"></p><button type="submit" class="button">Save breathing room</button></form></div>`, sheet => {
-        sheet.querySelector('form').addEventListener('submit', e => { e.preventDefault(); const amount = parseAmount(sheet.querySelector('[name="buffer"]').value); if (!Number.isSafeInteger(amount) || amount < 0) { sheet.querySelector('.error').textContent = 'Use a valid amount of zero or more.'; return; } const result = ctx.act('updateProfile', { buffer: amount }); if (!result.ok) { sheet.querySelector('.error').textContent = result.message; return; } ctx.closeSheet(); ctx.refresh(); });
+        sheet.querySelector('form').addEventListener('submit', e => {return runActionFlow(function*(){ e.preventDefault(); const amount = parseAmount(sheet.querySelector('[name="buffer"]').value); if (!Number.isSafeInteger(amount) || amount < 0) { sheet.querySelector('.error').textContent = 'Use a valid amount of zero or more.'; return; } const result = (yield (ctx.actAsync||ctx.act).call(ctx,'updateProfile', { buffer: amount })); if (!result.ok) { sheet.querySelector('.error').textContent = result.message; return; } ctx.closeSheet(); ctx.refresh(); });});
       }); return;
     }
     const pd = ctx.draft.plan;
@@ -390,7 +391,7 @@ export function bindPlanning(ctx, route) {
     if (action === 'plan-another') { pd.item = {}; return planRoute('name'); }
     if (action === 'plan-save') {
       if (!pd?.items.length) return setError(ctx, 'Add an essential to start your plan.');
-      const result = pd.newPeriod ? ctx.act(pd.newPeriod.periodId?'reuseBudgetPeriod':'startBudgetPeriod',{...pd.newPeriod,items:pd.items,provenance:pd.suggestion}) : ctx.act(ctx.state.budget?.created ? 'updateBudget' : 'createBudget', { items:pd.items,provenance:pd.suggestion,buffer:pd.buffer,endDate:pd.endDate });
+      const result = pd.newPeriod ? (yield (ctx.actAsync||ctx.act).call(ctx,pd.newPeriod.periodId?'reuseBudgetPeriod':'startBudgetPeriod',{...pd.newPeriod,items:pd.items,provenance:pd.suggestion})) : (yield (ctx.actAsync||ctx.act).call(ctx,ctx.state.budget?.created ? 'updateBudget' : 'createBudget', { items:pd.items,provenance:pd.suggestion,buffer:pd.buffer,endDate:pd.endDate }));
       if (!result.ok) return setError(ctx, result.message);
       ctx.draft.plan = null;
       return ctx.celebrate({ title: 'Your money has a plan.', body: `${planningMoney(ctx,getSummary(ctx.state).spendable)} is left after your essentials and breathing room.`, button: 'See my plan', onDone: () => finish(ctx, { section: 'plan', page: 'home' }) });
@@ -400,7 +401,7 @@ export function bindPlanning(ctx, route) {
     if (action === 'box-open') return ctx.go({ section: 'boxes', page: 'detail', id: button.dataset.id });
     if (action === 'hack-explain') { planningSheet(ctx, `<h2>Let the little things add up.</h2><p class="lead muted">A Savings Hack puts a little away when you make a successful payment.</p><div class="panel">${row({ emoji: '🪄', title: 'Percentage', sub: 'Save a percentage of each payment.' })}${row({ emoji: '⚡', title: 'Fixed amount', sub: 'Save the same small amount each time.' })}${row({ emoji: '🪙', title: 'Round up', sub: 'Save the change to the next whole amount.' })}</div><p class="muted">Choose a Money Box to switch one on. You can change it or turn it off whenever you like.</p>${btn('Got it', 'p:sheet-close')}`, sheet => sheet.querySelector('[data-action="p:sheet-close"]').addEventListener('click', ctx.closeSheet)); return; }
     const bd = ctx.draft.box;
-    if(handleInitialPartnerAction(ctx,route,action,{setError,boxRoute,refresh}))return;
+    if((yield handleInitialPartnerAction(ctx,route,action,{setError,boxRoute,refresh})))return;
     if (action === 'box-idea') { const idea = boxIdeas[Number(button.dataset.index)]; if (!idea) return; bd.name = idea.name; bd.emoji = idea.emoji; refresh(); return; }
     if (action === 'box-emoji') { const input = ctx.$('[name="planning-name"]'); if (input) bd.name = input.value; bd.emoji = button.dataset.emoji; refresh(); return; }
     if (action === 'box-name') { const name = ctx.$('[name="planning-name"]')?.value.trim(); if (!name) return setError(ctx, 'Give this goal a name first.'); bd.name = name.slice(0, 40); if(route.edit)delete ctx.draft.boxEditBackup; return boxRoute(route.edit ? 'review' : 'target'); }
@@ -418,7 +419,7 @@ export function bindPlanning(ctx, route) {
       if (!bd?.name || !Number.isSafeInteger(bd.target) || bd.target<0) return setError(ctx, 'Check your goal details first.');
       let accountabilityPartner;
       if (bd.partnerEnabled) { const checked = validatePartnerDetails({name:bd.partnerName,phone:bd.partnerPhone},ctx.state.profile?.phone); if (!checked.ok) return setError(ctx,checked.message); if(!partnerReady(ctx))return setError(ctx,'Confirm your partner’s acceptance and code before creating this Money Box.'); accountabilityPartner = checked.partner; }
-      const result = ctx.act('createBox', { ...(accountabilityPartner ? {accountabilityPartner,partnerInvitationId:bd.partnerInvitationId,partnerSetupId:bd.partnerSetupId} : {}), name: bd.name, emoji: bd.emoji, target: bd.target, deadline: bd.deadline, hack: bd.hack||{ type: 'none', value: 0 }, locked: false, idempotencyKey: bd.idempotencyKey || (bd.idempotencyKey = uid()) });
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'createBox', { ...(accountabilityPartner ? {accountabilityPartner,partnerInvitationId:bd.partnerInvitationId,partnerSetupId:bd.partnerSetupId} : {}), name: bd.name, emoji: bd.emoji, target: bd.target, deadline: bd.deadline, hack: bd.hack||{ type: 'none', value: 0 }, locked: false, idempotencyKey: bd.idempotencyKey || (bd.idempotencyKey = uid()) }));
       if (!result.ok) return setError(ctx, result.message);
       const id = result.id || result.box?.id || ctx.state.boxes.at(-1)?.id;
       ctx.draft.box = null;
@@ -430,28 +431,28 @@ export function bindPlanning(ctx, route) {
     if (action === 'box-withdraw') return boxMoney(ctx, b, true);
     if (action === 'box-pull') { const amount = spareChange(ctx); if (!amount) return ctx.toast('Add money to your everyday account first.'); return boxMoney(ctx, b, false, amount); }
     if (action === 'box-edit') return editBox(ctx, b);
-    if (action === 'box-lock') return ctx.auth({ title: b.locked ? 'Unlock your Money Box' : 'Keep it for your goal', onSuccess: () => { const result = ctx.act('updateBox', { id: b.id, locked: !b.locked }); if (displayResult(ctx, result, b.locked ? 'Goal protected. You can still add money.' : hasBoxProtection(b) ? 'Goal unlocked. Your partner still approves money out.' : 'Unlocked. Your choice, always.')) ctx.refresh(); } });
+    if (action === 'box-lock') return ctx.auth({ title: b.locked ? 'Unlock your Money Box' : 'Keep it for your goal', onSuccess: () => {return runActionFlow(function*(){ const result = (yield (ctx.actAsync||ctx.act).call(ctx,'updateBox', { id: b.id, locked: !b.locked })); if (displayResult(ctx, result, b.locked ? 'Goal protected. You can still add money.' : hasBoxProtection(b) ? 'Goal unlocked. Your partner still approves money out.' : 'Unlocked. Your choice, always.')) ctx.refresh(); });} });
     if (action === 'box-menu') {
       planningSheet(ctx, `<h2>${esc(b.emoji)} ${esc(b.name)}</h2><div class="panel">${row({ emoji: '✏️', title: 'Edit goal', action: 'p:menu-edit', right: icon('chevron', 16) })}${row({ emoji: '⚡', title: 'Savings Hack', action: 'p:menu-hack', right: icon('chevron', 16) })}${row({emoji:icon('users'),title:'Accountability partner',sub:hasBoxProtection(b)?'Manage partner protection':protectionSummary(b).status==='invited'?'Invitation pending · Withdrawals stay available':'Add someone you trust',action:'p:menu-partner',right:icon('chevron',16)})}${row({ emoji: '🗂️', title: 'Archive Money Box', sub: 'Your money and complete history stay safe.', action: 'p:menu-delete', right: icon('chevron', 16) })}</div>`, sheet => {
         sheet.querySelector('[data-action="p:menu-edit"]').addEventListener('click', () => { ctx.closeSheet(); editBox(ctx, b); });
         sheet.querySelector('[data-action="p:menu-partner"]').addEventListener('click', () => openBoxProtection(ctx,b));
         sheet.querySelector('[data-action="p:menu-hack"]').addEventListener('click', () => { ctx.closeSheet(); openHackEditor(ctx,b); });
-        sheet.querySelector('[data-action="p:menu-delete"]').addEventListener('click', () => { ctx.closeSheet(); const result=ctx.act('archiveBox',{id:b.id}); if(displayResult(ctx,result))finish(ctx,{section:'boxes',page:'home'}); });
+        sheet.querySelector('[data-action="p:menu-delete"]').addEventListener('click', () => {return runActionFlow(function*(){ ctx.closeSheet(); const result=(yield (ctx.actAsync||ctx.act).call(ctx,'archiveBox',{id:b.id})); if(displayResult(ctx,result))finish(ctx,{section:'boxes',page:'home'}); });});
       }); return;
     }
     if (action === 'box-hack') return openHackEditor(ctx,b);
     if (action === 'hack-type') { if (ctx.draft.hack.type !== button.dataset.type) ctx.draft.hack = { type: button.dataset.type, value: button.dataset.type === 'percent' ? 5 : 100 }; refresh(); return; }
     if (action === 'hack-round') { ctx.draft.hack.value = Number(button.dataset.value); refresh(); return; }
-    if (action === 'hack-disable') { const result = ctx.act('updateBox', { id: b.id, hack: { type: 'none', value: 0 } }); if (displayResult(ctx, result, 'Savings Hack turned off. Your saved money stays put.')) { ctx.draft.hack = null; ctx.setCapture?.(null); ctx.go({ section: 'boxes', page: 'detail', id: b.id },{replace:true}); } return; }
+    if (action === 'hack-disable') { const result = (yield (ctx.actAsync||ctx.act).call(ctx,'updateBox', { id: b.id, hack: { type: 'none', value: 0 } })); if (displayResult(ctx, result, 'Savings Hack turned off. Your saved money stays put.')) { ctx.draft.hack = null; ctx.setCapture?.(null); ctx.go({ section: 'boxes', page: 'detail', id: b.id },{replace:true}); } return; }
     if (action === 'hack-save') {
       const hd = { ...ctx.draft.hack }, raw = ctx.$('[name="planning-hack"]')?.value;
       if (hd.type === 'percent') { hd.value = Number(raw); if (!Number.isFinite(hd.value) || hd.value < 1 || hd.value > 100) return setError(ctx, 'Choose a percentage from 1 to 100.'); }
       else if (hd.type === 'fixed') { hd.value = parseAmount(raw); if (!validMoney(hd.value)) return setError(ctx, 'Choose a positive amount to save.'); }
       else if (hd.type !== 'roundup') return setError(ctx, 'Choose how you would like to save.');
-      const result = ctx.act('updateBox', { id: b.id, hack: hd });
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'updateBox', { id: b.id, hack: hd }));
       if (displayResult(ctx, result, 'Your little saving moves are switched on.')) { ctx.draft.hack = null; ctx.setCapture?.(null); ctx.go({ section: 'boxes', page: 'detail', id: b.id },{replace:true}); }
     }
-  }));
+  });}));
   const money = ctx.$('#planning-amount');
   if (money) listen(money, 'keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const button = ctx.$('.bottom-action .button'); if (button) button.click(); } });
   return () => { alive = false; stopParity(); listeners.forEach(remove => remove()); };
