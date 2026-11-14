@@ -1,3 +1,5 @@
+import {runActionFlow} from './approved-flow.js';
+import {unmatchedReceipts,unmatchedReceiptAmount} from './receipt-matching.js';
 import { prepareIOURepayment } from './payments.js';
 import { esc, cash, icon, pageHead, row, field, btn, empty, progress, dateLabel } from './ui.js';
 import { getSummary, pendingIOUAmount, repayableIOUAmount } from './model.js';
@@ -27,15 +29,15 @@ const formError = (root, message) => {
   const el = root.querySelector('.life-form-error');
   if (el) el.textContent = message;
 };
-const commit = (ctx, type, payload, root) => {
-  const result = ctx.act(type, payload);
+const commit = (ctx, type, payload, root) => {return runActionFlow(function*(){
+  const result = (yield (ctx.actAsync||ctx.act).call(ctx,type, payload));
   if (!result?.ok) {
     if (root?.isConnected) formError(root, result?.message || 'Please check the details and try again.');
     else ctx.toast(result?.message || 'Please check the details and try again.');
     return null;
   }
   return result;
-};
+});};
 
 function actionRow(action, emoji, title, sub = '', right = '') {
   return row({ action, emoji, title, sub, right });
@@ -121,25 +123,25 @@ function editOutsideMoney(ctx, balance = null, draft = null) {
       name.placeholder = outsideKinds[d.type].name;
       el.querySelectorAll('[data-outside-kind]').forEach((choice) => choice.setAttribute('aria-pressed', String(choice.dataset.outsideKind === d.type)));
     });
-    el.querySelector('form').onsubmit = (e) => {
+    el.querySelector('form').onsubmit = (e) => {return runActionFlow(function*(){
       e.preventDefault(); capture();
       if (!d.name.trim()) { formError(el, 'Give this balance a name you’ll recognise.'); return; }
       if (!/^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})$/.test(d.balance)) { formError(el, 'Enter a balance of zero or more, with up to two decimal places.'); return; }
       const value = Math.round(Number(d.balance) * 100);
-      const result = commit(ctx, balance ? 'updateExternalBalance' : 'createExternalBalance', { id: balance?.id, type: d.type, name: d.name.trim(), balance: value, idempotencyKey: d.requestKey }, el);
+      const result = (yield commit(ctx, balance ? 'updateExternalBalance' : 'createExternalBalance', { id: balance?.id, type: d.type, name: d.name.trim(), balance: value, idempotencyKey: d.requestKey }, el));
       if (!result) return;
       ctx.closeSheet(); ctx.refresh(); ctx.toast(balance ? 'Outside balance updated.' : 'Outside money added to your picture.');
-    };
+    });};
     el.querySelector('[data-action="outside-cancel"]').onclick = () => ctx.closeSheet();
     const remove = el.querySelector('[data-action="outside-remove"]');
     if (remove) remove.onclick = () => {
       capture();
       ctx.sheet(sheetHead('Remove ' + balance.name + '?', 'Only this manual record will be removed. No money moves.') + errorBox + btn('Keep this balance', 'outside-keep') + btn('Remove balance', 'outside-confirm-remove', { secondary: true }), (confirm) => {
         confirm.querySelector('[data-action="outside-keep"]').onclick = () => editOutsideMoney(ctx, balance, d);
-        confirm.querySelector('[data-action="outside-confirm-remove"]').onclick = () => {
-          if (!commit(ctx, 'removeExternalBalance', { id: balance.id, idempotencyKey: uid() }, confirm)) return;
+        confirm.querySelector('[data-action="outside-confirm-remove"]').onclick = () => {return runActionFlow(function*(){
+          if (!(yield commit(ctx, 'removeExternalBalance', { id: balance.id, idempotencyKey: uid() }, confirm))) return;
           ctx.closeSheet(); ctx.refresh(); ctx.$('[data-action="life-external-add"]')?.focus(); ctx.toast('Outside balance removed.');
-        };
+        });};
       }, { onClose: () => editOutsideMoney(ctx, balance, d), closeLabel: 'Cancel removal' });
     };
   }, { closeLabel: 'Cancel balance changes' });
@@ -251,14 +253,14 @@ function reviewRecoveryIncome(ctx) {
   const r=ctx.state.recovery, received=ctx.state.transactions.filter(t=>t.type==='income'&&t.status==='success'&&t.at>=r.startedAt);
   ctx.sheet(sheetHead('Let’s check what arrived.','Only confirmed money already in your ledger can be reviewed. This does not add money again.') + (received.length ? '<div class="stack">'+received.map(t=>'<button type="button" class="panel life-option" data-review-income="'+esc(t.id)+'"><span><strong>'+esc(t.merchant||'Money received')+'</strong><small>'+dateLabel(t.at)+'</small></span><strong>'+personalMoney(ctx,t.amount)+'</strong></button>').join('')+'</div>' : '<p class="muted">No confirmed money has arrived since this plan began. Expected allowance and IOUs do not count.</p>') + errorBox + btn('Back to my plan','recovery-review-back'), el=>{
     el.querySelector('[data-action="recovery-review-back"]').onclick=()=>ctx.closeSheet();
-    el.querySelectorAll('[data-review-income]').forEach(button=>button.onclick=()=>{const result=commit(ctx,'reviewRecoveryIncome',{transactionId:button.dataset.reviewIncome,idempotencyKey:'recovery-review:'+r.startedAt+':'+button.dataset.reviewIncome},el);if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);}});
+    el.querySelectorAll('[data-review-income]').forEach(button=>button.onclick=()=>{return runActionFlow(function*(){const result=(yield commit(ctx,'reviewRecoveryIncome',{transactionId:button.dataset.reviewIncome,idempotencyKey:'recovery-review:'+r.startedAt+':'+button.dataset.reviewIncome},el));if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);}});});
   });
 }
 function finishRecovery(ctx) {
   const sum=getSummary(ctx.state), gap=Math.max(0,sum.planned+(ctx.state.buffer||0)-sum.available);
   ctx.sheet(sheetHead('Ready to finish recovery?','Your commitments and money records stay intact. Saving rules resume only when money allows.') + '<div class="panel life-padded"><p>Current shortfall: <strong>'+personalMoney(ctx,gap)+'</strong></p><p>Available: '+personalMoney(ctx,sum.available)+' · Planned: '+personalMoney(ctx,sum.planned)+'</p></div>' + (gap ? '<label class="recovery-protect"><input type="checkbox" name="recoveryAdjusted"><span>I have reviewed this remaining gap and adjusted my arrangements outside this plan.</span></label>' : '') + errorBox + btn('Finish recovery','recovery-finish-confirm') + btn('Keep this plan','recovery-finish-cancel',{secondary:true}),el=>{
     el.querySelector('[data-action="recovery-finish-cancel"]').onclick=()=>ctx.closeSheet();
-    el.querySelector('[data-action="recovery-finish-confirm"]').onclick=()=>{ const confirmAdjusted=el.querySelector('[name="recoveryAdjusted"]')?.checked===true; const result=commit(ctx,'completeRecovery',{confirmAdjusted,idempotencyKey:'recovery-complete:'+ctx.state.recovery.startedAt},el);if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);} };
+    el.querySelector('[data-action="recovery-finish-confirm"]').onclick=()=>{return runActionFlow(function*(){ const confirmAdjusted=el.querySelector('[name="recoveryAdjusted"]')?.checked===true; const result=(yield commit(ctx,'completeRecovery',{confirmAdjusted,idempotencyKey:'recovery-complete:'+ctx.state.recovery.startedAt},el));if(result){ctx.closeSheet();ctx.refresh();ctx.toast(result.message);} });};
   });
 }
 
@@ -283,21 +285,22 @@ function groupDetail(ctx, route) { return renderGroupOverview(ctx, route); }
 function story(ctx) {
   const s = ctx.state;
   const summary = getSummary(s);
-  const guideEnd = s.recovery?.active && s.recovery.checkInDate === summary.guidanceDate ? 'your recovery check-in' : s.budget?.created ? 'the end of your plan' : 'your next expected income';
+  const guideEnd = summary.guidanceSource === 'recovery' ? 'your recovery check-in' : summary.guidanceSource === 'plan' ? 'the end of your plan' : 'your next expected income';
   const payments = (s.transactions || []).filter((x) => x.status === 'success' && ['payment','iou','card-purchase'].includes(x.type) && x.direction === 'out');
   const netAmount = x => Math.max(0,x.amount - (x.type === 'card-purchase' ? x.refunded || 0 : 0)) + (x.fee || 0);
   const categories = new Map();
   payments.forEach((x) => categories.set(x.category || 'Other', (categories.get(x.category || 'Other') || 0) + netAmount(x)));
   const ranked = Array.from(categories.entries()).filter(([,amount])=>amount>0).sort((a, b) => b[1] - a[1]);
   const spent = Math.max(0,payments.reduce((n, x) => n + netAmount(x), 0));
+  const merchantRefunds = (s.transactions || []).filter(x => x.type === 'refund' && x.direction === 'in' && x.status === 'success').reduce((n, x) => n + x.amount, 0);
   const contributed = (s.transactions || []).filter((x) => x.type === 'saving' && x.direction === 'out' && x.status === 'success').reduce((n, x) => n + x.amount, 0);
   return '<section class="page life-page">' + pageHead('Your money story', { eyebrow: 'THE PATTERNS THAT MATTER' }) +
     '<h1 class="large-question">' + (ranked.length ? 'Every cedi has a story.' : 'Your story starts here.') + '</h1><p class="muted">A clear look at the activity in this account.</p>' +
     '<div class="stat-grid"><div class="stat"><span class="muted">Payments made</span><strong>' + personalMoney(ctx,spent) + '</strong></div><div class="stat"><span class="muted">Set aside</span><strong class="accent">' + personalMoney(ctx,contributed) + '</strong></div></div>' +
     (ranked.length ? '<div class="section-label">Where your spending went</div><div class="panel life-padded">' + ranked.map(([name, amount], i) => '<div class="life-story-category"><div class="life-between"><span>' + esc(name) + '</span><strong>' + personalMoney(ctx,amount) + '</strong></div><div class="progress"><div class="progress-bar life-category-' + (i % 4) + '" style="width:' + Math.max(2, Math.round(amount / Math.max(1, spent) * 100)) + '%"></div></div></div>').join('') + '</div>' : empty({ emoji: '↗', title: 'A fresh start.', body: 'Your spending patterns will appear as you make payments.', action: 'life-pay', label: 'Make a payment' })) +
-    '<div class="panel life-padded"><span class="eyebrow">TODAY’S CHECK-IN</span><h2>' + personalMoney(ctx,summary.spendable) + ' is left after your plan.</h2><p class="muted">' + (summary.daysLeft > 0 ? 'That works out to about ' + personalMoney(ctx,summary.dailyAllowance) + ' a day until ' + guideEnd + ' on ' + dateLabel(summary.guidanceDate) + '.' : 'Review your planning dates to get a daily guide.') + '</p>' + btn('Look at my plan', 'life-plan', { secondary: true }) + '</div>' +
+    '<div class="panel life-padded"><span class="eyebrow">TODAY’S CHECK-IN</span><h2>' + personalMoney(ctx,summary.spendable) + ' is left after your plan.</h2><p class="muted">' + (summary.hasDailyGuide ? 'That works out to about ' + personalMoney(ctx,summary.dailyAllowance) + ' a day until ' + guideEnd + ' on ' + dateLabel(summary.guidanceDate) + '.' : summary.guidanceDate ? 'Review your planning dates to get a daily guide.' : 'Add a planning end date before using a daily guide. No expected income date is recorded.') + '</p>' + btn('Look at my plan', 'life-plan', { secondary: true }) + '</div>' +
     '<div class="panel">' + actionRow('life-chat', '✳', 'Ask Lux about it', 'Turn these numbers into a next step') + actionRow('life-overview', '◎', 'See the whole picture', 'Available, saved and expected') + '</div>' +
-    explain('Transfers between your own accounts are kept out of spending totals.') + '</section>';
+    explain('Transfers between your own accounts are kept out of spending totals.' + (merchantRefunds ? ' Payments made is before ' + personalMoney(ctx,merchantRefunds) + ' in merchant refunds received. Those refunds appear separately in Activity; card refunds already reduce card purchases.' : '')) + '</section>';
 }
 
 function settings(ctx) {
@@ -318,9 +321,9 @@ function settings(ctx) {
     '</div><div class="section-label">Here for you</div><div class="panel">' +
       actionRow('life-tour', icon('spark'), 'Take the Lumo tour', 'See what Lumo can do for you') +
       actionRow('life-help', icon('chat'), 'Talk to us', 'Questions, ideas and feedback') +
-      actionRow('life-privacy', icon('lock'), 'Privacy & this prototype', 'What stays on this device') +
+      actionRow('life-privacy', icon('lock'), 'Privacy & this prototype', ctx.connected?'What syncs and what stays on this device':'What stays on this device') +
     '</div><div class="section-label">Try the full experience</div><div class="panel">' + actionRow('life-onboarding-preview', icon('card'), ctx.draft.onboarding?.preview ? 'Continue signup preview' : 'Try full signup', 'Name, number, Ghana Card and selfie') + '</div>' + explain('Signup preview keeps your current demo account and money choices safe.') +
-    '<div class="panel life-padded"><span class="eyebrow">INTERACTIVE PROTOTYPE</span><p>Payments, identity checks and approvals are simulated. No real money moves.</p><p class="muted">Use your demo PIN only. Your demo data is saved in this browser.</p><div class="inline-actions">' + btn('Start fresh', 'life-reset', { secondary: true }) + btn('Reload the demo', 'life-demo', { secondary: true }) + '</div></div>' +
+    '<div class="panel life-padded"><span class="eyebrow">INTERACTIVE PROTOTYPE</span><p>Payments, identity checks and approvals are simulated. No real money moves.</p><p class="muted">'+(ctx.connected?'Use your test transaction PIN. Your shared test-account records sync after sign-in on another device. Resetting this browser does not delete your shared account.':'Use your demo PIN only. Your demo data is saved in this browser.')+'</p><div class="inline-actions">' + btn('Start fresh', 'life-reset', { secondary: true }) + btn('Reload the demo', 'life-demo', { secondary: true }) + '</div></div>' +
     '<p class="life-signoff muted">Lumo · Decisions with clarity.</p></section>';
 }
 
@@ -435,8 +438,8 @@ function settleIOU(ctx, x) {
   const d=ctx.draft.iouSettlement,incoming=x.type==='owedToMe';
   if(!incoming && !d.method)d.method='lumo';
   function show() {
-    const receipts=(ctx.state.transactions||[]).filter(t=>t.type==='income'&&!t.iouId&&t.status==='success'&&t.direction==='in'&&t.amount-(t.iouAllocations||[]).reduce((n,a)=>n+a.amount,0)>0);
-    const choices=incoming?`<label class="field"><span>Where did it arrive?</span><select name="receiptDestination" required><option value="">Choose where you received it</option>${[['lumo','In Lumo · match an existing receipt'],['cash','Cash'],['momo','My outside MoMo wallet'],['bank','My outside bank account']].map(([v,label])=>`<option value="${v}" ${d.destination===v?'selected':''}>${label}</option>`).join('')}</select></label><div data-receipt-choice ${d.destination==='lumo'?'':'hidden'}><label class="field"><span>Confirmed Lumo receipt</span><select name="receiptTransaction"><option value="">Choose a receipt</option>${receipts.map(t=>`<option value="${esc(t.id)}" ${d.receiptTransactionId===t.id?'selected':''}>${esc(t.merchant)} · ${personalMoney(ctx,t.amount-(t.iouAllocations||[]).reduce((n,a)=>n+a.amount,0))} unmatched · ${dateLabel(t.at)}</option>`).join('')}</select></label><p class="muted">No receipt yet? Add the received money to Lumo first, then match it here. Matching never adds it twice.</p></div><p class="muted">Outside repayments close the IOU without changing Lumo or your manually recorded balances. Update outside balances separately if needed.</p>`:`<label class="field"><span>How are we settling up?</span><select name="repaymentMethod"><option value="lumo" ${d.method==='lumo'?'selected':''}>Pay a Lumo person</option><option value="momo" ${d.method==='momo'?'selected':''}>Send to mobile money</option><option value="outside" ${d.method==='outside'?'selected':''}>I already paid outside Lumo</option></select></label><div data-outside-choice ${d.method==='outside'?'':'hidden'}><label class="field"><span>Where did you pay?</span><select name="outsideDestination"><option value="">Choose where you paid</option>${[['cash','Cash'],['momo','My outside MoMo wallet'],['bank','My outside bank account']].map(([v,label])=>`<option value="${v}" ${d.destination===v?'selected':''}>${label}</option>`).join('')}</select></label><p class="muted">Record only a repayment you have already made. Lumo and your recorded outside balances stay unchanged.</p></div>`;
+    const receipts=unmatchedReceipts(ctx.state.transactions,{requireLedger:ctx.connected===true});
+    const choices=incoming?`<label class="field"><span>Where did it arrive?</span><select name="receiptDestination" required><option value="">Choose where you received it</option>${[['lumo','In Lumo · match an existing receipt'],['cash','Cash'],['momo','My outside MoMo wallet'],['bank','My outside bank account']].map(([v,label])=>`<option value="${v}" ${d.destination===v?'selected':''}>${label}</option>`).join('')}</select></label><div data-receipt-choice ${d.destination==='lumo'?'':'hidden'}><label class="field"><span>Confirmed Lumo receipt</span><select name="receiptTransaction"><option value="">Choose a receipt</option>${receipts.map(t=>`<option value="${esc(t.id)}" ${d.receiptTransactionId===t.id?'selected':''}>${esc(t.merchant)} · ${personalMoney(ctx,unmatchedReceiptAmount(t,{requireLedger:ctx.connected===true}))} unmatched · ${dateLabel(t.at)}</option>`).join('')}</select></label><p class="muted">No receipt yet? Add the received money to Lumo first, then match it here. Matching never adds it twice.</p></div><p class="muted">Outside repayments close the IOU without changing Lumo or your manually recorded balances. Update outside balances separately if needed.</p>`:`<label class="field"><span>How are we settling up?</span><select name="repaymentMethod"><option value="lumo" ${d.method==='lumo'?'selected':''}>Pay a Lumo person</option><option value="momo" ${d.method==='momo'?'selected':''}>Send to mobile money</option><option value="outside" ${d.method==='outside'?'selected':''}>I already paid outside Lumo</option></select></label><div data-outside-choice ${d.method==='outside'?'':'hidden'}><label class="field"><span>Where did you pay?</span><select name="outsideDestination"><option value="">Choose where you paid</option>${[['cash','Cash'],['momo','My outside MoMo wallet'],['bank','My outside bank account']].map(([v,label])=>`<option value="${v}" ${d.destination===v?'selected':''}>${label}</option>`).join('')}</select></label><p class="muted">Record only a repayment you have already made. Lumo and your recorded outside balances stay unchanged.</p></div>`;
     ctx.sheet(sheetHead(incoming?'Where did the money land?':'How much are you repaying?',incoming?'Match money already received. A promise is still expected money.':'Choose a payment, or record money already paid elsewhere.')+'<form class="form-stack">'+amountInput('settleAmount',d.amountText)+'<p class="muted">'+personalMoney(ctx,remaining(x))+' still '+(incoming?'expected from ':'owed to ')+esc(x.name)+'.</p>'+choices+errorBox+'<button class="button" type="submit">'+(incoming?'Record repayment':'Review repayment')+'</button></form>'+btn('Back to IOU','life-settlement-close',{secondary:true}),el=>{
       el.querySelector('[name="settleAmount"]').addEventListener('input',e=>{d.amountText=e.target.value;ctx.saveDraft?.();});
       el.querySelector('[name="receiptDestination"]')?.addEventListener('change',e=>{d.destination=e.target.value;el.querySelector('[data-receipt-choice]').hidden=d.destination!=='lumo';ctx.saveDraft?.();});
@@ -444,33 +447,34 @@ function settleIOU(ctx, x) {
       el.querySelector('[name="repaymentMethod"]')?.addEventListener('change',e=>{d.method=e.target.value;el.querySelector('[data-outside-choice]').hidden=d.method!=='outside';ctx.saveDraft?.();});
       el.querySelector('[name="outsideDestination"]')?.addEventListener('change',e=>{d.destination=e.target.value;ctx.saveDraft?.();});
       el.querySelector('[data-action="life-settlement-close"]').onclick=()=>ctx.closeSheet();
-      el.querySelector('form').onsubmit=e=>{
+      el.querySelector('form').onsubmit=e=>{return runActionFlow(function*(){
         e.preventDefault();d.amountText=el.querySelector('[name="settleAmount"]').value;ctx.saveDraft?.();
         const amount=readAmount(el.querySelector('[name="settleAmount"]'));
         if(!Number.isSafeInteger(amount)||amount<=0||amount>remaining(x))return formError(el,'Choose an amount up to '+personalMoney(ctx,remaining(x))+'.');
         if(incoming&&(!d.destination||(d.destination==='lumo'&&!d.receiptTransactionId)))return formError(el,'Choose where it arrived and a confirmed receipt for Lumo money.');
+        if(incoming&&d.destination==='lumo'){const receipt=ctx.state.transactions?.find(t=>t.id===d.receiptTransactionId),unmatched=unmatchedReceiptAmount(receipt,{requireLedger:ctx.connected===true});if(amount>unmatched)return formError(el,'This receipt has '+personalMoney(ctx,unmatched)+' unmatched. Choose that amount or less.');}
         if(!incoming && d.method!=='outside'){ const available=repayableIOUAmount(ctx.state,x);if(amount>available)return formError(el,'There is '+personalMoney(ctx,Math.max(0,available))+' left to repay after pending payments.');ctx.closeSheet();prepareIOURepayment(ctx,x,amount,d.method);return; }
         if(!incoming&&!['cash','momo','bank'].includes(d.destination))return formError(el,'Choose where you already paid.');
-        const act=()=>{
+        const act=()=>{return runActionFlow(function*(){
           const payload={id:x.id,amount,idempotencyKey:d.operationId,...(incoming?d.destination==='lumo'?{receiptTransactionId:d.receiptTransactionId}:{destination:d.destination}:{outside:true,destination:d.destination})};
-          const r=commit(ctx,'settleIOU',payload,el);if(!r)return;
+          const r=(yield commit(ctx,'settleIOU',payload,el));if(!r)return;
           delete ctx.draft.iouSettlement;ctx.saveDraft?.();ctx.closeSheet();ctx.refresh();ctx.toast(r.message);
-        };
-        if(incoming)act();else ctx.auth({title:'Record outside repayment to '+x.name,onCancel:show,onSuccess:act});
-      };
+        });};
+        if(incoming)(yield act());else ctx.auth({title:'Record outside repayment to '+x.name,onCancel:show,onSuccess:act});
+      });};
     });
   }
   show();
 }
 
-async function shareText(ctx, title, text, onReturn) {
+function shareText(ctx, title, text, onReturn) {return runActionFlow(function*(){
   try {
     if (navigator.share) {
-      await navigator.share({ title, text });
+      (yield navigator.share({ title, text }));
       return;
     }
     if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
+      (yield navigator.clipboard.writeText(text));
       ctx.toast('Copied. Share it wherever you like.');
       return;
     }
@@ -481,7 +485,7 @@ async function shareText(ctx, title, text, onReturn) {
     el.querySelector('textarea').select();
     el.querySelector('[data-action="life-share-done"]').onclick = () => onReturn ? onReturn() : ctx.closeSheet();
   });
-}
+});}
 
 const groupPhone = value => String(value || '').replace(/[\s()-]/g, '');
 const groupApproverCount = d => 1 + d.members.filter(m => m.role === 'approver').length;
@@ -611,14 +615,14 @@ function editProfile(ctx) {
     field({ label: 'What should we call you?', name: 'profileName', value: ctx.state.profile.name, required: true }) +
     field({ label: 'Your campus', name: 'profileCampus', value: ctx.state.profile.campus || '', placeholder: 'University of Ghana' }) +
     errorBox + '<button class="button" type="submit">Save details</button></form>', (el) => {
-    el.querySelector('form').onsubmit = (e) => {
+    el.querySelector('form').onsubmit = (e) => {return runActionFlow(function*(){
       e.preventDefault();
       const name = el.querySelector('[name="profileName"]').value.trim().slice(0, 50);
       const campus = el.querySelector('[name="profileCampus"]').value.trim().slice(0, 80);
       if (!name) return formError(el, 'What name would you like to use?');
-      if (!commit(ctx, 'updateProfile', { name, campus }, el)) return;
+      if (!(yield commit(ctx, 'updateProfile', { name, campus }, el))) return;
       ctx.closeSheet(); ctx.refresh(); ctx.toast('That is you.');
-    };
+    });};
   });
 }
 
@@ -658,7 +662,7 @@ export function bindLife(ctx, route) {
   root.querySelectorAll('[data-action]').forEach((b) => {
     const a = b.dataset.action;
     if (!a?.startsWith('life-')) return;
-    b.addEventListener('click', () => {
+    b.addEventListener('click', () => {return runActionFlow(function*(){
       const s = ctx.state;
       const x = (s.ious || []).find((i) => i.id === route.id);
       const g = (s.groups || []).find((i) => i.id === route.id);
@@ -669,8 +673,8 @@ export function bindLife(ctx, route) {
       if (a === 'life-recovery-adjust') { ctx.draft.recovery = { days: ctx.state.recovery.days || 7, checkInDate: ctx.state.recovery.active ? ctx.state.recovery.checkInDate || ctx.state.recovery.nextDate : addDays(7), adjustments: {}, editing: true }; ctx.go(go('recovery',{step:0})); return; }
       if (a === 'life-external-add') { editOutsideMoney(ctx); return; }
       if (a.startsWith('life-external-edit:')) { const balance = (s.externalBalances || []).find((item) => item.id === a.slice('life-external-edit:'.length)); if (balance) editOutsideMoney(ctx, balance); return; }
-      if (a === 'life-visibility') { ctx.act('settings', { hideBalance: !s.settings.hideBalance }); ctx.refresh(); return; }
-      if (a === 'life-notifications') { ctx.act('settings', { notifications: !s.settings.notifications }); ctx.refresh(); return; }
+      if (a === 'life-visibility') { (yield (ctx.actAsync||ctx.act).call(ctx,'settings', { hideBalance: !s.settings.hideBalance })); ctx.refresh(); return; }
+      if (a === 'life-notifications') { (yield (ctx.actAsync||ctx.act).call(ctx,'settings', { notifications: !s.settings.notifications })); ctx.refresh(); return; }
       if (a === 'life-tour') { ctx.startTour({ replay: true, returnTo: route }); return; }
       if (a === 'life-onboarding-preview') { ctx.startOnboardingPreview(); return; }
       if (a === 'life-requests' || a === 'life-splits') { ctx.go({section:'pay',page:a === 'life-requests'?'requests':'splits'}); return; }
@@ -697,7 +701,7 @@ export function bindLife(ctx, route) {
         if (!ctx.draft.iouCreate || !validateIOUStep(ctx, route)) return;
         const d = ctx.draft.iouCreate;
         if (!d.name.trim() || !Number.isSafeInteger(d.amount) || d.amount <= 0) { formError(root, 'Check the person and total amount before saving.'); return; }
-        const r = commit(ctx, d.edit ? 'updateIOU' : 'createIOU', { id: d.edit ? d.id : undefined, name: d.name.trim(), type: d.type, amount: d.amount, due: d.due, note: d.note.trim().slice(0, 240), budgetItemId: d.type === 'owedByMe' ? d.budgetItemId || '' : '', idempotencyKey: d.idempotencyKey }, root);
+        const r = (yield commit(ctx, d.edit ? 'updateIOU' : 'createIOU', { id: d.edit ? d.id : undefined, name: d.name.trim(), type: d.type, amount: d.amount, due: d.due, note: d.note.trim().slice(0, 240), budgetItemId: d.type === 'owedByMe' ? d.budgetItemId || '' : '', idempotencyKey: d.idempotencyKey }, root));
         if (!r) return;
         const id = r.iou?.id || r.id, edited = d.edit;
         delete ctx.draft.iouCreate; ctx.saveDraft?.(); ctx.finish(go('iou-detail', { id })); ctx.toast(edited ? 'IOU updated.' : 'A clear agreement. Kept.'); return;
@@ -715,9 +719,9 @@ export function bindLife(ctx, route) {
           el.querySelector('[data-action="iou-edit"]').onclick = () => openIOUWizard(ctx, x);
           el.querySelector('[data-action="iou-cancel"]').onclick = () => {
             infoSheet(ctx, 'Cancel this IOU?', '<p>The remaining ' + personalMoney(ctx,remaining(x)) + ' will leave your open IOUs. No money moves.</p><button class="button secondary" data-action="iou-confirm-cancel">Yes, cancel the record</button>');
-            document.querySelector('[data-action="iou-confirm-cancel"]').onclick = () => {
-              if (commit(ctx, 'cancelIOU', { id: x.id })) { ctx.closeSheet(); ctx.refresh(); ctx.toast('IOU cancelled.'); }
-            };
+            document.querySelector('[data-action="iou-confirm-cancel"]').onclick = () => {return runActionFlow(function*(){
+              if ((yield commit(ctx, 'cancelIOU', { id: x.id }))) { ctx.closeSheet(); ctx.refresh(); ctx.toast('IOU cancelled.'); }
+            });};
           };
         }); return;
       }
@@ -747,11 +751,11 @@ export function bindLife(ctx, route) {
       }
       if (a === 'life-recovery-save') {
         const d = recoveryDraft(ctx), reductions = recoveryReductions(ctx,d);
-        const r = commit(ctx, 'recoveryPlan', { checkInDate: d.checkInDate || d.nextDate || addDays(d.days), days: d.days, reduceCategories: reductions, pauseSavings: true, message: reductions.length ? 'Your chosen costs eased. Other commitments protected.' : 'Current plan protected.' });
+        const r = (yield commit(ctx, 'recoveryPlan', { checkInDate: d.checkInDate || d.nextDate || addDays(d.days), days: d.days, reduceCategories: reductions, pauseSavings: true, message: reductions.length ? 'Your chosen costs eased. Other commitments protected.' : 'Current plan protected.' }));
         if (!r) return;
         delete ctx.draft.recovery; ctx.saveDraft?.(); ctx.go(go('recovery')); ctx.toast('Your recovery plan is in place. One day at a time.'); return;
       }
-      if (a === 'life-printing-demo') { const result = ctx.act('ensureProjectPrintingDemo', {}); if (result?.ok) ctx.go(go('group-detail', { id: result.group?.id || result.id || 'group-project-printing' })); else ctx.toast(result?.message || 'This sample is unavailable.'); return; }
+      if (a === 'life-printing-demo') { const result = (yield (ctx.actAsync||ctx.act).call(ctx,'ensureProjectPrintingDemo', {})); if (result?.ok) ctx.go(go('group-detail', { id: result.group?.id || result.id || 'group-project-printing' })); else ctx.toast(result?.message || 'This sample is unavailable.'); return; }
       if (a === 'life-new-group' || a === 'life-resume-group') { newGroup(ctx); return; }
       if (a === 'life-restart-group') { restartGroup(ctx); return; }
       if (a === 'life-create-exit') { captureGroupDraft(ctx, route); ctx.saveDraft?.(); ctx.go(go('groups'), { replace: true }); return; }
@@ -765,7 +769,7 @@ export function bindLife(ctx, route) {
         if (!d) return;
         if (!d.name.trim() || !Number.isSafeInteger(d.target) || d.target <= 0 || !d.members.length || d.threshold > groupApproverCount(d)) { ctx.toast('Review the group name, target and agreement first.'); return; }
         const members = [{ id: 'me', name: ctx.state.profile.name || 'You', role: 'approver' }, ...d.members.map(m => ({ ...m }))];
-        const r = commit(ctx, 'createGroup', { name: d.name.trim(), purpose: d.purpose?.trim() || d.name.trim(), deadline: d.deadline || '', emoji: d.emoji, target: d.target, members, mandate: { approvers: members.filter(m => m.role === 'approver').map(m => m.id), threshold: d.threshold }, idempotencyKey: d.idempotencyKey }, root);
+        const r = (yield commit(ctx, 'createGroup', { name: d.name.trim(), purpose: d.purpose?.trim() || d.name.trim(), deadline: d.deadline || '', emoji: d.emoji, target: d.target, members, mandate: { approvers: members.filter(m => m.role === 'approver').map(m => m.id), threshold: d.threshold }, idempotencyKey: d.idempotencyKey }, root));
         if (!r) return;
         const id = r.group?.id || r.id || ctx.state.groups.at(-1)?.id, name = d.name;
         delete ctx.draft.groupCreate; ctx.saveDraft?.();
@@ -775,11 +779,11 @@ export function bindLife(ctx, route) {
       if (a === 'life-profile-edit') { editProfile(ctx); return; }
       if (a === 'life-keepback') {
         ctx.sheet(sheetHead('What would you like to leave untouched?') + '<form class="form-stack">' + amountInput('keepback', ((s.buffer || 0) / 100).toFixed(2), 'Keep-back amount', '0') + errorBox + '<button class="button" type="submit">Keep that aside</button></form>', (el) => {
-          el.querySelector('form').onsubmit = (e) => {
+          el.querySelector('form').onsubmit = (e) => {return runActionFlow(function*(){
             e.preventDefault(); const amount = readAmount(el.querySelector('[name="keepback"]'));
             if (!Number.isSafeInteger(amount) || amount < 0 || amount > s.wallet) return formError(el, 'Choose an amount within your available balance.');
-            if (commit(ctx, 'settings', { buffer: amount }, el)) { ctx.closeSheet(); ctx.refresh(); ctx.toast('Your keep-back is updated.'); }
-          };
+            if ((yield commit(ctx, 'settings', { buffer: amount }, el))) { ctx.closeSheet(); ctx.refresh(); ctx.toast('Your keep-back is updated.'); }
+          });};
         }); return;
       }
       if (a === 'life-reset' || a === 'life-demo') {
@@ -794,6 +798,7 @@ export function bindLife(ctx, route) {
         }); return;
       }
       if (a === 'life-privacy') {
+        if(ctx.connected){ctx.go(go('account-privacy'));return;}
         infoSheet(ctx, 'Your privacy in this prototype', '<p>Demo account activity and preferences are stored in this browser. You can clear them using Start fresh.</p><p>Signup asks for your Ghana Card number and takes three guided selfies in one camera session. The number and photos stay only in memory, are never uploaded or saved, and are removed when you finish, exit or reload signup. The microphone stays off.</p><p>After the selfies, a demo verification animation returns sample Ghana Card details for you to confirm before PIN setup. The confirmed sample legal name becomes the holder name on both demo accounts. No live bank, NIA or biometric service is connected. Use the demo Ghana Card number GHA-000000000-0 and a demo PIN only.</p><p>Feedback stays on this device. Sharing opens your device’s own sharing controls.</p>'); return;
       }
       if (a === 'life-help-question') { feedback(ctx, 'question'); return; }
@@ -802,6 +807,6 @@ export function bindLife(ctx, route) {
       if (a === 'life-help-balance') { infoSheet(ctx, 'Three views of your money', '<p><strong>Available</strong> is the money in your everyday account.</p><p><strong>Planned</strong> is what you have reserved for commitments.</p><p><strong>Left after plan</strong> subtracts your plan and keep-back from available money. Money Boxes are held separately.</p>'); return; }
       if (a === 'life-help-expected') { infoSheet(ctx, 'Expected is not available.', '<p>Allowance and money someone owes you remain expected until they actually arrive.</p><p>Match an existing confirmed Lumo receipt, or record a repayment that arrived in cash, MoMo or another bank. Recording an IOU repayment never credits Lumo a second time. A due date alone never adds money.</p>'); return; }
       if (a === 'life-help-pause') { infoSheet(ctx, 'A moment of clarity.', '<p>Lumo may pause when a payment could use money your plan is relying on.</p><p>You can see the effect, change the amount or continue after reviewing it. There is no judgement.</p>'); }
-    });
+    });});
   });
 }

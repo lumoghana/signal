@@ -1,0 +1,37 @@
+{
+  "version": "2.7.2",
+  "apk_sha256": "b2ba268a4fb1fa78a8f8654cd06b288e5e11a14279b8077ea182d3356362be18",
+  "baseline": {
+    "web": "v66 / e3de575",
+    "native": "2.4.3"
+  },
+  "fixes": [
+    "Native essentials remain drafts until Complete budget",
+    "Shared first-time setup checkpoints and validated resume",
+    "Activity uses meaningful counterparty/category/note metadata",
+    "Unchanged background snapshots preserve existing views; real changes preserve scroll and disclosures",
+    "Connected funding and settings use honest shared-test descriptions"
+  ],
+  "tests": {
+    "nativeModelSuites": 52,
+    "androidFrameworkCases": 38,
+    "web": 1370,
+    "backend": 110
+  },
+  "visual": {
+    "webVisualFilesUnchanged": 47,
+    "nativeAssetsAndResourcesUnchanged": {
+      "assets": 273,
+      "res": 54
+    },
+    "approvedReferences": {
+      "web": "v66 /e3de575",
+      "native": "2.4.3"
+    },
+    "scope": "styles/artwork only; behavior changes independently tested"
+  },
+  "sharedEdgeVersion": 5,
+  "physicalHandsetVerified": false,
+  "newLiveSignedInPaymentVerified": false,
+  "olderReceiptNames": "Proposed database enrichment blocked by automatic review and not applied; existing handles and previously verified transaction metadata remain in use."
+}

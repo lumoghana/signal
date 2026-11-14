@@ -1,0 +1,95 @@
+-- Isolated connected merchant/account lifecycle. Every fixture and posting rolls back.
+begin;
+create function pg_temp.ops_assert(p_value boolean,p_label text) returns void language plpgsql as $$
+begin if p_value is distinct from true then raise exception 'Operations integration failed: %',p_label;end if;perform set_config('lumo.ops.checks',(coalesce(nullif(current_setting('lumo.ops.checks',true),''),'0')::integer+1)::text,true);end $$;
+create function pg_temp.ops_call(p_command text,p_payload jsonb default '{}') returns jsonb language plpgsql as $$
+declare r jsonb;begin
+ if p_command not in ('account.open','account.get','merchant.get','staff.list','staff.invitations','shift.list','refund.list','notification.list','profile.get','support.list','merchant.search') and not(p_payload?'attemptId') then p_payload:=p_payload||jsonb_build_object('attemptId','ops-'||gen_random_uuid()::text);end if;
+ execute 'set local role authenticated';r:=public.lumo_rpc(p_command,p_payload);execute 'reset role';return r;
+ exception when others then execute 'reset role';raise;end $$;
+create function pg_temp.ops_actor(p_user uuid,p_session uuid) returns void language sql as $$ select set_config('request.jwt.claims',jsonb_build_object('sub',p_user,'role','authenticated','session_id',p_session)::text,true);$$;
+do $$
+declare
+ v_owner uuid:=gen_random_uuid();v_manager uuid:=gen_random_uuid();v_cashier uuid:=gen_random_uuid();v_payer uuid:=gen_random_uuid();
+ s_owner uuid:=gen_random_uuid();s_manager uuid:=gen_random_uuid();s_cashier uuid:=gen_random_uuid();s_payer uuid:=gen_random_uuid();s_extra uuid:=gen_random_uuid();
+ v_pin text:=lpad(floor(random()*1000000)::integer::text,6,'0');v_new_pin text:=lpad(floor(random()*1000000)::integer::text,6,'0');v_suffix text:=substr(replace(gen_random_uuid()::text,'-',''),1,8);
+ v_result jsonb;v_first jsonb;v_merchant uuid;v_shop uuid;v_other_shop uuid;v_member_manager uuid;v_member_cashier uuid;v_shift uuid;v_payment uuid;v_proposal uuid;v_notify uuid;v_account uuid;v_reference text;v_balance bigint;v_i integer;v_users uuid[];v_sessions uuid[];
+begin
+ perform set_config('lumo.ops.checks','0',true);v_users:=array[v_owner,v_manager,v_cashier,v_payer];v_sessions:=array[s_owner,s_manager,s_cashier,s_payer];
+ for v_i in 1..4 loop
+  insert into auth.users(id,aud,role,email,email_confirmed_at,raw_app_meta_data,created_at,updated_at) values(v_users[v_i],'authenticated','authenticated','ops-'||v_i||'-'||v_suffix||'@example.invalid',now(),'{"lumo_pilot":true}',now(),now());
+  insert into auth.sessions(id,user_id,created_at,updated_at) values(v_sessions[v_i],v_users[v_i],now(),now());
+  perform pg_temp.ops_actor(v_users[v_i],v_sessions[v_i]);
+  v_result:=pg_temp.ops_call('account.open',jsonb_build_object('handle','ops_'||v_i||'_'||v_suffix,'displayName','Operations fixture '||v_i,'pin',v_pin));
+  perform pg_temp.ops_assert(v_result->>'ok'='true','each fixture opens account');
+ end loop;
+ perform pg_temp.ops_actor(v_owner,s_owner);
+ v_result:=pg_temp.ops_call('merchant.create',jsonb_build_object('businessName','Operations Fixture','shopName','Night Market'));v_merchant:=(v_result#>>'{merchant,id}')::uuid;v_shop:=(v_result#>>'{shop,id}')::uuid;v_account:=(v_result#>>'{merchant,accountId}')::uuid;
+ perform pg_temp.ops_assert(v_merchant is not null and v_shop is not null,'merchant setup');
+ v_result:=pg_temp.ops_call('shop.create',jsonb_build_object('merchantId',v_merchant,'name','Private Shop'));v_other_shop:=(v_result#>>'{shop,id}')::uuid;
+ v_result:=pg_temp.ops_call('staff.invite',jsonb_build_object('shopId',v_shop,'handle','ops_2_'||v_suffix,'role','manager'));v_member_manager:=(v_result#>>'{membership,id}')::uuid;
+ perform pg_temp.ops_assert(v_result#>>'{membership,status}'='pending','owner invites exact manager handle');
+ v_result:=pg_temp.ops_call('staff.invite',jsonb_build_object('shopId',v_shop,'handle','ops_3_'||v_suffix,'role','cashier'));v_member_cashier:=(v_result#>>'{membership,id}')::uuid;
+ perform pg_temp.ops_assert(v_result#>>'{membership,status}'='pending','owner invites cashier');
+ v_result:=pg_temp.ops_call('shift.start',jsonb_build_object('shopId',v_shop));v_shift:=(v_result#>>'{shift,id}')::uuid;perform pg_temp.ops_assert(v_shift is not null,'owner starts own shift');
+ v_result:=pg_temp.ops_call('shift.start',jsonb_build_object('shopId',v_shop));perform pg_temp.ops_assert(v_result#>>'{shift,id}'=v_shift::text,'a second start reuses active shift');
+ v_result:=pg_temp.ops_call('shift.end',jsonb_build_object('shopId',v_shop,'note','Owner handover'));perform pg_temp.ops_assert(v_result#>>'{shift,endedAt}' is not null,'owner ends own shift');
+ perform pg_temp.ops_actor(v_manager,s_manager);
+ v_result:=pg_temp.ops_call('merchant.get');perform pg_temp.ops_assert(v_result->'merchants'='[]'::jsonb,'pending staff has no merchant scope');
+ v_result:=pg_temp.ops_call('staff.invitations');perform pg_temp.ops_assert(jsonb_array_length(v_result->'invitations')=1,'only addressed invitation listed');
+ v_result:=pg_temp.ops_call('staff.respond',jsonb_build_object('membershipId',v_member_manager,'accept',true));perform pg_temp.ops_assert(v_result#>>'{membership,status}'='active','manager accepts invitation');
+ v_result:=pg_temp.ops_call('merchant.get');perform pg_temp.ops_assert(jsonb_array_length(v_result->'merchants')=1 and jsonb_array_length(v_result#>'{merchants,0,shops}')=1 and v_result#>>'{merchants,0,shops,0,role}'='manager' and v_result#>'{merchants,0,balance}'='null'::jsonb and v_result#>>'{merchants,0,accountId}'=v_account::text,'staff sees only assigned shop, receipt account ID and no aggregate balance');
+ v_result:=pg_temp.ops_call('staff.list',jsonb_build_object('merchantId',v_merchant));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','manager cannot read team roster');
+ v_result:=pg_temp.ops_call('request.create',jsonb_build_object('shopId',v_other_shop,'amount',1000));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','staff cannot collect for another shop');
+ v_result:=pg_temp.ops_call('request.create',jsonb_build_object('shopId',v_shop,'amount',1000,'note','Counter fixture'));perform pg_temp.ops_assert(v_result#>>'{request,amount}'='1000','manager generates fixed amount QR');
+ perform pg_temp.ops_actor(v_cashier,s_cashier);
+ v_result:=pg_temp.ops_call('staff.respond',jsonb_build_object('membershipId',v_member_manager,'accept',true));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','another user cannot accept manager invitation');
+ v_result:=pg_temp.ops_call('staff.respond',jsonb_build_object('membershipId',v_member_cashier,'accept',true));perform pg_temp.ops_assert(v_result#>>'{membership,status}'='active','cashier accepts own invitation');
+ v_result:=pg_temp.ops_call('request.create',jsonb_build_object('shopId',v_shop,'amount',1500));perform pg_temp.ops_assert(v_result#>>'{request,amount}'='1500','cashier can create fixed request');
+ v_result:=pg_temp.ops_call('merchant.close',jsonb_build_object('shopId',v_shop));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','cashier cannot close trading day');
+ v_result:=pg_temp.ops_call('shift.start',jsonb_build_object('shopId',v_shop));perform pg_temp.ops_assert(v_result#>>'{shift,id}' is not null,'cashier starts shift');
+ perform pg_temp.ops_actor(v_payer,s_payer);
+ v_result:=pg_temp.ops_call('wallet.fund',jsonb_build_object('amount',50000,'confirmSandbox',true));perform pg_temp.ops_assert(v_result->>'ok'='true','payer explicitly funds test wallet');
+ v_result:=pg_temp.ops_call('payment.pay',jsonb_build_object('shopId',v_shop,'amount',30000,'pin',v_pin));v_payment:=(v_result#>>'{receipt,id}')::uuid;v_reference:=v_result#>>'{receipt,reference}';perform pg_temp.ops_assert(v_payment is not null,'payer pays merchant');
+ perform pg_temp.ops_actor(v_cashier,s_cashier);
+ v_result:=pg_temp.ops_call('payment.refund',jsonb_build_object('paymentId',v_payment,'amount',100,'pin',v_pin));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','cashier cannot refund');
+ perform pg_temp.ops_actor(v_manager,s_manager);
+ v_result:=pg_temp.ops_call('payment.refund',jsonb_build_object('paymentId',v_payment,'amount',6000,'pin',v_pin));perform pg_temp.ops_assert(v_result#>>'{receipt,type}'='refund','manager refunds below cumulative limit');
+ v_result:=pg_temp.ops_call('payment.refund',jsonb_build_object('paymentId',v_payment,'amount',6000,'pin',v_pin));v_proposal:=(v_result#>>'{refundProposal,id}')::uuid;perform pg_temp.ops_assert(v_result#>>'{refundProposal,status}'='pending' and not(v_result?'receipt'),'split refunds crossing cumulative limit require approval without moving funds');
+ select a.balance into v_balance from lumo_private.accounts a where a.id=v_account;perform pg_temp.ops_assert(v_balance=24000,'pending proposal does not debit merchant');
+ v_result:=pg_temp.ops_call('refund.decide',jsonb_build_object('proposalId',v_proposal,'approve',true,'pin',v_pin));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','manager cannot approve own refund');
+ perform pg_temp.ops_actor(v_owner,s_owner);
+ v_result:=pg_temp.ops_call('refund.list',jsonb_build_object('merchantId',v_merchant));perform pg_temp.ops_assert(jsonb_array_length(v_result->'refunds')=1,'owner sees refund approval queue');
+ v_result:=pg_temp.ops_call('refund.decide',jsonb_build_object('proposalId',v_proposal,'approve',true,'pin',v_pin));perform pg_temp.ops_assert(v_result#>>'{refundProposal,status}'='refunded' and v_result#>>'{receipt,originalPaymentId}'=v_payment::text,'owner approval returns money to original payer');
+ v_result:=pg_temp.ops_call('refund.decide',jsonb_build_object('proposalId',v_proposal,'approve',true,'pin',v_pin));perform pg_temp.ops_assert(v_result->>'code'='ALREADY_DECIDED','new attempt cannot execute approved refund twice');
+ perform pg_temp.ops_assert((select a.balance from lumo_private.accounts a where a.id=v_account)=18000,'merchant exact after two refunds');
+ v_result:=pg_temp.ops_call('merchant.close',jsonb_build_object('shopId',v_shop));perform pg_temp.ops_assert(v_result->>'closed'='true' and (select a.balance from lumo_private.accounts a where a.id=v_account)=18000,'trading close keeps underlying money');
+ v_result:=pg_temp.ops_call('merchant.settings',jsonb_build_object('shopId',v_shop,'location','Night Market Legon','latitude',5.6501,'longitude',-0.1891,'published',true));perform pg_temp.ops_assert(v_result->>'ok'='true','owner publishes receiving shop location');
+ perform pg_temp.ops_actor(v_payer,s_payer);
+ v_result:=pg_temp.ops_call('merchant.search',jsonb_build_object('query','Operations Fixture','latitude',5.6501,'longitude',-0.1891));perform pg_temp.ops_assert(jsonb_array_length(v_result->'shops')=1 and v_result#>>'{shops,0,id}'=v_shop::text and v_result#>>'{shops,0,distanceMetres}'='0','directory returns published proximity match only');
+ v_result:=pg_temp.ops_call('profile.update',jsonb_build_object('displayName','Updated fixture','preferences',jsonb_build_object('theme','dark','sound',true)));perform pg_temp.ops_assert(v_result#>>'{profile,displayName}'='Updated fixture' and v_result#>>'{profile,preferences,theme}'='dark','profile and preferences persist centrally');
+ v_result:=pg_temp.ops_call('profile.update',jsonb_build_object('preferences',jsonb_build_object('isAdmin',true)));perform pg_temp.ops_assert(v_result->>'code'='INVALID_INPUT','unknown privileged preference rejected');
+ v_result:=pg_temp.ops_call('security.pin',jsonb_build_object('oldPin','00000000','newPin',v_new_pin));perform pg_temp.ops_assert(v_result->>'code'='PIN_REQUIRED','PIN change requires old PIN');
+ v_result:=pg_temp.ops_call('security.pin',jsonb_build_object('oldPin',v_pin,'newPin',v_new_pin));perform pg_temp.ops_assert(v_result->>'changed'='true','payment PIN changes with old PIN');
+ insert into auth.sessions(id,user_id,created_at,updated_at) values(s_extra,v_payer,now(),now());
+ v_result:=pg_temp.ops_call('security.sessions');perform pg_temp.ops_assert(jsonb_array_length(v_result->'sessions')=2,'own active sessions list excludes other accounts');
+ v_result:=pg_temp.ops_call('security.session.revoke',jsonb_build_object('sessionId',s_owner,'pin',v_new_pin));perform pg_temp.ops_assert(v_result->>'code'='NOT_FOUND','another user session cannot be revoked');
+ v_result:=pg_temp.ops_call('security.session.revoke',jsonb_build_object('sessionId',s_payer,'pin',v_new_pin));perform pg_temp.ops_assert(v_result->>'code'='CURRENT_SESSION','current session uses ordinary sign out');
+ v_result:=pg_temp.ops_call('security.session.revoke',jsonb_build_object('sessionId',s_extra,'pin',v_new_pin));perform pg_temp.ops_assert(v_result->>'revoked'='true' and not exists(select 1 from auth.sessions s where s.id=s_extra),'own other session revoked');
+ perform pg_temp.ops_actor(v_payer,s_extra);v_result:=pg_temp.ops_call('account.get');perform pg_temp.ops_assert(v_result->>'code'='SESSION_REVOKED','revoked session token immediately denied by account guard');perform pg_temp.ops_actor(v_payer,s_payer);
+ v_result:=pg_temp.ops_call('notification.list');perform pg_temp.ops_assert(jsonb_array_length(v_result->'notifications')>=3,'payments and security changes reach own inbox');v_notify:=(v_result#>>'{notifications,0,id}')::uuid;
+ v_result:=pg_temp.ops_call('notification.read',jsonb_build_object('notificationId',v_notify));perform pg_temp.ops_assert(v_result->>'read'='true','own notification marked read');
+ v_result:=pg_temp.ops_call('support.create',jsonb_build_object('subject','Payment question','body','Fixture only; no message is sent to an external service.','reference',v_reference));perform pg_temp.ops_assert(v_result#>>'{ticket,status}'='open','support request saved privately');
+ perform pg_temp.ops_actor(v_owner,s_owner);
+ v_result:=pg_temp.ops_call('notification.read',jsonb_build_object('notificationId',v_notify));perform pg_temp.ops_assert(v_result->>'code'='NOT_FOUND','another user cannot mark notification read');
+ v_result:=pg_temp.ops_call('support.list');perform pg_temp.ops_assert(v_result->'tickets'='[]'::jsonb,'support tickets are owner isolated');
+ v_result:=pg_temp.ops_call('staff.remove',jsonb_build_object('membershipId',v_member_cashier));perform pg_temp.ops_assert(v_result#>>'{membership,status}'='removed','owner removes cashier');
+ perform pg_temp.ops_actor(v_cashier,s_cashier);
+ v_result:=pg_temp.ops_call('request.create',jsonb_build_object('shopId',v_shop,'amount',100));perform pg_temp.ops_assert(v_result->>'code'='FORBIDDEN','removed cashier cannot create new payment requests');
+ v_result:=pg_temp.ops_call('merchant.get');perform pg_temp.ops_assert(v_result->'merchants'='[]'::jsonb,'removed cashier loses merchant visibility');
+ perform pg_temp.ops_assert(not has_table_privilege('authenticated','lumo_private.inbox','SELECT') and not has_table_privilege('authenticated','lumo_private.staff_memberships','SELECT') and not has_function_privilege('authenticated','lumo_private.operations_command(text,jsonb)','EXECUTE'),'private operations tables/helpers deny direct access');
+ perform set_config('lumo.ops.report',jsonb_build_object('checks',current_setting('lumo.ops.checks')::integer,'testFixturesRolledBack',true,'merchantBalance',18000)::text,true);
+end $$;
+set constraints all immediate;
+select current_setting('lumo.ops.report')::jsonb as lumo_operations_test;
+rollback;

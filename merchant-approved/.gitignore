@@ -1,0 +1,9 @@
+.sites-runtime/
+.wrangler/
+node_modules/
+.env*
+.dev.vars*
+outputs/
+worker/assets.generated.js
+dist/server/
+dist/.openai/

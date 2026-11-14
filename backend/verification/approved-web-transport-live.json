@@ -1,0 +1,104 @@
+{
+  "at": "2026-11-13T08:22:26.566Z",
+  "scope": "Actual approved frontend service module over HTTP, with in-memory browser storage and injected exclusive lease provider; no computer-browser sign-in or hardware-biometric claim.",
+  "checks": 14,
+  "passed": [
+    "original frontend transport signs in generated consumer A against the actual gateway",
+    "frontend snapshot installs the verified original account state",
+    "lost real committed reply leaves frontend payment unknown with a durable attempt",
+    "frontend writes the original attempt before the real money POST",
+    "switching the original transport to consumer B installs only B state",
+    "other consumer receives the exact canonical one-pesewa test receipt",
+    "original owner attempt survives the account switch",
+    "same original frontend signs consumer A back in with generated credentials",
+    "restored frontend retry replays one ledger posting without a second debit",
+    "known confirmed original attempt clears only after durable cleanup",
+    "actual refresh rotates the session while keeping the same immutable account owner",
+    "frontend sign-out confirms local Auth revocation and clears the saved current session",
+    "scope-local sign-out keeps the other earlier authorized test session alive",
+    "frontend durable storage contains no generated login password or transaction PIN"
+  ],
+  "requests": [
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "login",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "action",
+      "type": "payment",
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "login",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "login",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "action",
+      "type": "payment",
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/token",
+      "action": "refresh-or-logout",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/logout",
+      "action": "refresh-or-logout",
+      "type": null,
+      "status": 204
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/logout",
+      "action": "refresh-or-logout",
+      "type": null,
+      "status": 204
+    },
+    {
+      "path": "/auth/v1/logout",
+      "action": "refresh-or-logout",
+      "type": null,
+      "status": 204
+    }
+  ],
+  "canonicalMoneyPostings": 1,
+  "amountPesewas": 1,
+  "rawCredentialsExcluded": true
+}

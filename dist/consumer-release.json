@@ -1,0 +1,63 @@
+{
+  "consumerExperience": "2.11.0",
+  "apkVersion": "2.11.0",
+  "apkVersionCode": 21100,
+  "apkSha256": "558893158d31a47778f79d2354dd4dbad0c81ad6c0cd7fd30b4b56d47aaa6b3f",
+  "apkDownload": "/downloads/Lumo-Test-Android.apk",
+  "lookupMode": "sandbox-sample-only",
+  "changes": [
+    "Lumo row tap opens selected person and amount without another Continue",
+    "MoMo phone-only sample network/name lookup then recipient confirmation",
+    "Bank plus account sample name lookup then recipient confirmation",
+    "Shared service availability disables affected payment options with clear messages",
+    "Foreground availability refresh preserves drafts and pending payment recovery",
+    "Service changes update open recipient forms without clearing inputs, focus or drafts"
+  ],
+  "webValidation": {
+    "testsPassed": 1618,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "browserJourneys": "Synthetic UI fixture: direct Lumo person selection; phone-only MoMo sample lookup and bank/account sample lookup; recipient confirmation, review, synthetic PIN, virtual debits and successful receipts.",
+    "syntheticFixtureAmountsPesewas": {
+      "openingAvailable": 100000,
+      "momoPrincipal": 2500,
+      "momoFee": 50,
+      "bankPrincipal": 4000,
+      "bankFee": 100,
+      "closingAvailable": 93350
+    },
+    "layoutChecks": {
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "shortHeightPx": 440,
+      "scope": "Dark Lumo/MoMo screens and controls reachable in the short light fixture."
+    },
+    "productionWrites": false,
+    "physicalDeviceVerified": false,
+    "availabilityRegression": "Existing payment controls disable/recover in place, detected-network recipient gating and confirmations, unavailable-service fallback message, busy/disposed controls, account-instance isolation, and protected refresh without remounting."
+  },
+  "androidValidation": {
+    "pureJavaSuites": 63,
+    "frameworkCases": 172,
+    "frameworkFailures": 0,
+    "frameworkErrors": 0,
+    "apiLevels": [
+      28,
+      35
+    ],
+    "layoutScenarios": 30,
+    "scope": "Robolectric framework and native-graphics layout checks; physical handset and ART execution remain unverified."
+  },
+  "providerMode": "sandbox",
+  "liveProviderLookup": false,
+  "baselineConsumerExperience": "2.10.6",
+  "adminAvailabilityRelease": {
+    "version": "2.11.0",
+    "backendFunction": "lumo-approved",
+    "backendFunctionVersion": 16,
+    "adminFunctionVersion": 3,
+    "customerMessages": "Scoped service availability with original-reference recovery"
+  }
+}

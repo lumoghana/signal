@@ -173,3 +173,12 @@ test('disposed or detached setup controls cannot create a box or overwrite its d
   const detached=binder({action:'box-partner-toggle'});detached.button.isConnected=false;detached.click();assert.equal(detached.draft.box.partnerEnabled,undefined);detached.cleanup();
   const moved=binder({route:createRoute('review'),action:'box-save'});moved.setRoute({section:'home',page:'home'});moved.click();assert.equal(moved.acts.length,0);moved.cleanup();
 });
+
+test('connected partner setup visibly explains the unavailable recovery route before enabling protection',()=>{
+ const ctx={state:createEmptyState(),draft:{box:boxDraft()},connected:true};
+ const html=renderPlanning(ctx,createRoute('partner'));
+ assert.match(html,/data-partner-support-limit/);assert.match(html,/cannot bypass their approval/);assert.match(html,/Choose a Money Box without a partner/);
+ assert.ok(html.indexOf('data-partner-support-limit')<html.indexOf('data-action="p:box-partner-toggle"'));
+ assert.ok(html.indexOf('data-partner-support-limit')<html.indexOf('<details'));
+ assert.doesNotMatch(html,/contact Lumo support through the planned toll-free line/);
+});

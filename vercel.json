@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "node scripts/build-offline-shell.mjs",
+  "buildCommand": "node scripts/prepare-approved-public-assets.mjs && node scripts/build-offline-shell.mjs",
   "outputDirectory": "dist",
   "installCommand": "",
   "headers": [

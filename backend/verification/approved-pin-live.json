@@ -1,0 +1,110 @@
+{
+  "verifiedAt": "2026-11-13T09:15:56.981Z",
+  "status": "passed",
+  "scope": "Actual original app.js pinAuth and actAsync functions executed in a VM with the actual approved frontend service module over HTTP. UI elements and timers are controlled stand-ins, storage is in-memory, and the cross-tab lease provider is injected. This is not authenticated computer-browser testing or a reproduction of the user account.",
+  "origin": "https://lumo-connected-pilot.vercel.app",
+  "checks": 16,
+  "passed": [
+    "Actual frontend signs generated consumer A in.",
+    "Actual frontend signs generated consumer B in.",
+    "Both generated accounts have current server snapshots.",
+    "Generated account uses a four-digit created PIN.",
+    "Generated sender has the one pesewa required for the bounded test.",
+    "Wrong PIN is rejected by the real endpoint without invoking a payment.",
+    "Original PIN sheet displays the server rejection.",
+    "Wrong PIN leaves both test-account wallet balances unchanged.",
+    "Correct created PIN passes the actual PIN sheet and original payment callback.",
+    "Actual actAsync and shared transport confirm the one-pesewa payment.",
+    "Transient authorization PIN clears after the original continuation completes.",
+    "The original PIN sheet sent one wrong and one correct verification only.",
+    "Exactly one payment POST follows the corrected PIN.",
+    "Both consumers receive the same canonical one-pesewa ledger receipt.",
+    "The bounded successful payment debits and credits exactly one pesewa.",
+    "No generated login password is persisted by the frontend transport."
+  ],
+  "amountPesewas": 1,
+  "paymentPosts": 1,
+  "pinVerificationRequests": 2,
+  "requests": [
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "login",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "login",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "verifyPin",
+      "type": null,
+      "status": 400
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "verifyPin",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "action",
+      "type": "payment",
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/functions/v1/lumo-approved",
+      "action": "snapshot",
+      "type": null,
+      "status": 200
+    },
+    {
+      "path": "/auth/v1/logout",
+      "action": "auth-session",
+      "type": null,
+      "status": 204
+    },
+    {
+      "path": "/auth/v1/logout",
+      "action": "auth-session",
+      "type": null,
+      "status": 204
+    }
+  ],
+  "rawCredentialsExcluded": true,
+  "userAccountIssueReproduced": false
+}

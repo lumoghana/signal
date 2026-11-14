@@ -1,0 +1,106 @@
+{
+  "projectId": "iwutbrljiiodamtyoorg",
+  "checkedAt": "2026-11-12T22:45:59.428203+00:00",
+  "sandbox": true,
+  "bankConnected": false,
+  "databaseChecks": 69,
+  "clientTests": 28,
+  "publicHttpBoundaryChecks": 4,
+  "consumerBaselineTests": 1305,
+  "databaseFlow": {
+    "funding": 10000,
+    "transferAtoB": 5000,
+    "fixedMerchantPaymentFromB": 2000,
+    "staticMerchantPaymentFromA": 1000,
+    "refundTotal": 2500,
+    "postCloseMerchantPayment": 300,
+    "finalTransferAtoB": 100,
+    "finalBalances": {
+      "consumerA": 4100,
+      "consumerB": 5100,
+      "merchant": 800
+    },
+    "unit": "integer pesewas"
+  },
+  "databaseFixtureRole": "authenticated, real hosted public.lumo_rpc; synthetic Auth rows and claims inside rollback",
+  "fixturesRolledBack": true,
+  "remainingFixtureProfiles": 0,
+  "remainingFixtureJournals": 0,
+  "remainingFixtureAuthUsers": 0,
+  "sourceSecurityReview": "No outstanding material issues in assigned account, ledger, authorization, replay, receipt and client journal scope",
+  "securityAdvisors": {
+    "error": 0,
+    "warning": 1,
+    "info": 11,
+    "infoReason": "Private tables intentionally deny all direct client access; RLS has no permissive policies",
+    "remediationReference": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+    "warningReason": "Supabase leaked-password protection remains disabled in this project; no plan upgrade or Auth configuration change was made",
+    "warningRemediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+  },
+  "migrations": [
+    {
+      "file": "20261112215314_lumo_shared_test_money.sql",
+      "sha256": "1581a662e1eca3f442c23945d053fb726d26d009a18f8f574f59b9bb155b533c"
+    },
+    {
+      "file": "20261112215654_lumo_fixed_request_lock_expiry.sql",
+      "sha256": "b64908a49bd6894549dd3412f82dc7997641449f15bb847b33de760dc9b6ab72"
+    },
+    {
+      "file": "20261112215856_lumo_handle_scope_fix.sql",
+      "sha256": "8a8d5c2bbb0137cb8dd2df88914b3d0c5a54a3792001ad15de5e8ea467d578c6"
+    },
+    {
+      "file": "20261112222059_lumo_pilot_auth.sql",
+      "sha256": "201d31bbf024927bd98a67b7f210a47233ffcf571698e72f5eba24f549897741"
+    },
+    {
+      "file": "20261112222757_lumo_refundable_amount.sql",
+      "sha256": "b985e07b3c71559161b8a67ed043c76a57887677f5f19b4cf165c0407799ea7e"
+    },
+    {
+      "file": "20261112223231_lumo_shared_shops.sql",
+      "sha256": "86b482943b1917deb5e86fc39610d976eaa3b468a045df98c5b9bf737bb6f9ee"
+    }
+  ],
+  "verificationLimits": [
+    "No Android emulator or physical handset runtime/camera test",
+    "No authenticated browser payment journey; deployed login/layout checked visually, real Auth/payment requests exercised over HTTP",
+    "Remaining original planning, Money Chat, group/IOU journeys, staff roles, account recovery and operations UI are not migrated",
+    "Sound works while merchant page is open; background push is not implemented",
+    "No real money, bank, MoMo, Ghana Card, email or SMS verification",
+    "Final expanded core database script rerun was interrupted without a result; last completed core run passed69 checks"
+  ],
+  "authHandlerTests": 16,
+  "backendNodeTests": 44,
+  "pilotWebTests": 24,
+  "liveAuthAndLedgerHttpChecks": 28,
+  "deployedOriginChecks": 7,
+  "pilotAuthDatabaseChecks": 23,
+  "sharedShopDatabaseChecks": 41,
+  "channels": {
+    "consumerWeb": "https://lumo-connected-pilot.vercel.app/",
+    "merchantWeb": "https://lumo-connected-pilot.vercel.app/merchant.html",
+    "androidVersion": "2.5.0",
+    "androidSha256": "fc9029a9c1b50a15cb5c5a3b77d91905d90e921e4bd7bf57b9d220cc1f080a6a",
+    "separateConnectedPilot": true,
+    "originalDemosPreserved": true
+  },
+  "deployment": {
+    "id": "dpl_8hHVnAJMDSMyLRXcdru6tAGAFvTZ",
+    "ready": true,
+    "protectionPreserved": true,
+    "edgeAuthVersion": 3,
+    "exactOriginCorsVerified": true
+  },
+  "liveQaRetirement": {
+    "generatedIdentitiesSuspended": 3,
+    "sessionsRemaining": 0,
+    "ledgerAuditRecordsRetained": true
+  },
+  "finalDatabaseRecheck": {
+    "completed": false,
+    "reason": "Large hosted test rerun did not return; last completed core run passed69. No additional pass claimed.",
+    "extraRefundProjectionAssertionRuntimeVerified": false
+  }
+}

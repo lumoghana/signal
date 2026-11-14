@@ -1,5 +1,5 @@
 /** Local member conversations. Money updates are projected from the group ledger. */
-import { getGroupActor, activeGroupMember, canReadGroup, groupSummary, groupMoneyEvents, groupPayoutStatus } from './group-ledger.js';
+import { getGroupActor, activeGroupMember, canReadGroup, groupSummary, groupMoneyEvents, groupPayoutStatus, groupMandateReady } from './group-ledger.js';
 import { cash } from './ui.js';
 import { designatedGroupApprovers, groupMandatePending } from './group-policy.js';
 
@@ -21,6 +21,17 @@ const idsAt = (chat, memberId) => Array.isArray(chat.readBy?.[memberId]) ? chat.
 const stableId = clientId => `group-message:${clientId}`;
 
 export const isGroupChatAction = type => ACTIONS.has(type);
+
+/** Use only on a cloned public projection. Reports belong to a private channel. */
+export function redactGroupReports(group) {
+  if (record(group?.chat)) group.chat.reports = [];
+  return group;
+}
+
+/** A response can acknowledge saving a report without repeating its contents. */
+export function publicGroupReport(report) {
+  return report ? { id: report.id, messageId: report.messageId, status: 'saved' } : null;
+}
 
 function sampleMessages(group) {
   const base = validDate(group.createdAt) ? Date.parse(group.createdAt) : Date.now() - 3600000;
@@ -197,6 +208,30 @@ export function getGroupAssistantAnswer(state, groupId, question) {
   const group = state.groups?.find(value => value.id === groupId);
   if (!group || !activeGroupMember(group, getGroupActor(group))) return fail('Join this group before asking about it.');
   const q = clean(question, 400).toLowerCase(), summary = groupSummary(group);
+  if (/who.*(?:not.*paid|still.*pay|contribut)|hasn.t.*contribut|missing.*contribut/.test(q)) {
+    const members = (group.members || []).filter(member => member.status === 'active');
+    const waiting = members.filter(member => !(member.amount > 0));
+    return good('Here are the confirmed contribution records.', { title: waiting.length ? 'Some contributions are still unconfirmed.' : 'Every joined member has a confirmed contribution.', paragraphs: waiting.length ? [...waiting.map(member => `${memberName(state, group, member.id)}: no confirmed contribution recorded${(group.contributions || []).some(c => c.memberId === member.id && c.status === 'pending') ? '; a contribution is processing' : ''}.`), 'A missing contribution is not an IOU or a promise to pay.'] : ['Every joined member has at least one confirmed contribution. That does not mean each has paid an agreed equal share.'] });
+  }
+  if (/why|blocked|can.t|cannot|next|what.*do|ready.*pay/.test(q)) {
+    if (group.status === 'closed') return good('This collection is closed.', { title: summary.balance > 0 ? 'A merchant refund is ready to return.' : 'The history is still here.', paragraphs: [summary.balance > 0 ? `${cash(summary.balance)} is held in this closed group. ${group.creatorId === getGroupActor(group) ? 'Choose Return merchant refund, review the original-source shares and confirm with your PIN.' : 'Ask the group creator to review Return merchant refund and confirm the original-source returns.'} This does not reopen contributions or payouts.` : 'New contributions and payouts are closed. Review the recorded contributions, returns and payment history.'] });
+    if (!groupMandateReady(group)) {
+      const pending = groupMandatePending(group).map(member => memberName(state, group, member.id));
+      return good('The payout agreement needs acceptance.', { title: 'Review the group agreement first.', paragraphs: [pending.length ? `${pending.join(', ')} still ${pending.length === 1 ? 'needs' : 'need'} to accept the current payout agreement.` : 'There are not enough designated approvers to meet the group agreement.', 'Open Your people to review the current agreement. A message or emoji does not accept it or authorise a payout.'] });
+    }
+    const actor = getGroupActor(group), approvers = designatedGroupApprovers(group);
+    if (!approvers.some(member => member.id === actor)) return good('Only designated approvers can authorise a payout.', { title: 'Your group money stays protected.', paragraphs: [`Ask ${approvers.map(member => memberName(state, group, member.id)).join(', ') || 'the creator'} to open Review payout. You can follow the shared details and contribute, but your chat reply cannot approve money leaving.`] });
+    const payout = (group.payouts || []).find(value => ['pending','approved','processing','failed'].includes(groupPayoutStatus(value))) || (group.payouts || [])[0];
+    if (payout) {
+      const status = groupPayoutStatus(payout);
+      if (status === 'expired') return good('This payout request has expired.', { title: 'Create a fresh request.', paragraphs: ['Its 48-hour approval window has ended and its reservation is released. Review the current recipient, amount and evidence, then collect fresh approvals.'] });
+      if (status === 'processing') return good('Payment confirmation is still pending.', { title: 'Wait for the confirmed result.', paragraphs: ['Do not send another payout to replace a processing payment. Its status and the group balance update together when the result is confirmed.'] });
+      if (status === 'pending') return good('This request still needs approvals.', { title: `${(payout.approvals || []).length} of ${payout.requiredApprovals} approvals recorded.`, paragraphs: ['Open Review payout to check the exact recipient, amount, fee and evidence. Each designated approver gives their own approval; the final payment remains a separate PIN-authorised step.'] });
+      if (status === 'approved') return good('The approvals are complete.', { title: 'Review once more before sending.', paragraphs: ['Open Review payout and check the current details. Reviews last five minutes. A current final review and your PIN are still required to send from the group account.'] });
+      if (status === 'failed') return good('The payout did not complete.', { title: 'The unpaid money stays in the group.', paragraphs: ['Open its recorded details before retrying. Changed details or expired approvals need a fresh request or review; a chat message cannot retry a payment.'] });
+    }
+    return good('There is no open payout to authorise.', { title: summary.available > 0 ? 'Review a new payout request.' : 'Collect confirmed contributions first.', paragraphs: [`${cash(summary.available)} is available after existing payout reservations. Group funds stay separate from everyone’s personal money.`] });
+  }
   if (/how much.*(?:needed|remaining|left)|still needed|remaining|collected|target/.test(q)) return good('Here’s where the group stands.', { title: summary.remaining === 0 ? 'The target is covered.' : `${cash(summary.remaining)} still needed.`, paragraphs: [`${cash(summary.collected)} in confirmed contributions towards ${cash(summary.target)}. Pending contributions are counted when they confirm.`, `${cash(summary.balance)} is currently held in the group account. Group money stays separate from personal available balances.`] });
   if (/awaiting|approval|pending|payout/.test(q) && !/rules|mandate|agreement/.test(q)) {
     const payouts = (group.payouts || []).filter(payout => ['pending', 'approved', 'processing'].includes(groupPayoutStatus(payout)));

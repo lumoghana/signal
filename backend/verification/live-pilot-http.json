@@ -1,0 +1,131 @@
+{
+  "checkedAt": "2026-11-12T22:23:37.651Z",
+  "projectId": "iwutbrljiiodamtyoorg",
+  "checks": [
+    {
+      "name": "registration is test-only without contact verification",
+      "passed": true
+    },
+    {
+      "name": "fresh zero account is bound to Auth identity",
+      "passed": true
+    },
+    {
+      "name": "registration is test-only without contact verification",
+      "passed": true
+    },
+    {
+      "name": "fresh zero account is bound to Auth identity",
+      "passed": true
+    },
+    {
+      "name": "registration is test-only without contact verification",
+      "passed": true
+    },
+    {
+      "name": "fresh zero account is bound to Auth identity",
+      "passed": true
+    },
+    {
+      "name": "explicit funding credits only A",
+      "passed": true
+    },
+    {
+      "name": "consumer transfer debits A",
+      "passed": true
+    },
+    {
+      "name": "consumer transfer credits B",
+      "passed": true
+    },
+    {
+      "name": "fixed quote contains server amount",
+      "passed": true
+    },
+    {
+      "name": "fixed amount tampering rejected",
+      "passed": true
+    },
+    {
+      "name": "fixed payment debits B",
+      "passed": true
+    },
+    {
+      "name": "static QR accepts customer amount",
+      "passed": true
+    },
+    {
+      "name": "merchant sees matching receipt and credited balance",
+      "passed": true
+    },
+    {
+      "name": "full refund returns money to original B",
+      "passed": true
+    },
+    {
+      "name": "partial refund returns money to original A",
+      "passed": true
+    },
+    {
+      "name": "cumulative refund ceiling enforced",
+      "passed": true
+    },
+    {
+      "name": "shop close retains merchant funds",
+      "passed": true
+    },
+    {
+      "name": "shop close resets trading counter",
+      "passed": true
+    },
+    {
+      "name": "simultaneous spending accepts one and rejects the unaffordable second",
+      "passed": true
+    },
+    {
+      "name": "concurrent spend leaves exact A balance",
+      "passed": true
+    },
+    {
+      "name": "committed response loss retains original request",
+      "passed": true
+    },
+    {
+      "name": "lookup recovers exact original receipt without another charge",
+      "passed": true
+    },
+    {
+      "name": "lost response charged exactly once",
+      "passed": true
+    },
+    {
+      "name": "simultaneous fixed QR payment credits merchant once",
+      "passed": true
+    },
+    {
+      "name": "same reference cannot change payment amount",
+      "passed": true
+    },
+    {
+      "name": "another account cannot recover a private payment attempt",
+      "passed": true
+    },
+    {
+      "name": "test funds conserved across consumers and merchant",
+      "passed": true
+    }
+  ],
+  "finalBalances": {
+    "consumerA": 1300,
+    "consumerB": 8100,
+    "merchant": 600
+  },
+  "unit": "integer pesewas",
+  "realAuthHttp": true,
+  "simultaneousBackendRequests": true,
+  "phoneRuntimeTested": false,
+  "qaIdentitiesRemainForUiChecks": false,
+  "qaIdentitiesSuspended": 3,
+  "qaSessionsRemaining": 0,
+  "ledgerAuditRecordsRetained": true
+}

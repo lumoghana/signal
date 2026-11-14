@@ -1,3 +1,6 @@
+import {paymentFee} from './payments-parity-model.js';
+import {availabilityMessage,bindAvailabilityControl} from './service-availability.js';
+import {externalSandboxEnabled,externalSimulationNotice} from './external-sandbox.js';
 import { esc, icon, pageHead } from './ui.js';
 import { RECIPIENT_BANKS, DEMO_MOMO_ACCOUNTS, normalizeMomoNumber, validateRecipientLookup, recipientLookupMatches, createRecipientLookup } from './recipient-lookup.js';
 
@@ -16,30 +19,36 @@ const head = (rail, editing, confirmation = false) => {
   return cancelBack ? markup.replace('<span class="head-spacer"></span>', `<button type="button" class="icon-button back-button labelled-back" data-action="pay-cancel-edit" aria-label="Back to review">${icon('back')}<span>Review</span></button>`) : markup;
 };
 const detailsRoute = (payment, editing = false) => ({ section: 'pay', page: 'recipient', ...(editing ? { edit: true } : {}), backTo: editing ? { section: 'pay', page: 'review' } : payment.flowOrigin || { section: 'pay', page: 'home' } });
+function recipientAvailability(ctx,payment,rail){
+ const checked=validateRecipientLookup(rail,payment.recipientForms?.[rail],{sandbox:externalSandboxEnabled(ctx)});
+ return availabilityMessage(ctx,rail,checked.ok?checked.request.network||payment.recipientLookup?.recipient?.network:'');
+}
+const availabilityNote=message=>`<p class="notice service-availability-message" data-recipient-availability role="status"${message?'':' hidden'}>${esc(message)}</p>`;
 
 export function renderAccountRecipient(ctx, route = {}) {
-  const payment = ctx.draft.payment || {}, rail = externalRail(payment.rail), editing = !!route.edit;
+  const payment = ctx.draft.payment || {}, rail = externalRail(payment.rail), editing = !!route.edit,sandbox=externalSandboxEnabled(ctx),unavailable=recipientAvailability(ctx,payment,rail);
+  if(ctx.connected===true&&!sandbox)return `<section class="page account-recipient" aria-label="${titleFor(rail)} availability">${head(rail,editing)}<div class="recipient-main"><h1>This provider is not connected.</h1><p class="recipient-intro">No bank or mobile money account lookup is available in this shared test. You can pay a registered Lumo person or scan a connected merchant.</p></div><div class="bottom-action">${'<button type="button" class="button" data-action="pay-cancel">Back to Payments</button>'}</div></section>`;
   if (route.page === 'recipient-confirm' && recipientLookupMatches(payment)) {
     const person = payment.recipientLookup.recipient;
     return `<section class="page account-recipient account-recipient--confirm" aria-label="Confirm recipient">
       ${head(rail, editing, true)}
       <div class="recipient-main"><p class="recipient-step">YOUR PERSON</p><h1>Is this<br>your person?</h1>
-        <div class="recipient-identity"><div class="recipient-initials" aria-hidden="true">${esc(initials(person.name))}<span>${icon('check', 17)}</span></div><p class="recipient-found">Account found</p><h2>${esc(person.name)}</h2><p class="recipient-name-label">Registered account name</p>
+        <div class="recipient-identity"><div class="recipient-initials" aria-hidden="true">${esc(initials(person.name))}<span>${icon('check', 17)}</span></div><p class="recipient-found">${sandbox?'Simulation destination':'Account found'}</p><h2>${esc(person.name)}</h2><p class="recipient-name-label">${sandbox?'Sample account name · Not verified':'Registered account name'}</p>
           <dl><div><dt>${rail === 'bank' ? 'Account number' : 'MoMo number'}</dt><dd>${esc(displayNumber(rail, person.number))}</dd></div><div><dt>${rail === 'bank' ? 'Bank' : 'Network'}</dt><dd>${esc(rail === 'bank' ? person.bank : person.network)}</dd></div></dl>
         </div>
-        <p class="recipient-demo-note">Demo lookup · sample account details</p>
-      </div><div class="bottom-action recipient-footer"><button type="button" class="button" data-recipient-confirm>Yes, that’s right ${icon('arrow', 19)}</button><button type="button" class="recipient-edit" data-recipient-edit>Edit details</button></div>
+        <p class="recipient-demo-note">${sandbox?'Demo lookup · Sample account details, not verified account data. '+externalSimulationNotice:'Demo lookup · sample account details'}</p>
+      </div><div class="bottom-action recipient-footer">${availabilityNote(unavailable)}<button type="button" class="button" data-recipient-confirm${unavailable?' disabled':''}>Yes, that’s right ${icon('arrow', 19)}</button><button type="button" class="recipient-edit" data-recipient-edit>Edit details</button></div>
     </section>`;
   }
   const form = payment.recipientForms?.[rail] || {};
   return `<section class="page account-recipient account-recipient--${rail}" aria-label="Find ${rail === 'bank' ? 'a bank' : 'a mobile money'} account">
     ${head(rail, editing)}
-    <div class="recipient-main"><p class="recipient-step">FIND YOUR PERSON</p><h1>${rail === 'bank' ? 'Let’s find<br>their account.' : 'Got their<br>MoMo number?'}</h1><p class="recipient-intro">${rail === 'bank' ? 'Their account number. Their bank. We’ll find the name.' : 'Just the number. We’ll find the name and network.'}</p>
+    <div class="recipient-main"><p class="recipient-step">FIND YOUR PERSON</p><h1>${rail === 'bank' ? 'Let’s find<br>their account.' : 'Got their<br>MoMo number?'}</h1><p class="recipient-intro">${sandbox?(rail==='bank'?'Their account number and bank. We’ll show the sample account details.':'Just their number. We’ll show the sample name and network.'):rail === 'bank' ? 'Their account number. Their bank. We’ll find the name.' : 'Just the number. We’ll find the name and network.'}</p>
       <form id="recipient-lookup-form" class="recipient-form" novalidate><label class="recipient-number-field"><span>${rail === 'bank' ? 'Account number' : 'MoMo number'}</span><div>${icon(rail === 'bank' ? 'bank' : 'phone', 23)}<input id="recipient-account-number" name="recipientNumber" type="tel" inputmode="${rail === 'bank' ? 'numeric' : 'tel'}" autocomplete="off" maxlength="24" placeholder="${rail === 'bank' ? 'Enter account number' : '024 555 0182'}" value="${esc(form.number || '')}" aria-describedby="recipient-feedback recipient-error"></div></label>
       ${rail === 'bank' ? `<label class="recipient-bank-field"><span>Their bank</span><select id="recipient-bank" name="recipientBank" aria-label="Their bank" aria-describedby="recipient-error"><option value="">Choose their bank</option>${RECIPIENT_BANKS.map(bank => `<option value="${esc(bank.label)}"${form.bank === bank.label || form.bank === bank.id ? ' selected' : ''}>${esc(bank.label)}</option>`).join('')}</select></label>` : ''}
-      <button type="button" class="recipient-demo" data-recipient-demo>${icon('spark', 16)} Try a demo ${rail === 'bank' ? 'account' : 'number'}</button>
+      <button type="button" class="recipient-demo" data-recipient-demo>${icon('spark', 16)} ${sandbox?'Use sample details':`Try a demo ${rail === 'bank' ? 'account' : 'number'}`}</button>
       </form><div class="recipient-feedback" id="recipient-feedback" role="status" aria-live="polite"><span class="recipient-loading-dots" hidden aria-hidden="true"><i></i><i></i><i></i></span><span data-recipient-status></span></div><p class="recipient-error" id="recipient-error" role="alert" hidden></p>
-    </div><div class="bottom-action recipient-footer"><p class="recipient-demo-note">Demo lookup · no live account data</p><button type="submit" form="recipient-lookup-form" class="button" data-recipient-find>Find account ${icon('arrow', 19)}</button></div>
+    </div><div class="bottom-action recipient-footer"><p class="recipient-demo-note">Demo lookup · Sample details, not verified account data</p>${availabilityNote(unavailable)}<button type="submit" form="recipient-lookup-form" class="button" data-recipient-find${unavailable?' disabled':''}>Find account ${icon('arrow', 19)}</button></div>
   </section>`;
 }
 
@@ -47,14 +56,22 @@ export function renderAccountRecipient(ctx, route = {}) {
 export function bindAccountRecipient(ctx, route = {}, { createLookup = createRecipientLookup } = {}) {
   const root = ctx.$('.account-recipient');
   if (!root) return () => {};
-  const payment = ctx.draft.payment, rail = externalRail(payment.rail), controller = createLookup();
+  const sandbox=externalSandboxEnabled(ctx);
+  if(ctx.connected===true&&!sandbox)return ()=>{};
+  const payment = ctx.draft.payment, rail = externalRail(payment.rail), controller = createLookup(sandbox?{lookup:request=>ctx.shared.lookupExternalRecipient(request),delay:700}:undefined);
+  if(sandbox){payment.externalSimulation=true;payment.providerMode='sandbox';}
+  const owner=ctx.shared?.user?.id,epoch=ctx.shared?.authVersion,origin=ctx.route;
+  const sameRoute=()=>!origin||!ctx.route||ctx.route===origin;
   let alive = true, busy = false;
-  const listeners = [], valid = () => alive && root.isConnected !== false && ctx.draft.payment === payment && payment.rail === rail;
+  const listeners = [], valid = () => alive && root.isConnected !== false && sameRoute() && ctx.draft.payment === payment && payment.rail === rail&&(!sandbox||ctx.shared?.user?.id===owner&&ctx.shared?.authVersion===epoch&&externalSandboxEnabled(ctx));
   const listen = (element, name, handler) => { if (!element) return; element.addEventListener(name, handler); listeners.push(() => element.removeEventListener(name, handler)); };
   const query = selector => root.querySelector(selector), save = () => ctx.saveDraft?.();
+  let updateAvailability=()=>{};
   if (route.page === 'recipient-confirm') {
+    updateAvailability=bindAvailabilityControl(ctx,query('[data-recipient-confirm]'),{message:()=>recipientAvailability(ctx,payment,rail),disabled:()=>busy,notice:query('[data-recipient-availability]')});
     listen(query('[data-recipient-confirm]'), 'click', event => {
       if (!valid() || busy || event.currentTarget.disabled) return;
+      if(updateAvailability())return;
       if (!recipientLookupMatches(payment)) return ctx.go(detailsRoute(payment, !!route.edit), { replace: true });
       busy = true; event.currentTarget.disabled = true; ctx.confirmAccountRecipient();
     });
@@ -62,6 +79,7 @@ export function bindAccountRecipient(ctx, route = {}, { createLookup = createRec
   } else {
     const form = query('#recipient-lookup-form'), number = query('[name="recipientNumber"]'), bank = query('[name="recipientBank"]');
     const button = query('[data-recipient-find]'), error = query('#recipient-error'), status = query('[data-recipient-status]'), dots = query('.recipient-loading-dots');
+    updateAvailability=bindAvailabilityControl(ctx,button,{message:()=>recipientAvailability(ctx,payment,rail),disabled:()=>busy,notice:query('[data-recipient-availability]')});
     const capture = () => {
       if (!valid()) return;
       payment.recipientForms ||= {};
@@ -73,12 +91,14 @@ export function bindAccountRecipient(ctx, route = {}, { createLookup = createRec
       button.innerHTML = value ? 'Finding account…' : `Find account ${icon('arrow', 19)}`;
       dots.hidden = !value; root.classList.toggle('is-looking', value);
       status.textContent = value ? 'One sec. Finding your person…' : '';
+      updateAvailability();
     };
     const clearError = () => { error.hidden = true; error.textContent = ''; number.removeAttribute('aria-invalid'); bank?.removeAttribute('aria-invalid'); };
     const invalidate = () => {
       controller.cancel(); loading(false); clearError();
       delete payment.recipientLookup; payment.recipient = null; payment.lookupRequired = true;
       capture();
+      updateAvailability();
     };
     listen(form, 'input', invalidate); listen(form, 'change', invalidate);
     listen(query('[data-recipient-demo]'), 'click', () => {
@@ -86,14 +106,15 @@ export function bindAccountRecipient(ctx, route = {}, { createLookup = createRec
       if (rail === 'bank') {
         const example = RECIPIENT_BANKS.find(item => item.label === bank.value) || RECIPIENT_BANKS[0];
         number.value = example.example; bank.value = example.label;
-      } else number.value = DEMO_MOMO_ACCOUNTS[0].number;
+      } else {number.value = DEMO_MOMO_ACCOUNTS[0].number;}
       invalidate();
     });
     listen(form, 'submit', async event => {
       event.preventDefault();
       if (!valid() || busy) return;
       capture(); clearError();
-      const checked = validateRecipientLookup(rail, payment.recipientForms[rail]);
+      if(updateAvailability())return;
+      const checked = validateRecipientLookup(rail, payment.recipientForms[rail],{sandbox});
       if (!checked.ok) {
         error.textContent = checked.message; error.hidden = false;
         const field = checked.field === 'bank' ? bank : number; field?.setAttribute('aria-invalid', 'true'); field?.focus(); return;
@@ -103,15 +124,16 @@ export function bindAccountRecipient(ctx, route = {}, { createLookup = createRec
       try { result = await controller.run(checked.request); }
       catch { result = { ok: false, message: 'The demo lookup took a little too long. Try again.' }; }
       if (!valid() || !result) return;
-      const latest = validateRecipientLookup(rail, payment.recipientForms[rail]);
+      const latest = validateRecipientLookup(rail, payment.recipientForms[rail],{sandbox});
       if (!latest.ok || latest.key !== checked.key) return;
       loading(false);
       if (!result.ok) { error.textContent = result.message; error.hidden = false; return; }
-      payment.recipientLookup = { key: checked.key, request: checked.request, recipient: { ...result.recipient }, confirmed: false };
+      if(sandbox&&(result.providerMode!=='sandbox'||result.simulation!==true||result.labelUnverified!==true||result.fee!==paymentFee(rail))){error.textContent='Lumo could not confirm this test destination. Try again.';error.hidden=false;return;}
+      payment.recipientLookup = { key: checked.key, request: checked.request, recipient: { ...result.recipient }, confirmed: false,...(sandbox?{simulation:true,providerMode:'sandbox'}:{}) };
       if (!recipientLookupMatches(payment)) { delete payment.recipientLookup; error.textContent = 'Those details didn’t match. Please try the lookup again.'; error.hidden = false; return; }
       save(); ctx.setCapture?.(null);
       ctx.go({ section: 'pay', page: 'recipient-confirm', ...(route.edit ? { edit: true } : {}), backTo: detailsRoute(payment, !!route.edit) });
     });
   }
-  return () => { alive = false; controller.dispose(); listeners.forEach(remove => remove()); };
+  return () => { alive = false; updateAvailability.dispose?.();controller.dispose(); listeners.forEach(remove => remove()); };
 }

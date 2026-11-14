@@ -1,0 +1,11 @@
+# Shared scheduled Lumo transfers
+
+Schedules are explicit test-money mandates to another existing Lumo handle. No bank or MoMo recurring payment is claimed. Mutations use the common durable attempt reference; creation verifies the payer's payment PIN. No PIN is stored on a schedule.
+
+- `schedule.list {}` -> `{schedules:[{id,recipientHandle,recipientName,amount,frequency,nextDue,endAt,maxOccurrences,completedOccurrences,status,lastFailure,createdAt,occurrences:[{id,scheduledDue,status,reference?,receipt?,failureCode?,createdAt}]}]}`. Only payer can read mandate; recipient sees actual posted receipts in Activity/inbox.
+- `schedule.create {recipientHandle,amount,frequency:'once'|'daily'|'weekly'|'monthly',firstDue:ISO8601 UTC,endAt?:ISO8601 UTC,maxOccurrences?:1..366,pin}` -> `{schedule}`. `firstDue` future and within one year. `once` exactly one; recurring mandates maximum 366 occurrences and require explicit endAt or maxOccurrences. Payment review must show recipient, amount, cadence and end condition before requesting PIN.
+- `schedule.cancel {scheduleId,pin}` -> `{schedule}`. Cancels payer's remaining future occurrences; posted receipts/history retained. Cannot alter recipient or amount. Create a new authorised mandate to change them.
+
+Status: `active`, `completed`, `cancelled`, `failed`. A failed execution (insufficient actual funds, restricted account, receiver unavailable) stops the mandate and notifies the payer; no repeated silent retry. The user must create a new mandate after resolving it. Concurrent workers lock due mandates `SKIP LOCKED`; unique `(schedule_id,scheduled_due)` keeps one occurrence. Each execution posts ordinary balanced `transfer` receipt and durable immutable occurrence result. Shared worker function is private and revoked from all client roles. Root enables narrowly scoped pg_cron calling `lumo_private.run_schedules()` as database owner only.
+
+Recurring times are UTC. Daily/weekly preserve due time; monthly advances on the same day where present, clipping to the last valid day for shorter months. No backdated catch-up storm: at most one occurrence per mandate per worker tick. Next future due time advances from the prior scheduled time, so overdue occurrences are processed safely once per tick unless mandate fails.

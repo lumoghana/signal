@@ -1,5 +1,5 @@
 import { esc, icon } from './ui.js';
-import { getConversationalAnswer } from './chat-language.js';
+import { getLuxAnswer, executeLuxPlan, luxQuestionContext, validateLuxPlan } from './lux-brain.js';
 import { isFinancialAnswerStale, installPreparedChatAction } from './chat-action-model.js';
 export { getMoneyAnswer, getSpendingPeriod } from './money-answers.js';
 
@@ -40,7 +40,7 @@ export function recoverInterruptedChat(state, storedChat) {
   const index = chat.messages.findLastIndex(message => message.role === 'user' && typeof message.text === 'string' && message.text.trim());
   if (index < 0 || chat.messages.slice(index + 1).some(message => message.role === 'assistant' && message.kind !== 'lesson')) return chat;
   const user = chat.messages[index];
-  chat.messages.push({ id: `a-recovered-${user.id || index}`, role: 'assistant', ...getConversationalAnswer(state, user.text, { messages: chat.messages.slice(0, index) }) });
+  chat.messages.push({ id: `a-recovered-${user.id || index}`, role: 'assistant', ...getLuxAnswer(state, user.text, { messages: chat.messages.slice(0, index) }) });
   chat.scrollToEnd = true;
   return chat;
 }
@@ -61,7 +61,7 @@ function messageHTML(message, state) {
   const stale = isFinancialAnswerStale(state, message), checked = message.checkedAt && Number.isFinite(Date.parse(message.checkedAt)) ? new Date(message.checkedAt).toLocaleString('en-GH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Accra' }) : '';
   const checkAgain = message.sourceQuestion || message.context?.canonicalQuestion ? `<button type="button" data-chat-recheck="${esc(message.id)}">${stale ? 'Recheck with current money' : 'Check again'}</button>` : '';
   const freshness = message.context && !['greeting', 'thanks', 'identity', 'clarify', 'approval'].includes(message.context.topic) ? stale ? `<div class="chat-freshness is-stale"><span>Your money has changed. This earlier answer needs a recheck.</span>${checkAgain}</div>` : `<details class="chat-freshness"><summary>${esc(`Checked ${checked || 'against recorded money'}`)} ${icon('chevron', 13)}</summary>${checkAgain}</details>` : '';
-  return `<article class="chat-message assistant" data-message-id="${esc(message.id)}">${speaker()}<div class="chat-reply-body">${message.title ? `<h2>${esc(message.title)}</h2>` : ''}${(Array.isArray(message.paragraphs) ? message.paragraphs : []).map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}${Array.isArray(message.stats) && message.stats.length ? `<div class="chat-response-card">${message.stats.filter(stat => stat && typeof stat === 'object').map(stat => `<div class="chat-stat"><span>${esc(stat.label)}</span><strong>${esc(stat.value)}</strong></div>`).join('')}</div>` : ''}${freshness}${actionButtons(message.actions, message.id, stale)}</div></article>`;
+  return `<article class="chat-message assistant" data-message-id="${esc(message.id)}">${speaker()}<div class="chat-reply-body">${message.title ? `<h2>${esc(message.title)}</h2>` : ''}${(Array.isArray(message.paragraphs) ? message.paragraphs : []).map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}${Array.isArray(message.stats) && message.stats.length ? `<div class="chat-response-card">${message.stats.filter(stat => stat && typeof stat === 'object').map(stat => `<div class="chat-stat"><span>${esc(stat.label)}</span><strong>${esc(stat.value)}</strong></div>`).join('')}</div>` : ''}${Array.isArray(message.basis) && message.basis.length ? `<details class="chat-basis"><summary>How Lux worked this out ${icon('chevron', 13)}</summary>${message.basis.map(line => `<p>${esc(line)}</p>`).join('')}</details>` : ''}${freshness}${actionButtons(message.actions, message.id, stale)}</div></article>`;
 }
 
 export function renderChat(ctx) {
@@ -74,26 +74,47 @@ export function renderChat(ctx) {
       ${hasMessages ? chat.messages.map(message => messageHTML(message, ctx.state)).join('') : `<div class="chat-intro"><div class="chat-hero-lux"><img src="/assets/lux-chat-2d.webp" width="148" height="148" alt="Lux, your Lumo money buddy"></div><h1>Hey ${esc(name)}.<br>Let’s talk money.</h1><p>What’s on your mind?</p><div class="chat-suggestions">${starters.map(starter => `<button type="button" data-chat-question="${esc(starter.question)}"><span aria-hidden="true">${starter.symbol}</span><span>${esc(starter.label)}</span>${icon('arrow', 14)}</button>`).join('')}</div><button type="button" class="chat-learn" data-chat-action="learn">${icon('spark', 17)} Learn with Lux</button></div>`}
       ${chat.pending ? `<div class="chat-message assistant chat-typing" role="status">${speaker()}<div class="chat-typing-body"><span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>Let’s work this out…</span></div></div>` : ''}<div id="chat-end" aria-hidden="true"></div>
     </div>
-    <footer class="chat-composer-wrap">${hasMessages && !chat.pending ? `<div class="chat-quick-actions">${followUps.map(question => `<button type="button" data-chat-question="${esc(question)}">${esc(question)}</button>`).join('')}<button type="button" data-chat-action="learn">${icon('spark', 15)} Learn with Lux</button></div>` : ''}<form id="chat-form" class="chat-composer" autocomplete="off"><label class="sr-only" for="chat-input">Ask about your money</label><textarea id="chat-input" name="question" rows="1" maxlength="400" enterkeyhint="send" placeholder="What’s the money question?" aria-label="Ask about your money">${esc(chat.input)}</textarea><button type="submit" class="chat-send" aria-label="Send question"${chat.pending || !chat.input.trim() ? ' disabled' : ''}>${icon('arrow', 21)}</button></form><p class="chat-disclaimer">Demo answers from your recorded money.</p>${!hasMessages ? `<div class="chat-swipe-hint" aria-label="Swipe right to return to your app"><span aria-hidden="true">${icon('back', 12)}<i></i><i class="active"></i></span><span>Swipe right to your app</span></div>` : ''}</footer>
+    <footer class="chat-composer-wrap">${hasMessages && !chat.pending ? `<div class="chat-quick-actions">${followUps.map(question => `<button type="button" data-chat-question="${esc(question)}">${esc(question)}</button>`).join('')}<button type="button" data-chat-action="learn">${icon('spark', 15)} Learn with Lux</button></div>` : ''}<form id="chat-form" class="chat-composer" autocomplete="off"><label class="sr-only" for="chat-input">Ask about your money</label><textarea id="chat-input" name="question" rows="1" maxlength="400" enterkeyhint="send" placeholder="What’s the money question?" aria-label="Ask about your money">${esc(chat.input)}</textarea><button type="submit" class="chat-send" aria-label="Send question"${chat.pending || !chat.input.trim() ? ' disabled' : ''}>${icon('arrow', 21)}</button></form><p class="chat-disclaimer">${ctx.connected ? 'Based on your recorded money. You approve every move.' : 'Sample money · Calculations from these records.'}</p>${!hasMessages ? `<div class="chat-swipe-hint" aria-label="Swipe right to return to your app"><span aria-hidden="true">${icon('back', 12)}<i></i><i class="active"></i></span><span>Swipe right to your app</span></div>` : ''}</footer>
   </section>`;
 }
 
 function ask(ctx, question) {
   const chat = chatState(ctx), clean = String(question || '').trim().slice(0, 400);
   if (!clean || chat.pending) return false;
-  const token = id('message'), run = { token, timer: null }, history = [...chat.messages];
+  const token = id('message'), run = { token, timer: null, controller: new AbortController() }, history = [...chat.messages];
+  const owner = ctx.shared?.user?.id || '', epoch = ctx.shared?.authVersion;
+  const validReply = () => ctx.draft.chat === chat && activeReplies.get(chat) === run && (ctx.shared?.user?.id || '') === owner && ctx.shared?.authVersion === epoch;
   chat.messages.push({ id: `u-${token}`, role: 'user', text: clean });
   chat.input = ''; chat.pending = true; chat.scrollToEnd = true; chat.followTail = true;
   activeReplies.set(chat, run); ctx.saveDraft?.(); ctx.refresh();
-  run.timer = setTimeout(() => {
-    if (ctx.draft.chat !== chat || activeReplies.get(chat) !== run) return;
-    // Read current money when replying, even if the customer visited another page.
-    const answer = getConversationalAnswer(ctx.state, clean, { messages: history });
+  run.timer = setTimeout(async () => {
+    if (!validReply()) return;
+    let answer;
+    if (ctx.connected && typeof ctx.shared?.askLux === 'function') {
+      const context = luxQuestionContext(history);
+      let result;
+      try { result = await ctx.shared.askLux(clean, context, { signal: run.controller.signal }); }
+      catch { result = { ok: false, message: 'I couldn’t reach Lux. Try again when you’re connected.' }; }
+      if (!validReply()) return;
+      if (result.ok && result.answer) {
+        const plan = result.plan && validateLuxPlan(result.plan, clean, context);
+        answer = plan ? executeLuxPlan(ctx.state, clean, plan, { messages: history, mode: result.mode }) : result.answer;
+        chat.mode = result.mode; chat.reason = result.reason;
+      } else {
+        answer = { title: 'Let’s try that again.', paragraphs: [result.message || 'I couldn’t refresh your money. Try again before relying on a number.'], actions: [], followUps: [clean], context: { topic: 'clarify' } };
+      }
+    } else {
+      answer = getLuxAnswer(ctx.state, clean, { messages: history });
+      chat.mode = 'local';
+    }
+    if (!validReply()) return;
     chat.messages.push({ id: `a-${token}`, role: 'assistant', ...answer });
+    // Bound private session storage and provider context independently.
+    while (chat.messages.length > 80) chat.messages.shift();
     chat.pending = false; activeReplies.delete(chat);
     if (chat.followTail !== false) chat.scrollToEnd = true;
     ctx.saveDraft?.(); if (ctx.route?.section === 'chat') ctx.refresh();
-  }, reducedMotion() ? 0 : 420);
+  }, reducedMotion() ? 0 : 120);
   return true;
 }
 function addLesson(ctx) {
@@ -153,11 +174,11 @@ export function bindChat(ctx) {
       case 'home': ctx.go({ section: 'home', page: 'home' }, { root: true }); break;
       case 'learn': ctx.go({section:'learn',page:'money-iq',returnTo:{section:'chat',page:'home',returnTo:ctx.route.returnTo||{section:'home',page:'home'}}}); break;
       case 'lesson': case 'next-lesson': addLesson(ctx); break;
-      case 'options': ctx.sheet(`<div class="chat-options-sheet"><p class="eyebrow">Ask Lux</p><h2>A fresh start?</h2><p><strong>Kept for this tab’s session.</strong> Refreshing keeps the conversation, but closing the tab can remove it. It is not synced to other devices. Clearing it leaves your money exactly as it is.</p><p class="chat-demo-detail">Lux uses the balances and activity recorded in this prototype. This is a local demo, with no live AI connection.</p><button type="button" class="button" data-chat-clear>Clear conversation</button><button type="button" class="button secondary" data-chat-keep>Keep chatting</button></div>`, sheet => {
+      case 'options': ctx.sheet(`<div class="chat-options-sheet"><p class="eyebrow">Ask Lux</p><h2>A fresh start?</h2><p><strong>Kept for this tab’s session.</strong> Refreshing keeps the conversation, but closing the tab can remove it. It is not synced to other devices. Clearing it leaves your money exactly as it is.</p><p class="chat-demo-detail">${ctx.connected ? chat.mode === 'ai' ? 'AI helps Lux understand your questions. Only your question and recent question context go to the AI provider. Lumo calculates the figures from your account records. The provider does not receive your balances or transaction history.' : chat.mode === 'recorded' ? 'Live AI is unavailable right now. Lux is using Lumo’s recorded-money tools. Questions have a narrower range until the AI connection is available.' : 'Connected Ask Lux checks your account records. When available, AI interprets your question; Lumo calculates the figures. AI receives questions and recent question context, not your balances or transaction history.' : 'This sample uses local recorded-money tools. No live AI connection is used.'} Chat can open a draft, but payments still require review, Pause when applicable, and your approval. Don’t share a PIN, password or Ghana Card number here.</p><button type="button" class="button" data-chat-clear>Clear conversation</button><button type="button" class="button secondary" data-chat-keep>Keep chatting</button></div>`, sheet => {
         const sameConversation = () => valid() && sheet.isConnected !== false;
         listen(sheet.querySelector('[data-chat-clear]'), 'click', () => {
           if (!sameConversation()) return;
-          const run = activeReplies.get(chat); if (run) clearTimeout(run.timer); activeReplies.delete(chat); chat.pending = false;
+          const run = activeReplies.get(chat); if (run) { clearTimeout(run.timer); run.controller?.abort(); } activeReplies.delete(chat); chat.pending = false;
           ctx.draft.chat = { messages: [], input: '', lessonIndex: chat.lessonIndex, pending: false }; ctx.closeSheet(); ctx.saveDraft?.(); ctx.refresh();
         });
         listen(sheet.querySelector('[data-chat-keep]'), 'click', () => { if (sameConversation()) ctx.closeSheet(); });

@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-13",
+  "scope": "Merchant shared-service connection and consumer QR compatibility",
+  "automated": {
+    "passed": 403,
+    "failed": 0,
+    "skipped": 0,
+    "transport": "Six mocked production HTTP/auth-race cases; retained D1 compatibility tests explicitly substitute only transport",
+    "workerPolicy": "Actual Worker response handler permits self and the configured Supabase origin only"
+  },
+  "liveReadOnly": {
+    "publicMerchantDirectoryHttp": 200,
+    "corsMatchesOriginalMerchantOrigin": true,
+    "sampleCodeLUM101": "SHOP_NOT_FOUND",
+    "registeredShopCodesResolved": 2,
+    "privateQrAccessAllowed": 2,
+    "unpublishedWithoutPrivateKey": "SHOP_NOT_READY"
+  },
+  "presentation": {
+    "registeredCollectHtmlUnchanged": [
+      "amount",
+      "static"
+    ],
+    "cssUnchanged": true,
+    "artworkUnchanged": true,
+    "sampleOnly": "Explicit local sample notice, approved signup action and sample poster wording"
+  },
+  "native": "Compiled APK2.7.1 decoder+parser; compact fixed QR passed synthetic205px and232px cases. Detailed results in merchant-native-qr-probe.json.",
+  "limits": [
+    "No physical-phone camera test",
+    "No new live authenticated payment or credential test; stored QA credential sign-in test was blocked by automatic approval review",
+    "No real money or provider connections",
+    "Sample and legacy D1 shops are not silently registered in the shared backend"
+  ]
+}

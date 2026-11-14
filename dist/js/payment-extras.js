@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import { RECIPIENT_BANKS, DEMO_MOMO_ACCOUNTS, validateRecipientLookup, createRecipientLookup } from './recipient-lookup.js';
 import {renderCardsParity,handleCardParityClick,selectedCard} from './card-parity-ui.js';
 import { esc, cash, icon, pageHead, field, dateLabel } from './ui.js';
@@ -51,14 +52,14 @@ export function addFavourite(ctx, { createLookup = createRecipientLookup } = {})
     const valid = () => alive && el.isConnected !== false;
     const request = () => validateRecipientLookup(value('favouriteRail'), { number: value('favouriteNumber'), bank: value('favouriteBank') });
     const invalidate = () => { lookup.cancel(); busy = false; found = null; result.hidden = true; result.innerHTML = ''; error.textContent = ''; feedback.textContent = ''; submit.disabled = false; submit.removeAttribute('aria-busy'); submit.textContent = value('favouriteRail') === 'lumo' ? 'Save favourite' : 'Find account'; };
-    const save = payload => {
+    const save = payload => {return runActionFlow(function*(){
       if (!valid() || busy) return;
       busy = true;
-      const saved = ctx.act('savePaymentFavorite', payload);
+      const saved = (yield (ctx.actAsync||ctx.act).call(ctx,'savePaymentFavorite', payload));
       if (showError(ctx, saved, error)) { busy = false; return; }
       alive = false; lookup.dispose(); ctx.closeSheet(); ctx.setCapture?.(null); ctx.refresh(); ctx.toast(saved.duplicate ? 'This person is already a favourite.' : 'Favourite saved.');
-    };
-    el.querySelectorAll('[data-favourite-contact]').forEach(button => button.addEventListener('click', () => { const person = known[Number(button.dataset.favouriteContact)]; if (person) { invalidate(); save({ rail: 'lumo', recipient: { ...person } }); } }));
+    });};
+    el.querySelectorAll('[data-favourite-contact]').forEach(button => button.addEventListener('click', () => {return runActionFlow(function*(){ const person = known[Number(button.dataset.favouriteContact)]; if (person) { invalidate(); (yield save({ rail: 'lumo', recipient: { ...person } })); } });}));
     form.querySelector('[name="favouriteRail"]').addEventListener('change', () => {
       const rail = value('favouriteRail'); invalidate();
       form.querySelector('[data-favourite-name]').hidden = rail !== 'lumo';
@@ -73,15 +74,15 @@ export function addFavourite(ctx, { createLookup = createRecipientLookup } = {})
       else { const bank = RECIPIENT_BANKS.find(bank => bank.label === value('favouriteBank')) || RECIPIENT_BANKS[0]; form.querySelector('[name="favouriteNumber"]').value = bank.example; form.querySelector('[name="favouriteBank"]').value = bank.label; }
       invalidate();
     });
-    form.addEventListener('submit', async event => {
+    form.addEventListener('submit', event => {return runActionFlow(function*(){
       event.preventDefault(); if (!valid() || busy) return;
       const rail = value('favouriteRail');
-      if (rail === 'lumo') return save({ rail, recipient: { name: value('favouriteName').replace(/^@/, '') } });
+      if (rail === 'lumo') return (yield save({ rail, recipient: { name: value('favouriteName').replace(/^@/, '') } }));
       const checked = request();
       if (!checked.ok) { error.textContent = checked.message; return; }
-      if (found?.key === checked.key) return save({ rail, recipient: { ...found.recipient } });
+      if (found?.key === checked.key) return (yield save({ rail, recipient: { ...found.recipient } }));
       error.textContent = ''; busy = true; submit.disabled = true; submit.setAttribute('aria-busy', 'true'); submit.textContent = 'Finding account…'; feedback.textContent = 'One sec. Finding your person…';
-      let response; try { response = await lookup.run(checked.request); } catch { response = { ok: false, message: 'The demo lookup took a little too long. Try again.' }; }
+      let response; try { response = (yield lookup.run(checked.request)); } catch { response = { ok: false, message: 'The demo lookup took a little too long. Try again.' }; }
       if (!valid() || !response) return;
       const latest = request(); if (!latest.ok || latest.key !== checked.key) return;
       busy = false; submit.disabled = false; submit.removeAttribute('aria-busy'); feedback.textContent = 'Demo lookup · no live account data';
@@ -89,18 +90,18 @@ export function addFavourite(ctx, { createLookup = createRecipientLookup } = {})
       found = { key: checked.key, recipient: { ...response.recipient } };
       result.hidden = false; result.innerHTML = `<span class="eyebrow">IS THIS YOUR PERSON?</span><strong>${esc(found.recipient.name)}</strong><p>${esc(found.recipient.number)} · ${esc(rail === 'momo' ? found.recipient.network : found.recipient.bank)}</p>`;
       submit.textContent = 'Yes, save favourite';
-    });
+    });});
   }, { onClose: () => { alive = false; lookup.dispose(); } });
 }
 
 function manageFavourite(ctx, item) {
   ctx.sheet(`<h2>${esc(item.recipient.name)}</h2><p>${esc(railLabel(item.rail))}${item.recipient.number ? ` · ${esc(item.recipient.number)}` : ''}</p><div class="stack">${button('Pay this person', 'pay-favourite')}${button('Remove favourite', 'remove-favourite', true)}</div>`, el => {
     el.querySelector('[data-extra-action="pay-favourite"]').onclick = () => { ctx.closeSheet(); ctx.startPayment({ ...item.recipient }, item.rail); };
-    el.querySelector('[data-extra-action="remove-favourite"]').onclick = () => {
-      const result = ctx.act('removePaymentFavorite', { id: item.id });
+    el.querySelector('[data-extra-action="remove-favourite"]').onclick = () => {return runActionFlow(function*(){
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,'removePaymentFavorite', { id: item.id }));
       if (showError(ctx, result)) return;
       ctx.closeSheet(); ctx.setCapture?.(null); ctx.refresh(); ctx.toast('Favourite removed.');
-    };
+    });};
   });
 }
 
@@ -112,14 +113,14 @@ export function bindPaymentExtras(ctx, route) {
   const authorize = (title, action, payload) => {
     if (authenticating) return;
     authenticating = true;
-    ctx.auth({ title, onCancel: () => { authenticating = false; }, onSuccess: () => {
+    ctx.auth({ title, onCancel: () => { authenticating = false; }, onSuccess: () => {return runActionFlow(function*(){
       authenticating = false;
       if (!valid()) return;
-      const result = ctx.act(action, payload);
+      const result = (yield (ctx.actAsync||ctx.act).call(ctx,action, payload));
       if (showError(ctx, result)) return;
       if (action === 'createDemoVirtualCard') { ctx.draft.selectedCardId = result.id; delete ctx.draft.virtualCardCreateKey; }
       ctx.setCapture?.(null); ctx.refresh();
-    } });
+    });} });
   };
   const click = event => {
     const button = event.target.closest('button');

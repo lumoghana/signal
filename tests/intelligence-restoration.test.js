@@ -123,7 +123,7 @@ test('private financial snapshot contains card balances but no PIN or identity d
 });
 
 test('only successful recent transactions can trigger a repeated-recipient Pause', () => {
-  const state = createEmptyState(); state.wallet = 100000; state.buffer = 0; state.income.nextDate = '2026-11-12';
+  const state = createEmptyState(); state.wallet = 100000; state.buffer = 0; state.income = {amount:100000,nextDate:'2026-11-12'};
   state.transactions = [tx(5000, '2026-11-02T11:55:00Z'), tx(5000, '2026-11-02T11:58:00Z')];
   const payload = { amount: 5000, recipient: { name: 'Kofi Mensah' } };
   const before = JSON.stringify(state), history = evaluatePauseHistory(state, payload, { now });
@@ -133,7 +133,7 @@ test('only successful recent transactions can trigger a repeated-recipient Pause
 });
 
 test('late-night Pause requires both a high unplanned amount and a meaningful wallet share', () => {
-  const state = createEmptyState(); state.wallet = 100000; state.buffer = 0; state.income.nextDate = '2026-11-12';
+  const state = createEmptyState(); state.wallet = 100000; state.buffer = 0; state.income = {amount:100000,nextDate:'2026-11-12'};
   const late = new Date('2026-11-02T23:30:00Z');
   assert.equal(evaluatePauseHistory(state, { amount: 500 }, { now: late }).show, false);
   assert.equal(evaluatePauseHistory(state, { amount: 15000 }, { now: late }).show, true);
