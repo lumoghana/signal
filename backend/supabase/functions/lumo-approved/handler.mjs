@@ -1,3 +1,4 @@
+import {externalRecipient,EXTERNAL_SIMULATION_FEES} from './external-transfer.mjs';
 import {createGuestCheckout} from './guest-checkout.mjs';
 import {savingsAutomaticWork} from './domain/savings-parity-model.js';
 import {partnerRespond,publicPartnerInbox} from './partners.mjs';
@@ -119,6 +120,15 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    if(body.action==='partnerInbox'){const loaded=requireOk(await repo.service('load'));return respond({ok:true,inbox:publicPartnerInbox(loaded.partners||[],identity.userId)});}
    if(body.action==='partnerRespond')return respond(await partnerRespond({body,identity,repo}));
    if(body.action==='snapshot')return respond(envelope(await runAutomatic(repo,requireOk(await repo.service('load')))));
+   if(body.action==='externalRecipient'){
+    if(Object.keys(body).some(key=>!['action','rail','number','network','bank','name'].includes(key)))throw failure('INVALID_INPUT');
+    const loaded=requireOk(await repo.service('load'));
+    if(loaded.account?.userId!==identity.userId)throw failure('PERSONAL_ACCOUNT_REQUIRED');
+    const sender=await repo.resolve(identity.userId);if(!sender?.ok||sender.recipient?.userId!==identity.userId)throw failure('PERSONAL_ACCOUNT_REQUIRED');
+    if(loaded.account?.status!==undefined&&loaded.account.status!=='active'||loaded.state?.account?.status==='closed')throw failure('ACCOUNT_CLOSED');
+    const recipient=externalRecipient(body);
+    return respond({ok:true,simulation:true,providerMode:'sandbox',fee:EXTERNAL_SIMULATION_FEES[recipient.rail],recipient,labelUnverified:true});
+   }
    if(body.action==='resolve')return respond(requireOk(await repo.resolve(body.query)));
    if(body.action==='searchPeople'){
     if(Object.keys(body).some(k=>!['action','query'].includes(k))||typeof body.query!=='string'||body.query.length>80||/[\u0000-\u001f\u007f]/.test(body.query))throw failure('INVALID_INPUT');

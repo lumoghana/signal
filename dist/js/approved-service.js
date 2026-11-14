@@ -21,7 +21,7 @@ const finalRejections = new Set(['DOMAIN_REJECTED','INVALID_INPUT','FORBIDDEN','
 
 export function createApprovedService({ config = APPROVED_CONFIG, fetch: transport = globalThis.fetch, storage = globalThis.localStorage, modeStorage = globalThis.sessionStorage, lockManager = globalThis.navigator?.locks, onSnapshot = () => {} } = {}) {
   let session = read(storage, SESSION_KEY, null), sample = read(modeStorage, MODE_KEY, false) === true;
-  let account=null,partnerRequests=[];
+  let account=null,partnerRequests=[],capabilities={};
   let queue = Promise.resolve(), refreshing = null, authEpoch = 0;
   const saveSession = value => {
     if (value === null) session = null;
@@ -109,13 +109,14 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     if (!valid()) return accountChanged();
     if (data.session?.access_token && !saveSession(data.session)) return failure('Lumo could not safely save your sign-in. Keep this browser open and try signing in again.', 'SESSION_STORAGE_UNAVAILABLE');
     if (data.account) account=data.account;
+    if (object(data.capabilities)) capabilities={...data.capabilities};
     if (Array.isArray(data.partnerInbox)) partnerRequests=data.partnerInbox;
     if (Array.isArray(data.inbox)) partnerRequests=body.action==='partnerRespond'?[...partnerRequests.filter(item=>!data.inbox.some(next=>next.id===item.id)),...data.inbox]:data.inbox;
     if (data.state) onSnapshot(data.state, data);
     return data;
   }
   async function authenticate(action, values) {
-    const epoch = ++authEpoch;
+    const epoch = ++authEpoch;capabilities={};
     sample = false; write(modeStorage, MODE_KEY, false);
     const data = await request({ action, ...values }, { authenticated: false, epoch });
     return data.ok ? { ...data.result, ...data, ok: true, message: data.result?.message || 'You’re signed in.' } : data;
@@ -127,13 +128,15 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     get user() { return session?.user || null; },
     get account() { return account; },
     get partnerRequests() { return partnerRequests; },
+    get capabilities() { return {...capabilities}; },
+    lookupExternalRecipient(values) { return request({action:'externalRecipient',rail:values?.rail,number:values?.number,network:values?.network,bank:values?.bank,name:values?.name}); },
     setSample(value) { const next = value === true; if (sample !== next) ++authEpoch; sample = next; write(modeStorage, MODE_KEY, sample); },
     login(handle, password) { return authenticate('login', { handle, password }); },
     register(values) { return authenticate('register', values); },
     async signOut() {
       const token = session?.access_token;
       const epoch = ++authEpoch;
-      const localCleared = saveSession(null); account=null;partnerRequests=[];
+      const localCleared = saveSession(null); account=null;partnerRequests=[];capabilities={};
       // The journal is already scoped by immutable account ID. A late or unknown
       // payment must keep its original reference across sign-out and account switches.
       const remote = token ? await post('/auth/v1/logout?scope=local', {}, token) : { ok: true };

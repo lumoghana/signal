@@ -1,3 +1,4 @@
+import {externalRail,externalSandboxEnabled,isExternalSandboxTransfer,externalSimulationNotice} from './external-sandbox.js';
 import {encodeSharedQrLink} from './approved-qr.js';
 import {parseQrPayload} from './qr-decoder.js';
 import {recoveryPending} from './payment-recovery.js';
@@ -50,6 +51,7 @@ function resetDraft(ctx, recipient = null, rail = 'lumo') {
   ctx.draft.payment = { rail, recipient: accountRail ? null : recipient, amount: 0, category: 'Other', note: '', idempotencyKey: nonce('payment') };
   if (accountRail) {
     ctx.draft.payment.lookupRequired = true;
+    if(externalSandboxEnabled(ctx)){ctx.draft.payment.externalSimulation=true;ctx.draft.payment.providerMode='sandbox';}
     ctx.draft.payment.recipientForms = { [rail]: { number: recipient?.number || '', ...(rail === 'bank' ? { bank: recipient?.bank || '' } : {}) } };
   }
   return ctx.draft.payment;
@@ -62,6 +64,7 @@ export function prepareFailedPaymentRetry(tx) {
   Object.assign(d, { amount: tx.amount, amountText: amountInput(tx.amount), category: tx.category || 'Other', note: tx.note || '', fee: paymentFee(tx.rail), retryOf: tx.id,
     ...(tx.requestId ? { requestId: tx.requestId, flowOrigin: payRoute('request-detail', { id: tx.requestId, backTo: payRoute('requests') }) } : {}),
     ...(tx.iouId ? { iouId: tx.iouId, flowOrigin: { section: 'life', page: 'iou-detail', id: tx.iouId } } : {}) });
+  if(isExternalSandboxTransfer(tx)){d.externalSimulation=true;d.providerMode='sandbox';}
   if (tx.serviceId) Object.assign(d, { serviceId: tx.serviceId, serviceFields: { ...tx.serviceFields }, paymentKind: 'service', reference: tx.reference, bundleName: tx.bundleName, billerName: tx.billerName, hubTab: tx.hubTab, recipient });
   return d;
 }
@@ -98,6 +101,7 @@ function resumePayment(ctx) {
   let target = d.serviceId ? (d.lastRoute?.page === 'pause' ? payRoute('pause', { backTo: paymentReviewRoute(d) }) : paymentReviewRoute(d)) : d.lastRoute && !d.lastRoute.edit && ['recipient','recipient-confirm','conversation','amount','review','pause'].includes(d.lastRoute.page)
     ? { ...d.lastRoute } : d.recipient && d.amount > 0 ? paymentReviewRoute(d) : payRoute(d.recipient ? 'amount' : 'recipient');
   if (['momo', 'bank'].includes(d.rail)) {
+    if(externalSandboxEnabled(ctx)){d.externalSimulation=true;d.providerMode='sandbox';}
     d.lookupRequired = true; d.recipientForms ||= {};
     d.recipientForms[d.rail] ||= { number: d.recipient?.number || '', ...(d.rail === 'bank' ? { bank: d.recipient?.bank || '' } : {}) };
     if (!recipientLookupMatches(d, { confirmed: true })) { d.recipient = null; target = payRoute(recipientLookupMatches(d) ? 'recipient-confirm' : 'recipient', { backTo: payRoute('home') }); }
@@ -107,7 +111,7 @@ function resumePayment(ctx) {
 }
 function startPayment(ctx, person = null, rail = 'lumo', force = false, origin = null) {
   if(originalPaymentFirst(ctx))return;
-  if(ctx.connected&&['momo','bank'].includes(rail)){ctx.toast('This provider is not connected. Choose a Lumo person or scan a connected merchant.');return;}
+  if(ctx.connected&&['momo','bank'].includes(rail)&&!externalSandboxEnabled(ctx)){ctx.toast('This provider is not connected. Choose a Lumo person or scan a connected merchant.');return;}
   const fresh = () => {
     ctx.setCapture?.(null); const d=resetDraft(ctx, person, rail);if(origin)d.flowOrigin=origin;remember(ctx);
     const conversation = person && rail === 'lumo';
@@ -332,7 +336,7 @@ function review(ctx) {
   d.fee = fee;
   const canPay = total <= ctx.state.wallet;
   return `<div class="page pay-review${d.serviceId ? ' service-payment-review' : ''}">${taskHead('Review payment')}
-    <div class="content"><h1 class="large-question">${d.serviceId ? 'Ready to go?' : 'All looking right?'}</h1>
+    <div class="content"><h1 class="large-question">${d.serviceId ? 'Ready to go?' : 'All looking right?'}</h1>${isExternalSandboxTransfer(d)?`<p class="notice" data-external-simulation>${externalSimulationNotice}</p>`:''}
     <div class="review-person">${recipientAvatar(d.recipient, 'large')}<div><strong>${esc(recipientLabel(d))}</strong><p class="muted">${esc(destinationLabel(d))}${!d.serviceId && d.recipient?.number ? ` · ${esc(d.recipient.number)}` : ''}</p></div></div>
     ${d.rail==='merchant'?`<div class="panel">${row({title:'Receiving shop',right:esc(d.shopName||'Connected merchant')})}${d.shopCode?row({title:'Merchant code',right:esc(d.shopCode)}):''}${d.shopArea?row({title:'Location',right:esc(d.shopArea)}):''}${d.requestId?row({title:'Payment request',sub:'The merchant confirmed this exact amount',right:cash(d.amount)}):''}</div>`:''}
     <div class="panel review-summary">${row({ emoji: icon('send'), title: 'You’re sending', right: cash(d.amount) })}${row({ emoji: icon('check'), title: 'Demo fee', right: cash(fee) })}${row({ emoji: icon('wallet'), title: 'Total', right: cash(total), className: 'total-row' })}</div>
@@ -372,14 +376,14 @@ export function isCompletedPayment(tx) {
 function completedPayment(ctx, tx) {
   const delivered = !!tx.serviceId;
   return `<section class="payment-success-screen" aria-labelledby="payment-success-title">
-    <header class="payment-success-header"><span class="payment-success-brand" aria-label="Lumo">lumo</span><span class="payment-success-confirmed">${icon('check',15)} All done</span></header>
+    <header class="payment-success-header"><span class="payment-success-brand" aria-label="Lumo">lumo</span><span class="payment-success-confirmed">${icon('check',15)} ${isExternalSandboxTransfer(tx)?'Test transfer complete':'All done'}</span></header>
     <div class="payment-success-main">
       <div class="payment-success-art" aria-hidden="true"><div class="payment-success-ring"></div><div class="payment-success-check">${icon('check',78)}</div>${Array.from({length:12},(_,i)=>`<i class="payment-success-spark" style="--spark-angle:${i*30}deg;--spark-delay:${(i%3)*70}ms"></i>`).join('')}</div>
-      <h1 id="payment-success-title">${delivered ? 'All sorted.' : 'Sent. Sorted.'}</h1>
+      <h1 id="payment-success-title">${isExternalSandboxTransfer(tx)?'Test money sent.':delivered ? 'All sorted.' : 'Sent. Sorted.'}</h1>
       <p class="payment-success-amount">${cash(tx.amount)}</p>
       <p class="payment-success-recipient">To <strong>${esc(tx.merchant || recipientLabel(draft(ctx)))}</strong></p>
-      <p class="payment-success-copy">${delivered ? 'Demo service delivered. You’re good to go.' : 'One less thing. Go enjoy your day.'}</p>
-      ${delivered ? '<p class="payment-success-demo">Demo payment · No real service was delivered.</p>' : ''}
+      <p class="payment-success-copy">${isExternalSandboxTransfer(tx)?'Your Lumo test balance has decreased. No real money reached the external account.':delivered ? 'Demo service delivered. You’re good to go.' : 'One less thing. Go enjoy your day.'}</p>
+      ${isExternalSandboxTransfer(tx)?'<p class="payment-success-demo">Sandbox simulation · No live MoMo or bank provider.</p>':''}${delivered ? '<p class="payment-success-demo">Demo payment · No real service was delivered.</p>' : ''}
     </div>
     <footer class="payment-success-footer"><button type="button" class="payment-success-done" data-action="pay-home">Done ${icon('check',19)}</button><button type="button" class="payment-success-receipt" data-action="pay-detail">View receipt ${icon('arrow',17)}</button></footer>
   </section>`;
@@ -403,7 +407,7 @@ function transaction(ctx, route) {
   if (!tx) return `<div class="page">${pageHead('Payment details')}${empty({ emoji: '↗', title: 'Payment not found.', body: 'Head back to Activity to find your latest payments.', action: 'pay-activity', label: 'Open Activity' })}</div>`;
   if (isOutsideRepayment(tx)) return outsideRepaymentRecord(tx);
   const success = tx.status === 'success';
-  return `<div class="page transaction-detail">${pageHead('Payment details')}<div class="content"><div class="transaction-hero"><div class="transaction-emoji">${tx.type === 'saving' && tx.emoji ? esc(tx.emoji) : icon(categorySymbol(tx.category),36)}</div><h1>${esc(tx.merchant || 'Payment')}</h1><p class="amount amount-xl ${tx.direction === 'in' ? 'accent' : ''}">${txAmount(tx)}</p><span class="chip ${success ? 'selected' : ''}">${icon(success ? 'check' : tx.status === 'pending' ? 'clock' : 'info', 15)}${esc({ success: 'Completed', pending: 'Pending', failed: 'Unsuccessful', reversed: 'Reversed' }[tx.status] || tx.status)}</span></div>
+  return `<div class="page transaction-detail">${pageHead('Payment details')}<div class="content">${isExternalSandboxTransfer(tx)?`<p class="notice" data-external-simulation>Sandbox transfer · Test money left your Lumo account. No real money reached this ${tx.rail==='momo'?'MoMo number':'bank account'}.</p>`:''}<div class="transaction-hero"><div class="transaction-emoji">${tx.type === 'saving' && tx.emoji ? esc(tx.emoji) : icon(categorySymbol(tx.category),36)}</div><h1>${esc(tx.merchant || 'Payment')}</h1><p class="amount amount-xl ${tx.direction === 'in' ? 'accent' : ''}">${txAmount(tx)}</p><span class="chip ${success ? 'selected' : ''}">${icon(success ? 'check' : tx.status === 'pending' ? 'clock' : 'info', 15)}${esc({ success: 'Completed', pending: 'Pending', failed: 'Unsuccessful', reversed: 'Reversed' }[tx.status] || tx.status)}</span></div>
     <div class="panel">${row({ emoji: icon('calendar'), title: 'When', right: dateLabel(tx.at) })}${row({ emoji: icon('send'), title: 'Via', right: railName(tx.rail) })}${row({ emoji: icon('plan'), title: 'Category', right: esc(tx.category || 'Other') })}${tx.fee?row({title:'Demo fee',right:cash(tx.fee)})+row({title:'Total paid',right:cash(tx.amount+tx.fee)}):''}${tx.billerName ? row({title:'Biller',right:esc(tx.billerName)}) : ''}${tx.reference ? row({title:'Payment reference',right:esc(tx.reference)}) : ''}${tx.bundleName ? row({title:'Demo bundle',right:esc(tx.bundleName)}) : ''}</div>
     ${tx.status === 'reversed' ? `<div class="notice"><span>The payment amount has returned to your everyday account.${tx.savingTransfers?.length ? ' Money moved by a Savings Hack stays saved in its Money Box. You can move it back separately.' : ''}</span></div>` : ''}
     ${tx.note ? `<div class="payment-note">“${esc(tx.note)}”</div>` : ''}
@@ -417,9 +421,9 @@ function outsideRepaymentRecord(tx) {
 }
 export function paymentReceiptText(tx) {
   if (isOutsideRepayment(tx)) return `Outside repayment recorded\n${tx.type === 'iou-manual-repayment' ? 'To' : 'From'} ${tx.merchant || 'Repayment'}\n${cash(tx.amount)}\n${tx.type === 'iou-manual-repayment' ? 'Paid using' : 'Received in'} ${outsideRepaymentRail(tx.rail)}${tx.type === 'split-manual-receipt' && tx.note ? '\nExpense: ' + tx.note : ''}\nRecorded by you · ${dateLabel(tx.at)}\nLumo balance unchanged. Recorded outside balances are unchanged.\nRecord reference ${tx.id}`;
-  return `Lumo payment\n${tx.merchant}${tx.billerName ? '\n' + tx.billerName : ''}\n${cash(tx.amount)}\n${tx.status}\n${dateLabel(tx.at)}\nReference ${tx.id}${tx.status === 'reversed' ? '\nPayment amount returned to the everyday account.' : ''}${tx.status === 'reversed' && tx.savingTransfers?.length ? '\nSeparate Savings Hack money remains saved in its Money Box.' : ''}`;
+  return `${isExternalSandboxTransfer(tx)?'Lumo test-money transfer · Sandbox simulation':'Lumo payment'}\n${tx.merchant}${tx.billerName ? '\n' + tx.billerName : ''}\n${cash(tx.amount)}\n${tx.status}\n${dateLabel(tx.at)}\nReference ${tx.id}${isExternalSandboxTransfer(tx)?'\nNo real MoMo or bank transfer occurred. Test money only.':''}${tx.status === 'reversed' ? '\nPayment amount returned to the everyday account.' : ''}${tx.status === 'reversed' && tx.savingTransfers?.length ? '\nSeparate Savings Hack money remains saved in its Money Box.' : ''}`;
 }
-function paymentOutcomeControls(tx){if(tx.type!=='payment')return '';return tx.status==='pending'?'<details class="parity-demo"><summary>Provider simulation</summary><p class="muted small">A check leaves the payment pending. Choose a confirmed provider outcome here.</p><button class="button secondary" data-action="pay-simulate-success">Confirm payment</button><button class="button secondary" data-action="pay-simulate-failed">Fail payment and release hold</button></details>':tx.status==='success'?'<details class="parity-demo"><summary>Reversal simulation</summary><p class="muted small">Return this confirmed payment once. Separate saving transfers stay saved.</p><button class="button secondary" data-action="pay-simulate-reversed">Simulate reversal</button></details>':'';}
+function paymentOutcomeControls(tx){if(tx.type!=='payment'||isExternalSandboxTransfer(tx))return '';return tx.status==='pending'?'<details class="parity-demo"><summary>Provider simulation</summary><p class="muted small">A check leaves the payment pending. Choose a confirmed provider outcome here.</p><button class="button secondary" data-action="pay-simulate-success">Confirm payment</button><button class="button secondary" data-action="pay-simulate-failed">Fail payment and release hold</button></details>':tx.status==='success'?'<details class="parity-demo"><summary>Reversal simulation</summary><p class="muted small">Return this confirmed payment once. Separate saving transfers stay saved.</p><button class="button secondary" data-action="pay-simulate-reversed">Simulate reversal</button></details>':'';}
 function serviceDeliveryControls(tx){if(!tx.serviceId||tx.status!=='success')return '';const delivery=tx.delivery||{status:'pending'};return `<div class="panel service-delivery"><h2>${delivery.status === 'failed' ? 'Let’s sort this out.' : 'Service delivery'}</h2><p>${esc({pending:'Waiting for the provider.',delivered:'Demo service delivered.',failed:'Delivery failed. Your payment remains recorded.'}[delivery.status]||delivery.status)}</p>${delivery.status==='failed'?'<button class="button secondary" data-action="pay-help">Get help with this payment</button><p class="muted small">Don’t pay again while we check. Your payment has not been refunded.</p>':''}${delivery.token?`<p class="muted small">Sample ECG token</p><strong>${esc(delivery.token)}</strong>`:''}<button class="button ghost" data-action="pay-delivery-check">Check delivery</button>${delivery.status!=='delivered'?'<details class="parity-demo"><summary>Delivery simulation</summary><button class="button secondary" data-action="pay-delivery-success">Confirm delivery</button><button class="button secondary" data-action="pay-delivery-failed">Fail delivery</button></details>':''}<p class="muted small">No real electricity token, airtime or bundle is issued.</p></div>`;}
 function paymentCode(ctx) {
   const link=collectLink(ctx);if(!link)return '<p role="status">Reconnect to show your signed-in Lumo code.</p>';
@@ -515,13 +519,19 @@ function noteSheet(ctx) {
   if(hasUnresolvedPayment(d)){ctx.go(payRoute('review'));return;}
   const origin=ctx.route,version=ctx.shared?.authVersion;
   if(ctx.connected){
-    if(!['lumo','merchant'].includes(d.rail)){ctx.toast('This provider is not connected. Use a registered Lumo account or a connected merchant.');return;}
+    if(!['lumo','merchant'].includes(d.rail)&&!(externalSandboxEnabled(ctx)&&isExternalSandboxTransfer(d))){ctx.toast('This provider is not connected. Use a registered Lumo account or a connected merchant.');return;}
     if(d.rail==='lumo'&&d.requestId){const request=ctx.state.moneyRequests?.find(item=>item.id===d.requestId&&item.direction==='incoming');if(!request){ctx.toast('This request is no longer available.');return;}d.recipient={id:request.senderUserId,name:request.name,emoji:request.name.charAt(0)};}
     else if(d.rail==='lumo'){const found=(yield ctx.shared.resolve(d.recipient?.handle||d.recipient?.number||d.recipient?.name));if(ctx.route!==origin||ctx.draft.payment!==d||ctx.shared?.authVersion!==version)return;if(!found.ok){ctx.toast(found.message);ctx.go(payRoute('recipient'));return;}d.recipient={...found.recipient,number:'@'+found.recipient.handle,emoji:found.recipient.name.charAt(0)};}
   }
+  if(ctx.connected&&isExternalSandboxTransfer(d)){
+    if(!externalSandboxEnabled(ctx)){ctx.toast('Test transfers are not available.');return;}
+    const checked=yield ctx.shared.lookupExternalRecipient(d.recipientLookup?.request);
+    if(ctx.route!==origin||ctx.draft.payment!==d||ctx.shared?.authVersion!==version)return;
+    if(!checked?.ok||checked.providerMode!=='sandbox'||checked.simulation!==true||checked.labelUnverified!==true||checked.fee!==paymentFee(d.rail)||JSON.stringify([checked.recipient?.name,checked.recipient?.number,checked.recipient?.network||'',checked.recipient?.bank||''])!==JSON.stringify([d.recipient?.name,d.recipient?.number,d.recipient?.network||'',d.recipient?.bank||''])){ctx.toast(checked?.message||'The test destination changed. Review it again.');ctx.go(payRoute('recipient'));return;}
+  }
   if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
   ctx.auth({ title: d.serviceId ? `Pay ${cash(d.amount)} for ${recipientLabel(d)}` : `Send ${cash(d.amount)} to ${recipientLabel(d).split(' ')[0]}`, onCancel: () => { ctx.refresh(); }, onSuccess: () => {return runActionFlow(function*(){
-    if (d.completed || ctx.draft.payment !== d) return;
+    if (d.completed || ctx.draft.payment !== d||ctx.connected&&(ctx.shared?.authVersion!==version||ctx.route!==origin)) return;
     if (d.lookupRequired && !recipientLookupMatches(d, { confirmed: true })) return ctx.go(payRoute('recipient'), { replace: true });
     (yield submitReviewedPayment(ctx,d));
   });} });
@@ -661,7 +671,7 @@ export function bindPayments(ctx, route) {
     });});
   }
   if (['transaction','status'].includes(route.page)) {
-    for(const outcome of ['success','failed','reversed']) on(ctx,`pay-simulate-${outcome}`,()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulatePaymentOutcome',{id:route.id||ctx.draft.lastPayment?.id,status:outcome,idempotencyKey:nonce('payment-result')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});
+    for(const outcome of ['success','failed','reversed']) on(ctx,`pay-simulate-${outcome}`,()=>{if(ctx.connected)return;return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulatePaymentOutcome',{id:route.id||ctx.draft.lastPayment?.id,status:outcome,idempotencyKey:nonce('payment-result')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});
     on(ctx,'pay-delivery-check',()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'checkServiceDelivery',{id:route.id}));ctx.toast(result.message);});});
     on(ctx,'pay-delivery-success',()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulateServiceDelivery',{id:route.id,status:'delivered',idempotencyKey:nonce('delivery')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});
     on(ctx,'pay-delivery-failed',()=>{return runActionFlow(function*(){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'simulateServiceDelivery',{id:route.id,status:'failed',idempotencyKey:nonce('delivery')}));if(result.ok)ctx.refresh();ctx.toast(result.message);});});

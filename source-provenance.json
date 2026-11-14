@@ -12,24 +12,24 @@
   "shipped_dist": "Approved consumer and merchant design extended with connected shop discovery, repeat payments, public guest checkout, payment-link sharing and permissioned business planning.",
   "prototype_boundary": "Shared simulated money across consumer and merchant accounts. No live bank, MoMo or NIA connection.",
   "android": {
-    "version": "2.10.3",
-    "version_code": 21003,
+    "version": "2.10.4",
+    "version_code": 21004,
     "package": "com.lumo.nativeapp.test",
     "delivered_separately": true,
     "assets_and_resources_preserved": true,
     "physical_device_verified": false,
-    "apk_sha256": "4fea703ed24e61d4343dc51ad41102bb131f5dfc1131a9d16b04dc24d4ae688a"
+    "apk_sha256": "40e63fd613bb8c7546113e03f2850ee2a2d2318be83ce64c6efb6bce1f2dbaad"
   },
   "validation": {
-    "consumer_tests": 1571,
+    "consumer_tests": 1581,
     "merchant_tests": 560,
-    "shared_boundary_and_guest_tests": 37,
+    "shared_boundary_and_guest_tests": 67,
     "guest_http_concurrency_checks": 5,
     "failures": 0,
     "consumer_design_preserved": true,
     "asset_manifest": "dist-sha256.json",
-    "android_pure_java_suites": 60,
-    "android_framework_cases": 132,
+    "android_pure_java_suites": 61,
+    "android_framework_cases": 142,
     "browser_verified": [
       "guest fixed quote and own-number review",
       "pending reference survives refresh",
@@ -39,13 +39,14 @@
     "limitations": [
       "Connected owner and cashier journeys verified via service and automated tests; browser role sign-in was not automated.",
       "Physical-phone installation and hardware checks remain."
-    ]
+    ],
+    "external_transfer_rollback_checks": true
   },
   "release_date": "2026-11-14",
   "merchant": {
     "source_commit": "3f4ba078f354e63ebc7069ad53d2bef29b042672",
     "site_project": "appgprj_6af5be2c38548191822030bb895d6d3d",
-    "shared_backend_function_version": 12,
+    "shared_backend_function_version": 13,
     "features": [
       "Dedicated and shared counter phones",
       "Individual cashier PIN access",
@@ -87,5 +88,29 @@
     "approved_and_legacy_paths_verified": true,
     "balance_fingerprint_unchanged": true,
     "journal_count_unchanged": true
+  },
+  "external_transfer_simulation": {
+    "consumer_web": true,
+    "consumer_android": true,
+    "provider_mode": "sandbox",
+    "live_provider_configured": false,
+    "rails": [
+      "momo",
+      "bank"
+    ],
+    "fee_pesewas": {
+      "momo": 50,
+      "bank": 100
+    },
+    "outcome": "immediate confirmed success",
+    "ledger_journal_kind": "external_simulation",
+    "ledger_debit": "principal plus test fee",
+    "recipient_name": "unverified optional user label",
+    "migration_applied": "20261114112311_personal_external_simulation.sql",
+    "rollback_database_tests_passed": true,
+    "live_persistent_http_qa": "blocked by automatic review; no persistent fixture created",
+    "ledger_total_zero": true,
+    "negative_owned_accounts": 0,
+    "unbalanced_journals": 0
   }
 }

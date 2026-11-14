@@ -55,7 +55,7 @@ export function normalizeBankAccount(value) {
   return /^\d{8,16}$/.test(number) ? number : '';
 }
 
-export function validateRecipientLookup(rail, form = {}) {
+export function validateRecipientLookup(rail, form = {}, {sandbox=false} = {}) {
   if (rail !== 'momo' && rail !== 'bank') return invalid('number', 'Choose mobile money or a bank account.');
   const details = form && typeof form === 'object' && !Array.isArray(form) ? form : {};
   const number = rail === 'momo' ? normalizeMomoNumber(details.number) : normalizeBankAccount(details.number);
@@ -66,7 +66,16 @@ export function validateRecipientLookup(rail, form = {}) {
     if (!bank) return invalid('bank', 'Choose the bank this account belongs to.');
     request.bank = bank.label;
   }
-  return { ok: true, key: JSON.stringify([rail, number, request.bank || '']), request };
+  if(sandbox){
+    if(rail==='momo'){
+      if(!['MTN MoMo','Telecel Cash','AT Money'].includes(details.network))return invalid('network','Choose the network for this test MoMo transfer.');
+      request.network=details.network;
+    }
+    const name=typeof details.name==='string'?details.name.trim().replace(/\s+/g,' '):'';
+    if(name.length>60||/[<>\u0000-\u001f\u007f]/.test(name))return invalid('name','Use a recipient label of up to 60 characters.');
+    if(name)request.name=name;
+  }
+  return { ok: true, key: JSON.stringify(sandbox?[rail,number,request.bank||'',request.network||'',request.name||'']:[rail, number, request.bank || '']), request };
 }
 
 /** Unknown numbers never receive a made-up identity or a prefix-derived network. */
@@ -86,14 +95,16 @@ export function resolveDemoRecipient(request) {
 export function recipientLookupMatches(payment, { confirmed = false } = {}) {
   if (!payment || !['momo', 'bank'].includes(payment.rail)) return false;
   const record = payment.recipientLookup;
-  const checked = validateRecipientLookup(payment.rail, payment.recipientForms?.[payment.rail]);
+  const sandbox=payment.externalSimulation===true&&payment.providerMode==='sandbox';
+  const checked = validateRecipientLookup(payment.rail, payment.recipientForms?.[payment.rail],{sandbox});
   if (!record || !checked.ok || record.key !== checked.key || !record.request || record.request.rail !== checked.request.rail || record.request.number !== checked.request.number || (record.request.bank || '') !== (checked.request.bank || '')) return false;
   const found = record.recipient;
-  if (!found || found.lookupSource !== 'demo' || typeof found.name !== 'string' || !found.name.trim() || found.name.length > 60 || /[<>\u0000-\u001f\u007f]/.test(found.name)) return false;
+  if (!found || found.lookupSource !== (sandbox?'sandbox':'demo') || typeof found.name !== 'string' || !found.name.trim() || found.name.length > 60 || /[<>\u0000-\u001f\u007f]/.test(found.name)) return false;
   const normalize = payment.rail === 'momo' ? normalizeMomoNumber : normalizeBankAccount;
   if (normalize(found.number) !== checked.request.number) return false;
   if (payment.rail === 'momo' && !['MTN MoMo', 'Telecel Cash', 'AT Money'].includes(found.network)) return false;
   if (payment.rail === 'bank' && found.bank !== checked.request.bank) return false;
+  if(sandbox&&(found.rail!==payment.rail||record.providerMode!=='sandbox'||record.simulation!==true||payment.rail==='momo'&&found.network!==checked.request.network||checked.request.name&&found.name!==checked.request.name))return false;
   if (!confirmed) return true;
   const accepted = payment.recipient;
   return record.confirmed === true && !!accepted && accepted.name === found.name && normalize(accepted.number) === checked.request.number && (payment.rail === 'momo' ? accepted.network === found.network : accepted.bank === found.bank);
@@ -122,7 +133,7 @@ export function createRecipientLookup({
     cancel();
     if (disposed) return Promise.resolve(null);
     return new Promise(resolve => {
-      const record = { resolve, timer: null, started: false, request: { rail: request?.rail, number: request?.number, ...(request?.bank !== undefined ? { bank: request.bank } : {}) } };
+      const record = { resolve, timer: null, started: false, request: { rail: request?.rail, number: request?.number, ...(request?.bank !== undefined ? { bank: request.bank } : {}),...(request?.network!==undefined?{network:request.network}:{}),...(request?.name!==undefined?{name:request.name}:{}) } };
       active = record;
       const settle = result => {
         if (active !== record || disposed) return;

@@ -1,3 +1,4 @@
+import {externalSandboxEnabled} from './external-sandbox.js';
 import { cash, esc, icon } from './ui.js';
 import { PAYMENT_SERVICES } from './payment-catalog.js';
 import {renderConnectedCampus,bindConnectedCampus} from './consumer-merchant-directory.js';
@@ -10,7 +11,7 @@ const pendingPayment = ctx => {
   const d = ctx.draft.payment;
   return !!d && !d.completed && !!(d.recipient || d.amount || d.recipientForms && Object.values(d.recipientForms).some(form => form.name || form.number));
 };
-const savedProviderUnavailable = ctx => ctx.connected === true && (['momo', 'bank'].includes(ctx.draft.payment?.rail)
+const savedProviderUnavailable = ctx => ctx.connected === true && (['momo', 'bank'].includes(ctx.draft.payment?.rail)&&!externalSandboxEnabled(ctx)
   || PAYMENT_SERVICES.some(service => service.id === ctx.draft.payment?.serviceId && service.type !== 'campus'));
 export const normalizeMerchantSearch = value => String(value || '').slice(0, 80).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ɔ/g, 'o').replace(/ɛ/g, 'e').replace(/[^a-z0-9]+/g, ' ').trim();
 export function merchantMatches(service, query) {
@@ -22,7 +23,7 @@ const hubRow = ({ action, title, subtitle = '', symbol = 'arrow', emoji = '', id
 const serviceRow = (service, options = {}) => hubRow({ action: 'service', title: service.name, subtitle: service.description || '', symbol: service.icon || 'spark', id: service.id, ...options });
 
 function sendMoney(ctx) {
-  const availability = ctx.connected === true ? { unavailable: true, subtitle: 'Not connected in this test' } : {};
+  const availability = ctx.connected === true ? externalSandboxEnabled(ctx)?{subtitle:'Test-money transfer · no real provider'}:{ unavailable: true, subtitle: 'Not connected in this test' } : {};
   const tools = [{ action: 'cards', title: 'Virtual cards', symbol: 'card' }, { action: 'requests', title: 'Requests', symbol: 'download' }, { action: 'ious', title: 'IOUs', symbol: 'repeat' }, { action: 'activity', title: 'Activity', symbol: 'plan' }];
   return `<div class="payments-hub-rails" role="group" aria-label="Send money to">${hubRow({ action: 'lumo', title: 'Lumo user', symbol: 'users' })}${hubRow({ action: 'momo', title: 'Mobile money', symbol: 'phone', ...availability })}${hubRow({ action: 'bank', title: 'Bank account', symbol: 'bank', ...availability })}</div><div class="payments-hub-shortcuts" role="group" aria-label="Your recipients"><button type="button" data-hub-action="recent">${icon('clock', 18)} Recent</button><button type="button" data-hub-action="favourites">${icon('heart', 18)} Favourites</button></div><div class="payments-hub-tools" role="group" aria-label="More payment tools">${tools.map(tool => `<button type="button" data-hub-action="${tool.action}">${icon(tool.symbol, 19)}<span>${tool.title}</span>${icon('chevron', 14)}</button>`).join('')}</div>`;
 }
@@ -70,7 +71,7 @@ export function bindPaymentsHub(ctx, route = {}) {
     if (button.dataset.hubTab) return ctx.go(hubRoute(button.dataset.hubTab), { replace: true });
     const action = button.dataset.hubAction;
     const service = action === 'service' ? PAYMENT_SERVICES.find(service => service.id === button.dataset.serviceId) : null;
-    if (ctx.connected === true && (['momo', 'bank'].includes(action) || service && service.type !== 'campus' || action === 'resume' && savedProviderUnavailable(ctx))) {
+    if (ctx.connected === true && (['momo', 'bank'].includes(action)&&!externalSandboxEnabled(ctx) || service && service.type !== 'campus' || action === 'resume' && savedProviderUnavailable(ctx))) {
       ctx.toast?.('This provider is not connected in the shared test. You can pay a Lumo user or scan a merchant’s Lumo QR.');
       return;
     }
