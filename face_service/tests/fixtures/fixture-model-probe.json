@@ -1,0 +1,47 @@
+{
+  "status": "passed",
+  "opencv": "4.12.0",
+  "fixtures": {
+    "face-a.png": {
+      "dimensions": [
+        512,
+        512
+      ],
+      "detected_faces": 1,
+      "embedding_shape": [
+        1,
+        128
+      ],
+      "score": 0.9323273301124573
+    },
+    "face-a-variation.jpg": {
+      "dimensions": [
+        512,
+        512
+      ],
+      "detected_faces": 1,
+      "embedding_shape": [
+        1,
+        128
+      ],
+      "score": 0.932004988193512
+    },
+    "face-b.jpg": {
+      "dimensions": [
+        512,
+        600
+      ],
+      "detected_faces": 1,
+      "embedding_shape": [
+        1,
+        128
+      ],
+      "score": 0.9431643486022949
+    }
+  },
+  "results": {
+    "same_source_cosine": 0.9869552275461047,
+    "different_source_cosine": 0.15191695100202196
+  },
+  "scope": "Actual pinned CPU model extraction and comparison. Controlled same-source perturbation and one different person; not liveness or demographic accuracy evidence. No customer data."
+}

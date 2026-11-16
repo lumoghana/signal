@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 /** Money IQ is a private learning experience. Financial records are read only. */
 import {esc,icon} from './ui.js';
 import {getMoneyIQ} from './money-iq-model.js';
@@ -94,13 +95,13 @@ export function bindMoneyIQ(ctx,route=ctx.route){
  const root=ctx.$('.miq-page');if(!root)return ()=>{};
  let disposed=false;
  const setError=message=>{const el=root.querySelector('[data-miq-error]');if(el){el.textContent=message;el.scrollIntoView({block:'nearest',behavior:'smooth'});}else ctx.toast(message);};
- const perform=(type,payload,{open=false}={})=>{
-  const result=ctx.act(type,payload);
+ const perform= (type,payload,{open=false}={})=>{return runActionFlow(function*(){
+  const result=(yield (ctx.actAsync||ctx.act).call(ctx,type,payload));
   if(!result?.ok){setError(result?.message||'That moment could not be saved. Try again.');return null;}
   if(open&&result.sessionId){ctx.go(landingRoute(ctx,result.sessionId),{replace:true});}else if(!disposed){ctx.refresh({scroll:0});const heading=ctx.$('.miq-page h1');if(heading?.focus){heading.tabIndex=-1;heading.focus({preventScroll:true});}}
   return result;
- };
- const onClick=event=>{
+ });};
+ const onClick= event=>{return runActionFlow(function*(){
   const choice=event.target.closest('[data-miq-choice]');
   if(choice&&root.contains(choice)){
    const session=view(ctx).session;if(!session||session.status!=='question')return;
@@ -121,15 +122,15 @@ export function bindMoneyIQ(ctx,route=ctx.route){
   const data=view(ctx),session=data.session;
   if(action==='resume'){const id=data.activeSessionId||data.lastSessionId;if(id)ctx.go(landingRoute(ctx,id),{replace:true});return;}
   if(action==='start'||action==='sample'||action==='restart'||action==='replay'){
-   perform('moneyIQStart',{mode:action==='sample'?'example':control.dataset.mode||'example',...(['restart','replay'].includes(action)?{replay:true}:{})},{open:true});return;
+   (yield perform('moneyIQStart',{mode:action==='sample'?'example':control.dataset.mode||'example',...(['restart','replay'].includes(action)?{replay:true}:{})},{open:true}));return;
   }
   if(!session){setError('Pick up your Money IQ week to continue.');return;}
   if(action==='reveal'){
    const option=ui(ctx).selected?.[selectedKey(session)];if(!Number.isInteger(option)){setError('Pick your first guess.');return;}
-   perform('moneyIQAnswer',{sessionId:session.id,questionId:session.question.id,option});return;
+   (yield perform('moneyIQAnswer',{sessionId:session.id,questionId:session.question.id,option}));return;
   }
-  if(action==='next'){perform('moneyIQNext',{sessionId:session.id,questionId:session.question?.id});return;}
-  if(action==='complete'){perform('moneyIQComplete',{sessionId:session.id});return;}
+  if(action==='next'){(yield perform('moneyIQNext',{sessionId:session.id,questionId:session.question?.id}));return;}
+  if(action==='complete'){(yield perform('moneyIQComplete',{sessionId:session.id}));return;}
   if(action==='activity'){
    const proposed=session.recap?.route;
    const target=proposed?.route||proposed;
@@ -139,7 +140,7 @@ export function bindMoneyIQ(ctx,route=ctx.route){
    ctx.saveDraft?.();
    ctx.go({...destination,returnTo:{...LANDING,id:session.id}});return;
   }
- };
+ });};
  root.addEventListener('click',onClick);
  const saved=ui(ctx).selected||{};
  if(Object.keys(saved).length>100){ui(ctx).selected=Object.fromEntries(Object.entries(saved).slice(-50));ctx.saveDraft?.();}

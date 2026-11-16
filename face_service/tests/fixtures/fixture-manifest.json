@@ -1,0 +1,32 @@
+{
+  "recorded_date": "2026-11-16",
+  "fixtures": [
+    {
+      "file": "face-a.png",
+      "source_url": "https://raw.githubusercontent.com/scikit-image/scikit-image/6a1a73f5b64cb7a0ba83367f30ee612b1d70d98c/src/_skimage2/data/astronaut.png",
+      "git_commit": "6a1a73f5b64cb7a0ba83367f30ee612b1d70d98c",
+      "sha256": "88431cd9653ccd539741b555fb0a46b61558b301d4110412b5bc28b5e3ea6cb5",
+      "size_bytes": 791555,
+      "rights_note": "Public domain per scikit-image astronaut API documentation; NASA source, factual offline testing only.",
+      "purpose": "Offline detector/matcher regression input; never production enrollment or public marketing."
+    },
+    {
+      "file": "face-b.jpg",
+      "source_url": "https://raw.githubusercontent.com/matplotlib/matplotlib/c7db3a61e120e55dd89fed906307fee08a55f496/lib/matplotlib/mpl-data/sample_data/grace_hopper.jpg",
+      "git_commit": "c7db3a61e120e55dd89fed906307fee08a55f496",
+      "sha256": "a8ca6d734765703b09728ab47fe59f473d93ae3967fc24c7c0288c3c7adb7130",
+      "size_bytes": 61306,
+      "rights_note": "Official Matplotlib sample data; bundled under Matplotlib license, retained below. Factual offline testing only, no endorsement or public UI use.",
+      "purpose": "Offline detector/matcher regression input; never production enrollment or public marketing."
+    },
+    {
+      "file": "face-a-variation.jpg",
+      "derived_from": "face-a.png",
+      "transformation": "Brightness factor0.94 and JPEG quality88",
+      "sha256": "897c2f20b5d24f09e5e6958b29cca4a11d8b86d561209d2e4ebb66fa41b0e2e6",
+      "size_bytes": 59391,
+      "purpose": "Controlled same-source robustness regression only; not independent capture/liveness evidence."
+    }
+  ],
+  "scope": "Public research example images for isolated offline tests only. No customer photographs, biometric templates or marketing use. These samples do not establish demographic accuracy or PAD."
+}

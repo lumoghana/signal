@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import {esc,cash,icon,pageHead,dateLabel} from './ui.js';
 import {getSummary} from './model.js';
 import {getLearningDashboard,getLearningLesson,getLearningPractice,getLearningNudge} from './learning-model.js';
@@ -118,18 +119,18 @@ export function bindLearning(ctx,r=ctx.route){
  const d=ui(ctx);d.lessonStory ||= {};d.reflection ||= {};d.revealed ||= {};d.practiceMode ||= {};d.practiceStage ||= {};d.storyChat ||= {};
  const showError=message=>{const el=ctx.$('[data-learning-error]');if(el)el.textContent=message;else ctx.toast(message);};
  const go=route=>{if(route.section==='learn'){if(!learningMotionNext.has(ctx))learningMotionNext.set(ctx,{direction:'forward',fresh:false});}else learningMotionNext.delete(ctx);ctx.saveDraft?.();ctx.go(route);};
- const act=(type,payload,onSuccess)=>{if(busy||!valid())return;busy=true;const result=ctx.act(type,payload);busy=false;if(!result.ok){showError(result.message||'Let’s try that again.');if(/changed|stale|latest|refresh/i.test(result.message||'')&&r.page==='practice'){const v=getLearningPractice(ctx.state,r.id,options(ctx));d.staleSession=v?.sessionId;ctx.refresh();showError(result.message);}return;}onSuccess?.(result);};
- const startLesson=(id,review=false,story=true)=>act('learningStartLesson',{lessonId:id,review},result=>{d.lessonStory[result.sessionId||id]=story;go({section:'learn',page:review?'review':'lesson',id,...(r.returnTo?{returnTo:r.returnTo}:{})});});
- const beginPractice=(kind,mode)=>act('learningStartPractice',{kind,mode},result=>{delete d.staleSession;d.practiceStage[result.sessionId]='picture';go({section:'learn',page:'practice',id:result.sessionId||kind,...(r.returnTo?{returnTo:r.returnTo}:{})});});
- const click=e=>{
+ const act= (type,payload,onSuccess)=>{return runActionFlow(function*(){if(busy||!valid())return;busy=true;const result=(yield (ctx.actAsync||ctx.act).call(ctx,type,payload));busy=false;if(!result.ok){showError(result.message||'Let’s try that again.');if(/changed|stale|latest|refresh/i.test(result.message||'')&&r.page==='practice'){const v=getLearningPractice(ctx.state,r.id,options(ctx));d.staleSession=v?.sessionId;ctx.refresh();showError(result.message);}return;}onSuccess?.(result);});};
+ const startLesson= (id,review=false,story=true)=>runActionFlow(function*(){return (yield act('learningStartLesson',{lessonId:id,review},result=>{d.lessonStory[result.sessionId||id]=story;go({section:'learn',page:review?'review':'lesson',id,...(r.returnTo?{returnTo:r.returnTo}:{})});}));});
+ const beginPractice= (kind,mode)=>runActionFlow(function*(){return (yield act('learningStartPractice',{kind,mode},result=>{delete d.staleSession;d.practiceStage[result.sessionId]='picture';go({section:'learn',page:'practice',id:result.sessionId||kind,...(r.returnTo?{returnTo:r.returnTo}:{})});}));});
+ const click= e=>{return runActionFlow(function*(){
   const b=e.target.closest('button');if(!b||b.disabled||!valid())return;
   if(b.dataset.learnStoryChat){const id=b.dataset.learnStoryChat;d.storyChat[id]=(d.storyChat[id]||1)+1;ctx.saveDraft?.();ctx.refresh();return;}
   if(b.dataset.learningTab){d.playTab=b.dataset.learningTab;ctx.saveDraft?.();ctx.refresh();return;}
   if(b.dataset.learningTopic){d.topic=b.dataset.learningTopic;ctx.saveDraft?.();ctx.refresh();return;}
   if(b.dataset.learnGoal){d.goal=b.dataset.learnGoal;ctx.refresh();return;}
   if(b.dataset.learnMode){d.mode=b.dataset.learnMode;ctx.refresh();return;}
-  if(b.dataset.learnLesson){startLesson(b.dataset.learnLesson);return;}
-  if(b.dataset.learnReview){startLesson(b.dataset.learnReview,true);return;}
+  if(b.dataset.learnLesson){(yield startLesson(b.dataset.learnLesson));return;}
+  if(b.dataset.learnReview){(yield startLesson(b.dataset.learnReview,true));return;}
   if(b.dataset.learningResume){go({section:'learn',page:'practice',id:b.dataset.learningResume});return;}
   if(b.dataset.learnPractice){go({section:'learn',page:'practice',id:b.dataset.learnPractice});return;}
   if(b.dataset.practiceMode){const v=getLearningPractice(ctx.state,r.id,options(ctx));d.practiceMode[v.kind||v.id]=b.dataset.practiceMode;ctx.refresh();return;}
@@ -139,7 +140,7 @@ export function bindLearning(ctx,r=ctx.route){
   if(b.dataset.learnAnswer){
    const kind=b.dataset.learnAnswer,v=kind==='lesson'?getLearningLesson(ctx.state,r.id,options(ctx)):getLearningPractice(ctx.state,r.id,options(ctx));
    if(!v?.sessionId)return;
-   act(kind==='lesson'?'learningAnswer':'learningAnswerPractice',{sessionId:v.sessionId,option:Number(b.dataset.option)},result=>{if(result.correct&&result.points>0)learningMotionNext.set(ctx,{direction:'forward',fresh:true});if(kind==='practice'&&getLearningPractice(ctx.state,r.id,options(ctx))?.correct)d.practiceStage[v.sessionId]='reflect';ctx.refresh({scroll:0});});return;
+   (yield act(kind==='lesson'?'learningAnswer':'learningAnswerPractice',{sessionId:v.sessionId,option:Number(b.dataset.option)},result=>{if(result.correct&&result.points>0)learningMotionNext.set(ctx,{direction:'forward',fresh:true});if(kind==='practice'&&getLearningPractice(ctx.state,r.id,options(ctx))?.correct)d.practiceStage[v.sessionId]='reflect';ctx.refresh({scroll:0});}));return;
   }
   if(b.dataset.learningRoute!==undefined){const v=getLearningPractice(ctx.state,r.id,options(ctx)),action=v?.routes?.[Number(b.dataset.learningRoute)];if(!action?.route)return;const returnTo={section:'learn',page:'practice',id:v.sessionId,...(r.returnTo?{returnTo:r.returnTo}:{})};ctx.draft.learningReturnTo=returnTo;go({...action.route,returnTo});return;}
   const action=b.dataset.learnAction;if(!action)return;
@@ -148,22 +149,22 @@ export function bindLearning(ctx,r=ctx.route){
   if(action==='money-iq'){go({section:'learn',page:'money-iq'});return;}
   if(action==='learning-home'){delete ctx.draft.learningReturnTo;go(HOME);return;}
   if(action==='choose-focus'){d.startStep='goal';ctx.refresh({scroll:0});return;}
-  if(action==='quick-play'){act('learningEnroll',{goal:d.goal||model(ctx).goal||'allowance',personalised:false},()=>act('campusStart',{missionId:getCampusGame(ctx.state).nextMissionId},result=>{delete ctx.draft.learningUI;go({section:'learn',page:'play',id:result.runId});}));return;}
+  if(action==='quick-play'){(yield act('learningEnroll',{goal:d.goal||model(ctx).goal||'allowance',personalised:false}, ()=>runActionFlow(function*(){return (yield act('campusStart',{missionId:getCampusGame(ctx.state).nextMissionId},result=>{delete ctx.draft.learningUI;go({section:'learn',page:'play',id:result.runId});}));})));return;}
   if(action==='start-back'){d.startStep='goal';ctx.refresh();return;}
   if(action==='start-next'){if(!d.goal&&!model(ctx).goal){showError('Choose the focus that feels useful for you.');return;}d.startStep='mode';ctx.refresh();return;}
-  if(action==='enrol'){act('learningEnroll',{goal:d.goal||model(ctx).goal,personalised:d.mode==='actual'&&effectivePersonal(ctx)},()=>{delete ctx.draft.learningUI;go(HOME);});return;}
+  if(action==='enrol'){(yield act('learningEnroll',{goal:d.goal||model(ctx).goal,personalised:d.mode==='actual'&&effectivePersonal(ctx)},()=>{delete ctx.draft.learningUI;go(HOME);}));return;}
   if(action==='preferences'){go({section:'learn',page:'preferences'});return;}
-  if(action==='save-preferences'){act(model(ctx).enrolled?'learningPreferences':'learningEnroll',{goal:d.preferenceGoal||model(ctx).goal,personalised:(d.preferenceMode||(model(ctx).personalised?'actual':'example'))==='actual'&&effectivePersonal(ctx)},()=>{delete ctx.draft.learningUI;delete ctx.draft.learningReturnTo;ctx.toast('Your learning preferences are saved.');go(r.returnTo?.section==='learn'&&r.returnTo.page==='money-iq'?r.returnTo:HOME);});return;}
+  if(action==='save-preferences'){(yield act(model(ctx).enrolled?'learningPreferences':'learningEnroll',{goal:d.preferenceGoal||model(ctx).goal,personalised:(d.preferenceMode||(model(ctx).personalised?'actual':'example'))==='actual'&&effectivePersonal(ctx)},()=>{delete ctx.draft.learningUI;delete ctx.draft.learningReturnTo;ctx.toast('Your learning preferences are saved.');go(r.returnTo?.section==='learn'&&r.returnTo.page==='money-iq'?r.returnTo:HOME);}));return;}
   if(action==='progress'){go({section:'learn',page:'progress'});return;}
-  if(action==='lesson-begin'){const v=getLearningLesson(ctx.state,r.id,options(ctx));if(v.status==='ready'||(r.page==='review'&&!v.review))startLesson(v.id,r.page==='review',false);else{d.lessonStory[v.sessionId||v.id]=false;ctx.refresh({scroll:0});}return;}
+  if(action==='lesson-begin'){const v=getLearningLesson(ctx.state,r.id,options(ctx));if(v.status==='ready'||(r.page==='review'&&!v.review))(yield startLesson(v.id,r.page==='review',false));else{d.lessonStory[v.sessionId||v.id]=false;ctx.refresh({scroll:0});}return;}
   if(action==='lesson-practice'){const v=getLearningLesson(ctx.state,r.id,options(ctx));go({section:'learn',page:'practice',id:['planning','expected','upcoming'].includes(v.topicId)?'incoming-plan':'weekly-review',...(r.returnTo?{returnTo:r.returnTo}:{})});return;}
-  if(action==='practice-begin'||action==='practice-refresh'){const v=getLearningPractice(ctx.state,r.id,options(ctx)),kind=b.dataset.practiceKind||v.kind||v.id,mode=d.practiceMode[kind]||(v.actualAvailable&&(model(ctx).effectivePersonalised??model(ctx).personalised)?'actual':'example');beginPractice(kind,mode);return;}
+  if(action==='practice-begin'||action==='practice-refresh'){const v=getLearningPractice(ctx.state,r.id,options(ctx)),kind=b.dataset.practiceKind||v.kind||v.id,mode=d.practiceMode[kind]||(v.actualAvailable&&(model(ctx).effectivePersonalised??model(ctx).personalised)?'actual':'example');(yield beginPractice(kind,mode));return;}
   if(action==='practice-choice'){const v=getLearningPractice(ctx.state,r.id,options(ctx));d.practiceStage[v.sessionId]=v.correct?'reflect':'choice';ctx.saveDraft?.();ctx.refresh({scroll:0});return;}
   if(action==='practice-picture'){learningMotionNext.set(ctx,{direction:'back',fresh:false});const v=getLearningPractice(ctx.state,r.id,options(ctx));d.practiceStage[v.sessionId]='picture';ctx.saveDraft?.();ctx.refresh({scroll:0});return;}
   if(action==='practice-reveal'){const v=getLearningPractice(ctx.state,r.id,options(ctx));d.revealed[v.sessionId]=true;ctx.refresh();return;}
-  if(action==='practice-complete'){const v=getLearningPractice(ctx.state,r.id,options(ctx)),reflection=d.reflection[v.sessionId];if(!reflection){showError('Choose the reflection that fits this check.');return;}act('learningCompletePractice',{sessionId:v.sessionId,reflection},result=>{if(result.points>0)learningMotionNext.set(ctx,{direction:'forward',fresh:true});delete ctx.draft.learningReturnTo;ctx.refresh({scroll:0});});return;}
-  if(action==='grace'){ctx.sheet(`<h2>A little breathing room.</h2><p>Take a grace week when studies or life need your attention. Your completed learning stays yours. No points are added for a grace week.</p><button class="button" data-learning-confirm-grace>Take this grace week</button>`,el=>{el.querySelector('[data-learning-confirm-grace]').onclick=()=>{if(!el.isConnected)return;act('learningGraceWeek',{},()=>{ctx.closeSheet();ctx.refresh();});};});return;}
-  if(action==='nudge'){const n=model(ctx).nudge||getLearningNudge(ctx.state,options(ctx));if(!n)return;const route=n.route||(n.lessonId?{section:'learn',page:'lesson',id:n.lessonId}:{section:'learn',page:'practice',id:n.practiceId||n.kind||'incoming-plan'});if(route.page==='lesson'){startLesson(route.id);return;}go(route);}
- };
+  if(action==='practice-complete'){const v=getLearningPractice(ctx.state,r.id,options(ctx)),reflection=d.reflection[v.sessionId];if(!reflection){showError('Choose the reflection that fits this check.');return;}(yield act('learningCompletePractice',{sessionId:v.sessionId,reflection},result=>{if(result.points>0)learningMotionNext.set(ctx,{direction:'forward',fresh:true});delete ctx.draft.learningReturnTo;ctx.refresh({scroll:0});}));return;}
+  if(action==='grace'){ctx.sheet(`<h2>A little breathing room.</h2><p>Take a grace week when studies or life need your attention. Your completed learning stays yours. No points are added for a grace week.</p><button class="button" data-learning-confirm-grace>Take this grace week</button>`,el=>{el.querySelector('[data-learning-confirm-grace]').onclick= ()=>{return runActionFlow(function*(){if(!el.isConnected)return;(yield act('learningGraceWeek',{},()=>{ctx.closeSheet();ctx.refresh();}));});};});return;}
+  if(action==='nudge'){const n=model(ctx).nudge||getLearningNudge(ctx.state,options(ctx));if(!n)return;const route=n.route||(n.lessonId?{section:'learn',page:'lesson',id:n.lessonId}:{section:'learn',page:'practice',id:n.practiceId||n.kind||'incoming-plan'});if(route.page==='lesson'){(yield startLesson(route.id));return;}go(route);}
+ });};
  root.addEventListener('click',click);const disposeGameEntry=bindCampusGameEntry(ctx),disposeMotion=bindLearningMotion(ctx,r,root);return ()=>{alive=false;root.removeEventListener('click',click);disposeGameEntry?.();disposeMotion?.();};
 }

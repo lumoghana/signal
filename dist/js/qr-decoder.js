@@ -1,8 +1,10 @@
+import {parseSharedQr,parseSharedQrLink,SHARED_CONSUMER_ORIGIN,trustedMerchantQrURL} from './approved-qr.js';
 import jsQR from './vendor/jsqr.js';
 import { isCampusCodeService } from './payment-catalog.js';
 
 const fail = message => ({ ok: false, message });
 const aliases = Object.freeze({ GOBE: 'gobe-spot', SHUTTLE: 'campus-shuttle', PRINTS: 'balme-prints', HALL: 'hall-dues' });
+const sharedPayment=parsed=>parsed.kind==='merchant'?{type:'merchant',id:parsed.shopId,shopId:parsed.shopId,...(parsed.requestId?{requestId:parsed.requestId}:{})}:{type:'person',handle:parsed.handle,name:'@'+parsed.handle,amount:0,note:''};
 
 export function merchantIdFromCode(input) {
   if (typeof input !== 'string' || input.length > 100) return null;
@@ -15,14 +17,30 @@ export function merchantIdFromCode(input) {
 export function parseQrPayload(input, { origin = globalThis.location?.origin } = {}) {
   if (typeof input !== 'string' || !input.trim() || input.length > 2048) return fail('That is not a supported Lumo code.');
   const value = input.trim();
+  if(value.startsWith('lumo:shared:v1:')){try{return {ok:true,payment:sharedPayment(parseSharedQr(value))};}catch{return fail('This shared code is invalid. Ask for a fresh Lumo code.');}}
   const merchant = /^(?:lumo:)?merchant:([^\s]+)$/i.exec(value);
   if (merchant) {
     const id = merchantIdFromCode(merchant[1]);
     return id ? { ok: true, payment: { type: 'merchant', id } } : fail('That campus merchant code is not recognised.');
   }
   let url, base;
-  try { base = new URL(origin); url = new URL(value, base); } catch { return fail('That is not a supported Lumo code.'); }
-  if (!['http:', 'https:'].includes(url.protocol) || url.origin !== base.origin || url.username || url.password || url.hash || !value.match(/^(?:https?:\/\/|\/|\?)/i)) return fail('Use a Lumo payment code. Other links cannot be opened here.');
+  try { base = new URL(origin||SHARED_CONSUMER_ORIGIN); url = new URL(value, base); } catch { return fail('That is not a supported Lumo code.'); }
+  if(url.searchParams.has('lumoCode')){try{return {ok:true,payment:sharedPayment(parseSharedQrLink(url.href))};}catch{return fail('This shared payment link is invalid. Ask for a fresh Lumo code.');}}
+  if(url.searchParams.has('pay')||url.searchParams.has('link')){
+    if(!trustedMerchantQrURL(url,base.origin)||!value.match(/^(?:https?:\/\/|\/|\?)/i))return fail('Use a Lumo merchant payment code. Other links cannot be opened here.');
+    const allowed=new Set(['pay','request','testKey','workspace','lumo','amount','link','utm_source','utm_medium','utm_campaign','utm_term','utm_content','fbclid','igsh']);
+    for(const key of url.searchParams.keys())if(!allowed.has(key)||url.searchParams.getAll(key).length!==1)return fail('This merchant code has conflicting or unsupported details. Ask for a fresh code.');
+    const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,token=/^[a-f0-9]{64}$/;
+    if(url.searchParams.has('link')){
+      const link=url.searchParams.get('link');
+      if(url.pathname!=='/checkout.html'||!token.test(link||'')||['pay','request','testKey','workspace','lumo','amount'].some(key=>url.searchParams.has(key)))return fail('This public payment code is invalid. Ask for a fresh code.');
+      return {ok:true,payment:{type:'merchant',link}};
+    }
+    const shopId=url.searchParams.get('pay'),requestId=url.searchParams.get('request'),testKey=url.searchParams.get('testKey'),amount=url.searchParams.get('amount');
+    if(!uuid.test(shopId||'')||requestId!==null&&!uuid.test(requestId)||testKey!==null&&(!token.test(testKey)||url.pathname==='/checkout.html')||url.searchParams.has('workspace')&&url.searchParams.get('workspace')!=='registered'||url.searchParams.has('lumo')&&url.searchParams.get('lumo')!=='1'||amount!==null&&(!requestId||!/^\d+$/.test(amount)||!Number.isSafeInteger(Number(amount))||Number(amount)<=0||Number(amount)>100000000))return fail('This merchant code is invalid. Ask for a fresh code.');
+    return {ok:true,payment:{type:'merchant',id:shopId.toLowerCase(),shopId:shopId.toLowerCase(),...(requestId?{requestId:requestId.toLowerCase()}:{}),...(testKey?{testKey}:{})}};
+  }
+  if (!['http:', 'https:'].includes(url.protocol) || ![base.origin,SHARED_CONSUMER_ORIGIN].includes(url.origin) || url.username || url.password || url.hash || !value.match(/^(?:https?:\/\/|\/|\?)/i)) return fail('Use a Lumo payment code. Other links cannot be opened here.');
   if (url.searchParams.getAll('payTo').length !== 1 || url.searchParams.getAll('amount').length > 1 || url.searchParams.getAll('note').length > 1) return fail('This payment code has conflicting details.');
   const name = (url.searchParams.get('payTo') || '').trim();
   const note = url.searchParams.get('note') || '';

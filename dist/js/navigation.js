@@ -18,7 +18,7 @@ const PAGES = {
   pay: new Set(['home', 'recipient', 'recipient-confirm', 'conversation', 'amount', 'review', 'pause', 'status', 'transaction', 'collect', 'scan', 'fund', 'fund-status', 'service', 'recipients-list', 'cards', 'requests', 'request-detail', 'splits', 'split-detail', 'funding-detail']),
   boxes: new Set(['home', 'create', 'detail', 'edit', 'hack', 'hacks', 'archive', 'transfer']),
   plan: new Set(['home', 'create', 'periods', 'guided']),
-  life: new Set(['overview', 'ious', 'iou-detail', 'iou-create', 'recovery', 'groups', 'group-detail', 'group-chat', 'group-create', 'story', 'settings', 'help', 'account-security', 'account-login-setup', 'account-access', 'account-recovery', 'account-devices', 'account-statements', 'account-support', 'account-support-new', 'account-support-detail', 'account-privacy', 'account-close']),
+  life: new Set(['money-check','money-preferences','overview', 'ious', 'iou-detail', 'iou-create', 'recovery', 'groups', 'group-detail', 'group-chat', 'group-create', 'story', 'settings', 'help', 'account-security', 'account-login-setup', 'account-access', 'account-recovery', 'account-devices', 'account-statements', 'account-support', 'account-support-new', 'account-support-detail', 'account-privacy', 'account-close']),
   chat: new Set(['home']),
   learn: new Set(['home','library','start','lesson','practice','progress','preferences','review','game','play','rewards','money-iq']),
 };
@@ -88,7 +88,7 @@ export function routeLabel(route) {
   if (r.section === 'boxes') return ({ detail: 'Money Box', edit: 'Money Box', hack: 'Savings Hack', create: 'Previous step', hacks:'Savings Hacks', archive:'Archived boxes', transfer:'Box transfer' })[r.page] || 'Money Boxes';
   if (r.section === 'plan') return ({create:'Previous step',periods:'Budget periods',guided:'Build my budget'})[r.page] || 'Plan';
   if (r.section === 'life' && r.page.startsWith('account-')) return ({'account-security':'Security','account-login-setup':'Sign-in details','account-access':'Welcome back','account-recovery':'Recover access','account-devices':'Devices','account-statements':'Statements','account-support':'Your reports','account-support-new':'Get help','account-support-detail':'Report','account-privacy':'Privacy','account-close':'Account closure'})[r.page] || 'Settings';
-  return ({ overview: 'All your money', ious: 'IOUs', 'iou-detail': 'IOU', 'iou-create': 'Previous step', recovery: r.step ? 'Previous step' : 'Recovery', groups: 'Groups', 'group-detail': 'Group', 'group-chat': 'Group chat', 'group-create': 'Previous step', story: 'Money Story', settings: 'Settings', help: 'Help' })[r.page] || 'Home';
+  return ({ 'money-check':'Money check', 'money-preferences':'Your Lumo setup', overview: 'All your money', ious: 'IOUs', 'iou-detail': 'IOU', 'iou-create': 'Previous step', recovery: r.step ? 'Previous step' : 'Recovery', groups: 'Groups', 'group-detail': 'Group', 'group-chat': 'Group chat', 'group-create': 'Previous step', story: 'Money Story', settings: 'Settings', help: 'Help' })[r.page] || 'Home';
 }
 
 function explicitParent(route) {

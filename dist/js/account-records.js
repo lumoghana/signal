@@ -54,7 +54,7 @@ export function bindAccountRecords(ctx,{download}={}){
  if(exportButton)exportButton.onclick=()=>{
   set(exportError);set(exportStatus);
   try{
-   startDownload('Lumo-account-data.json',JSON.stringify(exportAccountData(ctx.state),null,2),'application/json');
+   startDownload('Lumo-account-data.json',JSON.stringify(exportAccountData(ctx.state,{connected:ctx.connected===true}),null,2),'application/json');
    const message='Your account data download has started.';set(exportStatus,message);ctx.toast(message);
   }catch{set(exportError,'Your account data download could not start. Please try again.');}
  };

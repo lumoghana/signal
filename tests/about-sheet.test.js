@@ -11,6 +11,7 @@ test('About opens an informational sheet and closes without navigating to Settin
   let closed=0;
   const sandbox={
     state:{profile:{name:'Ama Mensah',campus:'University of Ghana'}},route:{section:'home',page:'home'},ctx:{},
+    getMoneyMaintenance:()=>({experience:'full'}),bindMaintenanceEntries(){},
     firstName:()=> 'Ama',row:()=>'',icon:()=>'',esc:String,appearanceRow:()=>'',
     signOut(){},openAppearance(){},userCloseSheet(){closed++;},
     go:route=>routes.push(route),sheet:(html,bind,options)=>sheets.push({html,bind,options}),

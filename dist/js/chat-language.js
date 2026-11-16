@@ -1,6 +1,7 @@
 import { getMoneyAnswer, getSpendingPeriod, getSpendingScope } from './money-answers.js';
 import { cash } from './ui.js';
 import { getPreparedChatAction, stampFinancialAnswer, readChatAmount, financialInputAmbiguity, clarifyFinancialInput } from './chat-action-model.js';
+import { getMaintenanceChatAnswer } from './chat-maintenance.js';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_RE = new RegExp(`\\b(${MONTHS.join('|')})(?:\\s+((?:19|20|21)\\d{2}))?\\b`, 'i');
@@ -161,6 +162,8 @@ function financialReply(state, topic, canonicalQuestion, now, rest = {}) {
 /** Local conversational layer. It can explain and open pages, never move money. */
 function conversationAnswer(state, question, { messages = [], now = new Date() } = {}) {
   const original = cleanText(question), q = folds(original), previous = previousContext(messages);
+  const maintenance = getMaintenanceChatAnswer(state, original, { now });
+  if (maintenance) return maintenance;
   const name = cleanText(state.profile?.name).split(' ')[0] || 'there';
   const prepared = getPreparedChatAction(state, original);
   if (prepared) return prepared;

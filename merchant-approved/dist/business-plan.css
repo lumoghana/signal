@@ -1,0 +1,41 @@
+.business-plan-workspace { max-width:720px; margin:0 auto; }
+.business-plan-workspace .page-heading { align-items:flex-start; gap:12px; }
+.business-plan-workspace .page-title { font-size:30px; line-height:1.13; letter-spacing:-.04em; }
+.business-plan-workspace .subtitle { font-size:14px; line-height:1.5; }
+.business-plan-workspace .panel { margin-bottom:16px; padding:22px; border:1px solid var(--line); border-radius:18px; background:var(--paper); }
+.plan-summary>.eyebrow { font-size:10px; color:var(--muted); letter-spacing:.1em; }
+.plan-summary .plan-hero-value { font-size:clamp(35px,10vw,48px); font-weight:500; letter-spacing:-.055em; margin:12px 0 5px; font-variant-numeric:tabular-nums; }
+.plan-summary .plan-shortfall { color:var(--amber); }
+.plan-summary>p { color:var(--muted); font-size:13px; line-height:1.55; }
+.plan-summary dl { margin:22px 0 16px; }
+.plan-summary dl>div { display:flex; justify-content:space-between; align-items:flex-start; gap:15px; padding:12px 0; border-top:1px solid var(--line); font-size:13px; }
+.plan-summary dt { color:var(--muted); }
+.plan-summary dd { margin:0; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.business-plan-workspace .plan-explainer { color:var(--muted); font-size:12px; line-height:1.55; margin:12px 0; }
+.plan-summary details { border-top:1px solid var(--line); padding-top:14px; }
+.plan-summary details summary,.plan-permissions>summary { cursor:pointer; font-size:13px; font-weight:500; }
+.plan-summary details p,.plan-permissions p { color:var(--muted); font-size:12px; line-height:1.6; margin:13px 0 0; }
+.plan-section .panel-title { font-size:20px; letter-spacing:-.03em; line-height:1.25; margin-bottom:12px; }
+.plan-section>.muted { font-size:13px; line-height:1.5; }
+.business-plan-workspace form { display:grid; gap:16px; margin-top:16px; }
+.plan-form-pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.business-plan-workspace .field { min-width:0; }
+.business-plan-workspace .input,.business-plan-workspace .select { min-width:0; width:100%; min-height:49px; border-radius:12px; font-size:16px; }
+.business-plan-workspace .label { font-size:13px; }
+.business-plan-workspace .btn { min-height:46px; border-radius:12px; }
+.business-plan-workspace .btn.small { min-height:40px; font-size:12px; padding:8px 12px; }
+.plan-filters { display:grid; gap:12px; margin-top:20px; }
+.plan-tabs { display:flex; gap:7px; }
+.plan-expense { display:flex; justify-content:space-between; gap:20px; padding:19px 0; border-top:1px solid var(--line); margin-top:12px; }
+.plan-expense>div:first-child { flex:1; min-width:0; }
+.plan-expense>div:last-child { flex:0 0 110px; text-align:right; }
+.plan-expense strong { display:block; font-size:14px; font-weight:500; overflow-wrap:anywhere; }
+.plan-expense small { display:block; margin-top:5px; font-size:11px; color:var(--muted); line-height:1.5; }
+.plan-expense p { margin:7px 0 0; color:var(--muted); font-size:11px; line-height:1.5; }
+.plan-expense .btn.ghost { min-height:35px; padding:5px 7px; }
+.plan-empty { color:var(--muted); text-align:center; font-size:13px; line-height:1.6; padding:28px 0 12px; }
+.plan-permissions>summary { font-size:15px; }
+.plan-permissions .check-line { display:flex; align-items:center; gap:12px; }
+.plan-permissions .check-line input { width:18px; height:18px; accent-color:var(--lime); }
+.business-plan-workspace .callout p { margin:0 0 12px; }
+@media(max-width:360px) { .business-plan-workspace .panel { padding:17px; }.plan-form-pair { grid-template-columns:1fr; }.plan-expense { gap:10px; }.plan-expense>div:last-child { flex-basis:95px; } }

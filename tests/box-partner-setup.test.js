@@ -173,3 +173,22 @@ test('disposed or detached setup controls cannot create a box or overwrite its d
   const detached=binder({action:'box-partner-toggle'});detached.button.isConnected=false;detached.click();assert.equal(detached.draft.box.partnerEnabled,undefined);detached.cleanup();
   const moved=binder({route:createRoute('review'),action:'box-save'});moved.setRoute({section:'home',page:'home'});moved.click();assert.equal(moved.acts.length,0);moved.cleanup();
 });
+
+test('connected partner setup visibly explains the unavailable recovery route before enabling protection',()=>{
+ const ctx={state:createEmptyState(),draft:{box:boxDraft()},connected:true};
+ const html=renderPlanning(ctx,createRoute('partner'));
+ assert.match(html,/data-partner-support-limit/);assert.match(html,/cannot bypass their approval/);assert.match(html,/Choose a Money Box without a partner/);
+ assert.ok(html.indexOf('data-partner-support-limit')<html.indexOf('data-action="p:box-partner-toggle"'));
+ assert.ok(html.indexOf('data-partner-support-limit')<html.indexOf('<details'));
+ assert.doesNotMatch(html,/contact Lumo support through the planned toll-free line/);
+});
+
+test('typing partner details keeps the connected invitation label and reuses an existing invitation',()=>{
+ const h=binder({draft:{box:boxDraft({partnerEnabled:true})},action:'box-partner',fields:{'[name="box-partner-name"]':'Esi Owusu','[name="box-partner-phone"]':'0241234567','[data-action="p:box-partner"]':''}});
+ h.ctx.connected=true;
+ const name=h.nodes.get('[name="box-partner-name"]'),primary=h.nodes.get('[data-action="p:box-partner"]');
+ name.dispatchEvent(new Event('input'));assert.equal(primary.textContent,'Send invitation');
+ h.click();name.dispatchEvent(new Event('input'));assert.equal(primary.textContent,'Continue');assert.equal(h.acts.length,1);
+ h.nodes.get('[name="box-partner-phone"]').value='0271112222';name.dispatchEvent(new Event('input'));assert.equal(primary.textContent,'Send invitation');
+ h.ctx.connected=false;name.dispatchEvent(new Event('input'));assert.equal(primary.textContent,'Send partner code');h.cleanup();
+});

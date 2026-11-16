@@ -1,5 +1,6 @@
 import { esc, cash, icon } from './ui.js';
 import { getSummary } from './model.js';
+import { getMoneyMaintenance } from './money-maintenance-model.js';
 import { bindHomeMovesGesture } from './home-gestures.js';
 
 export const homeAccount = ctx => ctx.draft?.homeAccount === 'savings' ? 'savings' : 'everyday';
@@ -25,6 +26,7 @@ export function homeNotice(state) {
   if (!state.budget?.created) return { action: 'budget', text: 'Give your money a purpose.' };
   if (state.income?.amount > 0 && state.income.nextDate && state.income.nextDate < today && !state.recovery?.active) return { action: 'story', text: 'Allowance running late? Let’s make room.' };
   if (state.budget.endDate && state.budget.endDate < today) return { action: 'budget', text: 'Time to refresh your plan.' };
+  if (getMoneyMaintenance(state).needsCheck) return { action: 'maintenance-check', text: 'A little money check, when you’re ready.' };
   return null;
 }
 

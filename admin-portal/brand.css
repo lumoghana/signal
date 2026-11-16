@@ -1,0 +1,140 @@
+/* Lumo Wordmark 1.1 is used as supplied. No retyped letters or extra full stop. */
+@font-face{font-family:'Lumo UI';src:url('./assets/lumo-regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:'Lumo UI';src:url('./assets/lumo-medium.woff2') format('woff2');font-style:normal;font-weight:500;font-display:swap}
+@font-face{font-family:'Lumo UI';src:url('./assets/lumo-semibold.woff2') format('woff2');font-style:normal;font-weight:600 800;font-display:swap}
+:root{
+  --ink:#191a22;--muted:#70717d;--line:#e1e3dc;--paper:#f3f4ee;--white:#fff;
+  --lime:#d4f65a;--lime-dark:#53661d;--brand-charcoal:#191a22;--brand-surface:#24252f;
+  --shadow:0 18px 70px #191a221c;
+  font-family:'Lumo UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+  font-synthesis:none;-webkit-font-smoothing:antialiased;letter-spacing:-.015em;
+}
+h1,h2,h3{font-weight:600;letter-spacing:-.035em}
+h1{font-size:32px;font-weight:500}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #6b7e2a}
+.btn{border-radius:11px;font-weight:600;letter-spacing:-.015em}
+.btn:hover{background:#f2f4e9}
+.btn.primary,.btn.lime{background:var(--lime);border-color:var(--lime);color:var(--brand-charcoal)}
+.btn.primary:hover:not(:disabled),.btn.lime:hover:not(:disabled){background:#e0ff77;border-color:#e0ff77;color:var(--brand-charcoal)}
+.btn.ghost{background:transparent}
+.input,select,textarea{border-radius:11px}
+.input::placeholder,textarea::placeholder{color:#9799a2}
+.panel,.metric,.service-card,.report-card{border-radius:15px}
+.metric-number,.money-summary-value{font-weight:500;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.metric-top .icon{color:#888b95}
+.metric-note{color:var(--muted)}
+.metric-note strong{color:#536228}
+.topbar{background:#f3f4eef5}
+.breadcrumb .breadcrumb-brand{margin:0;color:inherit}
+.mobile-logo{display:none;object-fit:contain;flex:none}
+.breadcrumb .breadcrumb-separator{margin:0 8px}
+.top-status{color:var(--muted)}
+.eyebrow{font-weight:600;letter-spacing:.12em}
+.environment{background:#eef3df;border-color:#dde5c6;color:#5b653f;border-radius:11px}
+.environment strong{color:#36431f}
+th{background:#f7f8f3;color:#6f7380}
+.table-footer{color:var(--muted)}
+.empty-state .empty-icon{background:#edf2dc;color:#687834}
+.empty-state h3{color:var(--ink)}
+.notice{background:#f0f4e5;border-color:#e0e7cd;color:#65704e;border-radius:11px}
+.notice strong{color:#3a4727}
+.money-summary-hero{background:#edf3dc;border-color:#dce6be;border-radius:14px}
+.money-summary-hero .eyebrow{color:#65714b}
+.money-summary-hero h3,.money-summary-value{color:#263219}
+.money-summary-hero p{color:#65704e}
+.money-guidance{background:#f1f4e9;border-radius:11px;color:#53633a}
+.money-guidance p{color:#727c64}
+.inline-link{color:#53661d}
+
+/* The same charcoal and lime as the consumer app, with a light working canvas. */
+.sidebar{background:var(--brand-charcoal);border-color:#ffffff12;color:#f5f5f7}
+.brand-block{padding:28px 23px 23px;gap:16px;justify-content:flex-start;min-height:96px}
+.sidebar-logo{display:block;width:116px;height:auto;flex:none;filter:brightness(0) invert(1)}
+.brand-pill{background:#d4f65a13;border-color:#d4f65a38;color:var(--lime);border-radius:5px;font-size:9px;letter-spacing:.08em;padding:4px 6px}
+.nav-group-label{color:#9b9daa;font-size:10px;letter-spacing:.12em}
+.nav-item{color:#c0c2ce;border-radius:10px;min-height:38px}
+.nav-item .icon{color:#9b9daa}
+.nav-item:hover{background:#2c2d38;color:#fff}
+.nav-item.active{background:var(--lime);color:var(--brand-charcoal);font-weight:600}
+.nav-item.active .icon{color:var(--brand-charcoal)}
+.nav-item .nav-count{background:#ffffff14;color:#f5f5f7}
+.nav-item.active .nav-count{background:#191a2214;color:var(--brand-charcoal)}
+.sidebar button:focus-visible{outline-color:var(--lime)}
+.sidebar-foot{border-color:#ffffff15;padding:16px}
+.sidebar-foot .avatar{background:#d4f65a1c;color:var(--lime);border-color:transparent}
+.staff-name{color:#f5f5f7;font-weight:600}
+.staff-role{color:#a6a8b6}
+.sidebar-foot .icon-btn{color:#b7b9c6}
+.sidebar-foot .icon-btn:hover{background:#30313c;color:#fff}
+
+/* Brand-led welcome, using the real wordmark and the current Lux artwork. */
+.auth-shell{background:#fff}
+.auth-story{background:var(--brand-charcoal);color:#f5f5f7}
+.auth-story:after{display:none}
+.lumo-brand{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.lumo-wordmark{display:block;width:180px;height:auto;filter:brightness(0) invert(1)}
+.auth-story .admin-label{color:#afb1bf;font-size:10px;letter-spacing:.15em;margin:0}
+.auth-story-body{max-width:470px;padding:45px 0 28px}
+.auth-story-body>.eyebrow{color:#c1c4cf;letter-spacing:.12em}
+.auth-story h1{font-size:clamp(38px,3.8vw,54px);font-weight:500;line-height:1.1;letter-spacing:-.045em;margin:18px 0 22px}
+.auth-story h1 em{color:var(--lime)}
+.auth-story-body>p{color:#b8bbc8;font-size:14px;line-height:1.7;max-width:350px}
+.auth-principles{margin-top:28px;gap:13px}
+.auth-principles div{color:#d2d4de;font-size:12px}
+.auth-principles .icon{color:var(--lime)}
+.auth-mascot{display:flex;align-items:center;gap:19px;margin:0 0 28px;position:relative;z-index:1}
+.auth-mascot>img{width:108px;height:108px;object-fit:contain;flex:none;transform:rotate(-5deg)}
+.auth-mascot>p{font-size:13px;font-weight:500;line-height:1.6;color:#f5f5f7}
+.auth-mascot>p>span{display:block;font-size:11px;font-weight:400;color:#a6a9b9;margin-top:3px}
+.auth-story-foot{color:#9397aa;font-size:10px}
+.auth-main{background:#fff}
+.auth-card h2{font-size:30px;font-weight:500;letter-spacing:-.045em}
+.auth-card>.eyebrow{color:#727680}
+.auth-card .input{min-height:48px;border-radius:12px;font-size:14px}
+.auth-card .field{margin-bottom:22px}
+.auth-card .btn.wide{min-height:48px;border-radius:12px;font-size:14px}
+.auth-card .field>span{font-weight:500;color:#3f424f}
+.auth-security{color:#777c87;font-size:11px}
+.auth-footer{color:#858993;border-color:var(--line);line-height:1.7}
+.auth-card .form-help{color:#737885}
+@media(max-width:1100px){
+  .brand-block{padding-left:20px;padding-right:16px;gap:12px}
+  .sidebar-logo{width:108px}
+  .auth-story{padding:40px}
+  .auth-story h1{font-size:42px}
+  .auth-mascot>img{width:90px;height:90px}
+}
+@media(max-height:780px) and (min-width:721px){
+  .auth-story{padding-top:32px;padding-bottom:28px}
+  .auth-story-body{padding-top:28px;padding-bottom:22px}
+  .auth-story h1{font-size:40px}
+  .auth-principles{gap:10px;margin-top:22px}
+  .auth-mascot{margin-bottom:18px}
+  .auth-mascot>img{width:76px;height:76px}
+}
+@media(max-width:720px){
+  .brand-block{padding:25px 23px;gap:16px}
+  .sidebar-logo{width:116px}
+  .mobile-logo{display:block;width:80px;height:auto}
+  .breadcrumb .breadcrumb-brand{display:none}
+  .breadcrumb{display:flex;align-items:center;gap:0;min-width:0;font-size:11px}
+  .breadcrumb>strong{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topbar{gap:9px}
+  .global-search{margin-left:auto;width:36px;min-width:36px;max-width:36px;height:36px;padding:0;justify-content:center;border-radius:10px}
+  .global-search>span:not(.icon),.global-search kbd{display:none}
+  .metric-number{font-size:clamp(19px,5.2vw,23px);letter-spacing:-.05em;line-height:1.2;overflow-wrap:normal;white-space:nowrap}
+  h1{font-size:29px}
+  .auth-story{padding:28px 27px}
+  .lumo-wordmark{width:136px}
+  .lumo-brand{gap:9px}
+  .auth-story .admin-label{font-size:9px;letter-spacing:.12em}
+  .auth-story-body{padding:24px 0 0;max-width:none}
+  .auth-story h1{font-size:34px;line-height:1.1;margin:9px 0 0}
+  .auth-story h1 br{display:none}
+  .auth-story h1 em:before{content:' '}
+  .auth-mascot{display:none}
+  .auth-main{padding:32px 27px 42px}
+  .auth-card h2{font-size:28px}
+}
+@media(prefers-reduced-motion:reduce){.auth-mascot>img{transform:none}}

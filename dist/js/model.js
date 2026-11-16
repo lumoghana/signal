@@ -11,6 +11,7 @@ import {ensureAccountState,handleAccountAction,accountAccess} from './account-mo
 import {ensureLearningState,validLearningState,handleLearningAction,syncLearningAfterMoneyAction,LEARNING_ACTIONS} from './learning-model.js';
 import {ensureGameState,handleCampusGameAction,GAME_ACTIONS} from './learning-game-model.js';
 import {ensureMoneyIQState,validMoneyIQState,handleMoneyIQAction,purgePersonalMoneyIQ,MONEY_IQ_ACTIONS} from './money-iq-model.js';
+import {ensureMoneyMaintenance,handleMoneyMaintenanceAction} from './money-maintenance-model.js';
 export const STORAGE_KEY = 'lumo-up-experience-v1';
 const DAY = 86400000;
 const MAX_MONEY = 10000000000;
@@ -71,6 +72,9 @@ export function favoriteRecipientKey(value) {
   return `${value.rail}:${value.rail === 'bank' ? normalized(recipient.bank) + ':' : ''}${String(destination).normalize('NFKC').replace(/\s+/g, '').replace(/^@/, '').toLowerCase()}`;
 }
 
+const merchantShopId = value => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+export function validMerchantFavorite(value) { return record(value) && merchantShopId(value.shopId) && typeof value.savedAt === 'string' && Number.isFinite(Date.parse(value.savedAt)) && Object.keys(value).every(key => ['shopId','savedAt'].includes(key)); }
+
 function validPaymentFavorite(value) {
   return record(value) && typeof value.id === 'string' && !!text(value.id, 100) && !!favoriteRecipientKey(value);
 }
@@ -123,8 +127,8 @@ export function createEmptyState(profile = {}) {
   const state = {
     version: 1, onboardingDone: false,
     profile: { name: text(profile.name || 'Ama', 60), phone: text(profile.phone, 30), campus: text(profile.campus || 'University of Ghana', 80) },
-    wallet: 0, buffer: 10000, income: { amount: 0, nextDate: inDays(14) },
-    budget: { items: [], created: false }, boxes: [], transactions: [], ious: [], groups: [], externalBalances: [], paymentFavorites: [], virtualCard: null,
+    wallet: 0, buffer: 10000, income: { amount: 0, nextDate: '' },
+    budget: { items: [], created: false }, boxes: [], transactions: [], ious: [], groups: [], externalBalances: [], paymentFavorites: [], merchantFavorites: [], virtualCard: null,
     settings: { hideBalance: true, notifications: true, pin: '1234' }, recovery: null,
     _appliedActions: {},
   };
@@ -184,6 +188,7 @@ export function validStoredState(s) {
     && (s.paymentFavorites === undefined || Array.isArray(s.paymentFavorites) && s.paymentFavorites.length <= 30 && s.paymentFavorites.every(validPaymentFavorite)
       && new Set(s.paymentFavorites.map(item => item.id)).size === s.paymentFavorites.length
       && new Set(s.paymentFavorites.map(favoriteRecipientKey)).size === s.paymentFavorites.length)
+    && (s.merchantFavorites === undefined || Array.isArray(s.merchantFavorites) && s.merchantFavorites.length <= 30 && s.merchantFavorites.every(validMerchantFavorite) && new Set(s.merchantFavorites.map(item => item.shopId)).size === s.merchantFavorites.length)
     && (s.virtualCard === undefined || validDemoVirtualCard(s.virtualCard))
     && Array.isArray(s.externalBalances)
     && s.externalBalances.every(item => item && typeof item.id === 'string' && text(item.id)
@@ -208,13 +213,14 @@ export function migrateState(s) {
   if (!s || typeof s !== 'object' || Array.isArray(s)) return s;
   if (s.version === 1 && s.externalBalances === undefined) s.externalBalances=[];
   if(s.version===1){
+    const merchantIds=new Set();s.merchantFavorites=(Array.isArray(s.merchantFavorites)?s.merchantFavorites:[]).filter(validMerchantFavorite).filter(value=>{if(merchantIds.has(value.shopId)||merchantIds.size>=30)return false;merchantIds.add(value.shopId);return true;}).map(value=>({shopId:value.shopId,savedAt:value.savedAt}));
     const favorites=Array.isArray(s.paymentFavorites)?s.paymentFavorites:[],ids=new Set(),destinations=new Set();
     s.paymentFavorites=favorites.filter(validPaymentFavorite).flatMap(value=>{const key=favoriteRecipientKey(value),id=text(value.id,100);if(ids.has(id)||destinations.has(key)||ids.size>=30)return [];ids.add(id);destinations.add(key);return [{id,rail:value.rail,recipient:normalizePaymentRecipient(value.recipient,value.rail,{destinationRequired:true})}];});
     // An invalid old display-only card may be discarded. Funded card records must
     // reach validation and recovery rather than silently losing their balance.
     if(!Array.isArray(s.virtualCards)&&s.virtualCard&&!validDemoVirtualCard(s.virtualCard)&&!(s.virtualCard.balance>0))s.virtualCard=null;
   }
-  ensureSavingsParity(s); ensurePaymentParityState(s); ensureAccountState(s); ensureBoxPartnerInvitations(s); ensureLearningState(s); ensureGameState(s); ensureMoneyIQState(s);
+  ensureSavingsParity(s); ensurePaymentParityState(s); ensureAccountState(s); ensureBoxPartnerInvitations(s); ensureLearningState(s); ensureGameState(s); ensureMoneyIQState(s); ensureMoneyMaintenance(s);
   if(Array.isArray(s.groups)){ensureGroupState(s);s.groups.forEach(ensureGroupChat);}
   if(Array.isArray(s.boxes))ensureBoxProtectionState(s);
   syncActivationProgress(s);
@@ -257,10 +263,25 @@ export function saveState(s) {
   } catch { return false; }
 }
 
-export function getSummary(s) {
+/** A guide needs recorded timing; an empty account never promises an income date. */
+export function getGuidanceHorizon(s, now = new Date()) {
+  const recordedDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && day(value) === value ? value : '';
+  const currentDay = now.toISOString().slice(0, 10);
+  const planDate = s.budget?.created === true && recordedDate(s.budget.endDate) || '';
+  const incomeDate = positive(s.income?.amount) && recordedDate(s.income.nextDate) || '';
+  const recoveryDate = s.recovery?.active && recordedDate(s.recovery.checkInDate || s.recovery.nextDate) || '';
+  const date = recoveryDate || planDate || incomeDate;
+  const source = recoveryDate ? 'recovery' : planDate ? 'plan' : incomeDate ? 'income' : '';
+  // A shorter temporary guide must not drop existing commitments. A longer one
+  // must include debts falling due before its check-in; overdue debts always count.
+  const commitmentDate = [currentDay, planDate || incomeDate, recoveryDate].filter(Boolean).sort().at(-1);
+  return { date, source, recorded: !!date, current: !!date && date >= currentDay, commitmentDate, planEndDate: planDate || incomeDate };
+}
+
+export function getSummary(s, now = new Date()) {
   const available = Math.max(0, integer(s.wallet));
-  const planEndDate = (s.budget?.created && day(s.budget.endDate)) || day(s.income?.nextDate) || inDays(14);
-  const horizon = planEndDate;
+  const guide = getGuidanceHorizon(s, now), planEndDate = guide.planEndDate;
+  const horizon = guide.commitmentDate;
   const plannedBudget = (s.budget?.items || []).reduce((sum, item) => sum + moneyRemaining(item), 0);
   const dueDebts = (s.ious || []).filter(i => i.type === 'owedByMe' && i.status === 'open' && (!day(i.due) || day(i.due) <= horizon));
   const coverage=new Map((s.budget.items||[]).map(i=>[i.id,moneyRemaining(i)]));
@@ -274,11 +295,11 @@ export function getSummary(s) {
   const cardBalance = (s.virtualCards || []).reduce((n,c) => n + Math.max(0, integer(c.balance)),0);
   const outsideTotal = (s.externalBalances || []).reduce((sum, item) => sum + Math.max(0, integer(item.balance)), 0);
   const expected = Math.max(0, integer(s.income?.amount)) + (s.ious || []).filter(i => i.type === 'owedToMe' && i.status === 'open').reduce((sum, i) => sum + iouRemaining(i), 0);
-  const guidanceDate = s.recovery?.active && day(s.recovery.checkInDate) || horizon;
+  const guidanceDate = guide.date;
   const guideHorizon = guidanceDate;
-  const dateDifference = Math.ceil((new Date(`${guideHorizon}T12:00:00Z`) - new Date(`${today()}T12:00:00Z`)) / DAY);
+  const dateDifference = guide.current ? Math.ceil((new Date(`${guideHorizon}T12:00:00Z`) - new Date(`${now.toISOString().slice(0, 10)}T12:00:00Z`)) / DAY) : -1;
   const daysLeft = dateDifference < 0 ? 0 : Math.max(1, dateDifference);
-  return { available, planned, spendable, savings, transferHolds, pendingPaymentHolds, pendingCardHolds, pendingContributionHolds, planEndDate, guidanceDate, cardBalance, cardTotal:cardBalance, total: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance, outsideTotal, allMoneyTotal: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance + outsideTotal, expected, daysLeft, dailyAllowance: daysLeft > 0 ? Math.floor(spendable / daysLeft) : 0 };
+  return { available, planned, spendable, savings, transferHolds, pendingPaymentHolds, pendingCardHolds, pendingContributionHolds, planEndDate, guidanceDate, guidanceSource: guide.source, hasDailyGuide: guide.current, commitmentDate: guide.commitmentDate, cardBalance, cardTotal:cardBalance, total: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance, outsideTotal, allMoneyTotal: available + savings + transferHolds + pendingPaymentHolds + pendingCardHolds + pendingContributionHolds + cardBalance + outsideTotal, expected, daysLeft, dailyAllowance: daysLeft > 0 ? Math.floor(spendable / daysLeft) : 0 };
 }
 
 function budgetMatch(s, category) {
@@ -287,23 +308,25 @@ function budgetMatch(s, category) {
   return (s.budget?.items||[]).find(i=>budgetCategoryKey(i.name)===key||budgetCategoryKey(i.id)===key)||null;
 }
 
-export function evaluatePayment(s, payload = {}) {
+export function evaluatePayment(s, payload = {}, now = new Date()) {
   const amount = integer(payload.amount, -1);
   const fee = nonnegative(payload.fee) ? payload.fee : 0;
   const total = Math.max(0, amount) + fee;
-  const summary = getSummary(s);
+  const summary = getSummary(s, now);
   const rule = (s.categoryRules || []).find(r => r.merchantKey === String(payload.merchant || payload.recipient?.name || payload.recipient||'').trim().toLowerCase());
   const explicitCategory=!!payload.categoryExplicit || (payload.category && normalized(payload.category)!=='other');
   const debt = payload.iouId ? (s.ious || []).find(i=>i.id===payload.iouId && i.type==='owedByMe' && i.status==='open') : null;
   const item = payload.iouId ? s.budget.items.find(i=>i.id===debt?.budgetItemId) : payload.budgetItemId ? s.budget.items.find(i=>i.id===payload.budgetItemId) : explicitCategory ? budgetMatch(s,payload.category) : rule ? s.budget.items.find(i=>i.id===rule.budgetItemId) : budgetMatch(s,payload.category);
   const allocation = item ? Math.min(Math.max(0, amount), moneyRemaining(item)) : 0;
   const afterAvailable = summary.available - total;
-  let afterPlanned = summary.planned - allocation;
+  let afterPlanned = summary.planned;
   const settlingIOU = payload.iouId ? (s.ious || []).find(i => i.id === payload.iouId && i.type === 'owedByMe' && i.status === 'open') : null;
   const invalidIOU = payload.iouId && (!settlingIOU || amount > repayableIOUAmount(s, settlingIOU));
-  if (settlingIOU && positive(amount) && !invalidIOU) {
-    const preview = {...s, budget:{...s.budget,items:s.budget.items.map(i=>i.id===settlingIOU.budgetItemId?{...i,spent:integer(i.spent)+amount}:i)},ious:s.ious.map(i=>i.id===settlingIOU.id?{...i,paid:integer(i.paid)+amount,status:integer(i.paid)+amount===i.amount?'settled':'open'}:i)};
-    afterPlanned = getSummary(preview).planned;
+  if (positive(amount) && !invalidIOU) {
+    // A purchase can consume a category that also covers an IOU. Recalculate
+    // its uncovered debt instead of treating that category release as free money.
+    const preview = {...s, budget:{...s.budget,items:s.budget.items.map(i=>i.id===item?.id?{...i,spent:integer(i.spent)+amount}:i)},ious:s.ious.map(i=>i.id===settlingIOU?.id?{...i,paid:integer(i.paid)+amount,status:integer(i.paid)+amount===i.amount?'settled':'open'}:i)};
+    afterPlanned = getSummary(preview, now).planned;
   }
   const plannedRelease = summary.planned - afterPlanned;
   const rawAfterSpendable = afterAvailable - afterPlanned - integer(s.buffer);
@@ -318,8 +341,8 @@ export function evaluatePayment(s, payload = {}) {
   else if (rawAfterSpendable < 0) reason = baselineShortfall > 0
     ? additionalShortfall > 0 ? 'This payment would increase the existing shortfall in your plan or cushion.' : 'Your plan already has a shortfall. This payment leaves that gap unchanged.'
     : 'This payment would use money set aside for your plan or your minimum balance.';
-  else if (amount - plannedRelease > summary.dailyAllowance * 1.5 && amount - plannedRelease >= 5000) reason = 'This uses more than a day of your flexible spending money.';
-  const history = evaluatePauseHistory(s,{...payload,budgetItemId:item?.id||payload.budgetItemId},{summary});
+  else if (summary.hasDailyGuide && amount - plannedRelease > summary.dailyAllowance * 1.5 && amount - plannedRelease >= 5000) reason = 'This uses more than a day of your flexible spending money.';
+  const history = evaluatePauseHistory(s,{...payload,budgetItemId:item?.id||payload.budgetItemId},{summary,now});
   if(!reason&&history.show&&positive(amount)&&total<=summary.available)reason=history.reason;
   return {
     historySignals: history.signals, needed: !!reason && positive(amount) && total <= summary.available,
@@ -392,6 +415,8 @@ function perform(s, type, p) {
   const game=handleCampusGameAction(s,type,p);if(game)return game;
   const learning=handleLearningAction(s,type,p,{getSummary});if(learning)return learning;
   ensureSavingsParity(s);
+  const maintenance = handleMoneyMaintenanceAction(s,type,p,{uid});
+  if (maintenance) return maintenance;
   const partnerInvitation=handleBoxPartnerInvitationAction(s,type,p);if(partnerInvitation)return partnerInvitation;
   const account = handleAccountAction(s,type,p,{uid});
   if(account)return account;
@@ -403,6 +428,20 @@ function perform(s, type, p) {
   if (protectionResult) return protectionResult;
   const groupResult = handleGroupLedgerAction(s, type, p) || handleGroupChatAction(s, type, p);
   if (groupResult) { if (groupResult.ok) s.groups.forEach(ensureGroupChat); return groupResult; }
+  if (type === 'saveMerchantFavorite') {
+    if (!merchantShopId(p.shopId)) return fail('Choose a connected Lumo shop.');
+    const favorites = s.merchantFavorites ||= [];
+    if (favorites.some(item => item.shopId === p.shopId)) return good('This shop is already saved.', { shopId: p.shopId, duplicate: true });
+    if (favorites.length >= 30) return fail('You can save up to thirty shops.');
+    favorites.push({ shopId: p.shopId, savedAt: new Date().toISOString() });
+    return good('Shop saved to your favourites.', { shopId: p.shopId });
+  }
+  if (type === 'removeMerchantFavorite') {
+    if (!merchantShopId(p.shopId)) return fail('Choose a saved shop.');
+    const favorites = s.merchantFavorites ||= [], index = favorites.findIndex(item => item.shopId === p.shopId);
+    if (index < 0) return good('This shop is no longer saved.', { shopId: p.shopId, duplicate: true });
+    favorites.splice(index, 1); return good('Shop removed from your favourites.', { shopId: p.shopId });
+  }
   if (type === 'savePaymentFavorite') {
     if (!['lumo', 'momo', 'bank'].includes(p.rail)) return fail('Choose Lumo, mobile money or a bank account.');
     const recipient = normalizePaymentRecipient(p.recipient, p.rail, { destinationRequired: true });
@@ -442,6 +481,7 @@ function perform(s, type, p) {
   if (type === 'createExternalBalance' || type === 'updateExternalBalance') {
     const existing = type === 'updateExternalBalance' ? s.externalBalances.find(item => item.id === p.id) : null;
     if (type === 'updateExternalBalance' && !existing) return fail('That balance could not be found.');
+    if (existing && ((p.expectedRevision !== undefined && p.expectedRevision !== (existing.revision || 0)) || (p.expectedUpdatedAt !== undefined && p.expectedUpdatedAt !== existing.updatedAt) || (p.expectedBalance !== undefined && p.expectedBalance !== existing.balance))) return fail('This recorded balance changed. Review it again.');
     const nextType = p.type === undefined ? existing?.type : p.type;
     const nextName = p.name === undefined && existing ? existing.name : typeof p.name === 'string' ? text(p.name, 60) : '';
     if (!externalTypes.includes(nextType)) return fail('Choose cash, a bank account or a MoMo wallet.');
@@ -451,11 +491,13 @@ function perform(s, type, p) {
     if (duplicate) return fail('That balance is already here. Use a different name for a separate account.');
     if (existing) {
       const before = copy(existing);
-      Object.assign(existing, { type: nextType, name: nextName, balance: p.balance, updatedAt: new Date().toISOString() });
+      const checkedAt = new Date().toISOString();
+      Object.assign(existing, { type: nextType, name: nextName, balance: p.balance, updatedAt: checkedAt, confirmedAt: checkedAt, revision: (Number.isSafeInteger(existing.revision) ? existing.revision : 0) + 1 });
       s.externalBalanceHistory.unshift({id:uid('external-history'),externalBalanceId:existing.id,type:'updated',at:new Date().toISOString(),before,after:copy(existing)});
       return good('Balance updated.', { id: existing.id, externalBalance: existing });
     }
-    const externalBalance = { id: uid('external'), type: nextType, name: nextName, balance: p.balance, updatedAt: new Date().toISOString() };
+    const checkedAt = new Date().toISOString();
+    const externalBalance = { id: uid('external'), type: nextType, name: nextName, balance: p.balance, updatedAt: checkedAt, confirmedAt: checkedAt, revision: 0 };
     s.externalBalances.push(externalBalance);
     s.externalBalanceHistory.unshift({id:uid('external-history'),externalBalanceId:externalBalance.id,type:'created',at:new Date().toISOString(),after:copy(externalBalance)});
     return good('Balance added to your money overview.', { id: externalBalance.id, externalBalance });

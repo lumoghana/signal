@@ -1,0 +1,48 @@
+begin;
+create function pg_temp.check_ops(value boolean,label text) returns void language plpgsql as $$begin if value is distinct from true then raise exception 'Operations assertion: %',label;end if;perform set_config('lumo.review.ops_checks',(coalesce(nullif(current_setting('lumo.review.ops_checks',true),''),'0')::int+1)::text,true);end$$;
+do $test$
+#variable_conflict use_variable
+declare actor uuid:=gen_random_uuid();sid uuid:=gen_random_uuid();payer uuid:=gen_random_uuid();other_user uuid:=gen_random_uuid();account_id uuid:=gen_random_uuid();other_account uuid:=gen_random_uuid();payment_id uuid:=gen_random_uuid();case_id uuid;result jsonb;version_before bigint;notification_id uuid;payload jsonb;
+begin
+ perform set_config('lumo.review.ops_checks','0',true);
+ insert into auth.users(id,email) values(actor,'ops-review@example.test'),(payer,'payer-review@example.test'),(other_user,'other-review@example.test');
+ insert into auth.sessions(id,user_id) values(sid,actor);
+ insert into lumo_private.admin_staff(user_id,display_name,email,role) values(actor,'Review operator','ops-review@example.test','super_admin');
+ insert into lumo_private.profiles(user_id,handle,display_name) values(payer,'ops_payer','Payer fixture'),(other_user,'ops_other','Other fixture');
+ insert into lumo_private.accounts(id,owner_user_id,kind) values(account_id,payer,'consumer'),(other_account,other_user,'consumer');
+ insert into lumo_private.journals(id,reference,payer_account_id,payee_account_id) values(payment_id,'ops-review-payment',account_id,account_id);
+ perform set_config('request.jwt.claims','{"role":"service_role"}',true);payload:=jsonb_build_object('actor',actor,'session',sid,'aal','aal1');
+ result:=public.lumo_admin_service('cases.create',payload||jsonb_build_object('subject','Private payment complaint','transactionId',payment_id));
+ perform pg_temp.check_ops(result->>'ok'='false','transaction case requires explicit contact');
+ result:=public.lumo_admin_service('cases.create',payload||jsonb_build_object('subject','Wrong person complaint','transactionId',payment_id,'customerId',other_user));
+ perform pg_temp.check_ops(result->>'ok'='false','unrelated account cannot be notified about payment');
+ result:=public.lumo_admin_service('cases.create',payload||jsonb_build_object('subject','Right private contact','transactionId',payment_id,'customerId',payer));
+ perform pg_temp.check_ops(result->>'ok'='true','original payer may be selected');case_id:=(result#>>'{data,record,id}')::uuid;
+ perform pg_temp.check_ops(result#>>'{data,communication,intendedAudience}'='consumer' and result#>>'{data,communication,recipientId}'=payer::text,'chosen audience is shown to support');
+ result:=public.lumo_admin_service('cases.update',payload||jsonb_build_object('id',case_id,'revision',1,'customerUpdate','Please confirm the original payment.','status','waiting_customer'));
+ perform pg_temp.check_ops(result->>'ok'='true','public reply saves for valid contact');
+ perform pg_temp.check_ops((select count(*)=1 from lumo_private.case_notifications where case_notifications.case_id=case_id),'one recipient notification created');
+ perform pg_temp.check_ops(not exists(select 1 from lumo_private.case_notifications where case_notifications.case_id=case_id and recipient_id=other_user),'other payment parties are not notified');
+ result:=public.lumo_admin_service('cases.get',payload||jsonb_build_object('id',case_id));
+ perform pg_temp.check_ops(result#>>'{data,communication,notifications,0,status}'='unread','support can distinguish unread update');
+ select id into notification_id from lumo_private.case_notifications n where n.case_id=case_id;
+ update lumo_private.case_notifications set read_at=clock_timestamp() where id=notification_id;
+ result:=public.lumo_admin_service('cases.get',payload||jsonb_build_object('id',case_id));
+ perform pg_temp.check_ops(result#>>'{data,communication,notifications,0,status}'='read','support can see recipient read acknowledgement');
+ result:=public.lumo_admin_service('cases.update',payload||jsonb_build_object('id',case_id,'revision',2,'customerId',other_user,'merchantId',null,'customerUpdate','Do not expose this'));
+ perform pg_temp.check_ops(result->>'ok'='false','contact correction cannot select unrelated person');
+ result:=public.lumo_admin_service('cases.update',payload||jsonb_build_object('id',case_id,'revision',2,'priority','urgent'));
+ perform pg_temp.check_ops(result->>'ok'='true' and (select due_at<=clock_timestamp()+interval '1 hour' from lumo_private.admin_cases where id=case_id),'priority escalation tightens due time');
+ select revision into version_before from lumo_private.service_availability where id='momo_send';
+ result:=public.lumo_admin_service('services.update',payload||jsonb_build_object('id','momo_send','mode','manual_off','reason','Operator incident review','message','Specific maintenance notice','expectedVersion',version_before));
+ perform pg_temp.check_ops(result->>'ok'='true' and result#>>'{data,mode}'='manual_off','fresh operator can turn service off');
+ result:=public.lumo_admin_service('services.update',payload||jsonb_build_object('id','momo_send','mode','automatic','reason','Stale old screen retry','expectedVersion',version_before));
+ perform pg_temp.check_ops(result->>'code'='REVISION_CONFLICT','stale operator cannot reopen shutdown');
+ perform pg_temp.check_ops((select mode='manual_off' and public_message='Specific maintenance notice' from lumo_private.service_availability where id='momo_send'),'conflict preserves emergency mode and wording');
+ result:=public.lumo_admin_service('services.update',payload||jsonb_build_object('id','momo_send','mode','automatic','reason','Fresh incident recovery','expectedVersion',version_before+1));
+ perform pg_temp.check_ops(result->>'ok'='true' and result#>>'{data,publicMessage}'='Specific maintenance notice','automatic mode omits and preserves public wording');
+ result:=public.lumo_admin_service('services.update',payload||jsonb_build_object('id','momo_send','mode','manual_off','reason','Missing revision attempt'));
+ perform pg_temp.check_ops(result->>'code'='INVALID_INPUT','missing revision fails closed');
+end $test$;
+select current_setting('lumo.review.ops_checks')::int checks;
+rollback;

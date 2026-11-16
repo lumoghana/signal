@@ -22,3 +22,23 @@ coverage/
 .qa/
 dist/__*
 dist/_qa-*
+
+# Keep reviewed function patches in Git; reconstructed full bundles stay local.
+backend/verification/tester-2.11.6/compatible-approved/
+backend/verification/tester-2.11.6/bounded-approved/
+
+# Python build hook restores verified public model weights before packaging.
+/face_service/models/face_detection_yunet_2023mar.onnx
+/face_service/models/face_recognition_sface_2021dec.onnx
+face_service/models/*.download
+
+# Restore public portrait test inputs locally from their pinned source manifest.
+/face_service/tests/fixtures/face-a.png
+/face_service/tests/fixtures/face-b.jpg
+/face_service/tests/fixtures/face-a-variation.jpg
+/face_service/tests/fixtures/face-a.png.download
+/face_service/tests/fixtures/face-b.jpg.download
+
+# Historical synthetic QA screenshots remain local, outside source publication.
+/verification/consumer-2.11.7/lumo-2.11.7-custom-groups.jpg
+/verification/consumer-2.11.7/lumo-2.11.7-reference-wrap.jpg

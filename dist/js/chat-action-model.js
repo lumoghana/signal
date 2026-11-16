@@ -1,5 +1,6 @@
-import { cash } from './ui.js';
+import { cash, dateLabel } from './ui.js';
 import { PAYMENT_SERVICES, prepareServicePayment } from './payment-catalog.js';
+import { openMaintenanceReview } from './money-maintenance-ui.js';
 
 const clean = value => String(value || '').trim().replace(/\s+/g, ' ').slice(0, 400);
 const norm = value => clean(value).toLowerCase().replace(/[’‘]/g, "'");
@@ -42,7 +43,7 @@ export function clarifyFinancialInput(reason = 'multiple') {
 
 /** A small money-only projection. It contains no PIN, identity data or chat. */
 export function financialSnapshotKey(state) {
-  return JSON.stringify({ wallet: state.wallet, buffer: state.buffer, income: state.income, budget: state.budget, boxes: (state.boxes || []).map(box => ({ id: box.id, balance: box.balance, target: box.target, deadline: box.deadline, archived: box.archived, hack: box.hack })), cards: (state.virtualCards || []).map(card => ({ id: card.id, balance: card.balance, status: card.status, limit: card.limit })), ious: state.ious, outside: state.externalBalances, recovery: state.recovery, transactions: (state.transactions || []).map(tx => [tx.id, tx.type, tx.direction, tx.rail, tx.amount, tx.fee, tx.refunded, tx.held, tx.walletDebited, tx.status, tx.category, tx.merchant, tx.recipient?.name, tx.at, tx.resolvedAt]) });
+  return JSON.stringify({ wallet: state.wallet, buffer: state.buffer, income: state.income, budget: state.budget, maintenance: state.moneyMaintenance || state.maintenance, boxes: (state.boxes || []).map(box => ({ id: box.id, balance: box.balance, target: box.target, deadline: box.deadline, archived: box.archived, hack: box.hack })), cards: (state.virtualCards || []).map(card => ({ id: card.id, balance: card.balance, status: card.status, limit: card.limit })), ious: state.ious, outside: state.externalBalances, recovery: state.recovery, transactions: (state.transactions || []).map(tx => [tx.id, tx.type, tx.direction, tx.rail, tx.amount, tx.fee, tx.refunded, tx.held, tx.walletDebited, tx.status, tx.category, tx.merchant, tx.recipient?.name, tx.at, tx.resolvedAt]) });
 }
 
 export function stampFinancialAnswer(state, answer, question, now = new Date()) {
@@ -114,6 +115,39 @@ export function getPreparedChatAction(state, question) {
 
 export function installPreparedChatAction(ctx, action) {
   const value = action?.prepare;
+  if (value?.kind === 'maintenance') {
+    const allowed = ['externalMovement', 'confirmExternalBalance', 'saveCommitment', 'reuseEssentialPlan', 'completeMoneyCheck'];
+    if (!allowed.includes(value.action)) return false;
+    const owner = ctx.shared?.user?.id || ctx.state.account?.id || '', epoch = ctx.shared?.authVersion;
+    if (owner && (value.owner !== owner || value.authVersion !== epoch)) { ctx.toast?.('Ask Lux to check this again in your current account.'); return false; }
+    const isCurrent = () => (ctx.shared?.user?.id || ctx.state.account?.id || '') === owner && ctx.shared?.authVersion === epoch && value.moneySnapshot === financialSnapshotKey(ctx.state) && value.preparedOn === new Date().toISOString().slice(0, 10);
+    if (!isCurrent()) { ctx.toast?.('Your money picture changed. Ask Lux to check this again.'); return false; }
+    const conversation = ctx.draft?.chat;
+    const onSaved = (result, submitted = {}) => {
+      if (!result?.ok || !conversation || ctx.draft?.chat !== conversation || (ctx.shared?.user?.id || ctx.state.account?.id || '') !== owner || ctx.shared?.authVersion !== epoch) return;
+      const savedId = `maintenance-saved-${submitted.idempotencyKey || result.id || value.action}`;
+      if (conversation.messages?.some(message => message.id === savedId)) return;
+      let title, paragraph, route;
+      if (value.action === 'saveCommitment') {
+        const saved = result.budgetItem || {}, name = saved.name || submitted.name, due = saved.due || submitted.due;
+        title = result.merged ? `Added to ${name}.` : `Saved ${name}.`;
+        paragraph = `${cash(submitted.amount)}${due ? ` · Needed ${dateLabel(due)} (${due})` : ''}.`;
+        route = { label: 'See my plan', route: { section: 'plan', page: 'home' } };
+      } else if (value.action === 'externalMovement' || value.action === 'confirmExternalBalance') {
+        const saved = result.externalBalance || {}, name = saved.name || (ctx.state.externalBalances || []).find(account => account.id === submitted.id)?.name || 'outside money';
+        title = value.action === 'confirmExternalBalance' ? `Checked ${name}.` : `Recorded ${name}.`;
+        paragraph = value.action === 'confirmExternalBalance' ? `${cash(submitted.balance)} confirmed.` : `${cash(submitted.amount)} ${submitted.direction === 'out' ? 'spent' : 'received'}.`;
+        route = { label: 'See all my money', route: { section: 'life', page: 'overview' } };
+      } else return;
+      conversation.messages ||= [];
+      conversation.messages.push({ id: savedId, role: 'assistant', title, paragraphs: [paragraph], actions: [route], followUps: [], context: { topic: 'approval' } });
+      while (conversation.messages.length > 80) conversation.messages.shift();
+      conversation.scrollToEnd = true; conversation.followTail = true;
+      ctx.saveDraft?.(); ctx.refresh?.();
+    };
+    openMaintenanceReview(ctx, { kind: value.action, payload: { ...value.payload }, source: 'Lux', moneySnapshot: value.moneySnapshot, preparedOn: value.preparedOn, isCurrent, onSaved });
+    return true;
+  }
   if (!value || !Number.isSafeInteger(value.amount) || value.amount <= 0) return false;
   if (value.kind === 'saving') {
     if (!(ctx.state.boxes || []).some(box => box.id === value.boxId && !box.archived)) { ctx.toast?.('That Money Box is no longer available.'); return false; }

@@ -1,4 +1,5 @@
 /** Local accountability-partner simulation. It never sends SMS or contacts support. */
+import {normalizePartnerCode} from './partner-code.js';
 const MAX_MONEY = 10000000000;
 const CODE_LIFETIME = 10 * 60 * 1000;
 const ACTIVE = new Set(['pending', 'code-issued', 'support-pending', 'approved']);
@@ -176,7 +177,9 @@ export function handleBoxProtectionAction(state, type, payload) {
   if (type === 'verifyBoxPartnerCode') {
     if (request.status !== 'code-issued' || box.protection.status !== 'active') return fail('Ask your partner for a fresh code for this request.');
     if (!fresh(request)) { request.status = 'expired'; delete request.code; audit(box, 'code-expired', { requestId: request.id }); return good('That code expired. Start a fresh request.', { requestId: request.id, authorized: false }); }
-    if (typeof payload.code !== 'string' || !/^\d{6}$/.test(payload.code) || payload.code !== request.code) {
+    const code = normalizePartnerCode(payload.code);
+    if (!code) return fail('Enter the six digits your partner shared. Spaces and hyphens are okay.');
+    if (code !== request.code) {
       request.attempts += 1;
       if (request.attempts >= 5) { request.status = 'locked'; delete request.code; audit(box, 'code-attempts-exhausted', { requestId: request.id }); }
       return good(request.status === 'locked' ? 'Too many attempts. Start a fresh request.' : 'That code does not match. Check with your partner.', { requestId: request.id, authorized: false, attempts: request.attempts });

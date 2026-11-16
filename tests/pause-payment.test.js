@@ -7,7 +7,7 @@ import { parentRoute } from '../dist/js/navigation.js';
 function account() {
   const state = createEmptyState({ name: 'Ama' });
   state.onboardingDone = true; state.wallet = 100000; state.buffer = 10000;
-  state.budget = { created: true, items: [
+  state.budget = { created: true, endDate: new Date(new Date().getTime() + 14 * 86400000).toISOString().slice(0,10), items: [
     { id: 'food', name: 'Food', amount: 35000, spent: 0, due: state.income.nextDate },
     { id: 'transport', name: 'Transport', amount: 20000, spent: 0, due: state.income.nextDate },
     { id: 'data', name: 'Data', amount: 10000, spent: 0, due: state.income.nextDate },

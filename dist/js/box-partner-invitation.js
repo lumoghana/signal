@@ -1,5 +1,6 @@
 /** Pre-creation partner confirmation. Codes and partner responses are local simulations. */
 import {validatePartnerDetails} from './box-protection.js';
+import {normalizePartnerCode} from './partner-code.js';
 
 export const BOX_PARTNER_INVITATION_ACTIONS = new Set(['sendBoxPartnerInvitation','respondBoxPartnerInitialInvitation','verifyBoxPartnerInvitation']);
 export const PARTNER_CODE_LIFETIME = 5 * 60 * 1000;
@@ -116,7 +117,9 @@ export function handleBoxPartnerInvitationAction(state,type,p={}){
   if(currentStatus(invitation)==='expired')return expire(invitation);
   if(invitation.status==='verified')return good('Partner already confirmed. Your Money Box can now be created.',{verified:true,invitationId:invitation.id,view:publicView(invitation),duplicate:true});
   if(invitation.status!=='accepted'||!invitation.acceptedAt)return fail('Your partner needs to accept the role before sharing their code.');
-  if(typeof p.code!=='string'||!/^\d{6}$/.test(p.code)||p.code!==invitation.code){
+  const code=normalizePartnerCode(p.code);
+  if(!code)return fail('Enter the six digits your partner shared. Spaces and hyphens are okay.');
+  if(code!==invitation.code){
     invitation.attempts+=1;if(invitation.attempts>=5){invitation.status='locked';delete invitation.code;}
     return fail(invitation.status==='locked'?'Too many tries. Send a new partner code.':'That code does not match. Check the code your partner shared.',{persistFailure:true,invitationId:invitation.id,view:publicView(invitation)});
   }

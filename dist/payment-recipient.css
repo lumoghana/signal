@@ -111,3 +111,4 @@
   .account-recipient *, .account-recipient *::before, .account-recipient *::after { animation: none !important; transition: none !important; }
   .account-recipient .recipient-loading-dots i { opacity: 1; }
 }
+#lumo-people-retry[hidden]{display:none}

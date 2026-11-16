@@ -1,0 +1,313 @@
+{
+  "at": "2026-11-13T10:32:38.697282+00:00",
+  "scope": "Current merchant vendor QR matrices at nominal CSS sizes, rasterized to nearest binary pixels; production compiled Android NativeCameraSession.decodeQr invoked by reflection, followed by actual NativeApprovedMerchantQr.parse. No physical camera or device claim.",
+  "expectedSampleRejected": true,
+  "summary": {
+    "static": {
+      "passed": 10,
+      "total": 10,
+      "failedSizes": []
+    },
+    "fixed": {
+      "passed": 7,
+      "total": 10,
+      "failedSizes": [
+        180,
+        195,
+        232
+      ]
+    },
+    "compact-static": {
+      "passed": 10,
+      "total": 10,
+      "failedSizes": []
+    },
+    "compact-fixed": {
+      "passed": 9,
+      "total": 10,
+      "failedSizes": [
+        220
+      ]
+    }
+  },
+  "cases": [
+    {
+      "case": "static",
+      "size": 180,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 195,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 205,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 220,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 224,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 232,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 246,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 255,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 276,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "static",
+      "size": 320,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 180,
+      "modules": 61,
+      "passed": false
+    },
+    {
+      "case": "fixed",
+      "size": 195,
+      "modules": 61,
+      "passed": false
+    },
+    {
+      "case": "fixed",
+      "size": 205,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 220,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 224,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 232,
+      "modules": 61,
+      "passed": false
+    },
+    {
+      "case": "fixed",
+      "size": 246,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 255,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 276,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "fixed",
+      "size": 320,
+      "modules": 61,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 180,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 195,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 205,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 220,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 224,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 232,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 246,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 255,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 276,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-static",
+      "size": 320,
+      "modules": 53,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 180,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 195,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 205,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 220,
+      "modules": 57,
+      "passed": false
+    },
+    {
+      "case": "compact-fixed",
+      "size": 224,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 232,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 246,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 255,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 276,
+      "modules": 57,
+      "passed": true
+    },
+    {
+      "case": "compact-fixed",
+      "size": 320,
+      "modules": 57,
+      "passed": true
+    }
+  ],
+  "stdout": "static 180px 53 modules: decoder + parser PASS\nstatic 195px 53 modules: decoder + parser PASS\nstatic 205px 53 modules: decoder + parser PASS\nstatic 220px 53 modules: decoder + parser PASS\nstatic 224px 53 modules: decoder + parser PASS\nstatic 232px 53 modules: decoder + parser PASS\nstatic 246px 53 modules: decoder + parser PASS\nstatic 255px 53 modules: decoder + parser PASS\nstatic 276px 53 modules: decoder + parser PASS\nstatic 320px 53 modules: decoder + parser PASS\nfixed 180px 61 modules: DECODE FAILED\nfixed 195px 61 modules: DECODE FAILED\nfixed 205px 61 modules: decoder + parser PASS\nfixed 220px 61 modules: decoder + parser PASS\nfixed 224px 61 modules: decoder + parser PASS\nfixed 232px 61 modules: DECODE FAILED\nfixed 246px 61 modules: decoder + parser PASS\nfixed 255px 61 modules: decoder + parser PASS\nfixed 276px 61 modules: decoder + parser PASS\nfixed 320px 61 modules: decoder + parser PASS\ncompact-static 180px 53 modules: decoder + parser PASS\ncompact-static 195px 53 modules: decoder + parser PASS\ncompact-static 205px 53 modules: decoder + parser PASS\ncompact-static 220px 53 modules: decoder + parser PASS\ncompact-static 224px 53 modules: decoder + parser PASS\ncompact-static 232px 53 modules: decoder + parser PASS\ncompact-static 246px 53 modules: decoder + parser PASS\ncompact-static 255px 53 modules: decoder + parser PASS\ncompact-static 276px 53 modules: decoder + parser PASS\ncompact-static 320px 53 modules: decoder + parser PASS\ncompact-fixed 180px 57 modules: decoder + parser PASS\ncompact-fixed 195px 57 modules: decoder + parser PASS\ncompact-fixed 205px 57 modules: decoder + parser PASS\ncompact-fixed 220px 57 modules: DECODE FAILED\ncompact-fixed 224px 57 modules: decoder + parser PASS\ncompact-fixed 232px 57 modules: decoder + parser PASS\ncompact-fixed 246px 57 modules: decoder + parser PASS\ncompact-fixed 255px 57 modules: decoder + parser PASS\ncompact-fixed 276px 57 modules: decoder + parser PASS\ncompact-fixed 320px 57 modules: decoder + parser PASS\nSample browser-only shop: rejected with guidance: Use a registered merchant\u2019s shared QR.\nMerchant native QR probe: 37 checks passed against built 2.7.1 classes and current merchant QR generator\n",
+  "artifacts": {
+    "compiledNativeClassesSha256": "bc33389bcb297483e1952132cb111a35136400143754e1d247bad093bdc99566",
+    "merchantQrVendorSha256": "18ae399f81182bc9de916e9c77b195df20cc58d6f2d55a62b085a299f1bf1780"
+  },
+  "sources": {
+    "generate.mjs": "import fs from 'node:fs';import vm from 'node:vm';\nconst sandbox={};vm.runInNewContext(fs.readFileSync('/workspace/scratch/37a0eb047690/lumo-signal-shared/merchant-approved/dist/vendor/qrcode.js','utf8'),sandbox);\nconst dir='/tmp/lumo-native-merchant-probe';fs.mkdirSync(dir,{recursive:true});\nconst shop='11111111-1111-4111-8111-111111111111',request='22222222-2222-4222-8222-222222222222',key='a'.repeat(64);\nconst old='https://lumo-connected-pilot.vercel.app/?pay='+shop+'&workspace=registered&testKey='+key;\nconst compact='https://lumo-connected-pilot.vercel.app/?pay='+shop+'&testKey='+key;\nconst cases=[];\nfor(const [kind,url] of [['static',old],['fixed',old+'&request='+request+'&amount=2500'],['compact-static',compact],['compact-fixed',compact+'&request='+request]])for(const size of [180,195,205,220,224,232,246,255,276,320]){\n const q=sandbox.qrcode(0,'M');q.addData(url);q.make();const count=q.getModuleCount(),actual=count*4+32;\n const bytes=Buffer.alloc(size*size,255);\n for(let y=0;y<size;y++)for(let x=0;x<size;x++){\n  const mx=Math.floor(((x+.5)*actual/size-16)/4),my=Math.floor(((y+.5)*actual/size-16)/4);\n  if(mx>=0&&my>=0&&mx<count&&my<count&&q.isDark(my,mx))bytes[y*size+x]=0;\n }\n const filename=dir+'/'+kind+'-'+size+'.gray';fs.writeFileSync(filename,bytes);cases.push({kind,url,size,modules:count,length:url.length,filename});\n}\nfs.writeFileSync(dir+'/cases.json',JSON.stringify(cases,null,2));\nconsole.log(JSON.stringify(cases.filter(c=>c.size===180).map(({kind,modules,length})=>({kind,modules,length}))));\n",
+    "MerchantQrProbe.java": "package com.lumo.nativeapp;\nimport java.nio.file.*;\nimport org.json.*;\nimport java.lang.reflect.*;\npublic final class MerchantQrProbe {\n public static void main(String[]args)throws Exception{\n  JSONArray cases=new JSONArray(Files.readString(Path.of(\"/tmp/lumo-native-merchant-probe/cases.json\")));\n  Method decoder=NativeCameraSession.class.getDeclaredMethod(\"decodeQr\",byte[].class,int.class,int.class);decoder.setAccessible(true);\n  int passed=0;\n  for(int i=0;i<cases.length();i++){JSONObject c=cases.getJSONObject(i);byte[] pixels=Files.readAllBytes(Path.of(c.getString(\"filename\")));String raw=(String)decoder.invoke(null,pixels,c.getInt(\"size\"),c.getInt(\"size\"));if(!c.getString(\"url\").equals(raw)){System.out.println(c.getString(\"kind\")+\" \"+c.getInt(\"size\")+\"px \"+c.getInt(\"modules\")+\" modules: DECODE FAILED\");continue;}NativeApprovedMerchantQr.Intent parsed=NativeApprovedMerchantQr.parse(raw);if(parsed==null||!parsed.shopId.equals(\"11111111-1111-4111-8111-111111111111\")||!parsed.testKey.equals(\"a\".repeat(64)))throw new AssertionError(\"Incorrect quote target/token\");if(c.getString(\"kind\").endsWith(\"fixed\")&&(!parsed.requestId.equals(\"22222222-2222-4222-8222-222222222222\")||(c.getString(\"kind\").equals(\"fixed\")?parsed.expectedAmount!=2500:parsed.expectedAmount!=0)))throw new AssertionError(\"Incorrect fixed quote\");System.out.println(c.getString(\"kind\")+\" \"+c.getInt(\"size\")+\"px \"+c.getInt(\"modules\")+\" modules: decoder + parser PASS\");passed++;}\n  String sample=\"https://lumo-merchant-mobile.oness15.chatgpt.site/?pay=shop-101&workspace=sample\";boolean rejected=false;try{NativeApprovedMerchantQr.parse(sample);}catch(IllegalArgumentException correct){rejected=true;System.out.println(\"Sample browser-only shop: rejected with guidance: \"+correct.getMessage());}if(!rejected)throw new AssertionError(\"Sample must not become connected shared payment\");passed++;\n  System.out.println(\"Merchant native QR probe: \"+passed+\" checks passed against built 2.7.1 classes and current merchant QR generator\");\n }\n}\n"
+  },
+  "commands": {
+    "generate": [
+      "node",
+      "/tmp/lumo-native-merchant-probe/generate.mjs"
+    ],
+    "compile": [
+      "java",
+      "-jar",
+      "/workspace/scratch/37a0eb047690/pair-source/android-toolchain/ecj.jar",
+      "-17",
+      "-proc:none",
+      "-cp",
+      "/tmp/lumo-native-merchant-probe:build/classes.jar:app/libs/zxing-core-3.5.3.jar:tests/lib/json-20240303.jar:/tmp/lumo-native-merchant-probe/android-only.jar",
+      "-d",
+      "/tmp/lumo-native-merchant-probe",
+      "/tmp/lumo-native-merchant-probe/MerchantQrProbe.java"
+    ],
+    "execute": [
+      "java",
+      "-cp",
+      "/tmp/lumo-native-merchant-probe:build/classes.jar:app/libs/zxing-core-3.5.3.jar:tests/lib/json-20240303.jar:/tmp/lumo-native-merchant-probe/android-only.jar",
+      "com.lumo.nativeapp.MerchantQrProbe"
+    ]
+  },
+  "limitations": [
+    "Synthetic raster checks isolate payload and decoder integration. Real camera focus, display glare, distance and Android image pipelines are not verified.",
+    "Compact fixed link is safe because absent workspace defaults to registered and absent amount is fetched and validated from server quote; requestId and testKey are preserved.",
+    "One compact fixed raster size still failed (220px), so shortening is a density improvement, not a universal scanning guarantee."
+  ]
+}

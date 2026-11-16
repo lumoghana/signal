@@ -1,0 +1,29 @@
+{
+  "release": "2.11.6",
+  "baseline": "exact deployed 2.11.5",
+  "reason": "These Git candidate tests exercise availability binding/refresh APIs that are absent from the published 2.11.5 baseline. The narrow release deliberately does not import that separate product delta. Test files and assertions are preserved intact for the candidate that includes those APIs.",
+  "deferredFiles": [
+    {
+      "path": "narrowtests/unshipped-candidate/service-availability-controls.test.js",
+      "sha256": "df0129ec32d656376925c67b2f4f03ad0f10c4751dd0125fe9b0e7a0f2345852",
+      "assertionsPreserved": true
+    },
+    {
+      "path": "narrowtests/unshipped-candidate/consumer-refresh-lifecycle.test.js",
+      "sha256": "b891479c21c18b85ea5b8d12c9ec5d9c613b534fa156e333ff987772fcd3ed8e",
+      "assertionsPreserved": true
+    }
+  ],
+  "baselineSha256": {
+    "dist/js/service-availability.js": "de990c7b0d3596bef2913d4ab2c331ad15b4faa81633020aef41bb329c3e5709",
+    "dist/js/payment-recipient.js": "fbe4d4d9edb6812ea21bac471c6fb53cab3eaba2a38f59aefae6fcde0adc1cb8",
+    "dist/js/app.js": "43c23087e2f8956425e256a2383d50e2b0243a996972d37dc70d7b4cdc24aaa7"
+  },
+  "absentExports": [
+    "bindAvailabilityControl",
+    "refreshAvailabilityControls"
+  ],
+  "shippingAvailabilityMatchesBaseline": true,
+  "shippingRecipientMatchesBaseline": true,
+  "scope": "No assertions were deleted and no shipping financial/authentication source was changed to satisfy these candidate tests."
+}

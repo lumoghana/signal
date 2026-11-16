@@ -53,7 +53,7 @@ export function closureBlockers(s) {
   if ((Array.isArray(cards) ? cards : []).some(c => money(c.balance))) blockers.push({ code: 'cards', title: 'Return your card funds', detail: 'A virtual card still has funds.', route: { section: 'pay', page: 'cards' } });
   if ((s.transactions || []).some(t => t.status === 'pending' || t.status === 'processing') || (s.fundingAttempts || []).some(t => ['pending','processing'].includes(t.status))) blockers.push({ code: 'pending', title: 'Wait for pending money', detail: 'A payment or funding attempt is still awaiting a final outcome.', route: { section: 'activity', page: 'home' } });
   if ((s.ious || []).some(i => i.status === 'open' && money(i.amount) > money(i.paid))) blockers.push({ code: 'ious', title: 'Resolve open IOUs', detail: 'Settle or close the outstanding records before closing Lumo.', route: { section: 'life', page: 'ious' } });
-  if ((s.groups || []).some(g => (g.creatorId === 'me' || groupApprovers(g).some(m => m.id === 'me')) && (money(groupSummary(g).balance) || g.payouts?.some(p => ['pending','approved','processing'].includes(groupPayoutStatus(p)))))) blockers.push({ code: 'groups', title: 'Resolve your group responsibilities', detail: 'A group you manage still holds money or has a payout in progress.', route: { section: 'life', page: 'groups' } });
+  if ((s.groups || []).some(g => g.status !== 'closed' && (g.creatorId === 'me' || (g.members || []).some(m => m.id === 'me' && (!m.status || m.status === 'active')) || (g.contributions || []).some(c => c.memberId === 'me' && c.status === 'success' && money(c.amount) > money(c.refundedAmount))))) blockers.push({ code: 'groups', title: 'Resolve your group responsibilities', detail: 'Leave or close open collections and resolve contribution returns before closing Lumo.', route: { section: 'life', page: 'groups' } });
   if ((s.boxTransfers || []).some(t => t.status === 'pending')) blockers.push({ code: 'box-pending', title: 'Check pending savings moves', detail: 'A Money Box move still needs a final outcome.', route: { section: 'boxes', page: 'home' } });
   return blockers;
 }
@@ -212,13 +212,13 @@ export function handleAccountAction(s, type, p = {}, h = {}) {
   return null;
 }
 
-export function exportAccountData(s) {
+export function exportAccountData(s,{connected=false}={}) {
   const a=ensureAccountState(s);
-  const txKeys=['id','type','direction','amount','fee','merchant','category','status','at','note','rail','boxId','parentPaymentId','resolvedAt','reversedAt'];
+  const txKeys=['id','type','direction','amount','fee','merchant','category','status','at','note','rail','boxId','parentPaymentId','resolvedAt','reversedAt','externalSimulation','providerMode'];
   return { format:'lumo-account-export-v1', generatedAt:new Date().toISOString(), simulation:true,
     profile:choose(s.profile,['name','campus']), account:choose(a,['status','closedAt']),
     balances:{everyday:money(s.wallet),savings:(s.boxes||[]).reduce((n,b)=>n+money(b.balance),0),currency:'GHS',unit:'pesewas'},
-    transactions:(s.transactions||[]).map(t=>({...choose(t,txKeys),...(t.type==='iou-manual-repayment'?{manual:true,direction:'out',description:'Paid outside Lumo',balanceEffect:'none'}:{})})),
+    transactions:(s.transactions||[]).map(t=>({...choose(t,txKeys),...(sandboxExternal(t)?{description:'Sandbox simulation · Test money only. No real MoMo or bank transfer.',recipient:choose(t.recipient||{},['rail','name','number','bank','network','lookupSource'])}:{}),...(t.type==='iou-manual-repayment'?{manual:true,direction:'out',description:'Paid outside Lumo',balanceEffect:'none'}:{})})),
     moneyBoxes:(s.boxes||[]).map(b=>choose(b,['id','name','target','balance','date','deadline','archived','archivedAt','hack'])),
     budget:clone(s.budget||{}), budgetHistory:clone(s.budgetHistory||[]),
     savingsHistory:(s.savingsHistory||[]).map(r=>choose(r,['id','at','boxId','type','amount','status','reason','trigger','transactionId'])),
@@ -231,14 +231,16 @@ export function exportAccountData(s) {
     externalBalances:(s.externalBalances||[]).map(i=>choose(i,['id','type','name','balance','updatedAt'])),externalBalanceHistory:(s.externalBalanceHistory||[]).map(i=>choose(i,['id','externalBalanceId','balanceId','type','name','balance','before','after','action','at'])),
     recovery:s.recovery?choose(s.recovery,['active','nextDate','checkInDate','days','dailyLimit','reduceCategories','startedAt','completedAt']):null,
     privacy:{...a.privacy}, requests:a.requests.map(r=>choose(r,['id','type','status','at','updatedAt'])),
-    supportCases:a.supportCases.map(c=>({...choose(c,['reference','title','body','category','transactionId','fundingId','status','createdAt','updatedAt']),updates:c.updates.map(u=>choose(u,['at','kind','text']))})),
+    supportCases:a.supportCases.map(c=>({...choose(c,['reference','title','body','category','transactionId','fundingId','status','createdAt','updatedAt']),updates:c.updates.map(u=>({...choose(u,['at','kind','text']),text:supportRecordText(u,{connected})}))})),
     notice:'Identity captures, Ghana Card details, login credentials, device keys, PINs, access codes, card credentials and private chats are excluded. Group records stay in their authorised group view.' };
 }
+const sandboxExternal=t=>['momo','bank'].includes(t?.rail)&&t.externalSimulation===true&&t.providerMode==='sandbox';
 const csvCell=value=>{let v=String(value??'');if(/^[=+\-@\t\r]/.test(v))v="'"+v;return '"'+v.replaceAll('"','""')+'"';};
 export function statementCSV(s,{from,to}={}) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(from||'')||!/^\d{4}-\d{2}-\d{2}$/.test(to||'')||from>to||!Number.isFinite(Date.parse(from))||!Number.isFinite(Date.parse(to))||new Date(from).toISOString().slice(0,10)!==from||new Date(to).toISOString().slice(0,10)!==to)throw new Error('Choose a valid start and end date.');
   const rows=[['Reference','Date (UTC)','Type','Direction','Description','Status','Amount (GHS)','Fee (GHS)','Rail','Category','Entry note']];
-  for(const t of (s.transactions||[]).filter(t=>t.at?.slice(0,10)>=from&&t.at?.slice(0,10)<=to).sort((x,y)=>x.at.localeCompare(y.at))){rows.push([t.id,t.at,t.type,t.direction,t.merchant,t.status,(money(t.amount)/100).toFixed(2),(money(t.fee)/100).toFixed(2),t.rail,t.category,t.type==='iou-manual-repayment'?'Paid outside Lumo · No Lumo balance change':'']);}
+  for(const t of (s.transactions||[]).filter(t=>t.at?.slice(0,10)>=from&&t.at?.slice(0,10)<=to).sort((x,y)=>x.at.localeCompare(y.at))){rows.push([t.id,t.at,t.type,t.direction,t.merchant,t.status,(money(t.amount)/100).toFixed(2),(money(t.fee)/100).toFixed(2),t.rail,t.category,sandboxExternal(t)?'Sandbox simulation · Test money only. No real MoMo or bank transfer.':t.type==='iou-manual-repayment'?'Paid outside Lumo · No Lumo balance change':'']);}
   return rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
 }
-export function supportSummary(s,caseId){const c=ensureAccountState(s).supportCases.find(c=>c.id===caseId);if(!c)return '';return ['Lumo local demo support report',c.reference,c.title,`Status: ${c.status}`,`Payment reference: ${c.transactionId||'None'}`,`Funding reference: ${c.fundingId||'None'}`,`Created: ${c.createdAt}`,'',c.body,'',...c.updates.map(u=>`${u.at} · ${u.kind}\n${u.text}`),'','This report is saved on this device. No live support team is connected.'].join('\n');}
+export function supportRecordText(update,{connected=false}={}) {return connected&&update.kind==='system'&&['Saved on this device. No support team has received this demo report.','Saved with your shared test account. No live support team has been contacted.'].includes(update.text)?'Saved with your shared test account for Lumo support to review. Updates appear in Support updates.':update.text;}
+export function supportSummary(s,caseId,{connected=false}={}){const c=ensureAccountState(s).supportCases.find(c=>c.id===caseId);if(!c)return '';return [connected?'Lumo shared test-account support report':'Lumo local demo support report',c.reference,c.title,`Status: ${c.status}`,`Payment reference: ${c.transactionId||'None'}`,`Funding reference: ${c.fundingId||'None'}`,`Created: ${c.createdAt}`,'',c.body,'',...c.updates.map(u=>`${u.at} · ${u.kind}\n${supportRecordText(u,{connected})}`),'',connected?'This report is saved with your shared test account for Lumo support to review. Check Support updates for messages and status changes.':'This report is saved on this device. No live support team is connected.'].join('\n');}

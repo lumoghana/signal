@@ -1,6 +1,7 @@
-import { getSummary, budgetCategoryKey } from './model.js';
+import { getSummary, getGuidanceHorizon, evaluatePayment, budgetCategoryKey } from './model.js';
 import { cash, dateLabel } from './ui.js';
 import { readChatAmount, financialInputAmbiguity, clarifyFinancialInput } from './chat-action-model.js';
+import { getOutsideFreshness } from './money-maintenance-model.js';
 
 function n(value) { return Number.isFinite(Number(value)) ? Number(value) : 0; }
 function sum(items, fn) { return items.reduce((total, item) => total + n(fn(item)), 0); }
@@ -11,20 +12,8 @@ function amountIn(question) {
   return parsed.found && !parsed.invalid ? parsed.amount : null;
 }
 function action(label, section, page = 'home', rest = {}) { return { label, route: { section, page, ...rest } }; }
-const recordedDay = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
-  && Number.isFinite(Date.parse(value + 'T00:00:00Z'))
-  && new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value ? value : '';
-/** Only user-recorded timing supports a guide. getSummary's fallback is not a promise. */
-function recordedHorizon(state) {
-  const checkIn = state.recovery?.active && recordedDay(state.recovery.checkInDate);
-  if (checkIn) return { date: checkIn, source: 'recovery' };
-  const end = state.budget?.created === true && recordedDay(state.budget.endDate);
-  if (end) return { date: end, source: 'plan' };
-  const expected = n(state.income?.amount) > 0 && recordedDay(state.income?.nextDate);
-  return expected ? { date: expected, source: 'income' } : { date: '', source: '' };
-}
 function horizonCopy(state, now) {
-  const horizon = recordedHorizon(state), today = now.toISOString().slice(0, 10);
+  const horizon = getGuidanceHorizon(state, now), today = now.toISOString().slice(0, 10);
   if (!horizon.date) return 'No planning end date is recorded, so this is a current balance, not a daily spending guide.';
   if (horizon.date < today) return horizon.source === 'income'
     ? `Your expected income date, ${dateLabel(horizon.date)}, has passed. Refresh the timing before relying on a daily guide.`
@@ -33,16 +22,18 @@ function horizonCopy(state, now) {
     : horizon.source === 'recovery' ? `Your recorded recovery check-in is ${dateLabel(horizon.date)}.`
       : `Your recorded plan runs through ${dateLabel(horizon.date)}.`;
 }
-function summaryOf(state) {
-  const summary = getSummary(state);
+function summaryOf(state, now) {
+  const summary = getSummary(state, now);
   return { ...Object.fromEntries(['available', 'planned', 'spendable', 'savings', 'cardTotal', 'transferHolds', 'pendingPaymentHolds', 'pendingCardHolds', 'pendingContributionHolds', 'total', 'outsideTotal', 'allMoneyTotal', 'expected', 'daysLeft', 'dailyAllowance'].map(key => [key, n(summary[key])])), guidanceDate: summary.guidanceDate, planEndDate: summary.planEndDate };
 }
-function allMoneyAnswer(state, summary) {
+function allMoneyAnswer(state, summary, now) {
   const hasOutsideBalances = (state.externalBalances || []).length > 0;
+  const freshness = getOutsideFreshness(state, { now }), stale = freshness.staleCount > 0;
+  const oldest = freshness.oldestAt && freshness.oldestAt <= now.toISOString() ? `${dateLabel(freshness.oldestAt)} (${freshness.oldestAt.slice(0, 10)})` : '';
   return {
-    title: 'Here is the money you hold.',
+    title: stale ? 'Here is your recorded estimate.' : 'Here is the money you hold.',
     paragraphs: [
-      `${cash(summary.allMoneyTotal)} is your total recorded money: ${cash(summary.total)} in Lumo and ${cash(summary.outsideTotal)} outside Lumo.`,
+      `${cash(summary.allMoneyTotal)} is ${stale ? 'an estimate from your recorded money' : 'your total recorded money'}: ${cash(summary.total)} in Lumo and ${cash(summary.outsideTotal)} outside Lumo.`,
       `Your Lumo total includes ${cash(summary.available)} in your spending account and ${cash(summary.savings)} in Money Boxes.`,
       ...(summary.cardTotal ? [`A further ${cash(summary.cardTotal)} is held on virtual cards. It is separate from Everyday payment money.`] : []),
       ...(summary.transferHolds ? [`${cash(summary.transferHolds)} is held for a pending internal transfer. It is included once in your total, but cannot be spent while held.`] : []),
@@ -50,12 +41,12 @@ function allMoneyAnswer(state, summary) {
       ...(summary.pendingCardHolds ? [`${cash(summary.pendingCardHolds)} is held for pending card purchases, separate from your remaining card balance.`] : []),
       ...(summary.pendingContributionHolds ? [`${cash(summary.pendingContributionHolds)} is held for pending group contributions. It stays in your recorded money until confirmed or returned.`] : []),
       hasOutsideBalances
-        ? 'Outside balances are manually recorded, so update them when they change. They do not increase your Lumo payment balance or left after plan.'
+        ? `${stale ? `${freshness.staleCount} outside ${freshness.staleCount === 1 ? 'balance needs' : 'balances need'} a check${oldest ? `; oldest balance check ${oldest}` : '; no reliable check date is recorded'}. ` : ''}Outside balances are manually recorded, so update them when they change. They do not increase your Lumo payment balance or left after plan.`
         : 'You have not added outside balances yet. Add cash, another bank or MoMo in All your money to see the full picture.',
       'Expected income, unpaid IOUs and group collections stay separate from this total.'
     ],
-    stats: [{ label: 'In Lumo', value: cash(summary.total) }, { label: 'Outside Lumo', value: cash(summary.outsideTotal) }, { label: 'All recorded money', value: cash(summary.allMoneyTotal) }],
-    actions: [action('All your money', 'life', 'overview')]
+    stats: [{ label: 'In Lumo', value: cash(summary.total) }, { label: 'Outside Lumo', value: cash(summary.outsideTotal) }, { label: stale ? 'Recorded estimate' : 'All recorded money', value: cash(summary.allMoneyTotal) }],
+    actions: [...(stale ? [action('Check outside balances', 'life', 'money-check')] : []), action('All your money', 'life', 'overview')]
   };
 }
 function remaining(item) { return Math.max(0, n(item.amount) - n(item.spent)); }
@@ -155,7 +146,7 @@ export function getSpendingPeriod(question, now = new Date()) {
   return { label: 'in your recorded history', start: null, end: null };
 }
 
-function paymentTransactions(state, question, now, scope = getSpendingScope(state, question)) {
+export function paymentTransactions(state, question, now, scope = getSpendingScope(state, question)) {
   const period = getSpendingPeriod(question, now);
   return (state.transactions || []).filter(tx => {
     if (!['payment', 'card-purchase'].includes(tx.type) || tx.status !== 'success' || tx.direction !== 'out' || tx.rail === 'internal' || !Number.isSafeInteger(tx.amount) || tx.amount <= 0) return false;
@@ -168,12 +159,25 @@ function paymentTransactions(state, question, now, scope = getSpendingScope(stat
   }).map(tx => ({ ...tx, amount: Math.max(0, tx.amount - (tx.type === 'card-purchase' ? n(tx.refunded) : 0)) + n(tx.fee) })).filter(tx => tx.amount > 0);
 }
 
+/** Refund arrivals are separate facts, never silently netted against another period. */
+export function merchantRefundTransactions(state, period, scope) {
+  return (state.transactions || []).filter(tx => {
+    if (tx.type !== 'refund' || tx.status !== 'success' || tx.direction !== 'in' || !Number.isSafeInteger(tx.amount) || tx.amount <= 0) return false;
+    const original = (state.transactions || []).find(value => value.id === tx.parentPaymentId || tx.originalPaymentId && value.ledgerJournalId === tx.originalPaymentId);
+    if (scope.categories.length && !scope.categories.some(category => budgetCategoryKey(category) === budgetCategoryKey(original?.category || tx.category || 'Other'))) return false;
+    if (scope.merchants.length && !scope.merchants.some(merchant => [original?.merchant, tx.merchant].some(name => scopeText(name) === scopeText(merchant)))) return false;
+    const at = new Date(tx.at); if (Number.isNaN(at.getTime())) return false;
+    const day = at.toISOString().slice(0, 10);
+    return (!period.start || day >= period.start) && (!period.end || day < period.end) && (!period.through || day <= period.through);
+  });
+}
+
 /** Local prototype guidance. Every amount is read from the current model. */
 export function getMoneyAnswer(state, question, now = new Date()) {
   const q = String(question).trim().toLowerCase();
   const generalSpendQuestion = /^(?:what|how much)(?: money)? can i (?:spend|use)(?:(?: in| from)? lumo)?(?: now)?[.!?\s]*$/.test(q);
   if (financialInputAmbiguity(q) === 'currency') return clarifyFinancialInput('currency');
-  const summary = summaryOf(state);
+  const summary = summaryOf(state, now);
   const amount = amountIn(q);
   const buffer = n(state.buffer);
   const items = state.budget?.items || [];
@@ -182,7 +186,7 @@ export function getMoneyAnswer(state, question, now = new Date()) {
         && /\b(?:balance|balances|account|accounts|have|hold|held|record|recorded|track|update|add|my|total|money)\b/.test(q))
     && !/\b(?:pay|spend|spent|buy|afford|send|transfer|repay|save|saving)\b/.test(q);
 
-  if (asksOutsideMoney) return allMoneyAnswer(state, summary);
+  if (asksOutsideMoney) return allMoneyAnswer(state, summary, now);
 
   if (/allowance.*late|late.*allowance|income.*late|money.*late|hasn.t arrived|not arrived|haven.t been paid|haven't been paid|recover|recovery/.test(q)) {
     return {
@@ -237,13 +241,15 @@ export function getMoneyAnswer(state, question, now = new Date()) {
     const sorted = [...categories.entries()].sort((a, b) => b[1] - a[1]);
     const total = sum(transactions, tx => tx.amount);
     const { label: period, month } = getSpendingPeriod(q, now);
+    const refunds = sum(merchantRefundTransactions(state, requested, scope), tx => tx.amount);
     return {
-      title: transactions.length ? `${cash(total)} ${scope.label || 'in completed payments'}.` : `No completed payments${scope.label ? ` ${scope.label}` : ''} ${period}.`,
+      title: transactions.length ? `${cash(total)} ${scope.label || 'in completed payments'}${refunds ? ', before merchant refunds' : ''}.` : `No completed payments${scope.label ? ` ${scope.label}` : ''} ${period}.`,
       paragraphs: transactions.length ? [
         `That covers ${transactions.length} ${transactions.length === 1 ? 'payment' : 'payments'}${scope.label ? ` ${scope.label}` : ''} ${period}.`,
-        `Your biggest category is ${sorted[0][0]} at ${cash(sorted[0][1])}. Savings transfers are kept separate from spending. Pending, failed and reversed payments are excluded.`
-      ] : ['Savings transfers and money you expect to receive are kept separate. Make a demo payment to see your spending story develop.'],
-      stats: sorted.slice(0, 3).map(([label, value]) => ({ label, value: cash(value) })),
+        `Your biggest category is ${sorted[0][0]} at ${cash(sorted[0][1])}. Savings transfers are kept separate from spending. Pending, failed and reversed payments are excluded.`,
+        ...(refunds ? [`${cash(refunds)} in merchant refunds arrived ${period}${scope.label ? ` ${scope.label}` : ''}. These are shown separately in Activity; this payment total is before those refunds. Card refunds already reduce the card purchases shown here.`] : [])
+      ] : ['Savings transfers and money you expect to receive are kept separate. Your spending story develops as you make payments.', ...(refunds ? [`${cash(refunds)} in merchant refunds arrived ${period}. A refund can relate to an earlier payment, so it is shown separately in Activity.`] : [])],
+      stats: [...sorted.slice(0, 3).map(([label, value]) => ({ label, value: cash(value) })), ...(refunds ? [{ label: 'Merchant refunds received', value: cash(refunds) }] : [])],
       actions: [month ? action('View month’s insights', 'activity', 'insights', { month }) : action('Open Money Story', 'life', 'story'), action('Review my plan', 'plan')]
     };
   }
@@ -307,17 +313,22 @@ export function getMoneyAnswer(state, question, now = new Date()) {
     };
     const budget = budgetMatch(state, q);
     const reserved = budget ? remaining(budget) : 0;
-    const beyondPlan = Math.max(0, amount - reserved);
-    const covered = amount <= summary.available && beyondPlan <= summary.spendable;
+    const impact = evaluatePayment(state, { amount, fee: 0, category: budget?.name || 'Other', ...(budget ? { budgetItemId: budget.id } : {}) }, now);
+    const beyondPlan = Math.max(0, amount - impact.budgetAllocation);
+    const covered = impact.allowed && impact.rawAfterSpendable >= 0;
     const paragraphs = [];
     if (budget) paragraphs.push(`Your ${budget.name} plan has ${cash(reserved)} left. ${amount <= reserved ? `This payment fits inside it and would leave ${cash(reserved - amount)} in that category.` : `${cash(beyondPlan)} of this payment would sit beyond that remaining plan.`}`);
     if (amount > summary.available) paragraphs.push(`The cost is ${cash(amount)}, but your spending account holds ${cash(summary.available)}. The gap is ${cash(amount - summary.available)}. Expected money cannot cover a payment today.`);
-    else if (covered) paragraphs.push(`Before any optional saving hack, your spending balance would become ${cash(summary.available - amount)}. ${cash(Math.max(0, summary.spendable - beyondPlan))} would remain after the rest of your current plan and buffer.`);
-    else paragraphs.push(`You have ${cash(summary.spendable)} left after plan. Paying this would use ${cash(Math.max(0, beyondPlan - summary.spendable))} assigned to another commitment or your buffer. Review the plan before deciding.`);
+    else if (covered) {
+      paragraphs.push(`Before any optional saving hack, your spending balance would become ${cash(impact.afterAvailable)}. ${cash(impact.afterSpendable)} would remain after the rest of your current plan and buffer.`);
+      if (impact.needed) paragraphs.push(impact.reason);
+    } else if (impact.baselineShortfall > 0) {
+      paragraphs.push(`Your plan and buffer already have a ${cash(impact.baselineShortfall)} gap. ${impact.additionalShortfall > 0 ? `This payment adds ${cash(impact.additionalShortfall)} to that gap.` : 'This payment leaves that gap unchanged.'} After it, ${cash(impact.afterAvailable)} would remain against ${cash(impact.afterPlanned)} of commitments and your ${cash(buffer)} buffer. Review the plan before deciding.`);
+    } else paragraphs.push(`You have ${cash(summary.spendable)} left after plan. Paying this would use ${cash(Math.max(0, -impact.rawAfterSpendable))} assigned to another commitment or your buffer. Review the plan before deciding.`);
     if (summary.outsideTotal > 0) paragraphs.push(`Your ${cash(summary.outsideTotal)} recorded outside Lumo is separate from this Lumo payment check.`);
     paragraphs.push('This is a check against your recorded plan. The payment review will show the final impact.');
     return {
-      title: covered ? budget && amount <= reserved ? 'That fits your plan.' : 'It fits, with this trade-off.' : 'This needs a pause.',
+      title: covered && !impact.needed ? budget && amount <= reserved ? 'That fits your plan.' : 'It fits, with this trade-off.' : 'This needs a pause.',
       paragraphs,
       stats: [{ label: 'Considering', value: cash(amount) }, { label: 'Left after plan now', value: cash(summary.spendable) }],
       actions: [action(covered ? 'Open payments' : 'Review my plan', covered ? 'pay' : 'plan'), action('See all your money', 'life', 'overview')]
@@ -325,7 +336,7 @@ export function getMoneyAnswer(state, question, now = new Date()) {
   }
 
   if (!generalSpendQuestion && /today|daily|per day|each day|how much.*spend/.test(q)) {
-    const guideDate = recordedHorizon(state).date;
+    const guideDate = getGuidanceHorizon(state, now).date;
     const currentGuideDate = !!guideDate && guideDate.slice(0, 10) >= now.toISOString().slice(0, 10);
     return {
       title: currentGuideDate ? 'Here is your daily guide.' : 'Let’s refresh the timing.',
@@ -341,7 +352,7 @@ export function getMoneyAnswer(state, question, now = new Date()) {
   }
 
   if (/all.*money|total|balance.*total|net worth|how much.*have/.test(q)) {
-    return allMoneyAnswer(state, summary);
+    return allMoneyAnswer(state, summary, now);
   }
 
   if (generalSpendQuestion || /why|spendable|left after|available|budget|plan|buffer/.test(q)) {

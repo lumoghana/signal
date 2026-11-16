@@ -1,0 +1,575 @@
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<manifest package="com.lumo.nativeapp.test" xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="21006" android:versionName="2.10.6">
++<manifest package="com.lumo.nativeapp.test" xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="21100" android:versionName="2.11.0">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -2,7 +2,7 @@
+ android {
+  namespace 'com.lumo.nativeapp'
+  compileSdk 36
+- defaultConfig { applicationId 'com.lumo.nativeapp.test'; minSdk 26; targetSdk 36; versionCode 21006; versionName '2.10.6' }
++ defaultConfig { applicationId 'com.lumo.nativeapp.test'; minSdk 26; targetSdk 36; versionCode 21100; versionName '2.11.0' }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+  buildTypes { release { minifyEnabled false } }
+ }
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,8 @@
+-# Lumo Test 2.10.6 for Android
++# Lumo Test 2.11.0 for Android
++
++Version 2.11.0 adds shared service availability on top of the corrected 2.10.6 consumer journeys. Install over 2.10.6 with the same package and signing certificate. The app polls the public availability endpoint while foregrounded and also consumes status included in authorised account snapshots. A manually paused, unhealthy, recovering or stale service disables the corresponding new-payment choice and shows the server's public message. Network-specific MoMo controls leave unaffected networks and rails available. Recovery updates existing controls without replacing a typed form. History, receipts, original-reference recovery and merchant shop saving remain reachable. Backend guards retain final authority. A SERVICE_PAUSED reply releases a local pending attempt only when the backend explicitly confirms no mutation; an unknown outcome retains its original reference.
++
++This release preserves the 2.10.6 assets, camera, QR, Lux, onboarding, payment review, conditional Pause and PIN journeys. All external MoMo and bank transfers remain labelled test-money simulations. No live provider monitoring or real external settlement is established by the native UI.
+ 
+ Version 2.10.6 corrects the consumer recipient journey. Tapping a registered Lumo person immediately resolves their identity and opens their amount screen with name and @username; the directory is hidden during the check and no second Continue is required. Exact typed usernames can still use Continue. Duplicate taps, route/account changes and reassigned handles cannot redirect a draft.
+ 
+@@ -74,7 +78,7 @@
+ ```sh
+ node scripts/approved-projection-fixture.mjs
+ python3 scripts/test-models.py
+-python3 scripts/build-apk.py --output output/Lumo-Test-2.10.6.apk
++python3 scripts/build-apk.py --output output/Lumo-Test-2.11.0.apk
+ python3 scripts/package-source.py
+ ```
+ 
+--- a/source-provenance.json
++++ b/source-provenance.json
+@@ -1,18 +1,18 @@
+ {
+   "application_id": "com.lumo.nativeapp.test",
+-  "version": "2.10.6",
++  "version": "2.11.0",
+   "architecture": "Native Android Java Views and Android platform APIs; no WebView",
+   "min_sdk": 26,
+   "target_sdk": 36,
+-  "apk_sha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
+-  "reference_web": "Native 2.10.5 baseline plus scoped consumer payment journey corrections; web/native full parity not asserted",
++  "apk_sha256": "558893158d31a47778f79d2354dd4dbad0c81ad6c0cd7fd30b4b56d47aaa6b3f",
++  "reference_web": "Preserved native2.10.6 recipient/payment experience, aligned with Signal release59dd4d2, plus shared admin availability controls.",
+   "build_status": "locally signed APK",
+   "financial_backend": "connected experience uses authoritative Supabase accounts, ledger, groups, planning, IOUs and mandates; preserved local preview stays isolated",
+   "identity_verification": "real Camera2 images; Ghana Card lookup and liveness outcome simulated",
+   "emulator_execution_tested": false,
+   "physical_device_tested": false,
+-  "runtime_validation_scope": "62 pure-Java suites and 164 Android framework cases passed, including 30 synthetic layout scenarios. Physical-device and ART acceptance unverified.",
+-  "runtime_verification": "verification/2.10.6-connected-experience-review.json",
++  "runtime_validation_scope": "63 pure-Java suite executables and172 Robolectric cases across Android API28/35 passed. Signed APK integrity/alignment/package/SDK/permission checks passed. Physical-device, ART and live-provider execution remain unverified.",
++  "runtime_verification": "verification/2.11.0-connected-experience-review.json",
+   "emulator": null,
+   "physical_biometric_hardware_tested": false,
+   "dependencies": {
+@@ -29,7 +29,9 @@
+   "zxing_sha256": "8d8064c1636fdaef7189dd9055c7d59950a8940a12f2293956446ec3c109fd82",
+   "androidsvg_version": "1.4",
+   "androidsvg_sha256": "c2f7c91ece632461d5e6d2e58f0a8a4fa1cfbcf3bbd89c66ef3b7a519bead1a0",
+-  "app_source_tree_sha256": "ed53d1ae5ec5e3e9d359e71b910fe753a6dd245045053db104362e44d44d5956",
++  "app_source_tree_sha256": "8b892fd533fa4fb6ec5ce68e9d49f9b0ec2089eccf3865bc11291c7cbf5576b2",
++  "baseline_native_version": "2.10.6",
++  "baseline_native_apk_sha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
+   "consumer_payment_changes": [
+     "Lumo row tap immediately resolves selected identity and opens named amount details; recipient list hidden during check.",
+     "Exact typed-handle Continue remains supported.",
+@@ -39,5 +41,16 @@
+     "Bank is visible on confirmation, amount and review.",
+     "Selected-id/owner/route/generation, external destination/name/fee guards and duplicate-tap protection retained.",
+     "Existing review, conditional Pause, PIN, virtual-money debit and receipt implementation retained."
+-  ]
++  ],
++  "service_availability": {
++    "public_polling": true,
++    "foreground_refresh": true,
++    "snapshot_projection": true,
++    "network_scoped_controls": true,
++    "manual_off_priority": true,
++    "drafts_preserved": true,
++    "unknown_outcomes_keep_reference": true,
++    "backend_authoritative": true,
++    "live_external_provider_monitoring": false
++  }
+ }
+--- a/app/src/main/java/com/lumo/nativeapp/Host.java
++++ b/app/src/main/java/com/lumo/nativeapp/Host.java
+@@ -11,6 +11,7 @@
+  default void payMerchant(String shopId){}
+  default boolean connected(){return false;}
+  default boolean hasSharedSession(){return false;}
++ default NativeServiceAvailability serviceAvailability(){return null;}
+  default long interactionGeneration(){return 0;}
+  default void submit(String type,org.json.JSONObject payload,boolean authorize,java.util.function.Consumer<NativeModel.Result> done){done.accept(NativeModel.fail("The shared service is unavailable."));}
+  default void registerShared(NativeModel prepared,String password,String pin,java.util.function.Consumer<NativeModel.Result> done){done.accept(NativeModel.fail("The shared service is unavailable."));}
+--- a/app/src/main/java/com/lumo/nativeapp/MainActivity.java
++++ b/app/src/main/java/com/lumo/nativeapp/MainActivity.java
+@@ -55,12 +55,16 @@
+     private NativeApprovedAccount shared;
+     private final ExecutorService network=Executors.newSingleThreadExecutor();
+     private final ExecutorService luxNetwork=Executors.newSingleThreadExecutor();
++    private final ExecutorService availabilityNetwork=Executors.newSingleThreadExecutor();
++    private final NativeServiceAvailability operationalAvailability=new NativeServiceAvailability();
++    private boolean availabilityRefreshing;
++    private long lastAvailabilityAttempt=-1;
+     private String approvalPin,pendingPaymentLink="";
+     private Runnable sharedApprovalCancelled;
+     private boolean sharedBusy,sharedRefreshing,recoveringShared,sharedPresentationPending,backgroundSharedRender,unresolvedSharedMove;
+     private org.json.JSONObject sharedPresentationSnapshot;
+     private Route shownRoute;
+-    private final Runnable sharedPoll=new Runnable(){public void run(){if(active&&!stopped&&connected()&&shared!=null&&shared.hasSession()&&data.onboarded&&!data.signedOut)refreshShared(false);if(active&&!stopped)main.postDelayed(this,sharedPollInterval());}};
++    private final Runnable sharedPoll=new Runnable(){public void run(){if(active&&!stopped&&connected()&&shared!=null&&shared.hasSession()&&data.onboarded&&!data.signedOut){refreshShared(false);refreshServiceAvailability(false);}if(active&&!stopped)main.postDelayed(this,sharedPollInterval());}};
+ 
+     private long sharedPollInterval(){boolean unresolved=sharedBusy||recoveringShared;if(data!=null)for(NativeModel.Transaction transaction:data.transactions)if("pending".equals(transaction.status)||"processing".equals(transaction.status)){unresolved=true;break;}unresolved|=unresolvedSharedMove;return NativePollPolicy.interval(current.screen,unresolved);}
+     private void rescheduleSharedPoll(){main.removeCallbacks(sharedPoll);if(active)main.postDelayed(sharedPoll,sharedPollInterval());}
+@@ -134,6 +138,7 @@
+     }
+     private void cancelSharedApproval(){Runnable cancelled=sharedApprovalCancelled;sharedApprovalCancelled=null;if(cancelled!=null)cancelled.run();}
+     public boolean hasSharedSession(){return shared!=null&&shared.hasSession();}
++    public NativeServiceAvailability serviceAvailability(){return shared!=null&&shared.hasSession()&&data!=null&&!data.signedOut?operationalAvailability:null;}
+     public long interactionGeneration(){return interactionGeneration;}
+     public boolean connected(){return !getIntent().getBooleanExtra("lumo.local.preview",false);}
+     private boolean financiallyChanged(NativeModel before,NativeModel after){return NativeSharedFinancialGuard.changed(before,after);}
+@@ -150,6 +155,8 @@
+         if(!projected.valid())throw new IllegalStateException("Lumo could not safely open the account response. Try again.");
+         NativeGroupNotifications.Snapshot before=NativeGroupNotifications.capture(data);
+         store.save(projected);data=projected;sessionUnlocked=data.onboarded&&!data.signedOut;
++        operationalAvailability.accept(reply,SystemClock.elapsedRealtime());
++        if(money!=null)money.refreshAvailabilityControls();
+         sharedPresentationSnapshot=NativeSyncPresentation.snapshot(reply);
+         for(NativeGroupNotifications.Notice notice:NativeGroupNotifications.drain(data,before))device.postGroupNotice(notice);
+     }
+@@ -200,6 +207,18 @@
+         body.addView(u.button("Check again",()->{closeSheet();checkSharedPending(true);}));body.addView(u.gap(10));
+         body.addView(u.secondary("Retry this move",()->{closeSheet();submit(pending.optString("type"),pending.optJSONObject("payload"),true,r->{if(!r.ok){toast(r.message);return;}if(data.tx(r.id)!=null)go("pay-status",r.id);else{toast(r.message);refresh();}});}));
+         body.addView(u.textButton("Close",this::closeSheet));sheet("Your last move",body);
++    }
++    private void refreshServiceAvailability(boolean force){
++        if(money!=null)money.refreshAvailabilityControls();
++        if(availabilityRefreshing||stopped||shared==null||!connected()||data==null||data.signedOut||!data.onboarded)return;
++        long now=SystemClock.elapsedRealtime();if(!force&&lastAvailabilityAttempt>=0&&now-lastAvailabilityAttempt<15000)return;
++        availabilityRefreshing=true;lastAvailabilityAttempt=now;final NativeApprovedAccount source=shared;
++        availabilityNetwork.execute(()->{org.json.JSONObject reply=null;try{reply=source.serviceStatus();}catch(Exception ignored){}final org.json.JSONObject result=reply;
++            main.post(()->{availabilityRefreshing=false;if(isDestroyed()||stopped||source!=shared||data==null||data.signedOut)return;
++                if(result!=null)operationalAvailability.accept(result,SystemClock.elapsedRealtime());
++                if(money!=null)money.refreshAvailabilityControls();
++            });
++        });
+     }
+     private void refreshShared(boolean showError){
+         if(sharedRefreshing||sharedBusy||shared==null||data.signedOut)return;
+@@ -350,7 +369,7 @@
+     private void recoveryPlan(){LinearLayout b=u.col();b.addView(u.lux(144,true));b.addView(u.h1("A little breathing room."));b.addView(u.p("Protect Everyday money while you find your feet. Pausing Savings Hacks stops automatic demo moves, without changing your plan or debts."));b.addView(u.item("Left after your plan",Ui.cash(data.spendable()),()->go("plan")));b.addView(u.button(data.recoveryActive?"Turn off breathing room":"Pause Savings Hacks",()->{NativeModel.Result r=commit(m->{m.recoveryActive=!m.recoveryActive;m.recoveryCheckInDate=NativeModel.inDays(7);return NativeModel.ok("Breathing room updated");});toast(r.message);if(r.ok)refresh();}));b.addView(u.secondary("Review my plan",()->go("plan")));showPage("Breathing room",b);}
+     private void scanner(){LinearLayout b=u.col();b.addView(u.h1("Scan. Check. Pay."));b.addView(u.p("Use your camera to scan a Lumo campus merchant or payment code."));b.addView(u.button("Scan with camera",()->device.scanQr((text,error)->{if(!current.screen.equals("scan"))return;if(error!=null){toast(error);return;}showScanned(text);})));b.addView(u.secondary("Upload a QR photo",()->device.pickQr((text,error)->{if(!current.screen.equals("scan"))return;if(error!=null){toast(error);return;}showScanned(text);})));b.addView(u.secondary("My code",()->go("pay-qr")));b.addView(u.textButton("Find a Lumo person",()->go("pay")));b.addView(u.textButton("Enter merchant code",()->go("pay-code")));showPage("Scan or show",b);if(scanLaunchPending){scanLaunchPending=false;final Route origin=current;content.post(()->{if(current==origin&&!stopped)device.scanQr((text,error)->{if(current!=origin)return;if(error!=null){toast(error);return;}showScanned(text);});});}}
+     private void showScanned(String raw){money.acceptQr(raw,null);}
+-    private void help(){LinearLayout b=u.col();b.addView(u.h1("Built for your next move."));b.addView(u.p("Lumo Test 2.10.6 · Android app\nYour approved Lumo experience, with shared test accounts."));b.addView(u.h2("An honest prototype"));b.addView(u.p("Your Everyday balance, Money Boxes, group activity and Lumo payments are connected to the shared test service. Test funds have no real value. Ghana Card checks and liveness results remain demonstrations. MoMo and external bank transfers can be simulated: virtual money leaves your test account, but no real recipient is paid. Live bank, MoMo and bill providers are not connected. The camera is real."));b.addView(u.p("Use test credentials. Your app password and transaction PIN are separate. Biometrics need supported, enrolled hardware and explicit activation under Security."));b.addView(u.h2("Your data"));b.addView(u.p("Saved account state and sign-in details are encrypted in this app’s private storage using AndroidKeyStore. Backups are disabled. Private Ask Lux conversations stay in the current session. Exports leave the app, so choose where you save them."));b.addView(u.secondary("Your records",()->go("records")));showPage("Help & about",b);}
++    private void help(){LinearLayout b=u.col();b.addView(u.h1("Built for your next move."));b.addView(u.p("Lumo Test 2.11.0 · Android app\nYour approved Lumo experience, with shared test accounts."));b.addView(u.h2("An honest prototype"));b.addView(u.p("Your Everyday balance, Money Boxes, group activity and Lumo payments are connected to the shared test service. Test funds have no real value. Ghana Card checks and liveness results remain demonstrations. MoMo and external bank transfers can be simulated: virtual money leaves your test account, but no real recipient is paid. Live bank, MoMo and bill providers are not connected. The camera is real."));b.addView(u.p("Use test credentials. Your app password and transaction PIN are separate. Biometrics need supported, enrolled hardware and explicit activation under Security."));b.addView(u.h2("Your data"));b.addView(u.p("Saved account state and sign-in details are encrypted in this app’s private storage using AndroidKeyStore. Backups are disabled. Private Ask Lux conversations stay in the current session. Exports leave the app, so choose where you save them."));b.addView(u.secondary("Your records",()->go("records")));showPage("Help & about",b);}
+ 
+     public void confirm(String title,String message,Runnable yes){final long token=generation;final Route origin=current;LinearLayout b=u.col();b.addView(u.p(message));b.addView(u.button("Continue",()->{if(token==generation&&origin==current&&!stopped){closeSheet();yes.run();}else{closeSheet();toast("Open the action again to review it.");}}));b.addView(u.gap(10));b.addView(u.secondary("Cancel",this::closeSheet));sheet(title,b);}
+     public void authorize(String title,Runnable success){
+@@ -410,7 +429,7 @@
+     void runScheduledChecks(boolean allowWhileLocked){if(connected())return;if(storageError||checkingSavings||data==null||authorization!=null||!allowWhileLocked&&(stopped||data.signedOut)||!NativeSavingsScheduler.hasDue(data))return;checkingSavings=true;int count=data.savingsHistory.size();NativeModel.Result r=commit(m->NativeSavingsScheduler.check(m));checkingSavings=false;if(r.ok&&data.savingsHistory.size()!=count&&!stopped)presentSharedUpdate(current,true);}
+     private void lockSession(){if(data==null||!data.onboarded||data.signedOut||storageError)return;invalidate();hideKeyboard();sessionUnlocked=false;data.signedOut=true;try{store.save(data);}catch(Exception ignored){}if(learning!=null)learning.clearPrivateSession();history.clear();current=new Route("login");lockedRenderPending=stopped;if(!stopped)refresh();}
+     @Override public void onUserInteraction(){super.onUserInteraction();if(data!=null&&data.onboarded&&!data.signedOut){long now=SystemClock.elapsedRealtime();if(SESSION.expired(now))lockSession();else SESSION.interact(now);}}
+-    @Override protected void onStart(){super.onStart();boolean returning=stopped;stopped=false;rescheduleSharedPoll();if(data!=null&&data.onboarded&&!data.signedOut){if(SESSION.expired(SystemClock.elapsedRealtime()))lockSession();else SESSION.foregrounded();}if(lockedRenderPending){lockedRenderPending=false;refresh();}else if(returning&&current.screen.equals("settings")&&activeSheet==null)refresh();main.post(()->runScheduledChecks(false));if(connected()&&shared!=null&&shared.hasSession()&&data.onboarded&&!data.signedOut){refreshShared(false);if(returning)main.post(()->checkSharedPending(true));}}
++    @Override protected void onStart(){super.onStart();boolean returning=stopped;stopped=false;rescheduleSharedPoll();if(data!=null&&data.onboarded&&!data.signedOut){if(SESSION.expired(SystemClock.elapsedRealtime()))lockSession();else SESSION.foregrounded();}if(lockedRenderPending){lockedRenderPending=false;refresh();}else if(returning&&current.screen.equals("settings")&&activeSheet==null)refresh();main.post(()->runScheduledChecks(false));if(connected()&&shared!=null&&shared.hasSession()&&data.onboarded&&!data.signedOut){refreshShared(false);refreshServiceAvailability(true);if(returning)main.post(()->checkSharedPending(true));}}
+     @Override public Object onRetainNonConfigurationInstance(){UiDrafts d=new UiDrafts();d.owner=data.username+"|"+data.phone;d.money=money.captureTransientState();d.groups=groups.captureTransientState();d.learning=learning.captureTransientState();d.life=life.captureTransientState();d.intro=intro.captureTransientState();d.auth=auth.captureTransientState();return d;}
+     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);boolean localPreview=!connected();intent.putExtra("lumo.local.preview",localPreview);setIntent(intent);openNotificationGroup(intent);capturePaymentLink(intent);openPendingPaymentLink();}
+     private void capturePaymentLink(Intent intent){
+@@ -426,7 +445,7 @@
+     private void openNotificationGroup(Intent intent){if(intent==null||data==null||data.signedOut)return;String id=intent.getStringExtra(NativeServices.GROUP_ID_EXTRA);if(id==null)return;intent.removeExtra(NativeServices.GROUP_ID_EXTRA);GroupEngine.Group g=GroupEngine.group(data,id);GroupEngine.Member me=g==null?null:GroupEngine.member(g,"me");if(me!=null&&"active".equals(me.status)&&me.joinedAt>0){NativeModel.Result opened=commit(m->{GroupEngine.Group target=GroupEngine.group(m,id);target.participantId="me";return NativeModel.ok("Group opened.");});if(opened.ok)go("group-chat",id);else toast(opened.message);}}
+ 
+     @Override protected void onStop(){super.onStop();interactionGeneration++;stopped=true;main.removeCallbacks(sharedPoll);if(money!=null)money.stopLocation();approvalPin=null;cancelSharedApproval();if(!isChangingConfigurations())SESSION.backgrounded(SystemClock.elapsedRealtime());generation++;device.cancelAuthentication();if(authorization!=null){authorization.dismiss();authorization=null;}device.onStop();}
+-    @Override protected void onDestroy(){if(u!=null)u.releaseKeyboard();active=false;main.removeCallbacks(idleCheck);main.removeCallbacks(sharedPoll);if(screenReceiverRegistered){try{unregisterReceiver(screenReceiver);}catch(RuntimeException ignored){}}if(live.get()==this)live.clear();crypto.shutdownNow();network.shutdown();luxNetwork.shutdownNow();super.onDestroy();}
++    @Override protected void onDestroy(){if(u!=null)u.releaseKeyboard();active=false;main.removeCallbacks(idleCheck);main.removeCallbacks(sharedPoll);if(screenReceiverRegistered){try{unregisterReceiver(screenReceiver);}catch(RuntimeException ignored){}}if(live.get()==this)live.clear();crypto.shutdownNow();network.shutdown();luxNetwork.shutdownNow();availabilityNetwork.shutdownNow();super.onDestroy();}
+     @Override protected void onSaveInstanceState(Bundle b){if(!pendingPaymentLink.isEmpty())b.putString("pending.payment.link",pendingPaymentLink);if(deferredFormState!=null&&data.signedOut&&(data.username+"|"+data.phone).equals(deferredFormOwner))b.putAll(deferredFormState);b.putString("screen",current.screen);b.putString("id",current.id);b.putBoolean("homeSavings",balanceSavings);b.putBoolean("homeDrawer",nativeHome!=null&&nativeHome.drawerOpen());if(askReturn!=null){b.putString("askReturnScreen",askReturn.screen);b.putString("askReturnId",askReturn.id);}auth.saveDraftState(b);money.saveDraftState(b);if(data.onboarded&&!data.signedOut){b.putString("draft.owner",data.username+"|"+data.phone);groups.saveDraftState(b);life.saveDraftState(b);intro.saveDraftState(b);}else if(deferredForm!=null){b.putString("draft.owner",deferredFormOwner);b.putString("screen",deferredForm.screen);b.putString("id",deferredForm.id);}super.onSaveInstanceState(b);}
+     @Override public void onConfigurationChanged(Configuration c){super.onConfigurationChanged(c);int night=c.uiMode&Configuration.UI_MODE_NIGHT_MASK;if(data.appearance==0&&night!=lastNightMode){lastNightMode=night;recreate();}}
+ 
+--- a/app/src/main/java/com/lumo/nativeapp/NativeApprovedAccount.java
++++ b/app/src/main/java/com/lumo/nativeapp/NativeApprovedAccount.java
+@@ -34,6 +34,8 @@
+     public synchronized boolean hasSession(){return session!=null;}
+     public synchronized String owner(){return session==null?"":session.optJSONObject("user").optString("id");}
+     public synchronized JSONObject lastSnapshot()throws Exception{return snapshot==null?null:copy(snapshot);}
++    /** Status checks carry no customer token and never install a money snapshot. */
++    public JSONObject serviceStatus()throws Exception{return transport.request("/functions/v1/lumo-approved",new JSONObject().put("action","serviceStatus"),null);}
+     private JSONObject minimalSession(JSONObject value)throws Exception{validateSession(value);JSONObject next=new JSONObject().put("access_token",value.getString("access_token")).put("refresh_token",value.getString("refresh_token")).put("user",new JSONObject().put("id",value.getJSONObject("user").getString("id")));if(value.has("expires_at"))next.put("expires_at",value.get("expires_at"));return next;}
+     /** Session and its account projection are one encrypted storage write. */
+     private void persistAuth(JSONObject next,JSONObject projection)throws Exception{JSONObject auth=new JSONObject().put("session",next);if(projection!=null)auth.put("snapshot",projection);store.putObject(AUTH_KEY,auth);session=next;snapshot=projection==null?null:copy(projection);}
+@@ -75,7 +77,7 @@
+     }
+     private void confirmed(JSONObject prepared,JSONObject response)throws Exception{JSONObject saved=pending();if(saved!=null&&!saved.optString("attemptId").equals(prepared.optString("attemptId")))throw new IOException("Keep the original move’s reference. A different move is being checked.");JSONObject next=copy(saved==null?prepared:saved);next.put("sent",true).put("confirmed",true).put("reply",copy(response));store.putObject("approved-pending:"+owner(),next);}
+     public synchronized JSONObject submit(JSONObject prepared,String pin,JSONObject proof)throws Exception{
+-        if(!owner().equals(prepared.optString("userId")))throw new IOException("Sign in to the original account before checking this move.");JSONObject body=new JSONObject().put("action","action").put("type",prepared.getString("type")).put("payload",prepared.getJSONObject("payload")).put("attemptId",prepared.getString("attemptId"));if(pin!=null&&!pin.isEmpty())body.put("pin",pin);if(proof!=null)body.put("deviceProof",proof);JSONObject result=authenticated(body);JSONObject outcome=result.optJSONObject("result");if(result.optBoolean("ok")&&(outcome==null||outcome.optBoolean("ok",true)))confirmed(prepared,result);else if(FINAL_REJECTIONS.contains(result.optString("code"))){JSONObject saved=pending();if(saved!=null&&saved.optString("attemptId").equals(prepared.optString("attemptId")))store.putObject("approved-pending:"+owner(),null);}return result;
++        if(!owner().equals(prepared.optString("userId")))throw new IOException("Sign in to the original account before checking this move.");JSONObject body=new JSONObject().put("action","action").put("type",prepared.getString("type")).put("payload",prepared.getJSONObject("payload")).put("attemptId",prepared.getString("attemptId"));if(pin!=null&&!pin.isEmpty())body.put("pin",pin);if(proof!=null)body.put("deviceProof",proof);JSONObject result=authenticated(body);JSONObject outcome=result.optJSONObject("result");if(result.optBoolean("ok")&&(outcome==null||outcome.optBoolean("ok",true)))confirmed(prepared,result);else if(FINAL_REJECTIONS.contains(result.optString("code"))||"SERVICE_PAUSED".equals(result.optString("code"))&&result.optBoolean("noMutation")){JSONObject saved=pending();if(saved!=null&&saved.optString("attemptId").equals(prepared.optString("attemptId")))store.putObject("approved-pending:"+owner(),null);}return result;
+     }
+     /** A read checks the exact durable attempt. It never creates a replacement money command. */
+     public synchronized JSONObject recoverPending()throws Exception{JSONObject saved=pending();if(saved==null)return new JSONObject().put("ok",true).put("found",false);JSONObject response=read("recover",new JSONObject().put("type",saved.getString("type")).put("payload",saved.getJSONObject("payload")).put("attemptId",saved.getString("attemptId")));if(response.optBoolean("ok")&&response.optBoolean("found"))confirmed(saved,response);return response;}
+--- a/app/src/main/java/com/lumo/nativeapp/NativeMoneyScreens.java
++++ b/app/src/main/java/com/lumo/nativeapp/NativeMoneyScreens.java
+@@ -75,6 +75,32 @@
+     private final Handler main=new Handler(Looper.getMainLooper());
+     private long uiEpoch, lookupSerial, qrReadSerial, merchantCodeSerial;
+     private Button activeLookupButton;
++    private boolean externalLookupInFlight;
++    private final ArrayList<AvailabilityBinding> availabilityBindings=new ArrayList<>();
++    private final class AvailabilityBinding {
++        final View control;final TextView explanation;final String service;final PayDraft draft;
++        AvailabilityBinding(View control,TextView explanation,String service,PayDraft draft){this.control=control;this.explanation=explanation;this.service=service;this.draft=draft;}
++        void update(){
++            NativeServiceAvailability availability=h.connected()?h.serviceAvailability():null;
++            long now=android.os.SystemClock.elapsedRealtime();
++            boolean allowed=availability==null||(draft==null?availability.available(service,now):availability.paymentAvailable(draft.rail,availabilityNetwork(draft),now));
++            String message=allowed?"":draft==null?availability.message(service,now):availability.paymentMessage(draft.rail,availabilityNetwork(draft),now);
++            boolean busy=control==activeLookupButton&&externalLookupInFlight||draft!=null&&paymentSubmitting||"test_funding".equals(service)&&fundingSubmitting;
++            control.setEnabled(allowed&&!busy);control.setAlpha(allowed?1f:.42f);
++            explanation.setText(message);explanation.setVisibility(allowed?View.GONE:View.VISIBLE);
++        }
++    }
++    private View availableControl(View control,String service,PayDraft draft){
++        if(!h.connected()||h.serviceAvailability()==null)return control;
++        LinearLayout wrapper=u.col();wrapper.addView(control);TextView explanation=txt("",13,u.muted);explanation.setPadding(u.dp(2),u.dp(5),u.dp(2),u.dp(11));explanation.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);wrapper.addView(explanation);
++        AvailabilityBinding binding=new AvailabilityBinding(control,explanation,service,draft);availabilityBindings.add(binding);binding.update();return wrapper;
++    }
++    public void refreshAvailabilityControls(){
++        for(int n=availabilityBindings.size()-1;n>=0;n--){AvailabilityBinding binding=availabilityBindings.get(n);if(!binding.control.isAttachedToWindow()){availabilityBindings.remove(n);continue;}binding.update();}
++        campusDirectory.refreshAvailability();
++    }
++    private String availabilityNetwork(PayDraft draft){if(!"momo".equals(draft.rail)||!draft.network.isEmpty())return draft.network;NativeRecipientLookup.Result sample=NativeExternalTransfer.lookup(draft.rail,draft.number,draft.bank);return sample.ok?sample.network:"";}
++    private boolean denyPayment(String rail,String network){NativeServiceAvailability availability=h.connected()?h.serviceAvailability():null;if(availability!=null&&!availability.paymentAvailable(rail,network,android.os.SystemClock.elapsedRealtime())){h.toast(availability.paymentMessage(rail,network,android.os.SystemClock.elapsedRealtime()));refreshAvailabilityControls();return true;}return false;}
+     private String recipientSearch="",collectNote="";
+     private long collectAmount;
+     private PayDraft recipientBackup;
+@@ -286,7 +312,7 @@
+     private String status(String v) { if("success".equals(v)||"confirmed".equals(v))return "Completed"; if("pending".equals(v))return "Pending";if("failed".equals(v))return "Failed";if("reversed".equals(v))return "Reversed";return v==null?"":v; }
+     private long fee() { return pay.rail.equals("momo")?50:pay.rail.equals("bank")?100:0; }
+     private void providerUnavailable(String label){LinearLayout body=u.col();body.addView(u.h2(label));body.addView(u.p("This provider is not connected to shared test accounts yet. Lumo payments and explicit MoMo or bank transfer simulations remain available. No real external provider is paid."));body.addView(u.button("Choose a Lumo person",()->{h.closeSheet();begin("lumo");}));body.addView(u.secondary("Scan a merchant QR",()->{h.closeSheet();h.go("pay-scan");}));h.sheet("Available in this test",body);}
+-    private void begin(String rail) { if(editingRecipient||(pay.preparedByLux||!pay.iouId.isEmpty())&&h.route().screen.equals("pay-recipient")){pay.rail=rail;pay.name="";pay.number="";pay.network="";pay.confirmed=false;}else pay=new PayDraft();pay.rail=rail;outcome="success";h.go(rail.equals("campus")?"pay-campus":"pay-recipient"); }
++    private void begin(String rail) { if(denyPayment(rail,""))return;externalLookupInFlight=false;if(editingRecipient||(pay.preparedByLux||!pay.iouId.isEmpty())&&h.route().screen.equals("pay-recipient")){pay.rail=rail;pay.name="";pay.number="";pay.network="";pay.confirmed=false;}else pay=new PayDraft();pay.rail=rail;outcome="success";h.go(rail.equals("campus")?"pay-campus":"pay-recipient"); }
+     private void initAction(String id) { if(!actionId.equals(id)){actionId=id;actionAmount="";actionCode="";actionKey=NativeModel.id();partnerPhoneOpen=false;} }
+ 
+     private void payments() {
+@@ -298,7 +324,7 @@
+         LinearLayout tabs=u.row();tabs.setPadding(u.dp(4),u.dp(4),u.dp(4),u.dp(4));tabs.setBackground(u.shape(u.surface,14));String[] labels={"Send money","Campus Pay","Top-ups & bills"};
+         for(int i=0;i<3;i++){final int chosen=i;Button tab=u.textButton(labels[i],()->{payTab=chosen;payments();});tab.setTextSize(14);tab.setPadding(u.dp(5),u.dp(8),u.dp(5),u.dp(8));tab.setTextColor(payTab==i?u.ink:u.muted);tab.setBackground(u.shape(payTab==i?0xFFD4F65A:Color.TRANSPARENT,10));tabs.addView(tab,new LinearLayout.LayoutParams(0,u.dp(44),1));}b.addView(tabs);space(b,16);
+         if(payTab==0){
+-            b.addView(moneyRow("users","Lumo user","",()->begin("lumo")));sectionRule(b);b.addView(moneyRow("phone","Mobile money","",()->begin("momo")));sectionRule(b);b.addView(moneyRow("bank","Bank account","",()->begin("bank")));
++            b.addView(availableControl(moneyRow("users","Lumo user","",()->begin("lumo")),"lumo_transfer",null));sectionRule(b);b.addView(availableControl(moneyRow("phone","Mobile money","",()->begin("momo")),"momo_send",null));sectionRule(b);b.addView(availableControl(moneyRow("bank","Bank account","",()->begin("bank")),"bank_send",null));
+             LinearLayout quick=u.row();Button recent=u.textButton("Recent",()->h.go("pay-recent")),favourites=u.textButton("Favourites",()->h.go("pay-favourites"));recent.setCompoundDrawables(NativeIcon.drawable(h.activity(),"clock",18,u.muted),null,null,null);recent.setCompoundDrawablePadding(u.dp(7));favourites.setCompoundDrawables(NativeIcon.drawable(h.activity(),"heart",18,u.muted),null,null,null);favourites.setCompoundDrawablePadding(u.dp(7));recent.setTextColor(u.muted);favourites.setTextColor(u.muted);quick.addView(recent,new LinearLayout.LayoutParams(0,u.dp(44),1));quick.addView(favourites,new LinearLayout.LayoutParams(0,u.dp(44),1));space(b,12);b.addView(quick);space(b,18);
+             String[][] tools={{"card","Virtual cards","cards"},{"download","Requests","requests"},{"repeat","IOUs","ious"},{"plan","Activity","activity"}};
+             sectionRule(b);for(int y=0;y<2;y++){LinearLayout line=u.row();for(int x=0;x<2;x++){String[] tool=tools[y*2+x];LinearLayout button=u.row();button.setPadding(u.dp(13),u.dp(11),u.dp(13),u.dp(11));button.setMinimumHeight(u.dp(54));button.addView(u.icon(tool[0],19),new LinearLayout.LayoutParams(u.dp(19),u.dp(24)));TextView name=txt(tool[1],14,u.text);name.setPadding(u.dp(9),0,0,0);button.addView(name,new LinearLayout.LayoutParams(0,-2,1));button.addView(u.icon("chevron",14),new LinearLayout.LayoutParams(u.dp(12),u.dp(20)));button.setOnClickListener(v->h.go(tool[2]));line.addView(button,new LinearLayout.LayoutParams(0,-2,1));if(x==0){View divider=u.divider();line.addView(divider,new LinearLayout.LayoutParams(u.dp(1),u.dp(54)));}}b.addView(line);sectionRule(b);}
+@@ -371,10 +397,10 @@
+     private void recipients() {
+         LinearLayout b=u.col(),f=footer();final boolean bank=pay.rail.equals("bank"),external=!pay.rail.equals("lumo");
+         if(external){space(b,10);TextView step=txt("FIND YOUR PERSON",12,u.accent);step.setLetterSpacing(.13f);b.addView(step);space(b,12);title(b,bank?"Let’s find\ntheir account.":"Got their\nMoMo number?");space(b,14);b.addView(u.p(h.connected()?(bank?"Their account number and bank. We’ll show the sample account details.":"Just their number. We’ll show the sample name and network."):bank?"Their account number. Their bank. We’ll find the name.":"Just the number. We’ll find the name and network."));space(b,25);
+-            b.addView(txt(bank?"Account number":"MoMo number",14,u.muted));LinearLayout number=u.row();number.setPadding(u.dp(15),0,u.dp(15),0);number.setBackground(u.border(u.surface,u.line,14));number.addView(u.icon(bank?"bank":"phone",23),new LinearLayout.LayoutParams(u.dp(23),u.dp(30)));EditText field=u.input(bank?"Enter account number":"024 555 0182",InputType.TYPE_CLASS_PHONE);field.setText(pay.number);field.setTextSize(h.activity().getResources().getConfiguration().screenHeightDp<760?23:25);field.setPadding(u.dp(12),0,0,0);field.setBackgroundColor(Color.TRANSPARENT);field.setContentDescription(bank?"Account number":"MoMo number");field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(24)});watch(field,v->{pay.number=v;pay.name="";pay.network="";pay.confirmed=false;lookupSerial++;if(activeLookupButton!=null){activeLookupButton.setEnabled(true);activeLookupButton.setText("Find account  →");}});number.addView(field,new LinearLayout.LayoutParams(0,u.dp(h.activity().getResources().getConfiguration().screenHeightDp<760?60:68),1));space(b,10);b.addView(number);space(b,20);
+-            if(bank)select(b,"Their bank",pay.bank.equals("Choose a bank")?"Choose their bank":pay.bank,new String[]{"Choose their bank","GCB Bank","Ecobank Ghana","Fidelity Bank","Stanbic Bank","Absa Bank Ghana"},v->{if(!pay.bank.equals(v)){lookupSerial++;if(activeLookupButton!=null){activeLookupButton.setEnabled(true);activeLookupButton.setText("Find account  →");}}pay.bank=v;pay.confirmed=false;pay.name="";pay.network="";});
++            b.addView(txt(bank?"Account number":"MoMo number",14,u.muted));LinearLayout number=u.row();number.setPadding(u.dp(15),0,u.dp(15),0);number.setBackground(u.border(u.surface,u.line,14));number.addView(u.icon(bank?"bank":"phone",23),new LinearLayout.LayoutParams(u.dp(23),u.dp(30)));EditText field=u.input(bank?"Enter account number":"024 555 0182",InputType.TYPE_CLASS_PHONE);field.setText(pay.number);field.setTextSize(h.activity().getResources().getConfiguration().screenHeightDp<760?23:25);field.setPadding(u.dp(12),0,0,0);field.setBackgroundColor(Color.TRANSPARENT);field.setContentDescription(bank?"Account number":"MoMo number");field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(24)});watch(field,v->{pay.number=v;pay.name="";pay.network="";pay.confirmed=false;lookupSerial++;externalLookupInFlight=false;if(activeLookupButton!=null){activeLookupButton.setEnabled(true);activeLookupButton.setText("Find account  →");}refreshAvailabilityControls();});number.addView(field,new LinearLayout.LayoutParams(0,u.dp(h.activity().getResources().getConfiguration().screenHeightDp<760?60:68),1));space(b,10);b.addView(number);space(b,20);
++            if(bank)select(b,"Their bank",pay.bank.equals("Choose a bank")?"Choose their bank":pay.bank,new String[]{"Choose their bank","GCB Bank","Ecobank Ghana","Fidelity Bank","Stanbic Bank","Absa Bank Ghana"},v->{if(!pay.bank.equals(v)){lookupSerial++;externalLookupInFlight=false;if(activeLookupButton!=null){activeLookupButton.setEnabled(true);activeLookupButton.setText("Find account  →");}refreshAvailabilityControls();}pay.bank=v;pay.confirmed=false;pay.name="";pay.network="";});
+             b.addView(u.textButton(bank?"✧  Try a demo account":"✧  Try a demo number",()->{if(bank){int index=1;for(int n=1;n<BANKS.length;n++)if(BANKS[n].equals(pay.bank))index=n;pay.bank=BANKS[index];pay.number=BANK_NUMBERS[index];}else pay.number=PEOPLE[0][2];h.refresh();}));
+-            TextView error=problem(b);caption(f,"Demo lookup · Sample details, not verified account data");Button find=u.button("Find account  →",()->lookup());f.addView(find);activeLookupButton=find;find.setOnClickListener(v->{if(h.connected()){lookupExternal(find,error);return;}String numberValue=pay.number;if(bank&&!numberValue.replaceAll("[ -]","").matches("[0-9]{8,16}")){error.setText("Check the account number. Use 8–16 digits.");return;}if(bank&&(pay.bank.startsWith("Choose")||pay.bank.isEmpty())){error.setText("Choose the bank this account belongs to.");return;}if(!bank&&phone(numberValue).isEmpty()){error.setText("Use a 10-digit Ghanaian mobile number, or start with +233.");return;}find.setEnabled(false);find.setText("Finding account…");error.setTextColor(u.accent);error.setText("One sec. Finding your person…");final PayDraft d=pay;final Route route=h.route();final String selectedNumber=pay.number,selectedBank=pay.bank;final long serial=++lookupSerial;main.postDelayed(()->{if(h.route()!=route||pay!=d||serial!=lookupSerial||!pay.number.equals(selectedNumber)||!pay.bank.equals(selectedBank))return;find.setEnabled(true);find.setText("Find account  →");error.setTextColor(u.red);if(!h.activity().hasWindowFocus()){error.setText("");return;}String issue=resolveLookup();if(issue!=null)error.setText(issue);},1100);});
++            TextView error=problem(b);caption(f,"Demo lookup · Sample details, not verified account data");Button find=u.button("Find account  →",()->lookup());activeLookupButton=find;f.addView(availableControl(find,"",pay));find.setOnClickListener(v->{if(h.connected()){lookupExternal(find,error);return;}String numberValue=pay.number;if(bank&&!numberValue.replaceAll("[ -]","").matches("[0-9]{8,16}")){error.setText("Check the account number. Use 8–16 digits.");return;}if(bank&&(pay.bank.startsWith("Choose")||pay.bank.isEmpty())){error.setText("Choose the bank this account belongs to.");return;}if(!bank&&phone(numberValue).isEmpty()){error.setText("Use a 10-digit Ghanaian mobile number, or start with +233.");return;}find.setEnabled(false);find.setText("Finding account…");error.setTextColor(u.accent);error.setText("One sec. Finding your person…");final PayDraft d=pay;final Route route=h.route();final String selectedNumber=pay.number,selectedBank=pay.bank;final long serial=++lookupSerial;main.postDelayed(()->{if(h.route()!=route||pay!=d||serial!=lookupSerial||!pay.number.equals(selectedNumber)||!pay.bank.equals(selectedBank))return;find.setEnabled(true);find.setText("Find account  →");error.setTextColor(u.red);if(!h.activity().hasWindowFocus()){error.setText("");return;}String issue=resolveLookup();if(issue!=null)error.setText(issue);},1100);});
+             task(bank?"Bank transfer":"Mobile money",b,f,"Payments");return;
+         }
+         if(h.connected()){
+@@ -389,20 +415,22 @@
+         title(b,"Who’s it for?");space(b,20);b.addView(choiceRow(pay.iouId.isEmpty()?new String[]{"Lumo","MoMo","Bank"}:new String[]{"Lumo","MoMo"},"Lumo",v->begin(v.equals("MoMo")?"momo":v.equals("Bank")?"bank":"lumo")));space(b,18);EditText search=u.input("Search your people",InputType.TYPE_CLASS_TEXT);search.setText(recipientSearch);b.addView(search);space(b,16);LinearLayout list=u.col();list.setBackground(u.shape(u.surface,18));b.addView(list);fillPeople(list,recipientSearch);watch(search,v->{recipientSearch=v;fillPeople(list,v);});space(b,16);caption(b,"Or use a Lumo name below.");space(b,15);field(b,"Lumo name",pay.number,"@kofi",InputType.TYPE_CLASS_TEXT,v->{pay.number=v;pay.confirmed=false;});TextView error=problem(b);caption(b,"Demo recipients. No real account lookup is performed.");f.addView(u.button("Continue",()->{String n=pay.number.trim().toLowerCase(Locale.ROOT);if(n.length()<2){error.setText("Tell us who you’re paying.");return;}pay.name=pay.number.trim().replaceFirst("^@","");pay.network="Lumo";pay.confirmed=true;pay.amountParent="pay-recipient";boolean editing=editingRecipient;editingRecipient=false;recipientBackup=null;h.go(editing||(pay.preparedByLux||!pay.iouId.isEmpty())&&amount(pay.amount)>0?"pay-review":"pay-amount");}));task("Pay someone",b,f,"Payments");
+     }
+     private void fillPeople(LinearLayout list,String filter){list.removeAllViews();if(h.connected()){String query=filter.toLowerCase(Locale.ROOT);for(NativeModel.Favorite person:m().favourites)if(person.rail.equals("lumo")&&(person.name+" "+person.number).toLowerCase(Locale.ROOT).contains(query)){list.addView(personRow(person.name,person.number+" · Lumo",()->adoptPerson(person.name,person.number,"lumo","Lumo","")));sectionRule(list);}if(list.getChildCount()==0)list.addView(u.p("Search using their exact registered Lumo username or phone number below."));return;}for(String[] p:PEOPLE)if(!p[1].equals("@kojo")&&p[0].toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT))){list.addView(personRow(p[0],p[1]+" · Lumo",()->adoptPerson(p[0],p[1],"lumo","Lumo","")));sectionRule(list);}if("night market".contains(filter.toLowerCase(Locale.ROOT)))list.addView(personRow("Night Market","@nightmarket · Lumo",()->adoptPerson("Night Market","@nightmarket","lumo","Lumo","")));}
+-    private void resetExternalLookupButton(){if(activeLookupButton!=null){activeLookupButton.setEnabled(true);activeLookupButton.setText("Find account  →");}}
++    private void resetExternalLookupButton(){externalLookupInFlight=false;if(activeLookupButton!=null){activeLookupButton.setEnabled(true);activeLookupButton.setText("Find account  →");}refreshAvailabilityControls();}
+     private void lookupExternal(Button button,TextView error){
+         final PayDraft draft=pay;final Route route=h.route();final String owner=m().username,rail=pay.rail,number=pay.number,bank=pay.bank;final long serial=++lookupSerial;
+         final NativeRecipientLookup.Result sample=NativeExternalTransfer.lookup(rail,number,bank);
+         pay.confirmed=false;pay.name="";pay.network="";
+         if(!sample.ok){error.setText(sample.message);return;}
+-        button.setEnabled(false);button.setText("Finding account…");error.setTextColor(u.accent);error.setText("One sec. Finding your person…");
++        if(denyPayment(rail,sample.network))return;
++        externalLookupInFlight=true;button.setEnabled(false);button.setText("Finding account…");error.setTextColor(u.accent);error.setText("One sec. Finding your person…");
+         // Sample data demonstrates the lookup experience. The shared service still validates
+         // the exact destination and fee; neither step claims a live provider identity check.
+         main.postDelayed(()->{
+             if(!externalLookupCurrent(draft,route,owner,serial,number,bank)||!button.isAttachedToWindow())return;
++            if(denyPayment(rail,sample.network)){externalLookupInFlight=false;button.setText("Find account  →");refreshAvailabilityControls();return;}
+             h.readShared("externalRecipient",NativeSharedContract.object("rail",rail,"number",sample.number,"network",rail.equals("momo")?sample.network:"","bank",rail.equals("bank")?sample.bank:"","name",sample.name),reply->{
+                 if(!externalLookupCurrent(draft,route,owner,serial,number,bank))return;
+-                button.setEnabled(true);button.setText("Find account  →");error.setTextColor(u.red);error.setText("");
++                externalLookupInFlight=false;button.setEnabled(true);button.setText("Find account  →");error.setTextColor(u.red);error.setText("");refreshAvailabilityControls();
+                 try{JSONObject recipient=NativeExternalTransfer.recipient(reply,rail,sample.number,sample.network,sample.bank);
+                     if(!sample.name.equals(recipient.optString("name")))throw new Exception("The sample account details changed. Find the account again.");
+                     pay.name=recipient.getString("name");pay.number=recipient.getString("number");pay.network=recipient.optString("network");pay.bank=recipient.optString("bank");pay.confirmed=false;h.go("pay-confirm");
+@@ -457,7 +485,7 @@
+         else{LinearLayout edit=u.col();edit.addView(u.textButton("Edit amount",()->h.go(!pay.requestId.isEmpty()?"request-detail":!pay.iouId.isEmpty()?"iou-detail":"pay-amount",!pay.requestId.isEmpty()?pay.requestId:pay.iouId)));if(pay.requestId.isEmpty()&&pay.iouId.isEmpty())edit.addView(u.textButton("Change recipient",()->{recipientBackup=copyPay(pay);editingRecipient=true;h.go("pay-recipient");}));if(!h.connected()||!NativeExternalTransfer.rail(pay.rail))edit.addView(u.textButton("Save as favourite",()->saveFavourite(pay.name,pay.number,pay.rail,pay.bank,pay.network)));b.addView(expansion("Edit payment details","",edit,false));}
+         if(h.connected()&&NativeExternalTransfer.rail(pay.rail))b.addView(u.p(NativeExternalTransfer.disclosure()));
+         LinearLayout simulation=u.col();simulation.addView(u.p("No provider is connected. A pending result keeps money held until separately confirmed. Fees are sample pricing."));select(simulation,"Sample result",outcome.equals("success")?"Confirmed":outcome.equals("pending")?"Pending":"Failed",new String[]{"Confirmed","Pending","Failed"},v->outcome=v.equals("Confirmed")?"success":v.equals("Pending")?"pending":"failed");if(!h.connected())b.addView(expansion("Payment simulation","",simulation,false));TextView error=problem(b);
+-        f.addView(u.button(total<=m().available()?"Continue":"Add money",()->{if(total>m().available()){h.go("pay-fund");return;}if(needsPause(total)){h.go("pay-pause");return;}authorizePayment();}));task("Review payment",b,f,service?"Details":"Amount");
++        f.addView(availableControl(u.button(total<=m().available()?"Continue":"Add money",()->{if(total>m().available()){h.go("pay-fund");return;}if(needsPause(total)){h.go("pay-pause");return;}authorizePayment();}),"",pay));task("Review payment",b,f,service?"Details":"Amount");
+     }
+     private View reviewRow(String icon,String label,String value,boolean total){LinearLayout row=u.row();row.setPadding(u.dp(14),u.dp(15),u.dp(14),u.dp(15));row.setMinimumHeight(u.dp(64));row.addView(txt(label,14,u.text),new LinearLayout.LayoutParams(0,-2,1));TextView amount=txt(value,total?28:17,total?u.accent:u.text);amount.setTypeface(u.font(total?550:500));amount.setGravity(Gravity.END);amount.setMaxWidth(u.dp(Math.max(140,h.activity().getResources().getConfiguration().screenWidthDp/2)));amount.setSingleLine(false);row.addView(amount,new LinearLayout.LayoutParams(-2,-2));return row;}
+ 
+@@ -500,6 +528,7 @@
+     }
+ 
+     private void authorizePayment() {
++        if(denyPayment(pay.rail,pay.network))return;
+         final PayDraft d=pay;final long a=amount(d.amount);final String chosen=outcome;final long total=a+(d.rail.equals("momo")?50:d.rail.equals("bank")?100:0);
+         if(h.connected()){if("merchant".equals(d.rail))reviewSharedMerchant(d,()->submitSharedPayment(d,a));else submitSharedPayment(d,a);return;}
+         h.authorize("A quick check. Then you’re good.",()->{NativeModel.Result r;
+@@ -524,7 +553,7 @@
+         final PayDraft draft=pay;final Route origin=h.route();final long serial=++lookupSerial;
+         h.resolveShared(query,response->{if(pay!=draft||h.route()!=origin||lookupSerial!=serial)return;JSONObject person=response.optJSONObject("recipient");if(!response.optBoolean("ok")||person==null){h.toast(response.optString("message","That Lumo account could not be found."));return;}applyRecipient(draft,person);next.run();});
+     }
+-    private void submitSharedPayment(PayDraft draft,long amount){
++    private void submitSharedPayment(PayDraft draft,long amount){if(denyPayment(draft.rail,draft.network))return;
+         if(paymentSubmitting)return;
+         if(!"lumo".equals(draft.rail)&&!"merchant".equals(draft.rail)&&!NativeExternalTransfer.rail(draft.rail)){h.toast("This payment method is not connected yet. Choose a Lumo account or scan a merchant QR.");return;}
+         if("lumo".equals(draft.rail)&&safe(draft.recipientId).isEmpty()){resolvePerson(draft.number,()->submitSharedPayment(draft,amount));return;}
+@@ -574,7 +603,7 @@
+     private void funding(){if(h.route().screen.equals("pay-fund")||h.route().screen.equals("pay-funding"))h.back();funding.number=m().ownFundingPhone();fundingSheet();}
+     private void fundingSheet(){funding.number=m().ownFundingPhone();LinearLayout b=u.col();caption(b,"Add money");b.addView(u.h1("A little fuel\nfor your plans."));boolean bank=funding.source.equals("Bank transfer");b.addView(choiceRow(new String[]{"Mobile money","Bank transfer"},bank?"Bank transfer":"Mobile money",v->{funding.source=v.equals("Bank transfer")?"Bank transfer":"MTN MoMo";fundingSheet();}));space(b,20);String receiving="Lumo demo receiving details\nBank: GCB Bank · simulation\nAccount name: "+m().name+" · demo\nAccount number: 000005001118\nReference: LUMO-DEMO\nDo not send real money to these sample details.";
+         if(bank&&!h.connected()){summaryLine(b,"Bank","GCB Bank · demo",14);space(b,18);b.addView(u.item("Account name",m().name+" · demo",null));summaryLine(b,"Sample account","000005001118",14);space(b,18);summaryLine(b,"Reference","LUMO-DEMO",14);space(b,16);caption(b,"Sample receiving details only. Do not transfer real money to them.");LinearLayout buttons=u.row();buttons.addView(u.secondary("Copy details",()->{ClipboardManager clipboard=(ClipboardManager)h.activity().getSystemService(Context.CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("Lumo receiving details",receiving));h.toast("Copied. Ready to share.");}),new LinearLayout.LayoutParams(0,u.dp(52),1));LinearLayout.LayoutParams share=new LinearLayout.LayoutParams(0,u.dp(52),1);share.leftMargin=u.dp(10);buttons.addView(u.secondary("Share details",()->h.services().shareText(receiving)),share);b.addView(buttons);space(b,20);}else if(!bank){caption(b,h.connected()?"Your registered Lumo number":"Your MoMo number");EditText own=u.input("Registered Lumo number",InputType.TYPE_CLASS_PHONE);own.setText(funding.number);own.setKeyListener(null);own.setFocusable(false);own.setCursorVisible(false);own.setContentDescription(h.connected()?"Your registered Lumo number. Read only.":"Your registered MoMo number. Read only.");b.addView(own);caption(b,h.connected()?"This identifies your Lumo account. No MoMo prompt will be sent.":"Your registered Lumo number. You can only add money from this MoMo wallet.");}
+-        money(b,h.connected()?"Test amount (GH₵)":bank?"Amount to track (GH₵)":"Top-up amount (GH₵)",funding.amount,v->funding.amount=v);caption(b,h.connected()?"Add test money to your shared account. No bank or MoMo wallet will be charged.":(bank?"Track the transfer, then wait for its confirmed result.":"Review your own wallet and amount. A top-up stays pending until confirmation.")+" This is a simulation. No prompt, bank debit or real transfer is sent.");TextView error=problem(b);space(b,20);b.addView(u.button(h.connected()?"Add test money":bank?"Track this transfer":"Review top-up",()->{long amount=amount(funding.amount);if(amount<=0||amount>100000000){error.setText("Use GH₵0.01 to GH₵1,000,000, with up to two decimal places.");return;}funding.number=m().ownFundingPhone();if(!bank&&funding.number.isEmpty()){error.setText("Check your registered Lumo number before adding money from MoMo.");return;}final FundingDraft draft=funding;if(h.connected()){if(fundingSubmitting)return;fundingSubmitting=true;h.submit("fund",NativeSharedContract.object("amount",amount,"source",draft.source+" · test money","rail",bank?"bank":"momo","note","Explicit test funding","idempotencyKey",draft.key),true,r->{fundingSubmitting=false;if(!result(r))return;funding=new FundingDraft();h.closeSheet();h.go("pay-fund-status",r.id);});return;}h.closeSheet();h.authorize(bank?"Track "+Ui.cash(amount)+" bank transfer?":"Request "+Ui.cash(amount)+" from your own wallet?",()->{NativeModel.Result r=h.commit(model->model.requestFunding(amount,draft.source,bank?"bank":"momo",draft.number,draft.key));if(result(r)){funding=new FundingDraft();h.go("pay-fund-status",r.id);}});}));space(b,8);b.addView(u.textButton("View top-up history",()->{h.closeSheet();h.go("pay-funding-detail");}));h.sheet("",b);}
++        money(b,h.connected()?"Test amount (GH₵)":bank?"Amount to track (GH₵)":"Top-up amount (GH₵)",funding.amount,v->funding.amount=v);caption(b,h.connected()?"Add test money to your shared account. No bank or MoMo wallet will be charged.":(bank?"Track the transfer, then wait for its confirmed result.":"Review your own wallet and amount. A top-up stays pending until confirmation.")+" This is a simulation. No prompt, bank debit or real transfer is sent.");TextView error=problem(b);space(b,20);b.addView(availableControl(u.button(h.connected()?"Add test money":bank?"Track this transfer":"Review top-up",()->{NativeServiceAvailability availability=h.connected()?h.serviceAvailability():null;if(availability!=null&&!availability.available("test_funding",android.os.SystemClock.elapsedRealtime())){error.setText(availability.message("test_funding",android.os.SystemClock.elapsedRealtime()));return;}long amount=amount(funding.amount);if(amount<=0||amount>100000000){error.setText("Use GH₵0.01 to GH₵1,000,000, with up to two decimal places.");return;}funding.number=m().ownFundingPhone();if(!bank&&funding.number.isEmpty()){error.setText("Check your registered Lumo number before adding money from MoMo.");return;}final FundingDraft draft=funding;if(h.connected()){if(fundingSubmitting)return;fundingSubmitting=true;h.submit("fund",NativeSharedContract.object("amount",amount,"source",draft.source+" · test money","rail",bank?"bank":"momo","note","Explicit test funding","idempotencyKey",draft.key),true,r->{fundingSubmitting=false;if(!result(r))return;funding=new FundingDraft();h.closeSheet();h.go("pay-fund-status",r.id);});return;}h.closeSheet();h.authorize(bank?"Track "+Ui.cash(amount)+" bank transfer?":"Request "+Ui.cash(amount)+" from your own wallet?",()->{NativeModel.Result r=h.commit(model->model.requestFunding(amount,draft.source,bank?"bank":"momo",draft.number,draft.key));if(result(r)){funding=new FundingDraft();h.go("pay-fund-status",r.id);}});}),"test_funding",null));space(b,8);b.addView(u.textButton("View top-up history",()->{h.closeSheet();h.go("pay-funding-detail");}));h.sheet("",b);}
+     private void fundingDetail(String id){NativeModel.Transaction tx=m().tx(id);LinearLayout b=u.col();if(tx==null){title(b,"Fuel for your plans.");for(NativeModel.Transaction entry:m().transactions)if(entry.type.equals("income"))b.addView(u.itemIcon(entry.rail.equals("bank")?"bank":"phone",entry.recipient,status(entry.status)+" · "+dateText(entry.at),m().hideBalance?"••••.••":Ui.cash(entry.amount),()->h.go("pay-fund-status",entry.id)));b.addView(u.button("Add money",()->{funding=new FundingDraft();fundingSheet();}));h.showTask("Your top-ups",b,footer(),"Home");return;}
+         space(b,24);ImageView icon=u.icon(tx.status.equals("success")?"check":tx.status.equals("pending")?"clock":"info",40,u.accent);FrameLayout circle=new FrameLayout(h.activity());circle.setBackground(u.border(Color.TRANSPARENT,u.accent,40));circle.addView(icon,new FrameLayout.LayoutParams(u.dp(40),u.dp(40),Gravity.CENTER));LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(u.dp(72),u.dp(72));lp.gravity=Gravity.CENTER_HORIZONTAL;b.addView(circle,lp);space(b,24);title(b,tx.status.equals("success")?"Money’s here.":tx.status.equals("pending")?"One more little step.":"That top-up didn’t land.");b.addView(txt(m().hideBalance?"••••.••":Ui.cash(tx.amount),44,u.text));space(b,16);b.addView(u.p(tx.status.equals("pending")?(tx.recipient.startsWith("Bank transfer")?"Waiting for your bank transfer to arrive.":"Waiting for approval in your own mobile-money wallet."):"Only confirmed funding increases Everyday."));summaryLine(b,"From",tx.recipient,14);space(b,18);summaryLine(b,"Status",status(tx.status),14);space(b,18);b.addView(u.item("Reference",tx.id,null));
+         if(tx.status.equals("pending")){b.addView(u.secondary("Check this reference",()->{if(h.connected())refreshShared();else h.toast("This reference is still pending. Checking alone does not confirm funding.");}));LinearLayout simulation=u.col();caption(simulation,"Choose the provider’s result. Checking alone never confirms it.");simulation.addView(u.secondary("Confirm funding",()->{NativeModel.Result r=h.commit(model->{NativeModel.Result result=model.resolvePayment(id,"success");if(result.ok&&model.tx(id)!=null&&model.tx(id).direction.equals("in")&&"fund".equals(model.setupStage))model.setupStage="plan";return result;});if(result(r))h.refresh();}));simulation.addView(u.secondary("Decline funding",()->{NativeModel.Result r=h.commit(model->model.resolvePayment(id,"failed"));if(result(r))h.refresh();}));simulation.addView(u.secondary("Expire funding",()->{NativeModel.Result r=h.commit(model->model.resolvePayment(id,"expired"));if(result(r))h.refresh();}));if(!h.connected())b.addView(expansion("Funding simulation","",simulation,false));}else if(tx.status.equals("failed")||tx.status.equals("expired"))b.addView(u.button("Review and try again",()->{funding=new FundingDraft();funding.amount=amountText(tx.amount);funding.source=tx.recipient.startsWith("Bank transfer")?"Bank transfer":"MTN MoMo";fundingSheet();}));else b.addView(u.button("Back to your money",()->{if(!pay.name.isEmpty()&&!pay.amount.isEmpty())h.go("pay-review");else h.home();}));b.addView(u.secondary("Missing a top-up?",()->h.go("support-new",id)));space(b,16);caption(b,"Local prototype · No real money moves.");h.showTask("Add money",b,footer(),"Your money");}
+--- a/app/src/main/java/com/lumo/nativeapp/NativeCampusDirectory.java
++++ b/app/src/main/java/com/lumo/nativeapp/NativeCampusDirectory.java
+@@ -31,6 +31,9 @@
+     private long serial,locationSerial; private Double latitude,longitude;
+     private LocationManager locationManager; private LocationListener locationListener;
+     private NativeReadFence locationFence;
++    private Button activePaymentButton;
++    private TextView activeAvailabilityNotice;
++    private boolean activeShopAccepting;
+     public NativeCampusDirectory(Host host,java.util.function.Consumer<String> onPay){h=host;u=h.ui();pay=onPay;}
+     private String owner(){return h.model().merchantAccountId+"|"+h.model().username;}
+     private void context(){String next=owner();if(!identity.equals(next)){identity=next;serial++;shops=new JSONArray();loaded=false;loading=false;query="";area="All areas";savedOnly=false;latitude=null;longitude=null;error="";locationNotice="";cancelLocation();}}
+@@ -79,9 +82,17 @@
+         if(!shop.optString("landmark").isEmpty())body.addView(u.p(shop.optString("landmark")));
+         body.addView(u.p(shop.optString("hours").isEmpty()?"Hours have not been provided.":"Stated hours: "+shop.optString("hours")));
+         body.addView(u.p("Shop code "+shop.optString("code")+"\n"+(shop.optBoolean("accepting")&&shop.optBoolean("open",true)?"Accepting Lumo payments":"Payments paused")));
+-        Button next=u.button("Continue to payment",()->{if(!actor.equals(owner()))return;h.closeSheet();pay.accept("https://"+NativeApprovedMerchantQr.HOST+"/?pay="+id);});next.setEnabled(shop.optBoolean("accepting")&&shop.optBoolean("open",true));body.addView(next);
++        Button next=u.button("Continue to payment",()->{if(!actor.equals(owner()))return;NativeServiceAvailability availability=h.serviceAvailability();if(availability!=null&&!availability.available("merchant_payment",android.os.SystemClock.elapsedRealtime())){h.toast(availability.message("merchant_payment",android.os.SystemClock.elapsedRealtime()));refreshAvailability();return;}h.closeSheet();pay.accept("https://"+NativeApprovedMerchantQr.HOST+"/?pay="+id);});activePaymentButton=next;activeShopAccepting=shop.optBoolean("accepting")&&shop.optBoolean("open",true);next.setEnabled(activeShopAccepting);body.addView(next);
++        activeAvailabilityNotice=u.text("",13,u.muted);activeAvailabilityNotice.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);body.addView(activeAvailabilityNotice);refreshAvailability();
+         Button save=u.secondary(favourite(id)?"Remove saved shop":"Save this shop",null);save.setOnClickListener(v->{if(!actor.equals(owner()))return;save.setEnabled(false);h.submit(favourite(id)?"removeMerchantFavorite":"saveMerchantFavorite",NativeSharedContract.object("shopId",id),false,result->{if(!actor.equals(owner()))return;if(result.ok){h.closeSheet();draw();}else save.setEnabled(true);h.toast(result.message);});});body.addView(save);
+         body.addView(u.text("The receiving shop is checked again before payment. Stated hours do not guarantee a shop is open.",12,u.muted));h.sheet("Merchant details",body);
++    }
++    public void refreshAvailability(){
++        if(activePaymentButton==null||activeAvailabilityNotice==null)return;
++        NativeServiceAvailability availability=h.serviceAvailability();long now=android.os.SystemClock.elapsedRealtime();
++        boolean available=availability==null||availability.available("merchant_payment",now);
++        activePaymentButton.setEnabled(activeShopAccepting&&available);activePaymentButton.setAlpha(available?1f:.42f);
++        activeAvailabilityNotice.setText(available?"":availability.message("merchant_payment",now));activeAvailabilityNotice.setVisibility(available?View.GONE:View.VISIBLE);
+     }
+     private void locate(){
+         context();cancelLocation();locationPending=true;locationFence=new NativeReadFence(h.route(),h.interactionGeneration(),++locationSerial);
+--- a/app/src/main/java/com/lumo/nativeapp/NativeSyncPresentation.java
++++ b/app/src/main/java/com/lumo/nativeapp/NativeSyncPresentation.java
+@@ -22,6 +22,13 @@
+   quietAccountMetadata(copy.optJSONObject("account"));
+   JSONObject state=copy.optJSONObject("state");
+   if(state!=null)quietAccountMetadata(state.optJSONObject("account"));
++  JSONObject capabilities=copy.optJSONObject("capabilities");
++  JSONArray availability=capabilities==null?null:capabilities.optJSONArray("serviceAvailability");
++  if(availability!=null)for(int n=0;n<availability.length();n++){
++   JSONObject service=availability.optJSONObject(n);if(service==null)continue;
++   // Health-check timestamps do not replace a screen. Availability and customer messages do.
++   service.remove("lastCheckedAt");service.remove("updatedAt");
++  }
+   return copy;
+  }
+  private static void quietAccountMetadata(JSONObject account)throws JSONException {
+--- /dev/null
++++ b/app/src/main/java/com/lumo/nativeapp/NativeServiceAvailability.java
+@@ -0,0 +1,53 @@
++package com.lumo.nativeapp;
++
++import java.util.HashMap;
++import java.util.Locale;
++import org.json.JSONArray;
++import org.json.JSONObject;
++
++/** Public operational status is display guidance. The shared ledger remains payment authority. */
++public final class NativeServiceAvailability {
++    static final long FRESH_FOR_MS=45000L;
++    private static final String CHECKING="Checking payment availability. Please try again shortly.";
++    private static final String UNAVAILABLE="This payment option is temporarily unavailable. Please use another method or try again later.";
++    private final HashMap<String,Entry> services=new HashMap<>();
++    private long receivedAt=-1;
++    private long serverAt=-1;
++    private static final class Entry {boolean available;String message;long serverAt;}
++
++    public synchronized boolean accept(JSONObject reply,long now){
++        if(reply==null||!reply.optBoolean("ok"))return false;
++        JSONArray rows=reply.optJSONArray("services");
++        JSONObject capabilities=reply.optJSONObject("capabilities");
++        if(rows==null&&capabilities!=null)rows=capabilities.optJSONArray("serviceAvailability");
++        if(rows==null||rows.length()==0)return false;
++        long envelopeAt=stamp(reply.optString("checkedAt"));
++        HashMap<String,Entry> next=new HashMap<>();
++        for(int i=0;i<rows.length();i++){
++            JSONObject row=rows.optJSONObject(i);if(row==null)continue;
++            String id=row.optString("serviceId",row.optString("id"));
++            if(!id.matches("[a-z][a-z0-9_]{0,79}")||!(row.opt("available") instanceof Boolean))continue;
++            Entry entry=new Entry();
++            String mode=row.optString("mode"),status=row.optString("status");
++            entry.available=row.optBoolean("available")&&mode.equals("automatic")&&status.equals("healthy")&&!row.optString("providerMode").equals("unavailable");
++            entry.message=clean(row.optString("message"));
++            entry.serverAt=Math.max(envelopeAt,Math.max(stamp(row.optString("updatedAt")),stamp(row.optString("lastCheckedAt"))));
++            Entry previous=services.get(id);
++            if(previous!=null&&previous.serverAt>entry.serverAt)next.put(id,previous);else next.put(id,entry);
++        }
++        if(next.isEmpty())return false;
++        if(envelopeAt>=0&&serverAt>envelopeAt)return false;
++        String before=signature();services.clear();services.putAll(next);receivedAt=now;serverAt=Math.max(serverAt,envelopeAt);
++        return !before.equals(signature());
++    }
++    public synchronized boolean fresh(long now){return receivedAt>=0&&now>=receivedAt&&now-receivedAt<=FRESH_FOR_MS;}
++    public synchronized boolean available(String id,long now){Entry entry=services.get(id);return fresh(now)&&entry!=null&&entry.available;}
++    public synchronized String message(String id,long now){Entry entry=services.get(id);if(!fresh(now)||entry==null)return CHECKING;return entry.available?"":entry.message.isEmpty()?UNAVAILABLE:entry.message;}
++    public synchronized boolean paymentAvailable(String rail,String network,long now){String base=forRail(rail);if(base.isEmpty())return true;if(!available(base,now))return false;String scoped=networkService(rail,network);return scoped.isEmpty()||available(scoped,now);}
++    public synchronized String paymentMessage(String rail,String network,long now){String base=forRail(rail);if(base.isEmpty())return "";if(!available(base,now))return message(base,now);String scoped=networkService(rail,network);return !scoped.isEmpty()&&!available(scoped,now)?message(scoped,now):"";}
++    public static String forRail(String rail){return "momo".equals(rail)?"momo_send":"bank".equals(rail)?"bank_send":"lumo".equals(rail)?"lumo_transfer":"merchant".equals(rail)?"merchant_payment":"";}
++    static String networkService(String rail,String network){if(!"momo".equals(rail))return "";String n=String.valueOf(network).toLowerCase(Locale.ROOT);return n.contains("mtn")?"momo_send_mtn":n.contains("telecel")||n.contains("vodafone")?"momo_send_telecel":n.contains("at money")||n.contains("airteltigo")||n.equals("at")?"momo_send_at":"";}
++    private static String clean(String message){return message.replaceAll("[\\p{Cntrl}]"," ").trim().substring(0,Math.min(300,message.replaceAll("[\\p{Cntrl}]"," ").trim().length()));}
++    private static long stamp(String value){if(value==null||value.isEmpty())return -1;try{return java.time.Instant.parse(value).toEpochMilli();}catch(Exception ignored){return -1;}}
++    private String signature(){StringBuilder out=new StringBuilder();java.util.ArrayList<String> ids=new java.util.ArrayList<>(services.keySet());java.util.Collections.sort(ids);for(String id:ids){Entry e=services.get(id);out.append(id).append('|').append(e.available).append('|').append(e.message).append(';');}return out.toString();}
++}
+--- /dev/null
++++ b/tests/NativeServiceAvailabilityTest.java
+@@ -0,0 +1,42 @@
++package com.lumo.nativeapp;
++import java.util.*;
++import java.io.IOException;
++import org.json.*;
++
++/** Exercises operational status and original-reference recovery without moving money. */
++public final class NativeServiceAvailabilityTest {
++    private static int checks;
++    private static void check(boolean value,String message){checks++;if(!value)throw new AssertionError(message);}
++    private static JSONObject object(Object... pairs)throws Exception{JSONObject out=new JSONObject();for(int n=0;n<pairs.length;n+=2)out.put((String)pairs[n],pairs[n+1]);return out;}
++    static JSONObject service(String id,boolean allowed)throws Exception{return object("id",id,"serviceId",id,"available",allowed,"mode","automatic","status",allowed?"healthy":"open","providerMode","sandbox","message",allowed?"":"MoMo is temporarily unavailable.","lastCheckedAt","2026-11-14T16:00:00Z","updatedAt","2026-11-14T15:00:00Z");}
++    static JSONObject healthy()throws Exception{JSONArray rows=new JSONArray();for(String id:new String[]{"lumo_transfer","momo_send","momo_send_mtn","momo_send_telecel","momo_send_at","bank_send","merchant_payment","test_funding"})rows.put(service(id,true));return object("ok",true,"services",rows,"checkedAt","2026-11-14T16:00:01Z");}
++    private static void statuses()throws Exception{
++        NativeServiceAvailability state=new NativeServiceAvailability();check(!state.available("momo_send",0),"An unchecked service cannot be announced as available");check(state.message("momo_send",0).contains("Checking"),"Unknown is explained as checking, not a fabricated outage");
++        JSONObject initial=healthy();check(state.accept(initial,100),"Initial healthy statuses change the presentation");check(state.paymentAvailable("momo","MTN MoMo",100),"A healthy global and network route is enabled");check(state.paymentAvailable("bank","GCB Bank",100),"Bank route is independent");
++        JSONObject heartbeat=healthy();heartbeat.put("checkedAt","2026-11-14T16:00:20Z");heartbeat.getJSONArray("services").getJSONObject(1).put("lastCheckedAt","2026-11-14T16:00:19Z");check(!state.accept(heartbeat,200),"Heartbeat-only changes do not replace the visible screen");
++        JSONObject scoped=healthy().put("checkedAt","2026-11-14T16:00:30Z");scoped.getJSONArray("services").getJSONObject(2).put("available",false).put("status","open");state.accept(scoped,300);
++        check(!state.paymentAvailable("momo","MTN MoMo",300),"A failed MTN path is disabled");check(state.paymentAvailable("momo","Telecel Cash",300),"MTN failure leaves Telecel available");check(state.paymentAvailable("lumo","",300),"MTN failure leaves Lumo payments available");
++        JSONObject manual=healthy().put("checkedAt","2026-11-14T16:00:40Z");manual.getJSONArray("services").getJSONObject(1).put("mode","manual_off");state.accept(manual,400);check(!state.paymentAvailable("momo","Telecel Cash",400),"Manual off overrides a contradictory healthy/available field");
++        check(!state.accept(scoped,500),"An older response cannot undo a manual shutdown");check(!state.paymentAvailable("momo","Telecel Cash",500),"Manual shutdown stays in place after the stale reply");
++        check(!state.available("bank_send",400+NativeServiceAvailability.FRESH_FOR_MS+1),"Stale availability cannot keep a new-money option enabled");
++        JSONObject malformed=healthy().put("checkedAt","2026-11-14T16:00:50Z");malformed.getJSONArray("services").getJSONObject(1).put("status","unexpected");state.accept(malformed,600);check(!state.available("momo_send",600),"Unrecognised health states fail closed");
++        JSONObject snapshot=object("ok",true,"capabilities",object("serviceAvailability",healthy().getJSONArray("services")));check(new NativeServiceAvailability().accept(snapshot,10),"Authenticated snapshot status uses the same projection as a public status read");
++    }
++    private static final String OWNER="11111111-1111-4111-8111-111111111111",ACCOUNT="33333333-3333-4333-8333-333333333333";
++    private static final class Memory implements NativeApprovedAccount.Storage {
++        final Map<String,JSONObject> objects=new HashMap<>();final Map<String,String> strings=new HashMap<>();
++        public JSONObject getObject(String key)throws Exception{return objects.containsKey(key)?new JSONObject(objects.get(key).toString()):null;}
++        public void putObject(String key,JSONObject value)throws Exception{if(value==null)objects.remove(key);else objects.put(key,new JSONObject(value.toString()));}
++        public String getString(String key){return strings.getOrDefault(key,"");}public boolean putString(String key,String value){strings.put(key,value);return true;}
++    }
++    private static Memory storage()throws Exception{Memory store=new Memory();store.putObject("session",object("access_token","a.b.c","refresh_token","refresh-test","expires_at",Long.MAX_VALUE,"user",object("id",OWNER)));return store;}
++    private static void paymentReferences()throws Exception{
++        for(boolean noMutation:new boolean[]{false,true}){
++            Memory store=storage();List<String> seen=new ArrayList<>();NativeApprovedAccount account=new NativeApprovedAccount(store,(path,body,token)->{seen.add(body.optString("attemptId"));return object("ok",false,"code","SERVICE_PAUSED","noMutation",noMutation);});JSONObject action=account.prepare("payment",object("amount",2500,"rail","momo"));account.markSent(action);account.submit(action,"1234",null);
++            check(noMutation?account.pending()==null:account.pending()!=null,"A paused outcome releases the pending record only with definitive no-mutation evidence");
++            if(!noMutation){account.recoverPending();check(seen.get(0).equals(seen.get(1)),"An uncertain paused response recovers using its original reference");}
++        }
++        Memory store=storage();final String[] token={"not-called"};NativeApprovedAccount account=new NativeApprovedAccount(store,(path,body,bearer)->{token[0]=bearer;check(body.length()==1&&body.optString("action").equals("serviceStatus"),"Availability read carries only the public command");return healthy();});account.serviceStatus();check(token[0]==null,"Public status sends no customer bearer token");check(account.lastSnapshot()==null,"Availability does not create or replace a financial snapshot");
++    }
++    public static void main(String[] args)throws Exception{statuses();paymentReferences();System.out.println("NativeServiceAvailabilityTest: "+checks+" operational status and original-reference checks passed");}
++}
+--- /dev/null
++++ b/tests/startup/src/test/java/com/lumo/nativeapp/ServiceAvailabilityExperienceTest.java
+@@ -0,0 +1,35 @@
++package com.lumo.nativeapp;
++import android.view.*;import android.widget.*;import java.lang.reflect.*;import java.util.*;import org.json.*;import org.junit.Test;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import static org.junit.Assert.*;
++@RunWith(RobolectricTestRunner.class) @Config(sdk={28,35}) @LooperMode(LooperMode.Mode.PAUSED)
++public class ServiceAvailabilityExperienceTest {
++ @Test public void outageDisablesOnlyTheAffectedChoiceAndRecoveryKeepsTheView()throws Exception{
++  Fixture f=new Fixture();f.status("momo_send",false);f.money.show(f.route);View page=f.page();TextView momo=text(page,"Mobile money");View row=(View)momo.getParent().getParent();assertFalse(row.isEnabled());assertEquals(.42f,row.getAlpha(),.01f);assertTrue(all(page).contains("MoMo is temporarily unavailable"));assertTrue(((View)text(page,"Lumo user").getParent().getParent()).isEnabled());assertTrue(((View)text(page,"Bank account").getParent().getParent()).isEnabled());
++  f.status("momo_send",true);f.money.refreshAvailabilityControls();assertSame(page,f.page());assertSame(momo,text(page,"Mobile money"));assertTrue(row.isEnabled());assertEquals(1f,row.getAlpha(),.01f);assertFalse(all(page).contains("MoMo is temporarily unavailable"));assertEquals(0,f.submissions);
++ }
++ @Test public void anOpenRecipientFormRetainsItsNumberWhileTheNetworkChanges()throws Exception{
++  Fixture f=new Fixture();f.begin("momo");EditText number=described(f.page(),"MoMo number");number.setText("0241112233");assertNull("MoMo keeps the phone-only lookup",find(f.page(),Spinner.class));assertNull(described(f.page(),"Recipient label (optional)"));View page=f.page();TextView prepare=text(page,"Find account  →");assertTrue(prepare.isEnabled());
++  f.status("momo_send_mtn",false);f.money.refreshAvailabilityControls();assertFalse(prepare.isEnabled());assertSame(number,described(f.page(),"MoMo number"));assertEquals("0241112233",number.getText().toString());assertSame(page,f.page());assertTrue(all(page).contains("MoMo is temporarily unavailable"));
++  number.setText("0241112244");assertFalse(prepare.isEnabled());number.setText("0555550124");assertTrue(prepare.isEnabled());assertSame(number,described(f.page(),"MoMo number"));assertEquals("0555550124",number.getText().toString());assertEquals(0,f.submissions);
++ }
++ @Test public void fundingShutdownLeavesTopUpHistoryReachable()throws Exception{
++  Fixture f=new Fixture();f.status("test_funding",false);f.route=new Route("pay-fund");f.money.show(f.route);TextView add=text(f.page(),"Add test money");assertNotNull(add);assertFalse(add.isEnabled());assertTrue(text(f.page(),"View top-up history").isEnabled());assertEquals(0,f.submissions);
++  f.status("test_funding",true);f.money.refreshAvailabilityControls();assertTrue(add.isEnabled());assertEquals(0,f.submissions);
++ }
++ @Test public void merchantShutdownKeepsTheShopAndSaveActionAvailable()throws Exception{
++  Fixture f=new Fixture();f.status("merchant_payment",false);NativeCampusDirectory directory=new NativeCampusDirectory(f.host,value->{throw new AssertionError("Unavailable service cannot start a merchant payment");});Method details=NativeCampusDirectory.class.getDeclaredMethod("details",JSONObject.class);details.setAccessible(true);details.invoke(directory,NativeSharedContract.object("id","33333333-3333-4333-8333-333333333333","name","Synthetic shop","businessName","Synthetic merchant","area","Night Market","code","LUM400001","accepting",true,"open",true));
++  TextView pay=text(f.page(),"Continue to payment");assertFalse(pay.isEnabled());assertTrue(text(f.page(),"Save this shop").isEnabled());assertTrue(all(f.page()).contains("Synthetic shop"));f.status("merchant_payment",true);directory.refreshAvailability();assertTrue(pay.isEnabled());assertEquals(0,f.submissions);
++ }
++ static class Fixture implements InvocationHandler{
++  final MainActivity activity=Robolectric.buildActivity(MainActivity.class).setup().get();final NativeModel model=activity.model();final NativeServiceAvailability availability=new NativeServiceAvailability();Route route=new Route("pay");final NativeMoneyScreens money;int submissions;long tick;
++  final Host host=(Host)Proxy.newProxyInstance(Host.class.getClassLoader(),new Class[]{Host.class},this);
++  Fixture()throws Exception{model.username="availability_tester";model.name="Synthetic Tester";model.phone="0241112233";model.onboarded=true;model.signedOut=false;model.setupStage="";model.wallet=100000;status("",true);money=new NativeMoneyScreens(host);}
++  void status(String service,boolean allowed)throws Exception{JSONArray rows=new JSONArray();for(String id:new String[]{"lumo_transfer","momo_send","momo_send_mtn","momo_send_telecel","momo_send_at","bank_send","merchant_payment","test_funding"}){boolean ok=!id.equals(service)||allowed;rows.put(NativeSharedContract.object("id",id,"serviceId",id,"available",ok,"mode","automatic","status",ok?"healthy":"open","providerMode","sandbox","message",ok?"":"MoMo is temporarily unavailable."));}availability.accept(NativeSharedContract.object("ok",true,"services",rows),android.os.SystemClock.elapsedRealtime());}
++  void begin(String rail)throws Exception{Method begin=NativeMoneyScreens.class.getDeclaredMethod("begin",String.class);begin.setAccessible(true);begin.invoke(money,rail);Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}
++  View page(){return activity.findViewById(android.R.id.content);}
++  public Object invoke(Object proxy,Method method,Object[] args)throws Throwable{switch(method.getName()){case "model":return model;case "route":return route;case "connected":return true;case "serviceAvailability":return availability;case "showFull":activity.setContentView((View)args[0]);return null;case "showTask":case "showRoot":case "showPage":{LinearLayout page=activity.ui().col();page.addView((View)args[1]);if(args.length>2&&args[2] instanceof View)page.addView((View)args[2]);activity.setContentView(page);return null;}case "sheet":activity.setContentView((View)args[1]);return null;case "go":route=new Route((String)args[0],args.length>1?(String)args[1]:"");money.show(route);return null;case "readShared":return null;case "submit":submissions++;return null;case "toast":return null;}try{return method.invoke(activity,args);}catch(InvocationTargetException e){throw e.getCause();}}
++ }
++ static EditText described(View v,String name){if(v instanceof EditText&&name.contentEquals(v.getContentDescription()==null?"":v.getContentDescription()))return(EditText)v;if(v instanceof ViewGroup)for(int n=0;n<((ViewGroup)v).getChildCount();n++){EditText found=described(((ViewGroup)v).getChildAt(n),name);if(found!=null)return found;}return null;}
++ static String all(View v){String value=v instanceof TextView?String.valueOf(((TextView)v).getText()):"";if(v instanceof ViewGroup)for(int n=0;n<((ViewGroup)v).getChildCount();n++)value+="\n"+all(((ViewGroup)v).getChildAt(n));return value;}
++ static TextView text(View v,String value){if(v instanceof TextView&&value.contentEquals(((TextView)v).getText()))return(TextView)v;if(v instanceof ViewGroup)for(int n=0;n<((ViewGroup)v).getChildCount();n++){TextView found=text(((ViewGroup)v).getChildAt(n),value);if(found!=null)return found;}return null;}
++ static<T extends View>T find(View v,Class<T> type){if(type.isInstance(v))return type.cast(v);if(v instanceof ViewGroup)for(int n=0;n<((ViewGroup)v).getChildCount();n++){T found=find(((ViewGroup)v).getChildAt(n),type);if(found!=null)return found;}return null;}
++}
+--- /dev/null
++++ b/verification/2.11.0-connected-experience-review.json
+@@ -0,0 +1,49 @@
++{
++  "version": "2.11.0",
++  "version_code": 21100,
++  "package": "com.lumo.nativeapp.test",
++  "apk_sha256": "558893158d31a47778f79d2354dd4dbad0c81ad6c0cd7fd30b4b56d47aaa6b3f",
++  "baseline_native_version": "2.10.6",
++  "baseline_native_apk_sha256": "9c2bdf9880dc53a8638cf3b8c45d3d7b87124e09f5b7af922787fbcc81682c61",
++  "pure_java_suites": 63,
++  "new_operational_checks": 21,
++  "android_framework": {
++    "tests": 172,
++    "failures": 0,
++    "errors": 0,
++    "skipped": 0
++  },
++  "new_framework_cases": 8,
++  "android_api_levels": [
++    28,
++    35
++  ],
++  "signing_certificate_sha256": "64f2301aa4b55db94c2748d67bf66b56bda7569f528455969c575b8603338a6c",
++  "signing_certificate_matches_2_10_6": true,
++  "assets_preserved": 273,
++  "android_resources_preserved": 54,
++  "bundled_library_files_preserved": 3,
++  "consumer_2_10_6_changes_preserved": [
++    "Immediate identity resolution after tapping a registered Lumo person, with recipient directory hidden during the check.",
++    "Phone-only MoMo lookup, bank account plus bank lookup, sample-name confirmation, named amount screen and bank displayed on review.",
++    "No manual MoMo network selector or recipient-name field restored.",
++    "NativeLumoRecipientPicker.java and NativeExternalTransfer.java byte-identical to2.10.6 baseline."
++  ],
++  "changes": [
++    "Public serviceStatus reads without customer tokens while foregrounded, plus status from authorised snapshots.",
++    "Payment choices and review/funding/merchant controls grey unavailable services and show public messages.",
++    "Network-specific MoMo controls use the same disclosed sample lookup as the preserved2.10.6 payment journey.",
++    "Manual shutdown, maintenance, recovering, unknown and stale statuses do not enable new payments.",
++    "Updates change existing controls without replacing recipient inputs or drafts.",
++    "History, receipts, status and original-reference recovery remain reachable.",
++    "Only SERVICE_PAUSED with explicit noMutation evidence clears a local pending attempt. Unknown outcomes retain the original reference.",
++    "Health-check timestamp changes do not rebuild read screens."
++  ],
++  "backend_contract": "lumo-approved action serviceStatus; services rows id/serviceId, available, mode, status, message, providerMode, updatedAt, lastCheckedAt; authenticated capabilities.serviceAvailability uses same rows.",
++  "financial_boundary": "Test money only. No live bank or MoMo provider configured by this build. Backend guards remain final authority.",
++  "physical_device_verified": false,
++  "apk_executed_on_art": false,
++  "os_app_link_routing_verified": false,
++  "physical_biometric_hardware_verified": false,
++  "validation_scope": "Actual production Java classes and Android framework shadows, plus signed APK integrity/alignment/package/SDK/permission checks. No physical handset or live external provider acceptance."
++}

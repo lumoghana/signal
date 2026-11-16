@@ -1,3 +1,4 @@
+import {runActionFlow} from './approved-flow.js';
 import {esc,icon} from './ui.js';
 import {getSummary} from './model.js';
 import {getLearningNudge} from './learning-model.js';
@@ -29,5 +30,5 @@ export function bindContextLearning(ctx){
   const next=nudge.route|| (nudge.practiceKind?{section:'learn',page:'practice',id:nudge.practiceKind}:nudge.lessonId?{section:'learn',page:'lesson',id:nudge.lessonId}:{section:'learn',page:'home'});
   ctx.go({...next,returnTo:{...ctx.route}});
  });
- ctx.$('[data-learning-dismiss]')?.addEventListener('click',()=>{const nudge=getLearningNudge(ctx.state,{summary:getSummary(ctx.state),topic:learningContextForRoute(ctx.route)});if(nudge?.eventId){const result=ctx.act('learningDismissNudge',{eventId:nudge.eventId});if(!result.ok){ctx.toast(result.message);return;}}ctx.refresh();});
+ ctx.$('[data-learning-dismiss]')?.addEventListener('click', ()=>{return runActionFlow(function*(){const nudge=getLearningNudge(ctx.state,{summary:getSummary(ctx.state),topic:learningContextForRoute(ctx.route)});if(nudge?.eventId){const result=(yield (ctx.actAsync||ctx.act).call(ctx,'learningDismissNudge',{eventId:nudge.eventId}));if(!result.ok){ctx.toast(result.message);return;}}ctx.refresh();});});
 }

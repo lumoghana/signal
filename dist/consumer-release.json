@@ -1,0 +1,25 @@
+{
+  "consumerExperience": "2.12.2",
+  "apkVersion": "2.12.2",
+  "apkVersionCode": 21202,
+  "apkSha256": "f1bdb612b0a08be224d44bfa636aca8848181dbb856117ee9a4fc00ace602898",
+  "apkBytes": 4617167,
+  "apkDownload": "/downloads/Lumo-Test-Android.apk",
+  "providerMode": "sandbox",
+  "liveProviderLookup": false,
+  "physicalHandsetVerified": false,
+  "passwordRecovery": {
+    "cameraCapture": "actual-camera-jpeg",
+    "faceMatching": "stored-template",
+    "faceSimulation": false,
+    "faceTemplateStorage": "server-only-aes-256-gcm",
+    "rawSelfieImagesRetained": false,
+    "livenessVerified": false,
+    "productionIdentityVerified": false,
+    "requiresPrivateRecoveryKey": true,
+    "legacyReEnrollmentRequired": true,
+    "faceRemovalRequiresCurrentPassword": true,
+    "niaMode": "simulation",
+    "sms": "sandbox-test-code"
+  }
+}

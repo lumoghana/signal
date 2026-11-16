@@ -54,18 +54,18 @@ export function createRouter({ initialRoute = HOME, saved, history, onNavigate =
     if (!pending && queue.length) perform(queue.shift());
   }
 
-  function pushed(route, consumeModal = false) {
+  function pushed(route, consumeModal = false, scroll = 0) {
     entries = entries.slice(0, cursor + 1);
-    entries.push({ route: normal(route), scroll: 0 });
+    entries.push({ route: normal(route), scroll: scrollValue(scroll) });
     cursor += 1;
     if (consumeModal) replaceNative();
     else history.pushState(pageState(), '');
   }
 
-  function replaced(route, { notifyNow = true, restore = false, truncateForward = false } = {}) {
+  function replaced(route, { notifyNow = true, restore = false, truncateForward = false, scroll } = {}) {
     const next = normal(route), unchanged = same(next, entries[cursor].route);
     if (truncateForward) entries = entries.slice(0, cursor + 1);
-    entries[cursor] = { route: next, scroll: unchanged ? entries[cursor].scroll : 0 };
+    entries[cursor] = { route: next, scroll: scroll === undefined ? (unchanged ? entries[cursor].scroll : 0) : scrollValue(scroll) };
     replaceNative();
     if (notifyNow) notify(restore || unchanged);
   }
@@ -100,9 +100,9 @@ export function createRouter({ initialRoute = HOME, saved, history, onNavigate =
     pending = null;
     cursor = operation.expectedIndex;
     if (operation.type === 'override') {
-      replaced(operation.target, { restore: true });
+      replaced(operation.target, { restore: true, scroll: operation.scroll });
     } else if (operation.type === 'replace') {
-      replaced(operation.target, { truncateForward: operation.fromModal });
+      replaced(operation.target, { truncateForward: operation.fromModal, scroll: operation.scroll });
     } else {
       entries = entries.slice(0, cursor + 1);
       if (operation.forceHome) replaced(HOME, { notifyNow: false });
@@ -110,8 +110,8 @@ export function createRouter({ initialRoute = HOME, saved, history, onNavigate =
       if (transient(safeParent)) safeParent = operation.canonical;
       if (same(operation.target, operation.canonical)) safeParent = operation.canonical;
       if (!same(entries[cursor].route, safeParent) && !same(safeParent, operation.target)) pushed(safeParent);
-      if (!same(entries[cursor].route, operation.target) || operation.needsFreshPush) pushed(operation.target);
-      else replaced(operation.target, { notifyNow: false });
+      if (!same(entries[cursor].route, operation.target) || operation.needsFreshPush) pushed(operation.target, false, operation.scroll);
+      else replaced(operation.target, { notifyNow: false, scroll: operation.scroll });
       notify(false);
     }
     drain();
@@ -123,26 +123,26 @@ export function createRouter({ initialRoute = HOME, saved, history, onNavigate =
     const target = normal(operation.target);
     let earlier = -1;
     for (let i = cursor - 1; i >= 0; i -= 1) if (same(entries[i].route, target)) { earlier = i; break; }
-    if (earlier >= 0) { rewind({ type: 'override', target }, earlier); return; }
+    if (earlier >= 0) { rewind({ ...operation, type: 'override', target }, earlier); return; }
     const fromModal = modalAbovePage();
     if (operation.replace || same(entries[cursor].route, target)) {
-      if (fromModal) rewind({ type: 'replace', target, fromModal: true }, cursor, 1);
-      else { replaced(target); drain(); }
+      if (fromModal) rewind({ ...operation, type: 'replace', target, fromModal: true }, cursor, 1);
+      else { replaced(target, { scroll: operation.scroll }); drain(); }
       return;
     }
-    pushed(target, fromModal);
+    pushed(target, fromModal, operation.scroll);
     notify(false);
     drain();
   }
 
-  function go(next, { replace = false, finish = false, root = false } = {}) {
+  function go(next, { replace = false, finish = false, root = false, scroll } = {}) {
     const target = normal(next);
     // Re-selecting the current root still emits a render, without growing history.
     if (root && !pending && same(target, entries[cursor].route) && cursor === entries.length - 1 && !modalAbovePage()) {
-      replaced(target);
+      replaced(target, { scroll });
       return;
     }
-    perform({ type: finish || root ? 'finish' : 'page', target, replace, root });
+    perform({ type: finish || root ? 'finish' : 'page', target, replace, root, scroll });
   }
 
   function back() {

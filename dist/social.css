@@ -1,0 +1,53 @@
+/* Private people lists and the in-app notification center. */
+.lumo-social{color:var(--text);min-width:0;padding-top:8px;overflow-wrap:anywhere}
+.lumo-social h2{font-size:27px;line-height:1.15;letter-spacing:-.8px;margin:8px 0 12px;font-weight:600}
+.lumo-social>p{font-size:14px;line-height:1.55;margin:0 0 18px}
+.lumo-social-title{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-right:28px}
+.lumo-social-symbol{width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--lime);flex:none}
+.lumo-social-search{display:flex;align-items:center;gap:10px;min-height:48px;border:1px solid var(--line);border-radius:14px;padding:0 14px;background:var(--surface);margin:16px 0 12px;color:var(--muted)}
+.lumo-social-search input{width:100%;min-width:0;background:none;border:0;color:var(--text);font:inherit;font-size:15px;line-height:22px;padding:12px 0;outline:none}
+.lumo-social-search:focus-within{outline:2px solid var(--lime);outline-offset:2px}
+.lumo-social-search input::placeholder{color:var(--muted);opacity:1}
+.lumo-friend-filters,.lumo-notification-filter{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
+.lumo-friend-filters button,.lumo-notification-filter button{border:1px solid var(--line);border-radius:20px;color:var(--muted);background:transparent;min-height:40px;padding:8px 12px;font:inherit;font-size:12px}
+.lumo-friend-filters button{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.lumo-friend-group-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;margin:4px 0 12px}
+.lumo-friend-group-tools button,.lumo-create-group-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:13px;text-align:left;white-space:normal}
+.lumo-create-group-link{margin:2px 0 8px}
+.lumo-group-count{margin:8px 0 12px;color:var(--muted);font-size:12px;text-align:right}
+.lumo-social .lumo-group-delete-name{font-size:18px;font-weight:600;color:var(--text);overflow-wrap:anywhere}
+.lumo-friend-filters button[aria-pressed=true],.lumo-notification-filter button[aria-pressed=true]{background:var(--lime);color:#191a22;border-color:var(--lime);font-weight:600}
+.lumo-social .lumo-social-status{font-size:12px;line-height:1.5;color:var(--muted);min-height:18px;margin:12px 0}
+.lumo-friend-results{border-top:1px solid var(--line);margin:12px 0 20px}
+.lumo-friend-row{border-bottom:1px solid var(--line)}
+.lumo-friend-person{display:flex;align-items:center;gap:12px;width:100%;min-height:80px;text-align:left;border:0;background:transparent;color:var(--text);font:inherit;padding:14px 0}
+.lumo-friend-avatar{display:grid;place-items:center;width:43px;height:43px;flex:none;border-radius:16px;background:var(--surface);border:1px solid var(--line);color:var(--text);font-size:15px;font-weight:600}
+.lumo-friend-avatar.large{width:66px;height:66px;font-size:22px;border-radius:22px;margin:0 auto 18px}
+.lumo-friend-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;line-height:1.3}
+.lumo-friend-copy strong{font-size:15px;font-weight:600;overflow-wrap:anywhere}
+.lumo-friend-copy>span{font-size:13px;color:var(--muted)}
+.lumo-friend-copy small{font-size:11px;color:var(--muted);line-height:1.5}
+.lumo-friend-list-badge{display:inline-block;padding:3px 8px;border-radius:6px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.lumo-friend-detail{text-align:center;padding:16px 0 22px}.lumo-friend-detail h2{margin-bottom:8px}.lumo-friend-detail p{font-size:14px;color:var(--muted);margin:0}
+.lumo-social-actions{display:grid;gap:10px;margin:20px 0 10px}.lumo-social-actions .button{width:100%;white-space:normal;min-height:48px}
+.lumo-social-back{display:inline-flex;align-items:center;gap:6px;margin:0 0 20px;font-size:13px;min-height:40px}.lumo-social-back+.eyebrow{display:block}
+.lumo-social-empty{padding:28px 12px;text-align:center;color:var(--muted)}.lumo-social-empty h3{font-size:17px;line-height:1.3;color:var(--text);font-weight:600;margin:16px 0 8px}.lumo-social-empty p{font-size:13px;line-height:1.5;max-width:30ch;margin:0 auto}
+.lumo-social-error{margin:16px 0!important;font-size:13px!important;line-height:1.5!important}
+.lumo-social button:focus-visible,.lumo-social select:focus-visible,.lumo-notification-control:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.lumo-notification-control{position:relative;flex:none}.lumo-notification-count{position:absolute;right:0;top:0;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--lime);color:#191a22;font-size:9px;font-weight:700;display:grid;place-items:center;border:1px solid var(--bg)}
+.lumo-notification-count[hidden],.lumo-social [hidden]{display:none!important}
+.lumo-notification-list{display:grid;gap:10px;margin:16px 0}
+.lumo-notification-item{display:flex;gap:10px;align-items:flex-start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:16px 13px;width:100%;min-width:0;color:var(--text);font:inherit}
+.lumo-notification-item.unread{border-color:var(--lime);box-shadow:inset 3px 0 var(--lime)}
+.lumo-notification-icon{flex:none;color:var(--muted);margin-top:2px}.lumo-notification-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:8px}
+.lumo-notification-copy>span{font-size:13px;line-height:1.45}.lumo-notification-copy small{font-size:11px;line-height:1.4;color:var(--muted)}
+.lumo-notification-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.lumo-notification-title strong{font-size:14px;line-height:1.4;font-weight:600}
+.lumo-unread-dot{width:7px;height:7px;border-radius:50%;background:var(--lime);flex:none;margin-top:6px}
+.lumo-recipient-friends{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0}.lumo-recipient-friends p{font-size:13px;line-height:1.5;margin:0;color:var(--muted);flex:1;min-width:140px}.lumo-recipient-friends button{display:inline-flex;gap:7px;align-items:center;min-height:42px;padding:9px 12px;font:inherit;font-size:13px;background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--text)}
+.payments-hub-shortcuts:has([data-hub-action=friends]){grid-template-columns:repeat(3,minmax(0,1fr))}
+[data-theme=light] .lumo-social-symbol{color:#485c20;background:#eef1e7}
+[data-theme=light] .lumo-social-search:focus-within,[data-theme=light] .lumo-social button:focus-visible,[data-theme=light] .lumo-social select:focus-visible,[data-theme=light] .lumo-notification-control:focus-visible{outline-color:#53661d}
+[data-theme=light] .lumo-notification-item.unread{border-color:#7c8d4e;box-shadow:inset 3px 0 #7c8d4e}
+[data-theme=light] .lumo-unread-dot{background:#53661d}
+@media(max-width:350px){.lumo-friend-filters{gap:6px}.lumo-friend-filters button{font-size:11px;padding:8px 10px}.lumo-social-title{gap:8px}.lumo-social h2{font-size:25px}.lumo-notification-item{padding:14px 11px;gap:8px}.lumo-notification-icon{display:none}.lumo-friend-copy strong{font-size:14px}.lumo-social-symbol{width:42px;height:42px}.lumo-recipient-friends p{min-width:130px}}
+.payments-hub-shortcuts:has([data-hub-action=friends])>button{flex-direction:column;gap:5px;min-height:62px;min-width:0;padding:10px 4px;font-size:12px}

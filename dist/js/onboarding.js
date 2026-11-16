@@ -7,7 +7,7 @@ import {
   confirmIdentityDetails, attemptOnboardingCode, resendOnboardingCode, expireOnboardingCode, checkPendingIdentityVerification,
   setOnboardingLogin
 } from './onboarding-model.js';
-import { createLoginCredential, normalizeUsername, validUsername, validateLoginPassword } from './login-credentials.js';
+import { createLoginCredential, normalizeLumoUsername, validUsername, validateLoginPassword } from './login-credentials.js';
 import { createCameraController, cameraErrorMessage, releasePhoto } from './camera.js';
 import { createVerificationAnimation } from './verification-animation.js';
 
@@ -24,7 +24,21 @@ export function clearOnboardingMedia(draft) {
   Object.values(r.photos).forEach(photo => releasePhoto(photo));
   runtimes.delete(draft);
 }
+// Only live snapshots held by this signup can seed recovery enrollment.
+export function onboardingRecoveryCaptures(draft) {
+ const r=runtimes.get(draft);
+ return r&&hasPhotos(draft,r)?LIVENESS_PROMPTS.map(key=>r.photos[key]?.blob).filter(blob=>blob&&typeof blob.arrayBuffer==='function'):[];
+}
 const routeFor = step => ({ section: 'onboarding', step });
+// Password proofs may be resumed; the shared registration secret never leaves memory.
+export const sharedSignupNeedsPassword = (ctx,d=ctx.draft?.onboarding) => ctx.connected===true && !d?.preview && ctx.hasSignupPassword?.()!==true;
+export const canKeepOnboardingPassword = (ctx,d=ctx.draft?.onboarding) => !!d?.login && !sharedSignupNeedsPassword(ctx,d);
+export function signupUsernameMessage(result){
+ if(['HANDLE_TAKEN','HANDLE_UNAVAILABLE','USERNAME_TAKEN'].includes(result?.code))return 'That Lumo username is already taken. Choose another one so people can find and pay the right person.';
+ if(result?.code==='REGISTRATION_PENDING')return 'That username is temporarily reserved. Try it again shortly or choose another one.';
+ return '';
+}
+
 const action = (label, name) => `<button type="button" class="button" data-onb-action="${name}">${label}</button>`;
 const link = (label, name) => `<button type="button" class="onb-link" data-onb-action="${name}">${label}</button>`;
 const field = (label, key, value, { type = 'text', placeholder = '', maxlength = 60, inputmode = '', autocomplete = 'off', className = '' } = {}) => `<label class="onb-field"><span>${label}</span><input class="input ${className}" data-onb-field="${key}" name="onb-${key}" type="${type}" value="${esc(value)}" placeholder="${esc(placeholder)}" maxlength="${maxlength}" ${inputmode ? `inputmode="${inputmode}"` : ''} autocomplete="${autocomplete}"></label>`;
@@ -38,7 +52,7 @@ const selfiePhase = (d, r) => !hasPhotos(d, r) ? 'capture' : d.verificationStatu
 const birthDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || '') ? new Date(value + 'T12:00:00Z').toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : value || '';
 const progressRows = d => LIVENESS_PROMPTS.map((key, index) => `<li data-selfie-progress="${key}" aria-label="${prompts[key].label}: ${d.liveness.completed.includes(key) ? 'captured' : d.liveness.completed.length === index ? 'next' : 'waiting'}" class="${d.liveness.completed.includes(key) ? 'done' : d.liveness.completed.length === index ? 'active' : ''}"><span>${d.liveness.completed.includes(key) ? icon('check', 12) : index + 1}</span>${prompts[key].label}</li>`).join('');
 const photoReview = r => LIVENESS_PROMPTS.map(key => r.photos[key] ? `<figure><img src="${esc(r.photos[key].url)}" alt="Your captured selfie: ${prompts[key].label.toLowerCase()}"><figcaption>${prompts[key].label}</figcaption></figure>` : '').join('');
-const privacyLine = () => `<div class="onb-privacy-line">${icon('lock', 12)}<span>ID and photos stay in memory.</span>${link('How this works', 'privacy-help')}</div>`;
+const privacyLine = () => `<div class="onb-privacy-line">${icon('lock', 12)}<span>Setup photos prepare your identity checks.</span>${link('How this works', 'privacy-help')}</div>`;
 const identityDemoOptions = () => `<details class="onb-demo-control"><summary>Try a demo result</summary>${['failure','pending','attention','already-linked'].map(outcome => `<button type="button" class="button ghost" data-onb-outcome="${outcome}">${({failure:'Unsuccessful check',pending:'Pending check',attention:'Details need attention','already-linked':'Identity already linked'})[outcome]}</button>`).join('')}</details>`;
 const stages = ['Checking the card number', 'Reviewing the selfie check', 'Preparing your details'];
 
@@ -71,7 +85,7 @@ function selfieBody(d, r) {
       <span class="onb-camera-chip" data-camera-chip>CAMERA OFF</span><button type="button" class="onb-camera-stop" data-onb-action="stop-camera" aria-label="Stop camera" hidden>${icon('close', 15)}</button>
     </div><div class="onb-camera-guidance"><span class="onb-selfie-count" data-selfie-count>${Math.min(3, d.liveness.completed.length + 1)} OF 3</span><h2 data-selfie-title aria-live="polite">${prompt.title}</h2><p data-selfie-instruction>${prompt.body}</p></div></div>
     <ol class="onb-selfie-progress" aria-label="Selfie progress">${progressRows(d)}</ol>
-    <label class="onb-consent"><input type="checkbox" data-onb-field="consent" name="onb-consent" ${d.consent ? 'checked' : ''}><span>I agree to the live camera demo check.</span></label>
+    <label class="onb-consent"><input type="checkbox" data-onb-field="consent" name="onb-consent" ${d.consent ? 'checked' : ''}><span>I agree to live camera capture.</span></label>
     <p class="onb-camera-status" role="status"></p></div>
     <div data-selfie-verification ${['checking', 'failed', 'pending', 'attention', 'already-linked'].includes(phase) ? '' : 'hidden'}>${['checking', 'failed', 'pending', 'attention', 'already-linked'].includes(phase) ? renderIdentityVerification(d, { stage: r.verificationStage }) : ''}</div>
     <div class="onb-selfie-ready" data-selfie-ready ${phase === 'ready' ? '' : 'hidden'}><span class="onb-complete-mark">${icon('check', 22)}</span><h2>All three. Nicely done.</h2><p>Your check is ready. Your details are up next.</p><div class="onb-selfie-review">${photoReview(r)}</div>${link('Retake my selfies', 'retake')}</div>${privacyLine()}`;
@@ -115,8 +129,8 @@ export function renderOnboarding(ctx, route) {
     title = 'Is this you?'; description = 'A quick look at your Ghana Card details. Then secure your Lumo.';
     body = renderIdentityVerification(d) + privacyLine(); primary = 'Yep, that’s me'; primaryAction = 'confirm-details'; secondary = link('Something’s not right', 'details-mismatch');
   } else if (step === 'login') {
-    title = 'Your way back in.'; description = 'A username and password for signing in. Your transaction PIN comes next.';
-    body = `<div class="onb-login-fields"><label class="onb-field"><span>Username</span><input class="input" data-onb-login="username" name="demo-username" value="${esc(d.login?.username || '')}" autocapitalize="none" spellcheck="false" autocomplete="off" maxlength="30" placeholder="e.g. ama.campus"></label><label class="onb-field"><span>Demo password</span><input class="input" data-onb-login="password" name="demo-password" type="password" autocomplete="off" maxlength="128" placeholder="At least 10 characters"></label><label class="onb-field"><span>Confirm demo password</span><input class="input" data-onb-login="confirm" name="demo-password-confirm" type="password" autocomplete="off" maxlength="128"></label></div><p class="onb-fine">${d.login ? 'Your password is set. Leave both password fields blank to keep it.' : 'Use a made-up password for this local prototype. Never use a real password.'}</p>${link('Use sample sign-in details', 'fill-login')}`;
+    title = 'Your name on Lumo.'; description = 'Choose a unique @username. People can use it to find you and send you money.';
+    body = `<div class="onb-login-fields"><label class="onb-field"><span>Your Lumo username</span><input class="input" data-onb-login="username" aria-describedby="onb-username-help" name="demo-username" value="${esc(d.login?.username || '')}" autocapitalize="none" spellcheck="false" autocomplete="off" maxlength="31" placeholder="e.g. @ama.campus"></label><p class="onb-fine" id="onb-username-help">Your @username is public and different from your full name. Share it to receive money. Your password signs you in. Your PIN approves money moves. Keep both private.</p><label class="onb-field"><span>Demo password</span><input class="input" data-onb-login="password" name="demo-password" type="password" autocomplete="off" maxlength="128" placeholder="At least 10 characters"></label><label class="onb-field"><span>Confirm demo password</span><input class="input" data-onb-login="confirm" name="demo-password-confirm" type="password" autocomplete="off" maxlength="128"></label></div><p class="onb-fine">${canKeepOnboardingPassword(ctx,d) ? 'Your password is set. Leave both password fields blank to keep it.' : d.login&&ctx.connected&&!d.preview ? 'Enter your test password again. It is kept only in memory, so it must be re-entered after a refresh before you create your PIN.' : 'Use a made-up password for this test account. Never use a real password.'}</p>${link('Use sample sign-in details', 'fill-login')}`;
   } else if (step === 'pin' || step === 'pin-confirm') {
     const confirming = step === 'pin-confirm';
     title = confirming ? 'One more time.' : 'Your money.<br>Your little lock.';
@@ -129,7 +143,7 @@ export function renderOnboarding(ctx, route) {
   return `<section class="onb-page onb-step-${step}" ${phase ? `data-identity-phase="${phase}"` : ''} aria-label="Lumo signup">
     <header class="onb-header"><button type="button" class="icon-button" data-onb-action="back" aria-label="Previous setup step">${icon('back', 21)}</button><div><span>${part.label}</span><small>${index + 1} of ${ONBOARDING_STEPS.length}</small></div><button type="button" class="icon-button" data-onb-action="close" aria-label="Save and exit signup">${icon('close', 20)}</button></header>
     <div class="onb-progress" role="progressbar" aria-valuemin="1" aria-valuemax="${ONBOARDING_STEPS.length}" aria-valuenow="${index + 1}" aria-label="Signup progress">${ONBOARDING_STEPS.map((_, i) => `<span class="${i <= index ? 'done' : ''} ${i === index ? 'current' : ''}"></span>`).join('')}</div>
-    <div class="onb-main"><div class="onb-simulation"><span>${demo}</span>${d.preview ? '<small>Account preview</small>' : ''}</div><div class="onb-welcome-heading"><div class="onb-heading-copy"><h1>${title}</h1><p class="onb-description">${description}</p></div>${companion}</div><form id="onb-form" autocomplete="off">${body}<p class="onb-error error" id="onb-error" role="alert"></p></form></div>
+    <div class="onb-main"><div class="onb-simulation"><span>${demo}</span>${d.preview ? '<small>Account preview</small>' : ''}</div><div class="onb-welcome-heading"><div class="onb-heading-copy"><h1>${title}</h1><p class="onb-description">${description}</p></div>${companion}</div><form id="onb-form" autocomplete="off">${body}<p class="onb-error error" id="onb-error" role="alert">${step==='login'?esc(d.usernameError||''):''}</p></form></div>
     <footer class="onb-footer">${action(primary, primaryAction)}${secondary}</footer>
   </section>`;
 }
@@ -138,6 +152,7 @@ export function bindOnboarding(ctx, route) {
   const root = ctx.$('.onb-page');
   if (!root) return () => {};
   const d = ctx.draft.onboarding, step = route.step || 'name', r = runtimeFor(d), isSelfie = step === 'selfie', isReview = step === 'identity-review';
+  if (['pin','pin-confirm'].includes(step) && sharedSignupNeedsPassword(ctx,d)) { ctx.go(routeFor('login'),{replace:true}); return () => {}; }
   let alive = true, busy = false, attempt = 0, lastPhase = isSelfie ? selfiePhase(d, r) : '';
   const current = () => alive && root.isConnected && runtimes.get(d) === r && ctx.draft.onboarding === d && ctx.route.section === 'onboarding' && ctx.route.step === step;
   const visible = () => current() && document.visibilityState !== 'hidden';
@@ -277,9 +292,11 @@ export function bindOnboarding(ctx, route) {
     if (isReview && !hasPhotos(d, r)) return error('Your photos are no longer here. Retake the check to continue.');
     if (step === 'code') { const attempt = attemptOnboardingCode(d); persist(); if (!attempt.ok) { error(attempt.message); return; } }
     if (step === 'login') {
-      const username = normalizeUsername(root.querySelector('[data-onb-login="username"]').value), password = root.querySelector('[data-onb-login="password"]').value, confirm = root.querySelector('[data-onb-login="confirm"]').value;
-      if (!validUsername(username)) return error('Choose a username with 3–30 letters, numbers, dots, underscores or hyphens.');
-      if (!(d.login?.username === username && !password && !confirm)) {
+      const username = normalizeLumoUsername(root.querySelector('[data-onb-login="username"]').value), password = root.querySelector('[data-onb-login="password"]').value, confirm = root.querySelector('[data-onb-login="confirm"]').value;
+      if (!validUsername(username)) return error('Use 3–30 letters, numbers, dots, underscores or hyphens. Start your Lumo username with a letter or number.');
+      if (!password && !confirm && canKeepOnboardingPassword(ctx,d)) {
+        if(d.login.username!==username){const saved=setOnboardingLogin(d,{username,credential:d.login.credential});if(!saved.ok)return error(saved.message);}
+      } else {
         const invalid = validateLoginPassword(password); if (invalid) return error(invalid);
         if (password !== confirm) return error('Those demo passwords don’t match yet.');
         setBusy(true);
@@ -287,6 +304,7 @@ export function bindOnboarding(ctx, route) {
           const credential = await createLoginCredential(password);
           if (!current()) return;
           const saved = setOnboardingLogin(d, { username, credential }); if (!saved.ok) return error(saved.message);
+          if(!d.preview)ctx.setSignupPassword?.(password);
           root.querySelector('[data-onb-login="password"]').value = ''; root.querySelector('[data-onb-login="confirm"]').value = '';
         } catch { return error('Couldn’t prepare sign-in on this browser. Please try again.'); }
         finally { if (current()) setBusy(false); }
@@ -304,7 +322,7 @@ export function bindOnboarding(ctx, route) {
   const resumeVerification = () => { if (visible() && isSelfie && hasPhotos(d, r) && ['idle', 'checking'].includes(d.verificationStatus)) startVerification(); else syncSelfie(); };
   const showPrivacy = () => {
     stopVerification(); stopCamera(); persist();
-    ctx.sheet(`<h2>Your check. Your control.</h2><div class="onb-sheet-copy"><p>Your Ghana Card number has its own page. Here, allow the front camera once and follow the three selfie prompts.</p><p>After the selfies, a short verification animation returns sample details on a separate page. Confirm them before creating your PIN.</p><p>The camera and photos are real. Verification, returned identity details and liveness checks are simulated. No movement detection, face matching or NIA lookup runs here.</p><p>Your ID number, returned record and photos stay only in memory. They are never uploaded or saved. They are removed when you leave, reload or finish signup. The microphone stays off.</p></div><button type="button" class="button" data-onb-sheet="done">Got it</button>${isSelfie ? identityDemoOptions() : ''}`, el => {
+    ctx.sheet(`<h2>Your check. Your control.</h2><div class="onb-sheet-copy"><p>Your Ghana Card number has its own page. Here, allow the front camera once and follow the three selfie prompts.</p><p>After the selfies, a short verification animation returns sample details on a separate page. Confirm them before creating your PIN.</p><p>The camera and photos are real. Ghana Card verification, returned identity details and live-person checks are simulated. No NIA lookup runs here.</p><p>Your ID number and returned sample record stay in memory. After your connected account is created, you choose whether Lumo may use these selfies to save an encrypted face profile for future identity checks. Saving that profile needs separate consent. The photos are discarded after processing. This compares you with the face enrolled for your account; it does not verify your Ghana Card identity or phone ownership. Your private recovery key is still required. The microphone stays off.</p></div><button type="button" class="button" data-onb-sheet="done">Got it</button>${isSelfie ? identityDemoOptions() : ''}`, el => {
       el.querySelector('[data-onb-sheet="done"]').onclick = () => { ctx.closeSheet(); resumeVerification(); };
       el.querySelectorAll('[data-onb-outcome]').forEach(button => { button.onclick = () => { r.verificationOutcome = button.dataset.onbOutcome; if (hasPhotos(d, r)) cancelIdentityVerification(d); ctx.closeSheet(); if (hasPhotos(d, r)) startVerification(); else ctx.toast('The next check will use your selected demo scenario. No real verification runs.'); }; });
     }, { onClose: resumeVerification });
@@ -331,6 +349,7 @@ export function bindOnboarding(ctx, route) {
     if (key === 'name') { const preview = root.querySelector('[data-name-preview]'); if (preview) preview.textContent = d.name.trim() ? `Nice to meet you, ${d.name.trim()}.` : 'Your next chapter starts here.'; }
     error(''); persist(); syncSelfie();
   }));
+  root.querySelector('[data-onb-login="username"]')?.addEventListener('input',()=>{if(d.usernameError){delete d.usernameError;error('');persist();}});
   root.querySelector('#onb-form').addEventListener('submit', event => { event.preventDefault(); if (!isSelfie && !isReview) advance(); });
   root.querySelectorAll('input:not([type="checkbox"])').forEach(input => input.addEventListener('keydown', event => {
     if (event.key !== 'Enter') return; event.preventDefault();

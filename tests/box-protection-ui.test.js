@@ -262,3 +262,21 @@ test('an approved partner request explains an independent goal lock before askin
   assert.equal(h.state.wallet, wallet + request.amount); assert.equal(request.status, 'consumed');
   assert.equal(hasBoxProtection(h.box), true);
 });
+
+test('connected protection warns about unavailable support recovery while retaining partner-approved changes',()=>{
+ const h=setup();h.ctx.connected=true;const before=JSON.stringify(h.state);
+ openBoxProtection(h.ctx,h.box);
+ assert.match(h.ctx.current.html,/Support recovery is not available in this connected test/);
+ assert.match(h.ctx.current.html,/cannot bypass their approval/);
+ assert.match(h.ctx.current.html,/data-bp="change"/);assert.match(h.ctx.current.html,/data-bp="remove"/);
+ assert.equal(JSON.stringify(h.state),before);assert.equal(h.ctx.calls.length,0);
+});
+
+test('connected unavailable-partner support does not create a support-pending trap or offer verification simulation',()=>{
+ const h=setup();h.ctx.connected=true;const request=requestWithdrawal(h),calls=h.ctx.calls.length,before=JSON.stringify(h.state);
+ h.click('support');
+ assert.match(h.ctx.current.html,/Support recovery is not available/);assert.match(h.ctx.current.html,/planned toll-free support route is not live/);
+ assert.doesNotMatch(h.ctx.current.html,/data-bp="(?:support-request|support-view|approve|pin)"|supportIdentityVerified/);
+ assert.equal(h.ctx.calls.length,calls);assert.equal(JSON.stringify(h.state),before);assert.equal(request.status,'pending');
+ h.click('owner');assert.match(h.ctx.current.html,/data-bp-code-form/);assert.equal(request.status,'pending');
+});

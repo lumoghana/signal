@@ -44,22 +44,25 @@ test('review of a resumed new-period draft uses fresh spending and the buffer th
   assert.equal(draft.plan.items[0].spent,8000);
 });
 
-test('starting a suggested period keeps its explanation visible before save without sharing the source object',()=>{
+test('starting a suggested period opens a recurring-safe review with the original explanation and no write',()=>{
   const state=createEmptyState();state.settings.hideBalance=false;state.wallet=100000;
   const provenance={transactions:0,projectedWeeks:2,sources:{'food and groceries':'sample'}};
   act(state,'createBudget',{items:[{id:'food',name:'Food',amount:1000}],endDate:date(7),provenance});
+  const before=structuredClone(state);
   class Node extends EventTarget{constructor(dataset={}){super();this.dataset=dataset;}}
-  const button=new Node({parity:'new-period'}),form={},error={},fields={start:{value:date(0)},end:{value:date(30)}};
-  const draft={},routes=[];
-  const ctx={state,draft,$:()=>null,$$:selector=>selector.includes('[data-parity]')?[button]:[],
-    sheet(_html,bind){bind({querySelector(selector){return selector==='form'?form:selector==='.error'?error:selector==='[name=start]'?fields.start:fields.end;}});},
-    closeSheet(){},go(route){routes.push(route);}};
+  const button=new Node({parity:'new-period'}),sheets=[],routes=[];
+  const ctx={state,draft:{},$:()=>null,$$:selector=>selector.includes('[data-parity]')?[button]:[],
+    sheet(html,bind){sheets.push({html,bind});},closeSheet(){},go(route){routes.push(route);}};
   const cleanup=bindPlanningParity(ctx,{section:'plan',page:'periods'});
-  button.dispatchEvent(new Event('click'));form.onsubmit({preventDefault(){}});cleanup();
-  assert.equal(routes.at(-1).step,'review');assert.deepEqual(draft.plan.suggestion,provenance);
-  assert.notEqual(draft.plan.suggestion,state.budget.provenance);
-  assert.match(renderPlanning({state,draft},{section:'plan',page:'create',step:'review'}),/Sample student starting amounts, not a prediction from your spending/);
-  draft.plan.suggestion.sources.extra='history';assert.equal(state.budget.provenance.sources.extra,undefined);
+  button.dispatchEvent(new Event('click'));cleanup();
+  assert.equal(sheets.length,1);
+  assert.match(sheets[0].html,/Same essentials, fresh plan/);
+  assert.match(sheets[0].html,/sample student starting amounts, not a prediction from your spending/i);
+  assert.match(sheets[0].html,/Start this reviewed plan/);
+  assert.match(sheets[0].html,/1 previous cost stays out/);
+  assert.doesNotMatch(sheets[0].html,/data-include-id="food" checked/);
+  assert.deepEqual(state,before,'Opening the next-period review cannot archive, reset spending or save anything.');
+  assert.deepEqual(routes,[],'The reviewed sheet replaces the old intermediate draft route.');
 });
 
 

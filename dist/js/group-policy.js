@@ -67,3 +67,8 @@ export function collectionRefundPreview(g) {
   for (let index=0;left>0;index++,left--) ordered[index%ordered.length].amount++;
   return rows.filter(c=>c.amount>0).map(({weight,remainder,...c})=>c);
 }
+
+/** Bind a return approval to the exact balance and original-source shares shown. */
+export function collectionReturnReview(g) {
+  return { reviewedBalance: g.balance, reviewedReturnsFingerprint: JSON.stringify(collectionRefundPreview(g).map(r => [r.contributionId, r.amount]).sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)) };
+}
