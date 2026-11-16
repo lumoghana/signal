@@ -6,6 +6,7 @@ node_modules/
 !.env.example
 .DS_Store
 *.log
+build-inputs/
 *.apk
 *.aab
 *.jks
