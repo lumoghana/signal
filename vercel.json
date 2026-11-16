@@ -39,7 +39,6 @@
   "functions": {
     "api/face.py": {
       "maxDuration": 30,
-      "maxConcurrency": 1,
       "includeFiles": "face_service/{*.py,models/**,model-manifest.json}",
       "excludeFiles": "{face_service/tests/**,dist/**,backend/**,merchant-approved/**,verification/**,build-inputs/**}"
     }
