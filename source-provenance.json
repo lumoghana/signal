@@ -4,7 +4,7 @@
   "repository": "lumoghana/signal",
   "release": "2.12.5",
   "release_date": "2026-11-17",
-  "status": "backend-and-merchant-site-live-vercel-publication-blocked",
+  "status": "live-and-verified",
   "approved_live_url": "https://lumo-connected-pilot.vercel.app/",
   "export_target": "GitHub / Vercel",
   "static_directory": "dist",
@@ -26,7 +26,7 @@
     "publicDownload": "https://lumo-connected-pilot.vercel.app/downloads/Lumo-Test-Android.apk",
     "sourceDeliveredSeparately": true,
     "originalSigningIdentityRetained": true,
-    "downloadStatus": "2.12.5 delivered separately; Vercel public download remains 2.12.4 pending publication approval"
+    "downloadStatus": "Both Vercel public APK downloads verified as the signed 2.12.5 release."
   },
   "recovery": {
     "mode": "prototype-face-only",
@@ -61,10 +61,23 @@
       "sourceCommit": "debc3ca069804024461df67e8c4033c258270b32"
     },
     "vercel": {
-      "currentRelease": "2.12.4",
-      "preparedRelease": "2.12.5",
-      "state": "automatic-approval-review-rejected",
-      "reason": "Explicit approval required to publish this release application and face-processing source to the existing Vercel projects."
+      "currentRelease": "2.12.5",
+      "state": "READY",
+      "consumer": {
+        "id": "dpl_37Q8hjGA2qAkQ3RabPyboQXQBuUq",
+        "url": "https://lumo-connected-pilot.vercel.app/",
+        "immutableUrl": "https://lumo-connected-pilot-ombfj3z1p-williedark-6795.vercel.app",
+        "runtime": "22.x"
+      },
+      "merchant": {
+        "id": "dpl_CsWXCGZupSxEFB1m5zJspPikwhU6",
+        "url": "https://lumo-merchant.vercel.app/",
+        "immutableUrl": "https://lumo-merchant-oiaajtzri-williedark-6795.vercel.app",
+        "runtime": "26.x"
+      },
+      "publicReleaseSourceAndApkHashesVerified": true,
+      "privateProcessorBoundaryVerified": true,
+      "aliasesAndEnvironmentPreserved": true
     }
   },
   "tests": {

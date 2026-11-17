@@ -1,6 +1,6 @@
 # Lumo 2.12.5: recovery review fixes
 
-Status: backend fixes and the merchant Site are live. The signed Android APK and source package are delivered separately. Both Vercel apps and their public APK downloads remain on 2.12.4 because automatic approval review rejected the new Vercel source publication and requires explicit authorization for this release.
+Status: live on the consumer and merchant Vercel apps, the merchant Site and the pilot backend. Both Vercel APK downloads match the signed 2.12.5 release. The Android source package is delivered separately. Public release metadata, changed client files, APK checksums and private face-processor access controls are verified. Existing aliases and environment settings are preserved.
 
 ## Issues corrected
 
