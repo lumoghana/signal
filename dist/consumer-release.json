@@ -1,9 +1,9 @@
 {
-  "consumerExperience": "2.12.5",
-  "apkVersion": "2.12.5",
-  "apkVersionCode": 21205,
-  "apkSha256": "21acf920bfc4e417283915125a69dadf2826b4961e24576f04819cf967b69e10",
-  "apkBytes": 4621263,
+  "consumerExperience": "2.13.0",
+  "apkVersion": "2.13.0",
+  "apkVersionCode": 21300,
+  "apkSha256": "fef51546c13256e36e46eb12e97a79bb2ea621b797d3eb0359bc0db4a983df72",
+  "apkBytes": 4641743,
   "apkDownload": "/downloads/Lumo-Test-Android.apk",
   "providerMode": "sandbox",
   "liveProviderLookup": false,
@@ -26,5 +26,17 @@
     "recoveryMode": "prototype-face-only",
     "prototypeOnly": true,
     "productionKeylessRecoveryAllowed": false
+  },
+  "loyalty": {
+    "version": "1.1.0",
+    "consumerTracking": true,
+    "explicitMembershipConsent": true,
+    "marketingConsentSeparate": true,
+    "existingMembershipLink": "merchant-issued-one-time-code",
+    "claimCodeMinutes": 10,
+    "autoEarningIdentity": "authenticated-purchaser",
+    "discountPayments": "canonical-positive-net-request",
+    "guestPhoneMatching": false,
+    "merchantOwnedProgramme": true
   }
 }

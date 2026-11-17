@@ -164,3 +164,39 @@ test('camera preview rebinds after rerender and a late decoded card cannot cross
 test('activity uses merchant labels while retaining source event types and recorded notes',async()=>{
  const d=base();d.activity=[{id:'a',type:'member-enrolled',units:0,memberId:member.id,shopId:'shop-a',createdAt:'2026-01-01T00:00:00Z'},{id:'b',type:'earn',units:1,memberId:member.id,shopId:'shop-a',createdAt:'2026-01-01T00:00:00Z'},{id:'c',type:'reward-earned',units:-5,memberId:member.id,shopId:'shop-a',createdAt:'2026-01-01T00:00:00Z'},{id:'d',type:'refund-adjustment',units:-1,memberId:member.id,shopId:'shop-a',reason:'Returned receipt verified',createdAt:'2026-01-01T00:00:00Z'}];const f=fixture({data:d});await f.module.refresh();const html=f.module.render();assert.match(html,/>Member joined<\/strong>/);assert.match(html,/>Purchase counted<\/strong>/);assert.match(html,/>Reward earned<\/strong>/);assert.match(html,/>Returned purchase adjustment<\/strong>/);assert.match(html,/data-event-type="refund-adjustment"/);assert.match(html,/Returned receipt verified/);assert.doesNotMatch(html,/>earn<\/strong>|>member-enrolled<\/strong>/);
 });
+
+test('linking a customer requires their presence and sends only a hashed one-time code',async()=>{
+ const sent=[],d=base();d.member=structuredClone(member);const f=fixture({data:d,api:async(path,o)=>{if(o)sent.push(o.body);return {loyalty:structuredClone(d),entity:o?{memberId:member.id,grantId:'grant-a',expiresAt:'2030-01-01T00:00:00Z'}:undefined};}});
+ await findMember(f);await f.module.handleClick('link-grant');await f.module.handleSubmit(form('link-grant',{actionShop:'shop-a'}));assert.equal(sent.length,0);assert.match(f.module.render(),/customer is here and agrees/);
+ await f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'}));assert.equal(sent.length,1);assert.equal(sent[0].operation,'createLinkGrant');assert.match(sent[0].payload.claimHash,/^[a-f0-9]{64}$/);assert.equal(sent[0].payload.claimCode,undefined);
+ const raw=f.module.render().match(/value="(LC1-[A-F0-9]{48})"/)?.[1];assert.ok(raw);const hash=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw))).toString('hex');assert.equal(sent[0].payload.claimHash,hash);assert.doesNotMatch(JSON.stringify(sent),/LC1-/);assert.doesNotMatch([...f.storage.values.values()].join(''),/LC1-/);
+ f.module.leave();await f.module.refresh();assert.doesNotMatch(f.module.render(),/value="LC1-/);
+});
+
+test('lost linking response retries the same hash and private code without issuing a second grant',async()=>{
+ const sent=[],d=base();d.member=structuredClone(member);let fail=true;const f=fixture({data:d,api:async(path,o)=>{if(o){sent.push(structuredClone(o.body));if(fail)throw new TypeError('Interrupted');}return {loyalty:structuredClone(d),entity:o?{memberId:member.id,expiresAt:'2030-01-01T00:00:00Z'}:undefined};}});
+ await findMember(f);await f.module.handleClick('link-grant');await f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'}));assert.equal(f.module.getView().pending.operation,'createLinkGrant');assert.doesNotMatch([...f.storage.values.values()].join(''),/LC1-/);fail=false;await f.module.handleClick('retry');assert.equal(sent.length,2);assert.deepEqual(sent[0],sent[1]);assert.match(f.module.render(),/value="LC1-[A-F0-9]{48}"/);
+});
+
+test('a locked or changed operator cannot retain or finish a linking code',async()=>{
+ let resolve;const gate=new Promise(r=>resolve=r),sent=[],d=base();d.member=structuredClone(member);const realCrypto=globalThis.crypto;const f=fixture({data:d,api:async(path,o)=>{if(o)sent.push(o.body);return {loyalty:structuredClone(d)};},extra:{crypto:{getRandomValues:v=>realCrypto.getRandomValues(v),subtle:{digest:async(...a)=>{await gate;return realCrypto.subtle.digest(...a);}}}}});
+ await findMember(f);await f.module.handleClick('link-grant');const pending=f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'}));f.setUser({...owner,id:'different-session',userId:'other-owner'});f.module.render();resolve();await pending;assert.equal(sent.length,0);assert.doesNotMatch(f.module.render(),/value="LC1-/);
+});
+
+test('double-submit during secure code creation issues one grant only',async()=>{
+ let resolve;const gate=new Promise(r=>resolve=r),sent=[],d=base();d.member=structuredClone(member);const realCrypto=globalThis.crypto;const f=fixture({data:d,api:async(path,o)=>{if(o)sent.push(o.body);return {loyalty:structuredClone(d),entity:o?{memberId:member.id,expiresAt:'2030-01-01T00:00:00Z'}:undefined};},extra:{crypto:{getRandomValues:v=>realCrypto.getRandomValues(v),subtle:{digest:async(...a)=>{await gate;return realCrypto.subtle.digest(...a);}}}}});
+ await findMember(f);await f.module.handleClick('link-grant');const first=f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'}));const second=f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'}));resolve();await Promise.all([first,second]);assert.equal(sent.length,1);
+});
+
+test('linked memberships show automatic progress without issuing another account link',async()=>{
+ const d=base();d.member={...structuredClone(member),consumerLinked:true};const f=fixture({data:d,api:async()=>({loyalty:structuredClone(d)})});await findMember(f);assert.match(f.module.render(),/Linked to the customer’s Lumo app/);assert.doesNotMatch(f.module.render(),/data-action="loyalty-link-grant"/);
+});
+
+test('unavailable secure code generation gives an actionable error without a mutation',async()=>{
+ const sent=[],d=base();d.member=structuredClone(member);const f=fixture({data:d,api:async(path,o)=>{if(o)sent.push(o.body);return {loyalty:structuredClone(d)};},extra:{crypto:{}}});await findMember(f);await f.module.handleClick('link-grant');assert.equal(await f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'})),false);assert.equal(sent.length,0);assert.match(f.module.render(),/Secure link codes are unavailable/);
+});
+
+test('backgrounding cancels an unfinished private code and never restores it after hashing',async()=>{
+ const previous=globalThis.document,listeners=new Map();globalThis.document={visibilityState:'visible',addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:()=>{}};
+ try{let resolve;const gate=new Promise(r=>resolve=r),sent=[],d=base();d.member=structuredClone(member);const realCrypto=globalThis.crypto;const f=fixture({data:d,api:async(path,o)=>{if(o)sent.push(o.body);return {loyalty:structuredClone(d)};},extra:{crypto:{getRandomValues:v=>realCrypto.getRandomValues(v),subtle:{digest:async(...a)=>{await gate;return realCrypto.subtle.digest(...a);}}}}});await findMember(f);await f.module.handleClick('link-grant');const request=f.module.handleSubmit(form('link-grant',{actionShop:'shop-a',linkConfirmed:'on'}));globalThis.document.visibilityState='hidden';listeners.get('visibilitychange')({type:'visibilitychange'});globalThis.document.visibilityState='visible';resolve();await request;assert.equal(sent.length,0);assert.doesNotMatch(f.module.render(),/value="LC1-/);f.module.destroy();}finally{if(previous===undefined)delete globalThis.document;else globalThis.document=previous;}
+});

@@ -26,7 +26,7 @@ function participating(l,m,id){const rule=ruleFor(l,m);if(!rule.shopIds.includes
 function operatorStamp(b,c){const current=list(b.shifts).find(s=>s.shopId===c.counter?.shopId&&s.staffId==='access-'+c.user.id&&s.status==='open');return [c.user.id,c.session?.id||'',c.counter?.id||'',c.counter?(c.counterShiftId||current?.id||''):''].join(':');}
 function append(l,entry){if(l.ledger.some(row=>row.id===entry.id))return false;l.ledger.push(entry);return true;}
 const capacityMessage='New loyalty earning and setup are paused at this prototype’s history capacity. Existing rewards, cancellations and refund adjustments are preserved. Export the records and contact support.';
-function capacityReached(b,l){return l.ledger.length>=LOYALTY_LIMITS.events-500||l.collections.length>=LOYALTY_LIMITS.collections-500||l.rewards.length>=LOYALTY_LIMITS.rewards-200||Object.keys(l._attempts).length>=LOYALTY_LIMITS.attempts-200||new TextEncoder().encode(JSON.stringify(l)).byteLength>450000||new TextEncoder().encode(JSON.stringify({...b,loyalty:l})).byteLength>1100000;}
+function capacityReached(b,l){return l.ledger.length>=LOYALTY_LIMITS.events-500||l.collections.length>=LOYALTY_LIMITS.collections-500||l.rewards.length>=LOYALTY_LIMITS.rewards-200||Object.keys(l._attempts).length>=LOYALTY_LIMITS.attempts-200||Object.keys(l._consumerAttempts||{}).length>=5800||new TextEncoder().encode(JSON.stringify(l)).byteLength>450000||new TextEncoder().encode(JSON.stringify({...b,loyalty:l})).byteLength>1100000;}
 function log(l,type,m,shopId,at,detail={}){return append(l,{id:uid('loyalty-event'),type,memberId:m?.id||null,shopId:shopId||null,units:0,createdAt:at,...detail});}
 function review(l,m,shopId,at,sourceId,reason){if(!l.reviews.some(r=>r.sourceId===sourceId&&r.memberId===m.id))l.reviews.push({id:uid('loyalty-review'),memberId:m.id,shopId,sourceId,reason,state:'open',createdAt:at});}
 function statusAt(l,at){return [...list(l.programme?.statusHistory)].reverse().find(row=>row.changedAt<=at)?.status||'active';}
@@ -77,6 +77,16 @@ export function reconcileLoyalty(b,{now}={}){
  if(!b.loyalty)return false;
  const at=stamp(now),l=normalizeLoyalty(b.loyalty),before=canonical(l);
  if(capacityReached(b,l)){l.capacityPaused=true;l.capacityMessage=capacityMessage;}
+ // Only shared-ledger hydration supplies this private actor field. Group-funded
+ // purchases belong to the authorised purchaser, never the group account owner.
+ if(!l.capacityPaused)for(const transaction of list(b.transactions)){
+  if(transaction.status!=='paid'||!transaction._loyaltyActorUserId||l.links.some(link=>link.transactionId===transaction.id||transaction.requestId&&link.requestId===transaction.requestId))continue;
+  const paidAt=transaction.confirmedAt||transaction.createdAt;
+  const member=l.members.find(m=>m._consumerUserId===transaction._loyaltyActorUserId&&Date.parse(m._consumerLinkedAt)<=Date.parse(paidAt));
+  if(!member||!loyaltyRulesForMember(l,member)?.shopIds.includes(transaction.shopId))continue;
+  memberLink(l,member,transaction.shopId,{transactionId:transaction.id,requestId:transaction.requestId||null,createdAt:paidAt,by:'consumer:'+member._consumerUserId});
+ }
+
  for(const reward of l.rewards)if(reward.state==='available'&&Date.parse(reward.expiresAt)<=Date.parse(at)){reward.state='expired';reward.expiredAt=at;log(l,'reward-expired',memberFor(l,reward.memberId),reward.earnedShopId,at,{rewardId:reward.id});}
  for(const collection of l.collections){
   if(!collection.requestId||collection.state!=='held')continue;
@@ -213,6 +223,15 @@ export function mutateLoyalty(network,context,input,{now}={}){
    if(l.members.length>=LOYALTY_LIMITS.members)fail('This prototype supports up to 500 programme members. Export the records and contact support.','LOYALTY_CAPACITY',409);
    const code='LC-'+Array.from(crypto.getRandomValues(new Uint8Array(10)),x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();
    const member={id:uid('loyalty-member'),code,name:text(payload.name,'Member name',80),phone:payload.phone?phone(payload.phone):null,marketingConsent:payload.marketingConsent,consentVersion:LOYALTY_CONSENT_VERSION,consentedAt:at,consentedBy:context.user.id,active:true,joinedShopId:shopId,ruleVersion:rule.version,createdAt:at,updatedAt:at};l.members.push(member);log(l,'member-enrolled',member,shopId,at,{by:context.user.id});entity={id:member.id,memberId:member.id,code};
+  }else if(operation==='createLinkGrant'){
+   keys(payload,['memberId','shopId','claimHash']);const m=memberFor(l,payload.memberId),shopId=shop(b,context,payload.shopId);activeMember(l,m);participating(l,m,shopId);
+   if(m._consumerUserId)fail('This membership is already linked to a Lumo account.','LOYALTY_ALREADY_LINKED',409);
+   if(!/^[a-f0-9]{64}$/.test(payload.claimHash||''))fail('Use a fresh private linking code.','LOYALTY_CLAIM_INVALID');
+   if(l._claimGrants.length>=1000)fail('This prototype has reached its linking-code history limit. Contact support.','LOYALTY_CAPACITY',409);
+   if(l._claimGrants.some(g=>g.hash===payload.claimHash))fail('Create a new private linking code.','LOYALTY_CLAIM_INVALID',409);
+   for(const grant of l._claimGrants)if(grant.memberId===m.id&&!grant.usedAt&&!grant.revokedAt)grant.revokedAt=at;
+   const grant={id:uid('loyalty-claim'),memberId:m.id,shopId,hash:payload.claimHash,createdAt:at,expiresAt:new Date(Date.parse(at)+10*60000).toISOString(),by:context.user.id};l._claimGrants.push(grant);
+   log(l,'link-code-created',m,shopId,at,{by:context.user.id});entity={id:grant.id,grantId:grant.id,memberId:m.id,expiresAt:grant.expiresAt};
   }else if(operation==='updateMember'){
    keys(payload,['memberId','name','phone','marketingConsent','active']);owner(b,context);const member=memberFor(l,payload.memberId);
    if(own(payload,'name'))member.name=text(payload.name,'Member name',80);if(own(payload,'phone'))member.phone=payload.phone?phone(payload.phone):null;
@@ -262,7 +281,7 @@ export function loyaltyProjection(b,context,query={}){
  const fullOwner=context.user.role==='owner'&&!context.counter;
  const safeReward=reward=>fullOwner?clone(reward):Object.fromEntries(['id','type','name','value','minimumSpend','state','expiresAt','earnedAt','ruleVersion'].filter(key=>reward[key]!==undefined).map(key=>[key,reward[key]]));
  const safeRule=rule=>{const result=clone(rule);if(!fullOwner){delete result.reward.cost;result.shopIds=result.shopIds.filter(id=>rights.allowedShopIds.includes(id));}return result;};
- const memberSummary=m=>{const rule=ruleFor(l,m);return {id:m.id,code:m.code,name:m.name,phone:fullOwner?m.phone:undefined,phoneMasked:m.phone?'••••'+m.phone.slice(-4):'',marketingConsent:m.marketingConsent,active:m.active,joinedShopId:fullOwner||rights.allowedShopIds.includes(m.joinedShopId)?m.joinedShopId:null,ruleVersion:m.ruleVersion,createdAt:m.createdAt,progress:loyaltyMemberBalance(l,m.id),target:rule.target,earning:rule.earning,rules:safeRule(rule),rewards:l.rewards.filter(r=>r.memberId===m.id).map(safeReward)};};
+ const memberSummary=m=>{const rule=ruleFor(l,m);return {id:m.id,code:m.code,name:m.name,consumerLinked:!!m._consumerUserId,phone:fullOwner?m.phone:undefined,phoneMasked:m.phone?'••••'+m.phone.slice(-4):'',marketingConsent:m.marketingConsent,active:m.active,joinedShopId:fullOwner||rights.allowedShopIds.includes(m.joinedShopId)?m.joinedShopId:null,ruleVersion:m.ruleVersion,createdAt:m.createdAt,progress:loyaltyMemberBalance(l,m.id),target:rule.target,earning:rule.earning,rules:safeRule(rule),rewards:l.rewards.filter(r=>r.memberId===m.id).map(safeReward)};};
  const selectedAllowed=selected&&(visibleMember(selected)||query.code&&rights.allowedShopIds.some(id=>ruleFor(l,selected).shopIds.includes(id)));
  if(selected&&!selectedAllowed)fail('This membership is outside your assigned shops.','LOYALTY_MEMBER_FORBIDDEN',403);
  const summary=selectedAllowed?memberSummary(selected):null;
@@ -283,7 +302,7 @@ export function loyaltyProjection(b,context,query={}){
   const saved=own(l._attempts,query.mutationId)?l._attempts[query.mutationId]:null;
   const value=saved&&entityFor(l,saved),receiptMember=value?.memberId&&l.members.find(m=>m.id===value.memberId);
   const visible=!receiptMember||visibleMember(receiptMember);
-  const safeEntity=value&&Object.fromEntries(['id','memberId','code','requestId','collectionId','shopId','amount','grossAmount','discount','expiresAt','state','rewardId','saleId','reviewId','ruleVersion'].filter(key=>value[key]!==undefined).map(key=>[key,value[key]]));
+  const safeEntity=value&&Object.fromEntries(['id','memberId','code','grantId','requestId','collectionId','shopId','amount','grossAmount','discount','expiresAt','state','rewardId','saleId','reviewId','ruleVersion'].filter(key=>value[key]!==undefined).map(key=>[key,value[key]]));
   result.mutationReceipt=attemptAllowed(b,context,l,saved)&&visible?{found:true,operation:saved.operation,entity:safeEntity}:{found:false};
  }
  return result;

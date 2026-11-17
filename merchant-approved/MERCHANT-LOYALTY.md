@@ -1,6 +1,6 @@
-# Merchant-owned loyalty 1.0.0
+# Merchant-owned loyalty 1.1.0
 
-This release adds Customers & loyalty to the merchant app. One business owns one programme, its branding, selected shops, earning rules, rewards and budget. The consumer app and signed Android artifact remain at 2.12.5. No consumer loyalty interface or new bank, MoMo or messaging provider is introduced.
+This release adds Customers & loyalty to the merchant app. One business owns one programme, its branding, selected shops, earning rules, rewards and budget. The paired consumer web and Android experience is 2.13.0. Customers can join, link existing memberships, track progress and use rewards in Your rewards. No new bank, MoMo or messaging provider is introduced.
 
 ## Merchant tasks
 
@@ -44,3 +44,9 @@ Loyalty is stored inside the trusted merchant business document, separately from
 This prototype supports 500 members, 6,000 loyalty events, 3,000 rewards, 3,000 collection records and 6,000 mutation receipts per programme. It pauses new earning/setup proactively near history limits, around 450 KB of loyalty data or 1.1 MB for the business document, leaving space for outstanding reward redemptions, cancellations and refund adjustments. It does not prune history or idempotency receipts to make space. Export the records and contact support for a capacity migration.
 
 Before publishing, remove every temporary `dist/__loyalty-qa*` file and rebuild the Worker so synthetic QA data cannot remain in its bundled assets. Preserve the existing consumer release manifests, APK checksum, merchant audience, Vercel aliases and environment settings.
+
+## Connected consumer membership
+
+Customers can join from a published shop in Campus Pay. To connect an existing membership, find the member and choose **Link customer’s Lumo app**. Confirm the customer is present and agrees, then let them scan the private one-time linking QR in Lumo. They review their original terms before linking. The code expires after ten minutes, is used once and clears from the merchant screen on leaving or changing operators. A printed membership card is not an account-linking credential.
+
+After linking, confirmed Lumo purchases by that authenticated customer update this same membership automatically. Guest or external payments are not matched by phone or name. Consumer-created discounted payment requests belong to that purchaser; cashier-prepared QRs keep their existing presentation rules. The normal payment and refund safeguards remain in place. Customers show their card for item rewards, which staff still fulfil.

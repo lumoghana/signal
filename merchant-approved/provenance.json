@@ -4,12 +4,12 @@
   "approvedCommit": "0e0ce95efc5d03719599fe3c745b7f1365e70c45",
   "sourceProjectId": "appgprj_6af5be2c38548191822030bb895d6d3d",
   "currentConnectedRelease": {
-    "siteVersion": 39,
-    "sourceCommit": "6536d2922be4fafff586cad9f494324f60bbc35e",
+    "siteVersion": 40,
+    "sourceCommit": "091170da1c30f7c961860f132c68156713d5d064",
     "deployedUrl": "https://lumo-merchant-mobile.oness15.chatgpt.site",
     "date": "2026-11-17",
-    "reason": "Merchant-owned loyalty with private member projection, immutable reward holds, confirmed-payment/refund reconciliation, cashier flows and merchant reporting."
+    "reason": "Connected consumer and merchant memberships, private account linking, canonical earning and reward payment safeguards."
   },
-  "merchantFeature": "merchant-loyalty-1.0.0",
-  "consumerArtifactUnchanged": "2.12.5"
+  "merchantFeature": "merchant-loyalty-1.1.0",
+  "consumerRelease": "2.13.0"
 }

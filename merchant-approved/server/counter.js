@@ -25,8 +25,8 @@ export function counterScope(n,c,scoped){
  // A handover keeps counter receipts visible while preserving the original cashier.
  // General shop QR receipts are not mixed into this request-specific journal.
  scoped.shops=scoped.shops.filter(s=>s.id===counter.shopId);
- scoped.transactions=b.transactions.filter(t=>t.shopId===counter.shopId&&t.counterId===counter.id).map(t=>{const out={...t};delete out.studentWalletId;return out;});
- scoped.requests=b.requests.filter(r=>r.shopId===counter.shopId&&r.counterId===counter.id).map(r=>({...r}));
+ scoped.transactions=b.transactions.filter(t=>t.shopId===counter.shopId&&t.counterId===counter.id).map(t=>{const out={...t};delete out.studentWalletId;delete out._loyaltyActorUserId;delete out._loyaltyPayerAccountId;return out;});
+ scoped.requests=b.requests.filter(r=>r.shopId===counter.shopId&&r.counterId===counter.id).map(r=>{const out={...r};delete out._consumerUserId;return out;});
  const payments=new Set(scoped.transactions.map(t=>t.id));
  scoped.refunds=b.refunds.filter(r=>payments.has(r.transactionId)).map(r=>({...r}));
  scoped.shifts=b.shifts.filter(s=>s.shopId===counter.shopId&&(s.counterId===counter.id||s.staffId==='access-'+c.user.id)).map(s=>({...s}));

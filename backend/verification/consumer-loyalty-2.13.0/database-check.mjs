@@ -1,0 +1,98 @@
+// Actual financial SQL and gateway/merchant/consumer handlers, synthetic Auth only.
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {bootLedger} from './local-ledger.mjs';
+import {createMerchantHandler} from '../../supabase/functions/lumo-approved/merchant/handler.mjs';
+import {createConsumerLoyalty} from '../../supabase/functions/lumo-approved/consumer-loyalty.mjs';
+import {createApprovedHandler} from '../../supabase/functions/lumo-approved/handler.mjs';
+const guard='20261117091402_consumer_loyalty_payer_guard.sql';
+let stage='boot';
+const {db,applied}=await bootLedger({additional:[guard],log:name=>{stage=name;}});
+const uuid=()=>crypto.randomUUID(),json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}}),hash=s=>createHash('sha256').update(s).digest('hex');
+const results=[];
+try{
+ stage='canonical SQL guard and bearer/refund tests';
+ const sqlResults=await db.exec(await readFile(new URL('../../tests/consumer-loyalty-payer.test.sql',import.meta.url),'utf8'));
+ const checks=sqlResults.flatMap(r=>r.rows||[]).find(row=>row.consumer_loyalty_checks)?.consumer_loyalty_checks;assert.ok(checks>=12);results.push({name:'canonical-payer-guard',checks});
+ const types={p_actor:'uuid',p_session:'uuid',p_revision:'bigint',p_ledger_stamp:'text',p_state:'jsonb',p_money_authorized:'boolean',p_command:'text',p_payload:'jsonb',p_shop:'uuid',p_test_key:'text',p_query:'text'};
+ let beforeMerchantCommit=null;
+ const rpc=async(name,args,claims={role:'service_role'})=>{if(name==='lumo_approved_merchant_commit'&&beforeMerchantCommit){const run=beforeMerchantCommit;beforeMerchantCommit=null;await run();}return db.transaction(async tx=>{
+  assert.match(name,/^lumo_[a-z_]+$/);const entries=Object.entries(args);assert.ok(entries.every(([key])=>types[key]));
+  await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify(claims)]);
+  const role=claims.role==='authenticated'?'authenticated':'service_role';await tx.exec('set local role '+role);
+  const params=entries.map(([,v])=>v&&typeof v==='object'?JSON.stringify(v):v),named=entries.map(([key],i)=>key+'=>$'+(i+1)+'::'+types[key]).join(',');
+  return (await tx.query('select public.'+name+'('+named+') as value',params)).rows[0].value;
+ });};
+ const users=new Map();
+ async function actor(label,personal=true){
+  const userId=uuid(),sessionId=uuid(),handle='loyalty_'+label+'_'+uuid().slice(0,7),phone='024'+String(users.size+1).padStart(7,'0'),identity={userId,sessionId,user:{email:handle+'@pilot.lumo.invalid'}};
+  await db.query("insert into auth.users(id,aud,role,email,raw_app_meta_data,email_confirmed_at,created_at,updated_at) values($1,'authenticated','authenticated',$2,'{\"lumo_pilot\":true}',now(),now(),now())",[userId,identity.user.email]);
+  await db.query('insert into auth.sessions(id,user_id,created_at,updated_at) values($1,$2,now(),now())',[sessionId,userId]);
+  const provision=await rpc('lumo_approved_service',{p_command:'provision',p_payload:{actor:userId,session:sessionId,handle,displayName:'Synthetic '+label,pin:'452913',mode:personal?'consumer':'merchant',...(personal?{phone}:{})}});assert.equal(provision.ok,true,JSON.stringify(provision));
+  const row={identity,handle,phone,personal,token:'e30.'+Buffer.from(JSON.stringify({sub:userId,session_id:sessionId,role:'authenticated'})).toString('base64url')+'.fixture'};users.set(userId,row);return row;
+ }
+ const claims=who=>({sub:who.identity.userId,session_id:who.identity.sessionId,role:'authenticated'});
+ const repo=who=>({service:(command,payload={})=>rpc('lumo_approved_service',{p_command:command,p_payload:{...payload,actor:who.identity.userId,session:who.identity.sessionId}}),resolve:query=>rpc('lumo_approved_service',{p_command:'resolve',p_payload:{query,actor:who.identity.userId,session:who.identity.sessionId}})});
+ const consumer=createConsumerLoyalty({serviceRpc:rpc}),merchant=createMerchantHandler({serviceRpc:rpc,prototypeFaceOnly:true});
+ const mapi=(who,path,body)=>merchant({identity:who.identity,body:{action:'merchant',path,method:body===undefined?'GET':'POST',body:body||{},merchantToken:who.merchantToken}});
+ const lapi=(who,operation,payload={},attemptId)=>consumer({identity:who.identity,repo:repo(who),body:{action:'loyalty',operation,payload,...(attemptId?{attemptId}:{})}});
+ const gateway=createApprovedHandler({supabaseUrl:'https://fixture.lumo.invalid',serviceRoleKey:'SYNTHETIC_SERVICE_ROLE',merchantHandler:createMerchantHandler,fetch:async(url,init)=>{
+  const parsed=new URL(url),bearer=init.headers.Authorization?.replace(/^Bearer /,''),user=[...users.values()].find(u=>u.token===bearer);
+  if(parsed.pathname==='/auth/v1/user')return user?json({id:user.identity.userId,email:user.identity.user.email,app_metadata:{lumo_pilot:true}}):json({},401);
+  assert.match(parsed.pathname,/^\/rest\/v1\/rpc\/lumo_/);const value=await rpc(parsed.pathname.split('/').at(-1),JSON.parse(init.body),user?claims(user):{role:'service_role'});return json(value);
+ }});
+ const gapi=async(who,body)=>{const response=await gateway(new Request('https://edge.fixture/approved',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+who.token},body:JSON.stringify(body)}));return {...await response.json(),httpStatus:response.status};};
+ const action=(who,type,payload,attemptId=uuid())=>gapi(who,{action:'action',type,payload,attemptId,pin:'452913'});
+ const owner=await actor('owner',false),ama=await actor('ama'),kojo=await actor('kojo');
+ stage='actual merchant signup, publish and versioned programme';
+ const password='Synthetic-fixture-password-2026';const signup=await mapi(owner,'/api/signup',{name:'Synthetic Kitchen',ownerName:'Synthetic owner',phone:'0240000090',businessType:'sole-trader',destination:'Test destination',verification:{identity:true,face:true},shop:{name:'Night Market',area:'Legon',category:'Food',lat:5.65,lng:-.18},credentials:{username:owner.handle,password},attemptId:'merchant-signup-'+uuid()});assert.equal(signup.ok,true,JSON.stringify(signup));owner.merchantToken=signup.merchantToken;const businessId=signup.state.business.id,shopId=signup.state.shops[0].id;
+ const activated=await mapi(owner,'/api/action',{type:'UPDATE_ACTIVATION',payload:{shopId,locationConfirmed:true,qrReady:true,ownerOperated:true}});assert.equal(activated.ok,true,JSON.stringify(activated));
+ const paired=await mapi(owner,'/api/devices',{shopId,deviceId:'synthetic-receiving-phone',label:'Synthetic test receiver'});assert.equal(paired.ok,true,JSON.stringify(paired));
+ const audio=await mapi(owner,'/api/devices/synthetic-receiving-phone',{action:'test',soundReady:true,expectedFailureVersion:0});assert.equal(audio.ok,true,JSON.stringify(audio));
+ const published=await mapi(owner,'/api/action',{type:'UPDATE_SHOP',payload:{id:shopId,published:true}});assert.equal(published.ok,true,JSON.stringify(published));
+ const mchange=async(operation,payload)=>{const current=await mapi(owner,'/api/loyalty');return mapi(owner,'/api/loyalty',{operation,payload,mutationId:uuid(),expectedRevision:current.loyalty.revision});};
+ const rule=target=>({name:'Kitchen Regulars',colour:'#d6f675',earning:'visits',minimumSpend:2000,target,onePerDay:false,shopIds:[shopId],reward:{type:'discount',name:'Five cedis off',value:500,cost:500,minimumSpend:2000,expiryDays:30},budgetLimit:50000});
+ assert.equal((await mchange('saveProgramme',rule(2))).ok,true);
+ const enrolled=await mchange('enrollMember',{name:'Private original member',phone:'0240000999',shopId,membershipConsent:true,marketingConsent:false});assert.equal(enrolled.ok,true,JSON.stringify(enrolled));const memberId=enrolled.entity.memberId;
+ assert.equal((await mchange('saveProgramme',rule(7))).ok,true);
+ stage='merchant grant to pinned preview and explicit consumer claim';
+ const code='LC1-'+crypto.getRandomValues(new Uint8Array(24)).reduce((s,n)=>s+n.toString(16).padStart(2,'0'),'').toUpperCase(),claimHash=hash(code),grant=await mchange('createLinkGrant',{memberId,shopId,claimHash});assert.equal(grant.ok,true,JSON.stringify(grant));
+ const preview=await lapi(ama,'programme',{claimCode:code});assert.equal(preview.loyalty.programme.ruleVersion,1);assert.equal(preview.loyalty.programme.rules.target,2);assert.doesNotMatch(JSON.stringify(preview),/Private original member|0240000999/);
+ const claimAttempt=uuid(),claimed=await lapi(ama,'claim',{claimCode:code,ruleVersion:1,consentVersion:preview.loyalty.programme.consentVersion,membershipConsent:true,marketingConsent:false},claimAttempt);assert.equal(claimed.loyalty.membership.id,memberId);assert.equal(claimed.loyalty.membership.target,2);
+ await assert.rejects(lapi(kojo,'claim',{claimCode:code,ruleVersion:1,consentVersion:preview.loyalty.programme.consentVersion,membershipConsent:true,marketingConsent:false},uuid()),e=>e.code==='LOYALTY_CLAIM_INVALID');
+ const raw=(await rpc('lumo_approved_merchant_read',{p_actor:owner.identity.userId,p_session:owner.identity.sessionId})).state.businesses[businessId];assert.equal(raw.loyalty._claimGrants[0].hash,claimHash);assert.equal(JSON.stringify(raw).includes(code),false);
+ const ordinary=await mapi(owner,'/api/session');assert.equal(JSON.stringify(ordinary).includes(claimHash),false);assert.equal(JSON.stringify(ordinary).includes(ama.identity.userId),false);
+ results.push({name:'merchant-grant-pinned-consumer-claim',checks:10});
+ stage='ordinary canonical payments automatically earn and refund reverses progress';
+ for(const who of [ama,kojo]){const funded=await action(who,'fund',{amount:20000});assert.equal(funded.ok,true,JSON.stringify(funded));}
+ const buy=async(who,amount=2500,requestId)=>{const body={amount,rail:'merchant',shopId,...(requestId?{requestId}:{})};const out=await action(who,'payment',body);assert.equal(out.ok,true,JSON.stringify(out));return out;};
+ const first=await buy(ama),second=await buy(ama);const earned=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership;assert.equal(earned.progress,0);assert.equal(earned.rewards.length,1);assert.equal(earned.rewards[0].state,'available');assert.equal(earned.history.filter(e=>e.type==='earn').length,2);
+ const repeated=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership;assert.equal(repeated.history.filter(e=>e.type==='earn').length,2);
+ stage='consumer net request + direct/gateway wrong payer rejection';
+ const prepared=await lapi(ama,'prepare',{membershipId:memberId,shopId,grossAmount:2500,rewardId:earned.rewards[0].id},uuid());assert.equal(prepared.entity.amount,2000);const requestId=prepared.entity.requestId;
+ const before=(await repo(kojo).service('load')).account.balance,wrong=await action(kojo,'payment',{amount:2000,rail:'merchant',shopId,requestId});assert.equal(wrong.ok,false);assert.equal((await repo(kojo).service('load')).account.balance,before);
+ const net=await buy(ama,2000,requestId);assert.equal(net.postedReceipts[0].amount,2000);assert.equal(net.postedReceipts[0].requestId,requestId);
+ const used=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership;assert.equal(used.rewards[0].state,'redeemed');assert.equal(used.history.filter(e=>e.type==='reward-redeemed').length,1);
+ const netJournal=net.postedReceipts[0].id;
+ owner.identity.passwordVerified=true;const step=await mapi(owner,'/api/auth/step-up',{purpose:'refund',currentPassword:password});assert.equal(step.ok,true,JSON.stringify(step));
+ const returned=await mapi(owner,'/api/action',{type:'REFUND',payload:{transactionId:netJournal,amount:2000,reason:'Synthetic discounted purchase returned',attemptId:uuid(),stepUpProof:step.proof}});assert.equal(returned.ok,true,JSON.stringify(returned));
+ const afterReturn=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership;assert.equal(afterReturn.rewards[0].state,'redeemed');
+ const verifyStep=await mapi(owner,'/api/auth/step-up',{purpose:'refund',currentPassword:password});assert.equal(verifyStep.ok,true);
+ const earningReturn=await mapi(owner,'/api/action',{type:'REFUND',payload:{transactionId:first.postedReceipts[0].id,amount:2500,reason:'Synthetic qualifying purchase returned',attemptId:uuid(),stepUpProof:verifyStep.proof}});assert.equal(earningReturn.ok,true,JSON.stringify(earningReturn));
+ const lostProgress=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership;assert.equal(lostProgress.progress,-1);assert.equal(lostProgress.rewards[0].state,'redeemed');
+ const balances=(await db.query('select (select sum(amount) from lumo_private.entries) as total,(select count(*) from lumo_private.journals j where (select count(*) from lumo_private.entries e where e.journal_id=j.id)<>2) as unbalanced')).rows[0];assert.equal(Number(balances.total),0);assert.equal(Number(balances.unbalanced),0);
+ results.push({name:'actual-gateway-payments-discount-and-refund',checks:18});
+ stage='real canonical payment wins metadata cancellation CAS';
+ assert.equal((await mchange('adjustProgress',{memberId,shopId,units:3,reason:'Synthetic owner correction for race fixture'})).ok,true);
+ const earnedAgain=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership.rewards.find(r=>r.state==='available');assert.ok(earnedAgain);
+ const secondHold=await lapi(ama,'prepare',{membershipId:memberId,shopId,grossAmount:2500,rewardId:earnedAgain.id},uuid());assert.equal(secondHold.entity.amount,2000);
+ beforeMerchantCommit=async()=>{const r=await buy(ama,2000,secondHold.entity.requestId);assert.equal(r.ok,true);};
+ await assert.rejects(lapi(ama,'cancel',{membershipId:memberId,requestId:secondHold.entity.requestId},uuid()),e=>e.code==='REQUEST_PROCESSING');
+ const raceResult=(await lapi(ama,'detail',{membershipId:memberId})).loyalty.membership;
+ assert.equal(raceResult.rewards.find(r=>r.id===earnedAgain.id).state,'redeemed');
+ const canonical=(await db.query('select status,paid_journal_id from lumo_private.payment_requests where id=$1',[secondHold.entity.requestId])).rows[0];assert.equal(canonical.status,'paid');assert.ok(canonical.paid_journal_id);
+ results.push({name:'actual-canonical-payment-winning-metadata-cancel',checks:8});
+ const evidence={passed:true,migrations:applied.length,checks:results.reduce((n,r)=>n+r.checks,0),results,scope:'Local PGlite: actual pgcrypto, canonical financial SQL/RPCs, gateway, merchant and consumer loyalty handlers. Synthetic Auth only; no hosted customer records or money. pg_cron registration omitted; unrelated post-Nov14 social/access migrations excluded.'};
+ console.log(JSON.stringify(evidence,null,2));await writeFile(new URL('database-result.json',import.meta.url),JSON.stringify(evidence,null,2)+'\n');
+}catch(error){console.error(JSON.stringify({stage,message:error.message,code:error.code,detail:error.detail,where:error.where,stack:error.stack}));process.exitCode=1;}finally{await db.close();}

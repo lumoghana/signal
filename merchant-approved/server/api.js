@@ -11,7 +11,7 @@ const newRecoveryKey=()=>('LUMO-'+randomToken().slice(0,32).toUpperCase().match(
 function response(data,status=200,cookies=[]){
  const h=new Headers({'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
  for(const cookie of cookies)h.append('Set-Cookie',cookie);
- return new Response(JSON.stringify({sandbox:true,bankConnected:false,smsConnected:false,...data}),{status,headers:h});
+ return new Response(JSON.stringify({sandbox:true,bankConnected:false,smsConnected:false,...data},(key,value)=>['_loyaltyActorUserId','_loyaltyPayerAccountId','_consumerUserId','_consumerAccountId','_consumerLinkedAt','_claimGrants','_consumerAttempts'].includes(key)?undefined:value),{status,headers:h});
 }
 function publicSessions(n,c){
  return n.sessions.filter(s=>s.businessId===c.user.businessId&&(c.user.role==='owner'||s.userId===c.user.id)).map(s=>{
@@ -212,7 +212,7 @@ function loyaltyContext(n,tokenHash,values={},method='GET',operation=''){
  const c=requireSession(n,tokenHash),b=n.businesses[c.user.businessId];
  if(!b||!['owner','manager','cashier'].includes(c.user.role))throw new APIError('Sign in to this merchant business before opening loyalty.',403,'LOYALTY_FORBIDDEN');
  const input={...values};
- if(c.counter&&method==='POST'&&!['enrollMember','attachPayment','attachRequest','prepareCollection','fulfilItem'].includes(operation))throw new APIError('Counter access does not include programme management or loyalty adjustments.',403,'LOYALTY_FORBIDDEN');
+ if(c.counter&&method==='POST'&&!['enrollMember','attachPayment','attachRequest','prepareCollection','fulfilItem','createLinkGrant'].includes(operation))throw new APIError('Counter access does not include programme management or loyalty adjustments.',403,'LOYALTY_FORBIDDEN');
  if(c.counter){
   const staffId='access-'+c.user.id,shift=b.shifts.find(s=>s.shopId===c.counter.shopId&&s.staffId===staffId&&s.status==='open');
   const staff=method==='GET'?input.staffId:input.counterStaffId;
@@ -339,7 +339,7 @@ export async function handleAPI(request,env){
    if(out.data.counterError){const error=out.data.counterError;return response({error:error.error,code:error.code,revision:out.revision},error.status);}
    return response({...out.data,revision:out.revision});
   }
-  if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,features:{merchantLoyalty:'1.0.0'},storage:env.approvedStore?'Supabase private merchant records and canonical ledger':'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
+  if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,features:{merchantLoyalty:'1.1.0',consumerLoyalty:'1.1.0'},storage:env.approvedStore?'Supabase private merchant records and canonical ledger':'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
   if(method==='GET'&&['/api/session','/api/business'].includes(path)){
    const out=await updateNetwork(env,n=>{
     const c=resolveSession(n,tokenHash);let changed=false;

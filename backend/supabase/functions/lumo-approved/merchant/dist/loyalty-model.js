@@ -7,7 +7,7 @@ export function normalizeLoyalty(value){
  const raw=value&&typeof value==='object'&&!Array.isArray(value)?clone(value):{};
  return {version:1,revision:Number.isSafeInteger(raw.revision)?raw.revision:0,programme:raw.programme||null,
   ruleVersions:list(raw.ruleVersions),members:list(raw.members),links:list(raw.links),collections:list(raw.collections),externalSales:list(raw.externalSales),
-  ledger:list(raw.ledger),rewards:list(raw.rewards),reviews:list(raw.reviews),managerShopIds:list(raw.managerShopIds),_attempts:raw._attempts&&typeof raw._attempts==='object'?raw._attempts:{},updatedAt:raw.updatedAt||null,capacityPaused:raw.capacityPaused===true,capacityMessage:raw.capacityMessage||''};
+  ledger:list(raw.ledger),rewards:list(raw.rewards),reviews:list(raw.reviews),managerShopIds:list(raw.managerShopIds),_attempts:raw._attempts&&typeof raw._attempts==='object'?raw._attempts:{},_claimGrants:list(raw._claimGrants),_consumerAttempts:raw._consumerAttempts&&typeof raw._consumerAttempts==='object'?raw._consumerAttempts:{},updatedAt:raw.updatedAt||null,capacityPaused:raw.capacityPaused===true,capacityMessage:raw.capacityMessage||''};
 }
 export function loyaltyRulesForMember(value,member){return list(value?.ruleVersions).find(rule=>rule.version===member?.ruleVersion)||null;}
 export function loyaltyMemberBalance(value,memberId){

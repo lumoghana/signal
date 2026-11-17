@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "migrations": 35,
+  "checks": 49,
+  "results": [
+    {
+      "name": "canonical-payer-guard",
+      "checks": 13
+    },
+    {
+      "name": "merchant-grant-pinned-consumer-claim",
+      "checks": 10
+    },
+    {
+      "name": "actual-gateway-payments-discount-and-refund",
+      "checks": 18
+    },
+    {
+      "name": "actual-canonical-payment-winning-metadata-cancel",
+      "checks": 8
+    }
+  ],
+  "scope": "Local PGlite: actual pgcrypto, canonical financial SQL/RPCs, gateway, merchant and consumer loyalty handlers. Synthetic Auth only; no hosted customer records or money. pg_cron registration omitted; unrelated post-Nov14 social/access migrations excluded."
+}

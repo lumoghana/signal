@@ -964,3 +964,263 @@
   const allowed=new Set(u.shopIds);
   c.shops=c.shops.filter(s=>allowed.has(s.id));
   for(const key of ['transactions','requests','closings','refunds','tickets','shifts','reconciliations'])c[key]=(c[key]||[]).filter(x=>allowed.has(x.shopId));
+
+--- a/backend/supabase/functions/lumo-approved/consumer-loyalty.mjs
++++ b/backend/supabase/functions/lumo-approved/consumer-loyalty.mjs
+@@ -0,0 +1,85 @@
++import {hydrateMerchantNetwork} from './merchant/handler.mjs';
++import {mutateLoyalty,reconcileLoyalty,prepareLoyaltyCollection,bindLoyaltyCollection,releaseLoyaltyCollection} from './merchant/server/loyalty.js';
++import {normalizeLoyalty,loyaltyRulesForMember,loyaltyMemberBalance,loyaltyTerms,LOYALTY_CONSENT_VERSION} from './merchant/dist/loyalty-model.js';
++
++const clone=x=>structuredClone(x),array=x=>Array.isArray(x)?x:[];
++const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
++const REF=/^[A-Za-z0-9_.:-]{10,100}$/;
++const fail=(code,message,status=400)=>{throw Object.assign(new Error(message),{code,status});};
++const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
++const keys=(x,allowed)=>{if(!plain(x)||Object.keys(x).some(k=>!allowed.includes(k)))fail('INVALID_INPUT','Use only the supported rewards details.');};
++const canonical=x=>JSON.stringify(x&&typeof x==='object'?Array.isArray(x)?x.map(v=>JSON.parse(canonical(v))):Object.fromEntries(Object.keys(x).filter(k=>x[k]!==undefined).sort().map(k=>[k,JSON.parse(canonical(x[k]))])):x);
++const safeRule=rule=>{if(!rule)return null;const out=clone(rule);delete out.reward.cost;return out;};
++const branding=l=>({id:l.programme.id,name:l.programme.name,colour:l.programme.colour,status:l.programme.status});
++const safeRequest=request=>request?Object.fromEntries(['id','shopId','amount','description','status','expiresAt','createdAt'].filter(k=>request[k]!==undefined).map(k=>[k,request[k]])):null;
++const businesses=n=>Object.values(n.businesses||{});
++const owned=(b,userId)=>array(b.loyalty?.members).find(m=>m._consumerUserId===userId);
++const at=value=>new Date(value).toISOString();
++
++/** Consumer capabilities are projected from the private merchant document.
++ * Only the verified account identity may join, link or spend its own reward.
++ * Every write uses the existing canonical journal + metadata CAS fence.
++ */
++export function createConsumerLoyalty({serviceRpc,now=()=>Date.now(),cryptoApi=globalThis.crypto}={}){
++ if(typeof serviceRpc!=='function')throw Error('Loyalty service RPC is required.');
++ const digest=async text=>Array.from(new Uint8Array(await cryptoApi.subtle.digest('SHA-256',new TextEncoder().encode(text))),n=>n.toString(16).padStart(2,'0')).join('');
++ async function claimHash(code){if(typeof code!=='string'||!/^LC1-[A-F0-9]{48}$/i.test(code.trim()))fail('LOYALTY_CLAIM_INVALID','That private linking code is unavailable. Ask the shop team for a fresh code.');return digest(code.trim().toUpperCase());}
++ function findMembership(n,userId,id){const b=businesses(n).find(b=>array(b.loyalty?.members).some(m=>m.id===id&&m._consumerUserId===userId));const m=b&&b.loyalty.members.find(m=>m.id===id&&m._consumerUserId===userId);if(!m)fail('LOYALTY_MEMBERSHIP_UNAVAILABLE','This membership is unavailable to your Lumo account.',404);return {b,m};}
++ function findProgramme(n,shopId){if(!UUID.test(shopId||''))fail('LOYALTY_PROGRAMME_UNAVAILABLE','Choose a participating shop.',404);const b=businesses(n).find(b=>b.loyalty?.programme&&b.shops.some(s=>s.id===shopId&&s.published===true));if(!b)fail('LOYALTY_PROGRAMME_UNAVAILABLE','This shop has no available loyalty programme.',404);return b;}
++ function findGrant(n,hash){for(const b of businesses(n)){const l=b.loyalty;if(!l?.programme)continue;const g=array(l._claimGrants).find(g=>g.hash===hash&&!g.usedAt&&!g.revokedAt&&Date.parse(g.expiresAt)>now());const m=g&&l.members.find(m=>m.id===g.memberId&&!m._consumerUserId&&m.active!==false);if(m)return {b,m,g};}fail('LOYALTY_CLAIM_INVALID','That private linking code is unavailable. Ask the shop team for a fresh code.');}
++ function reconcile(b){if(!b.loyalty)return false;let changed=false;for(const c of array(b.loyalty.collections)){const r=b.requests.find(r=>r.id===c.requestId);if(c.state==='held'&&r?.status==='open'&&Date.parse(r.expiresAt)<=now()&&!b.transactions.some(t=>t.requestId===r.id&&['paid','processing'].includes(t.status))){r.status='cancelled';r.cancellationReason='loyalty-expired';changed=true;}}return reconcileLoyalty(b,{now:now()})||changed;}
++ function shops(b,rule){return b.shops.filter(s=>rule.shopIds.includes(s.id)).map(s=>({id:s.id,name:s.name,accepting:s.accepting!==false&&s.open!==false,published:s.published===true}));}
++ function memberView(b,m){const l=b.loyalty,r=loyaltyRulesForMember(l,m);return {id:m.id,merchantId:b.business.id,merchantName:b.business.name,name:m.name,code:m.code,active:m.active!==false,ruleVersion:m.ruleVersion,linkedAt:m._consumerLinkedAt,progress:loyaltyMemberBalance(l,m.id),target:r.target,earning:r.earning,terms:loyaltyTerms(r),rules:safeRule(r),programme:branding(l),marketingConsent:m.marketingConsent===true,consentVersion:LOYALTY_CONSENT_VERSION,shops:shops(b,r),capacityPaused:l.capacityPaused===true,
++   rewards:l.rewards.filter(v=>v.memberId===m.id).map(v=>Object.fromEntries(['id','type','name','value','minimumSpend','state','expiresAt','earnedAt','ruleVersion'].filter(k=>v[k]!==undefined).map(k=>[k,v[k]]))),
++   history:l.ledger.filter(v=>v.memberId===m.id).slice(-100).reverse().map(v=>({id:v.id,type:v.type,units:v.units,createdAt:v.createdAt,shopId:v.shopId,shopName:b.shops.find(s=>s.id===v.shopId)?.name||'Shop'})),
++   collections:l.collections.filter(c=>c.memberId===m.id&&c._consumerUserId===m._consumerUserId).map(c=>({...collectionEntity(b,c),attemptId:c.mutationId}))};}
++ function programmeView(b,rule,userId,{claim=false}={}){const l=b.loyalty,m=owned(b,userId);return {merchantId:b.business.id,merchantName:b.business.name,programme:branding(l),rules:safeRule(rule),terms:loyaltyTerms(rule),ruleVersion:rule.version,consentVersion:LOYALTY_CONSENT_VERSION,shops:shops(b,rule),canJoin:!claim&&!m&&l.programme.status==='active'&&!l.capacityPaused,membershipId:m?.id||null,claim};}
++ function collectionEntity(b,c){const r=b.requests.find(r=>r.id===c.requestId);return {id:c.requestId,requestId:c.requestId,collectionId:c.id,membershipId:c.memberId,shopId:c.shopId,amount:c.amount,grossAmount:c.grossAmount,discount:c.discount,rewardId:c.rewardId,expiresAt:r?.expiresAt||c.expiresAt,state:c.state,request:safeRequest(r)};}
++ function resultEntity(b,saved,userId){if(saved.membershipId){const m=b.loyalty.members.find(m=>m.id===saved.membershipId&&m._consumerUserId===userId);if(!m)return null;}if(saved.collectionId){const c=b.loyalty.collections.find(c=>c.id===saved.collectionId&&c._consumerUserId===userId);return c?collectionEntity(b,c):null;}return clone(saved.entity);}
++ function projection(n,userId,{membershipId,programme,receipt}={}){const memberships=businesses(n).flatMap(b=>array(b.loyalty?.members).filter(m=>m._consumerUserId===userId).map(m=>memberView(b,m)));return {version:'1.1.0',memberships,membership:membershipId?memberships.find(m=>m.id===membershipId)||null:null,programme:programme||null,...(receipt?{mutationReceipt:receipt}:{})};}
++ async function read(identity){const raw=await serviceRpc('lumo_approved_merchant_read',{p_actor:identity.userId,p_session:identity.sessionId});if(!raw?.ok)fail(raw?.code||'LOYALTY_UNAVAILABLE','Your rewards could not be checked. Try again after reconnecting.',raw?.code==='SESSION_REVOKED'?401:503);return {...raw,state:hydrateMerchantNetwork(raw)};}
++ async function loadConsumer(identity,repo,operation){if(!UUID.test(identity?.userId||'')||!UUID.test(identity?.sessionId||''))fail('AUTH_REQUIRED','Sign in before opening your rewards.',401);const snapshot=await repo.service('load');if(!snapshot?.ok)fail(snapshot?.code==='SESSION_REVOKED'?'SESSION_REVOKED':'LOYALTY_UNAVAILABLE',snapshot?.code==='SESSION_REVOKED'?'Sign in again to open your rewards.':'Your rewards could not be loaded. Reconnect and try again.',snapshot?.code==='SESSION_REVOKED'?401:503);if(snapshot.account?.userId!==identity.userId||!UUID.test(snapshot.account?.id||''))fail('PERSONAL_ACCOUNT_REQUIRED','Open rewards with your personal Lumo account.',403);const closed=snapshot.account.status==='closed'||snapshot.state?.account?.status==='closed';if(closed&&!['list','detail','recover'].includes(operation))fail('ACCOUNT_CLOSED','This account is closed. Existing rewards are available to read.',409);if(!closed){const recipient=await repo.resolve(identity.userId);if(!recipient?.ok||recipient.recipient?.userId!==identity.userId)fail('PERSONAL_ACCOUNT_REQUIRED','Open rewards with your personal Lumo account.',403);}return snapshot;}
++ function consent(payload,rule){if(payload.membershipConsent!==true||typeof payload.marketingConsent!=='boolean'||payload.ruleVersion!==rule.version||payload.consentVersion!==LOYALTY_CONSENT_VERSION)fail('LOYALTY_TERMS_CHANGED','Open and accept the current programme terms before continuing.',409);}
++ function receipt(n,userId,attemptId){for(const b of businesses(n)){const saved=b.loyalty?._consumerAttempts?.[userId+':'+attemptId];if(saved){const entity=resultEntity(b,saved,userId);if(entity)return {found:true,operation:saved.operation,entity};}}return {found:false};}
++ async function handler({body,identity,repo}){
++  keys(body,['action','operation','payload','attemptId']);const operation=body.operation,payload=body.payload||{};if(!['list','detail','programme','join','claim','prepare','cancel','recover'].includes(operation))fail('INVALID_INPUT','Choose an available rewards action.');
++  const snapshot=await loadConsumer(identity,repo,operation),mutation=['join','claim','prepare','cancel'].includes(operation);if(mutation&&!REF.test(body.attemptId||''))fail('LOYALTY_REFERENCE_REQUIRED','Keep the original rewards request reference.');
++  const allowed={list:[],detail:['membershipId'],programme:['shopId','claimCode'],join:['shopId','ruleVersion','consentVersion','membershipConsent','marketingConsent'],claim:['claimCode','ruleVersion','consentVersion','membershipConsent','marketingConsent'],prepare:['membershipId','shopId','grossAmount','rewardId','description'],cancel:['membershipId','requestId'],recover:['attemptId']};keys(payload,allowed[operation]);
++  const input=clone(payload);if(operation==='claim'||operation==='programme'&&payload.claimCode){input.claimHash=await claimHash(payload.claimCode);delete input.claimCode;}
++  if(operation==='recover'&&!REF.test(input.attemptId||''))fail('LOYALTY_REFERENCE_REQUIRED','Use the original rewards reference.');
++  const fingerprint=mutation?await digest(canonical({operation,payload:input,userId:identity.userId})):null;
++  for(let tries=0;tries<12;tries++){
++   const raw=await read(identity),n=raw.state;let changed=false,entity=null,selected=null,programme=null,replayed=false;const timestamp=at(now());
++   // A canonical payment/refund may have happened since either app last opened.
++   for(const b of businesses(n))if(owned(b,identity.userId))changed=reconcile(b)||changed;
++   let savedBusiness=null,saved=null;if(mutation)for(const b of businesses(n)){const entry=b.loyalty?._consumerAttempts?.[identity.userId+':'+body.attemptId];if(entry){savedBusiness=b;saved=entry;break;}}
++   if(saved){if(saved.fingerprint!==fingerprint)fail('LOYALTY_REFERENCE_CONFLICT','This rewards reference belongs to different details.',409);entity=resultEntity(savedBusiness,saved,identity.userId);if(!entity)fail('LOYALTY_MEMBERSHIP_UNAVAILABLE','This membership is unavailable to your Lumo account.',403);selected=saved.membershipId;replayed=true;}
++   else if(operation==='detail'){const found=findMembership(n,identity.userId,input.membershipId);selected=found.m.id;}
++   else if(operation==='programme'){
++    if(input.claimHash){if(input.shopId)fail('INVALID_INPUT','Use a shop or a linking code, not both.');const {b,m}=findGrant(n,input.claimHash);programme=programmeView(b,loyaltyRulesForMember(b.loyalty,m),identity.userId,{claim:true});}
++    else {const b=findProgramme(n,input.shopId),l=normalizeLoyalty(b.loyalty);b.loyalty=l;programme=programmeView(b,l.ruleVersions.find(r=>r.version===l.programme.currentVersion),identity.userId);}
++   }else if(operation==='join'){
++    const b=findProgramme(n,input.shopId);b.loyalty=normalizeLoyalty(b.loyalty);reconcile(b);const l=b.loyalty,rule=l.ruleVersions.find(r=>r.version===l.programme.currentVersion);consent(input,rule);let m=owned(b,identity.userId);
++    if(!m){const c={user:{id:'consumer:'+identity.userId,businessId:b.business.id,role:'cashier',shopIds:[input.shopId]},session:{id:identity.sessionId}};const out=mutateLoyalty(n,c,{operation:'enrollMember',payload:{name:String(snapshot.account.displayName||'Lumo member').slice(0,80),shopId:input.shopId,membershipConsent:true,marketingConsent:input.marketingConsent},mutationId:'consumer-'+body.attemptId,expectedRevision:l.revision},{now:now()});m=b.loyalty.members.find(m=>m.id===out.entity.memberId);m._consumerUserId=identity.userId;m._consumerAccountId=snapshot.account.id;m._consumerLinkedAt=timestamp;}
++    entity={id:m.id,membershipId:m.id,merchantId:b.business.id};selected=m.id;if(!l.members.some(existing=>existing._consumerUserId===identity.userId)){changed=true;saveAttempt(b,m,operation,fingerprint,body.attemptId,entity,timestamp);}
++   }else if(operation==='claim'){
++    const {b,m,g}=findGrant(n,input.claimHash),l=b.loyalty,rule=loyaltyRulesForMember(l,m);if(owned(b,identity.userId))fail('LOYALTY_ALREADY_JOINED','Your Lumo account already has a membership with this merchant.',409);consent(input,rule);g.usedAt=timestamp;g.usedBy=identity.userId;m._consumerUserId=identity.userId;m._consumerAccountId=snapshot.account.id;m._consumerLinkedAt=timestamp;m.marketingConsent=input.marketingConsent;m.updatedAt=timestamp;l.ledger.push({id:'loyalty-event-'+cryptoApi.randomUUID(),type:'member-linked',memberId:m.id,shopId:g.shopId,units:0,createdAt:timestamp});entity={id:m.id,membershipId:m.id,merchantId:b.business.id};selected=m.id;changed=true;saveAttempt(b,m,operation,fingerprint,body.attemptId,entity,timestamp);
++   }else if(operation==='prepare'){
++    const {b,m}=findMembership(n,identity.userId,input.membershipId),shop=b.shops.find(s=>s.id===input.shopId);if(Object.keys(b.loyalty._consumerAttempts||{}).length>=5800)fail('LOYALTY_CAPACITY','This programme needs the shop team to redeem your earned reward. Your reward is preserved.',409);if(b.loyalty.collections.some(c=>c.memberId===m.id&&c._consumerUserId===identity.userId&&c.state==='held'))fail('LOYALTY_COLLECTION_PENDING','Check your existing reward payment before preparing another one.',409);if(!shop||shop.published!==true||shop.accepting===false||shop.open===false)fail('SHOP_UNAVAILABLE','This participating shop is not accepting payments right now.',409);if(!Number.isSafeInteger(input.grossAmount)||input.grossAmount<1||input.grossAmount>1000000)fail('LOYALTY_AMOUNT','Use a purchase amount from GH₵0.01 to GH₵10,000.');if(!input.rewardId)fail('LOYALTY_REWARD_UNAVAILABLE','Choose an available discount reward.',409);
++    const c={user:{id:'consumer:'+identity.userId,businessId:b.business.id,role:'cashier',shopIds:[shop.id]},session:{id:identity.sessionId}};const prepared=prepareLoyaltyCollection(b,c,{memberId:m.id,shopId:shop.id,grossAmount:input.grossAmount,rewardId:input.rewardId,description:input.description},{now:now(),mutationId:body.attemptId});const owner=n.users.find(u=>u.businessId===b.business.id&&u.role==='owner'&&u.active===true);if(!owner)fail('SHOP_UNAVAILABLE','This shop cannot prepare a reward payment right now.',409);
++    const request={id:cryptoApi.randomUUID(),shopId:shop.id,amount:prepared.amount,description:prepared.description,status:'open',createdAt:timestamp,expiresAt:prepared.expiresAt,createdByUserId:owner.id,staffId:null,staffName:null,counterId:null,shiftId:null,attribution:'shop',intentChannel:'consumer-loyalty',_consumerUserId:identity.userId};b.requests.push(request);bindLoyaltyCollection(b,request,prepared);const collection=b.loyalty.collections.find(c=>c.id===prepared.collectionId);collection._consumerUserId=identity.userId;entity=collectionEntity(b,collection);selected=m.id;changed=true;saveAttempt(b,m,operation,fingerprint,body.attemptId,entity,timestamp,collection.id);
++   }else if(operation==='cancel'){
++    const {b,m}=findMembership(n,identity.userId,input.membershipId),collection=b.loyalty.collections.find(c=>c.requestId===input.requestId&&c.memberId===m.id&&c._consumerUserId===identity.userId),request=collection&&b.requests.find(r=>r.id===input.requestId&&r._consumerUserId===identity.userId);if(!request)fail('LOYALTY_COLLECTION_UNAVAILABLE','That reward payment belongs to a different request.',404);if(request.status==='paid'||b.transactions.some(t=>t.requestId===request.id&&['paid','processing'].includes(t.status)))fail('REQUEST_PROCESSING','This payment is confirmed or still being checked. Keep its original reference.',409);const cancelling=request.status==='open';if(cancelling){request.status='cancelled';request.cancellationReason='consumer-loyalty-cancelled';}const released=releaseLoyaltyCollection(b,request.id,{now:now()});entity=collectionEntity(b,collection);selected=m.id;if(cancelling||released){changed=true;saveAttempt(b,m,operation,fingerprint,body.attemptId,entity,timestamp,collection.id);}
++   }
++   const result={ok:true,sandbox:true,currency:'GHS',loyalty:projection(n,identity.userId,{membershipId:selected||input.membershipId,programme,...(operation==='recover'?{receipt:receipt(n,identity.userId,input.attemptId)}:{})}),...(entity?{entity}:{}),...(replayed?{replayed:true}:{})};
++   if(!changed)return result;
++   const committed=await serviceRpc('lumo_approved_merchant_commit',{p_actor:identity.userId,p_session:identity.sessionId,p_revision:raw.revision,p_ledger_stamp:raw.ledgerStamp,p_state:n,p_money_authorized:false});if(committed?.ok===true)return result;if(committed?.code==='CONCURRENT_UPDATE')continue;if(!plain(committed)||committed.ok!==false||typeof committed.code!=='string')fail('LOYALTY_OUTCOME_UNKNOWN','Your rewards request could not be confirmed. Keep its original reference.',503);fail(committed.code,'Your rewards request could not be confirmed. Keep its original reference.',committed.code==='SESSION_REVOKED'?401:409);
++  }
++  fail('CONCURRENT_UPDATE','Your rewards changed while this request was checked. Retry the same reference.',409);
++ }
++ function saveAttempt(b,m,operation,fingerprint,attemptId,entity,timestamp,collectionId=null){const l=b.loyalty;if(Object.keys(l._consumerAttempts).length>=5800&&operation==='join')fail('LOYALTY_CAPACITY','This prototype reached its rewards request history limit. Contact support.',409);l._consumerAttempts[m._consumerUserId+':'+attemptId]={operation,fingerprint,membershipId:m.id,collectionId,entity:clone(entity),createdAt:timestamp};l.revision++;l.updatedAt=timestamp;}
++ // Quote/payment guards are private gateway checks; the journal trigger repeats
++ // the actor binding at the final canonical write, including direct RPC calls.
++ handler.assertRequest=async(identity,requestId)=>{if(!requestId)return null;const {state:n}=await read(identity);for(const b of businesses(n)){const r=b.requests.find(r=>r.id===requestId);if(!r)continue;if(r._consumerUserId&&r._consumerUserId!==identity.userId)fail('REQUEST_UNAVAILABLE','This reward payment belongs to another Lumo account.',403);const c=array(b.loyalty?.collections).find(c=>c.requestId===requestId);if(c){const mine=b.loyalty.members.some(m=>m.id===c.memberId&&m._consumerUserId===identity.userId);return {grossAmount:c.grossAmount,discount:c.discount,amount:c.amount,...(mine?{membershipId:c.memberId,rewardId:c.rewardId}:{})};}}return null;};
++ return handler;
++}
+--- a/backend/supabase/functions/lumo-approved/handler.mjs
++++ b/backend/supabase/functions/lumo-approved/handler.mjs
+@@ -1,3 +1,4 @@
++import {createConsumerLoyalty} from './consumer-loyalty.mjs';
+ import {createAvailability,servicesForAction} from './availability.mjs';
+ import {externalRecipient,EXTERNAL_SIMULATION_FEES} from './external-transfer.mjs';
+ import {createGuestCheckout} from './guest-checkout.mjs';
+@@ -45,6 +46,7 @@
+  }
+  async function serviceRpc(name,args){const {data}=await upstream('/rest/v1/rpc/'+name,args);if(!plain(data))throw failure('SERVICE_UNAVAILABLE',null,503);return data;}
+  const availability=availabilityEnabled?createAvailability({serviceRpc}):null;
++ const consumerLoyalty=createConsumerLoyalty({serviceRpc,cryptoApi});
+  async function service(command,payload){return serviceRpc('lumo_approved_service',{p_command:command,p_payload:payload});}
+  const requireOk=value=>{if(!value?.ok){const error=failure(value?.code||'SERVICE_UNAVAILABLE',messages[value?.code],value?.code==='SESSION_REVOKED'?401:400);if(value?.code==='SERVICE_PAUSED')error.noMutation=true;throw error;}return value;};
+  async function identify(token){
+@@ -58,7 +60,7 @@
+    service:(command,payload={})=>service(command,{...payload,...identityPayload}),
+    repair:(command,payload={})=>serviceRpc('lumo_approved_pin_repair',{p_command:command,p_payload:{...payload,...identityPayload}}),
+    resolve:query=>service('resolve',{...identityPayload,query:String(query||'')}),
+-   quote:async payload=>{if(!payload.shopId&&payload.query){const lookup=await serviceRpc('lumo_approved_merchant_lookup',{p_query:payload.query});if(!lookup?.ok)return lookup;payload={...payload,shopId:lookup.shopId};}const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true};},
++   quote:async payload=>{const loyalty=await consumerLoyalty.assertRequest(identity,payload.requestId);if(!payload.shopId&&payload.query){const lookup=await serviceRpc('lumo_approved_merchant_lookup',{p_query:payload.query});if(!lookup?.ok)return lookup;payload={...payload,shopId:lookup.shopId};}const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true,...(loyalty?{loyalty}:{})};},
+    rpc:async(command,payload={})=>(await upstream('/rest/v1/rpc/lumo_rpc',{p_command:command,p_payload:payload},{token:identity.accessToken})).data,
+   };
+  }
+@@ -122,6 +124,7 @@
+    if(body.action==='merchant'&&!token&&merchantHandler){merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity:null}));}
+    const identity=await identify(token),repo=repository(identity);
+    try{onIdentified?.(request,identity);}catch{}
++   if(body.action==='loyalty')return respond(await consumerLoyalty({body,identity,repo}));
+    if(body.action==='caseInbox')return respond(requireOk(await serviceRpc('lumo_case_inbox',{p_payload:{operation:body.operation||'list',page:body.page,pageSize:body.pageSize,notificationId:body.notificationId,caseId:body.caseId,audience:'consumer',actor:identity.userId,session:identity.sessionId}})));
+    if(body.action==='partnerInbox'){const loaded=requireOk(await repo.service('load'));return respond({ok:true,inbox:publicPartnerInbox(loaded.partners||[],identity.userId)});}
+    if(body.action==='partnerRespond')return respond(await partnerRespond({body,identity,repo}));
+--- a/backend/supabase/functions/lumo-approved/merchant/dist/loyalty-model.js
++++ b/backend/supabase/functions/lumo-approved/merchant/dist/loyalty-model.js
+@@ -7,7 +7,7 @@
+  const raw=value&&typeof value==='object'&&!Array.isArray(value)?clone(value):{};
+  return {version:1,revision:Number.isSafeInteger(raw.revision)?raw.revision:0,programme:raw.programme||null,
+   ruleVersions:list(raw.ruleVersions),members:list(raw.members),links:list(raw.links),collections:list(raw.collections),externalSales:list(raw.externalSales),
+-  ledger:list(raw.ledger),rewards:list(raw.rewards),reviews:list(raw.reviews),managerShopIds:list(raw.managerShopIds),_attempts:raw._attempts&&typeof raw._attempts==='object'?raw._attempts:{},updatedAt:raw.updatedAt||null,capacityPaused:raw.capacityPaused===true,capacityMessage:raw.capacityMessage||''};
++  ledger:list(raw.ledger),rewards:list(raw.rewards),reviews:list(raw.reviews),managerShopIds:list(raw.managerShopIds),_attempts:raw._attempts&&typeof raw._attempts==='object'?raw._attempts:{},_claimGrants:list(raw._claimGrants),_consumerAttempts:raw._consumerAttempts&&typeof raw._consumerAttempts==='object'?raw._consumerAttempts:{},updatedAt:raw.updatedAt||null,capacityPaused:raw.capacityPaused===true,capacityMessage:raw.capacityMessage||''};
+ }
+ export function loyaltyRulesForMember(value,member){return list(value?.ruleVersions).find(rule=>rule.version===member?.ruleVersion)||null;}
+ export function loyaltyMemberBalance(value,memberId){
+--- a/backend/supabase/functions/lumo-approved/merchant/handler.mjs
++++ b/backend/supabase/functions/lumo-approved/merchant/handler.mjs
+@@ -35,8 +35,8 @@
+   }
+   b.requests=[...requests.values()].map(request=>{const link=linkAttribution.get(request.id);return link?.attribution==='shop'?{...request,staffId:null,staffName:null,shiftId:null,counterId:null,attribution:'shop',intentChannel:'online',publicPaymentLinkId:link.linkId}:request;});
+   b.transactions=ledger.filter(j=>j.type==='merchant_payment').map(j=>{
+-   const old=oldPayments.get(j.id)||{},request=requests.get(j.requestId),link=linkAttribution.get(j.requestId),shopAttributed=j.requestAttribution==='shop'||link?.attribution==='shop'||!!j.guestCollectionId&&!j.requestId;
+-   return {...old,id:j.id,shopId:j.shopId,counterId:old.counterId||request?.counterId||null,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true,...(shopAttributed?{staffId:null,staffName:null,counterId:null,shiftId:null,attribution:'shop',intentChannel:j.requestId?'online':null,publicPaymentLinkId:j.publicPaymentLinkId||link?.linkId||null}:{}),...(j.guestCollectionId?{payer:j.payerName||'MoMo guest',rail:'momo',source:'guest-momo',linkId:j.guestLinkId,guestCollectionId:j.guestCollectionId,providerReference:j.providerReference,providerMode:'sandbox',settlementStatus:'sandbox-posted'}:{})};
++   const old=oldPayments.get(j.id)||{},request=requests.get(j.requestId),link=linkAttribution.get(j.requestId),shopAttributed=j.requestAttribution==='shop'||link?.attribution==='shop'||request?.attribution==='shop'||!!j.guestCollectionId&&!j.requestId;
++   return {...old,id:j.id,_loyaltyActorUserId:j.guestCollectionId?null:j.actorUserId||null,_loyaltyPayerAccountId:j.payerAccountId||null,shopId:j.shopId,counterId:old.counterId||request?.counterId||null,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true,...(shopAttributed?{staffId:null,staffName:null,counterId:null,shiftId:null,attribution:'shop',intentChannel:j.requestId?'online':null,publicPaymentLinkId:j.publicPaymentLinkId||link?.linkId||null}:{}),...(j.guestCollectionId?{payer:j.payerName||'MoMo guest',rail:'momo',source:'guest-momo',linkId:j.guestLinkId,guestCollectionId:j.guestCollectionId,providerReference:j.providerReference,providerMode:'sandbox',settlementStatus:'sandbox-posted'}:{})};
+   });
+   const canonicalRefunds=ledger.filter(j=>j.type==='refund').map(j=>{
+    const key=j.refundId||j.id,old=oldRefunds.get(key)||{};
+--- a/backend/supabase/functions/lumo-approved/merchant/server/api.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/api.js
+@@ -11,7 +11,7 @@
+ function response(data,status=200,cookies=[]){
+  const h=new Headers({'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+  for(const cookie of cookies)h.append('Set-Cookie',cookie);
+- return new Response(JSON.stringify({sandbox:true,bankConnected:false,smsConnected:false,...data}),{status,headers:h});
++ return new Response(JSON.stringify({sandbox:true,bankConnected:false,smsConnected:false,...data},(key,value)=>['_loyaltyActorUserId','_loyaltyPayerAccountId','_consumerUserId','_consumerAccountId','_consumerLinkedAt','_claimGrants','_consumerAttempts'].includes(key)?undefined:value),{status,headers:h});
+ }
+ function publicSessions(n,c){
+  return n.sessions.filter(s=>s.businessId===c.user.businessId&&(c.user.role==='owner'||s.userId===c.user.id)).map(s=>{
+@@ -212,7 +212,7 @@
+  const c=requireSession(n,tokenHash),b=n.businesses[c.user.businessId];
+  if(!b||!['owner','manager','cashier'].includes(c.user.role))throw new APIError('Sign in to this merchant business before opening loyalty.',403,'LOYALTY_FORBIDDEN');
+  const input={...values};
+- if(c.counter&&method==='POST'&&!['enrollMember','attachPayment','attachRequest','prepareCollection','fulfilItem'].includes(operation))throw new APIError('Counter access does not include programme management or loyalty adjustments.',403,'LOYALTY_FORBIDDEN');
++ if(c.counter&&method==='POST'&&!['enrollMember','attachPayment','attachRequest','prepareCollection','fulfilItem','createLinkGrant'].includes(operation))throw new APIError('Counter access does not include programme management or loyalty adjustments.',403,'LOYALTY_FORBIDDEN');
+  if(c.counter){
+   const staffId='access-'+c.user.id,shift=b.shifts.find(s=>s.shopId===c.counter.shopId&&s.staffId===staffId&&s.status==='open');
+   const staff=method==='GET'?input.staffId:input.counterStaffId;
+@@ -339,7 +339,7 @@
+    if(out.data.counterError){const error=out.data.counterError;return response({error:error.error,code:error.code,revision:out.revision},error.status);}
+    return response({...out.data,revision:out.revision});
+   }
+-  if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,features:{merchantLoyalty:'1.0.0'},storage:env.approvedStore?'Supabase private merchant records and canonical ledger':'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
++  if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,features:{merchantLoyalty:'1.1.0',consumerLoyalty:'1.1.0'},storage:env.approvedStore?'Supabase private merchant records and canonical ledger':'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
+   if(method==='GET'&&['/api/session','/api/business'].includes(path)){
+    const out=await updateNetwork(env,n=>{
+     const c=resolveSession(n,tokenHash);let changed=false;
+--- a/backend/supabase/functions/lumo-approved/merchant/server/counter.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/counter.js
+@@ -25,8 +25,8 @@
+  // A handover keeps counter receipts visible while preserving the original cashier.
+  // General shop QR receipts are not mixed into this request-specific journal.
+  scoped.shops=scoped.shops.filter(s=>s.id===counter.shopId);
+- scoped.transactions=b.transactions.filter(t=>t.shopId===counter.shopId&&t.counterId===counter.id).map(t=>{const out={...t};delete out.studentWalletId;return out;});
+- scoped.requests=b.requests.filter(r=>r.shopId===counter.shopId&&r.counterId===counter.id).map(r=>({...r}));
++ scoped.transactions=b.transactions.filter(t=>t.shopId===counter.shopId&&t.counterId===counter.id).map(t=>{const out={...t};delete out.studentWalletId;delete out._loyaltyActorUserId;delete out._loyaltyPayerAccountId;return out;});
++ scoped.requests=b.requests.filter(r=>r.shopId===counter.shopId&&r.counterId===counter.id).map(r=>{const out={...r};delete out._consumerUserId;return out;});
+  const payments=new Set(scoped.transactions.map(t=>t.id));
+  scoped.refunds=b.refunds.filter(r=>payments.has(r.transactionId)).map(r=>({...r}));
+  scoped.shifts=b.shifts.filter(s=>s.shopId===counter.shopId&&(s.counterId===counter.id||s.staffId==='access-'+c.user.id)).map(s=>({...s}));
+--- a/backend/supabase/functions/lumo-approved/merchant/server/loyalty.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/loyalty.js
+@@ -26,7 +26,7 @@
+ function operatorStamp(b,c){const current=list(b.shifts).find(s=>s.shopId===c.counter?.shopId&&s.staffId==='access-'+c.user.id&&s.status==='open');return [c.user.id,c.session?.id||'',c.counter?.id||'',c.counter?(c.counterShiftId||current?.id||''):''].join(':');}
+ function append(l,entry){if(l.ledger.some(row=>row.id===entry.id))return false;l.ledger.push(entry);return true;}
+ const capacityMessage='New loyalty earning and setup are paused at this prototype’s history capacity. Existing rewards, cancellations and refund adjustments are preserved. Export the records and contact support.';
+-function capacityReached(b,l){return l.ledger.length>=LOYALTY_LIMITS.events-500||l.collections.length>=LOYALTY_LIMITS.collections-500||l.rewards.length>=LOYALTY_LIMITS.rewards-200||Object.keys(l._attempts).length>=LOYALTY_LIMITS.attempts-200||new TextEncoder().encode(JSON.stringify(l)).byteLength>450000||new TextEncoder().encode(JSON.stringify({...b,loyalty:l})).byteLength>1100000;}
++function capacityReached(b,l){return l.ledger.length>=LOYALTY_LIMITS.events-500||l.collections.length>=LOYALTY_LIMITS.collections-500||l.rewards.length>=LOYALTY_LIMITS.rewards-200||Object.keys(l._attempts).length>=LOYALTY_LIMITS.attempts-200||Object.keys(l._consumerAttempts||{}).length>=5800||new TextEncoder().encode(JSON.stringify(l)).byteLength>450000||new TextEncoder().encode(JSON.stringify({...b,loyalty:l})).byteLength>1100000;}
+ function log(l,type,m,shopId,at,detail={}){return append(l,{id:uid('loyalty-event'),type,memberId:m?.id||null,shopId:shopId||null,units:0,createdAt:at,...detail});}
+ function review(l,m,shopId,at,sourceId,reason){if(!l.reviews.some(r=>r.sourceId===sourceId&&r.memberId===m.id))l.reviews.push({id:uid('loyalty-review'),memberId:m.id,shopId,sourceId,reason,state:'open',createdAt:at});}
+ function statusAt(l,at){return [...list(l.programme?.statusHistory)].reverse().find(row=>row.changedAt<=at)?.status||'active';}
+@@ -77,6 +77,16 @@
+  if(!b.loyalty)return false;
+  const at=stamp(now),l=normalizeLoyalty(b.loyalty),before=canonical(l);
+  if(capacityReached(b,l)){l.capacityPaused=true;l.capacityMessage=capacityMessage;}
++ // Only shared-ledger hydration supplies this private actor field. Group-funded
++ // purchases belong to the authorised purchaser, never the group account owner.
++ if(!l.capacityPaused)for(const transaction of list(b.transactions)){
++  if(transaction.status!=='paid'||!transaction._loyaltyActorUserId||l.links.some(link=>link.transactionId===transaction.id||transaction.requestId&&link.requestId===transaction.requestId))continue;
++  const paidAt=transaction.confirmedAt||transaction.createdAt;
++  const member=l.members.find(m=>m._consumerUserId===transaction._loyaltyActorUserId&&Date.parse(m._consumerLinkedAt)<=Date.parse(paidAt));
++  if(!member||!loyaltyRulesForMember(l,member)?.shopIds.includes(transaction.shopId))continue;
++  memberLink(l,member,transaction.shopId,{transactionId:transaction.id,requestId:transaction.requestId||null,createdAt:paidAt,by:'consumer:'+member._consumerUserId});
++ }
++
+  for(const reward of l.rewards)if(reward.state==='available'&&Date.parse(reward.expiresAt)<=Date.parse(at)){reward.state='expired';reward.expiredAt=at;log(l,'reward-expired',memberFor(l,reward.memberId),reward.earnedShopId,at,{rewardId:reward.id});}
+  for(const collection of l.collections){
+   if(!collection.requestId||collection.state!=='held')continue;
+@@ -213,6 +223,15 @@
+    if(l.members.length>=LOYALTY_LIMITS.members)fail('This prototype supports up to 500 programme members. Export the records and contact support.','LOYALTY_CAPACITY',409);
+    const code='LC-'+Array.from(crypto.getRandomValues(new Uint8Array(10)),x=>x.toString(16).padStart(2,'0')).join('').toUpperCase();
+    const member={id:uid('loyalty-member'),code,name:text(payload.name,'Member name',80),phone:payload.phone?phone(payload.phone):null,marketingConsent:payload.marketingConsent,consentVersion:LOYALTY_CONSENT_VERSION,consentedAt:at,consentedBy:context.user.id,active:true,joinedShopId:shopId,ruleVersion:rule.version,createdAt:at,updatedAt:at};l.members.push(member);log(l,'member-enrolled',member,shopId,at,{by:context.user.id});entity={id:member.id,memberId:member.id,code};
++  }else if(operation==='createLinkGrant'){
++   keys(payload,['memberId','shopId','claimHash']);const m=memberFor(l,payload.memberId),shopId=shop(b,context,payload.shopId);activeMember(l,m);participating(l,m,shopId);
++   if(m._consumerUserId)fail('This membership is already linked to a Lumo account.','LOYALTY_ALREADY_LINKED',409);
++   if(!/^[a-f0-9]{64}$/.test(payload.claimHash||''))fail('Use a fresh private linking code.','LOYALTY_CLAIM_INVALID');
++   if(l._claimGrants.length>=1000)fail('This prototype has reached its linking-code history limit. Contact support.','LOYALTY_CAPACITY',409);
++   if(l._claimGrants.some(g=>g.hash===payload.claimHash))fail('Create a new private linking code.','LOYALTY_CLAIM_INVALID',409);
++   for(const grant of l._claimGrants)if(grant.memberId===m.id&&!grant.usedAt&&!grant.revokedAt)grant.revokedAt=at;
++   const grant={id:uid('loyalty-claim'),memberId:m.id,shopId,hash:payload.claimHash,createdAt:at,expiresAt:new Date(Date.parse(at)+10*60000).toISOString(),by:context.user.id};l._claimGrants.push(grant);
++   log(l,'link-code-created',m,shopId,at,{by:context.user.id});entity={id:grant.id,grantId:grant.id,memberId:m.id,expiresAt:grant.expiresAt};
+   }else if(operation==='updateMember'){
+    keys(payload,['memberId','name','phone','marketingConsent','active']);owner(b,context);const member=memberFor(l,payload.memberId);
+    if(own(payload,'name'))member.name=text(payload.name,'Member name',80);if(own(payload,'phone'))member.phone=payload.phone?phone(payload.phone):null;
+@@ -262,7 +281,7 @@
+  const fullOwner=context.user.role==='owner'&&!context.counter;
+  const safeReward=reward=>fullOwner?clone(reward):Object.fromEntries(['id','type','name','value','minimumSpend','state','expiresAt','earnedAt','ruleVersion'].filter(key=>reward[key]!==undefined).map(key=>[key,reward[key]]));
+  const safeRule=rule=>{const result=clone(rule);if(!fullOwner){delete result.reward.cost;result.shopIds=result.shopIds.filter(id=>rights.allowedShopIds.includes(id));}return result;};
+- const memberSummary=m=>{const rule=ruleFor(l,m);return {id:m.id,code:m.code,name:m.name,phone:fullOwner?m.phone:undefined,phoneMasked:m.phone?'••••'+m.phone.slice(-4):'',marketingConsent:m.marketingConsent,active:m.active,joinedShopId:fullOwner||rights.allowedShopIds.includes(m.joinedShopId)?m.joinedShopId:null,ruleVersion:m.ruleVersion,createdAt:m.createdAt,progress:loyaltyMemberBalance(l,m.id),target:rule.target,earning:rule.earning,rules:safeRule(rule),rewards:l.rewards.filter(r=>r.memberId===m.id).map(safeReward)};};
++ const memberSummary=m=>{const rule=ruleFor(l,m);return {id:m.id,code:m.code,name:m.name,consumerLinked:!!m._consumerUserId,phone:fullOwner?m.phone:undefined,phoneMasked:m.phone?'••••'+m.phone.slice(-4):'',marketingConsent:m.marketingConsent,active:m.active,joinedShopId:fullOwner||rights.allowedShopIds.includes(m.joinedShopId)?m.joinedShopId:null,ruleVersion:m.ruleVersion,createdAt:m.createdAt,progress:loyaltyMemberBalance(l,m.id),target:rule.target,earning:rule.earning,rules:safeRule(rule),rewards:l.rewards.filter(r=>r.memberId===m.id).map(safeReward)};};
+  const selectedAllowed=selected&&(visibleMember(selected)||query.code&&rights.allowedShopIds.some(id=>ruleFor(l,selected).shopIds.includes(id)));
+  if(selected&&!selectedAllowed)fail('This membership is outside your assigned shops.','LOYALTY_MEMBER_FORBIDDEN',403);
+  const summary=selectedAllowed?memberSummary(selected):null;
+@@ -283,7 +302,7 @@
+   const saved=own(l._attempts,query.mutationId)?l._attempts[query.mutationId]:null;
+   const value=saved&&entityFor(l,saved),receiptMember=value?.memberId&&l.members.find(m=>m.id===value.memberId);
+   const visible=!receiptMember||visibleMember(receiptMember);
+-  const safeEntity=value&&Object.fromEntries(['id','memberId','code','requestId','collectionId','shopId','amount','grossAmount','discount','expiresAt','state','rewardId','saleId','reviewId','ruleVersion'].filter(key=>value[key]!==undefined).map(key=>[key,value[key]]));
++  const safeEntity=value&&Object.fromEntries(['id','memberId','code','grantId','requestId','collectionId','shopId','amount','grossAmount','discount','expiresAt','state','rewardId','saleId','reviewId','ruleVersion'].filter(key=>value[key]!==undefined).map(key=>[key,value[key]]));
+   result.mutationReceipt=attemptAllowed(b,context,l,saved)&&visible?{found:true,operation:saved.operation,entity:safeEntity}:{found:false};
+  }
+  return result;
+--- a/backend/supabase/functions/lumo-approved/merchant/server/network.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/network.js
+@@ -242,7 +242,7 @@
+  return value;
+ }
+ export function scopedBusiness(b,u){
+- const c=clone(b);delete c.counterDevices;delete c.loyalty;delete c.businessPlan;delete c.businessPlanAccess;delete c.businessPlanSummary;delete c.businessPlanDebits;Object.assign(c,businessPlanProjection(b,u));if(u.role==='owner')return c;
++ const c=clone(b);for(const row of [...(c.transactions||[]),...(c.requests||[])]){delete row._loyaltyActorUserId;delete row._loyaltyPayerAccountId;delete row._consumerUserId;}delete c.counterDevices;delete c.loyalty;delete c.businessPlan;delete c.businessPlanAccess;delete c.businessPlanSummary;delete c.businessPlanDebits;Object.assign(c,businessPlanProjection(b,u));if(u.role==='owner')return c;
+  const allowed=new Set(u.shopIds);
+  c.shops=c.shops.filter(s=>allowed.has(s.id));
+  for(const key of ['transactions','requests','closings','refunds','tickets','shifts','reconciliations'])c[key]=(c[key]||[]).filter(x=>allowed.has(x.shopId));

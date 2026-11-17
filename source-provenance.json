@@ -2,31 +2,35 @@
   "schema_version": 2,
   "product": "Lumo",
   "repository": "lumoghana/signal",
-  "release": "2.12.5",
+  "release": "2.13.0",
   "release_date": "2026-11-17",
   "status": "live-and-verified",
   "approved_live_url": "https://lumo-connected-pilot.vercel.app/",
   "export_target": "GitHub / Vercel",
   "static_directory": "dist",
   "asset_manifest": "dist-sha256.json",
-  "release_notes": "RECOVERY-REVIEW-2.12.5.md",
+  "release_notes": "CONSUMER-LOYALTY-2.13.0.md",
   "baseline": {
-    "release": "2.12.4",
-    "consumerDeployment": "dpl_4aAn2Fbim2cp7uUJjnfbXAvaqiyq",
-    "merchantDeployment": "dpl_HD3CCnFya2v7yJZ4uac1fwwxyht3",
-    "githubCommit": "f433d04cb88d573e35716bec2f3b3f549335a55a",
-    "approvedServiceVersion": 21,
-    "accessServiceVersion": 6
+    "release": "2.12.5",
+    "merchantFeature": "merchant-loyalty-1.0.0",
+    "consumerDeployment": "dpl_37Q8hjGA2qAkQ3RabPyboQXQBuUq",
+    "merchantDeployment": "dpl_F2THtMoe2gk3ejRCwtLwxGQec5kM",
+    "githubCommit": "d07c93a34d6f0a8c7f7f29805f825e3f086a11f3",
+    "approvedServiceVersion": 23,
+    "accessServiceVersion": 7
   },
   "android": {
-    "version": "2.12.5",
-    "versionCode": 21205,
-    "apkSha256": "21acf920bfc4e417283915125a69dadf2826b4961e24576f04819cf967b69e10",
-    "apkBytes": 4621263,
+    "version": "2.13.0",
+    "versionCode": 21300,
+    "apkSha256": "fef51546c13256e36e46eb12e97a79bb2ea621b797d3eb0359bc0db4a983df72",
+    "apkBytes": 4641743,
     "publicDownload": "https://lumo-connected-pilot.vercel.app/downloads/Lumo-Test-Android.apk",
     "sourceDeliveredSeparately": true,
     "originalSigningIdentityRetained": true,
-    "downloadStatus": "Both Vercel public APK downloads verified as the signed 2.12.5 release."
+    "downloadStatus": "Both Vercel downloads verified against the original-certificate signed 2.13.0 APK.",
+    "nativeAppSourceTreeSha256": "2b90073e341d1942feb17ddffc657a08d3d0170956eecab513c81cf0f6c42729",
+    "sourcePackageSha256": "bdc1e15527de5c6013304b4e029202c326ef8555df71fcd471516b991262064a",
+    "sourcePackage": "Lumo-Test-Android-Source-2.13.0.zip"
   },
   "recovery": {
     "mode": "prototype-face-only",
@@ -41,7 +45,8 @@
   },
   "limitations": [
     "Physical handset capture and real-user recovery acceptance remain unverified.",
-    "Genuine liveness is deliberately simulated and must be integrated before production."
+    "Genuine liveness is deliberately simulated and must be integrated before production.",
+    "Consumer loyalty was checked with synthetic transports, PostgreSQL fixtures, Android framework tests and phone renders. Physical handset installation, upgrade and scanning remain unverified."
   ],
   "deployments": {
     "access": {
@@ -50,29 +55,29 @@
       "bundleSha256": "6a2149d5b01a4b4ef3845f25b623426eabc6cdcb4f3bc09f2b148ba23f22c2ee"
     },
     "approved": {
-      "version": 23,
+      "version": 24,
       "state": "ACTIVE",
-      "bundleSha256": "526874dd1d8705321f4043596d659caae1a6f1d3f33279ac61f87f8d4cfc48d6"
+      "bundleSha256": "5afa79dc902653cdffe7496c70a52c7d571850ffdf21f466de35d2e5bd091081"
     },
     "merchantSite": {
       "url": "https://lumo-merchant-mobile.oness15.chatgpt.site",
-      "version": 39,
+      "version": 40,
       "state": "succeeded",
-      "sourceCommit": "6536d2922be4fafff586cad9f494324f60bbc35e"
+      "sourceCommit": "091170da1c30f7c961860f132c68156713d5d064"
     },
     "vercel": {
-      "currentRelease": "2.12.5",
+      "currentRelease": "2.13.0",
       "state": "READY",
       "consumer": {
-        "id": "dpl_37Q8hjGA2qAkQ3RabPyboQXQBuUq",
+        "id": "dpl_BndMxm5DmAXqkDA9gNWeVgVXbkNR",
         "url": "https://lumo-connected-pilot.vercel.app/",
-        "immutableUrl": "https://lumo-connected-pilot-ombfj3z1p-williedark-6795.vercel.app",
+        "immutableUrl": "https://lumo-connected-pilot-ozfo7043g-williedark-6795.vercel.app",
         "runtime": "22.x"
       },
       "merchant": {
-        "id": "dpl_F2THtMoe2gk3ejRCwtLwxGQec5kM",
+        "id": "dpl_A3Lw9E25bMhhN36MfrJNpqE664HG",
         "url": "https://lumo-merchant.vercel.app/",
-        "immutableUrl": "https://lumo-merchant-76jxkdqvf-williedark-6795.vercel.app",
+        "immutableUrl": "https://lumo-merchant-carnmyuk6-williedark-6795.vercel.app",
         "runtime": "26.x"
       },
       "publicReleaseSourceAndApkHashesVerified": true,
@@ -81,17 +86,19 @@
     }
   },
   "tests": {
-    "consumer": 1822,
-    "merchant": 726,
-    "backend": 377,
+    "consumer": 1876,
+    "merchant": 734,
+    "backend": 397,
     "protectedSql": 72,
     "newSql": 29,
     "adversarialHandlerPostgres": 45,
-    "nativeModelSuites": 77,
-    "nativeFramework": 390,
-    "nativePhoneLayouts": 48,
+    "nativeModelSuites": 79,
+    "nativeFramework": 424,
+    "nativePhoneLayouts": 24,
     "processorPython": 14,
-    "processorIntegration": 4
+    "processorIntegration": 4,
+    "consumerLoyaltySql": 49,
+    "consumerLoyaltyAdversarial": 14
   },
   "assetManifestReconciliation": {
     "unchangedPriorSourceEntries": 20,
@@ -108,23 +115,23 @@
   },
   "merchantFeatures": {
     "loyalty": {
-      "version": "1.0.0",
-      "release": "merchant-loyalty-1.0.0",
+      "version": "1.1.0",
+      "release": "merchant-loyalty-1.1.0",
+      "consumerRelease": "2.13.0",
       "status": "live-and-verified",
       "releaseDate": "2026-11-17",
-      "guide": "merchant-approved/MERCHANT-LOYALTY.md",
-      "canonicalSiteCommit": "6536d2922be4fafff586cad9f494324f60bbc35e",
-      "backendVersion": 23,
-      "backendFiles": 42,
-      "publicAssetsVerified": 9,
-      "consumerArtifactUnchanged": "2.12.5",
+      "guide": "CONSUMER-LOYALTY-2.13.0.md",
+      "canonicalSiteCommit": "091170da1c30f7c961860f132c68156713d5d064",
+      "backendVersion": 24,
+      "backendFiles": 43,
+      "privatePayerGuardApplied": true,
       "prototypeMemberLimit": 500,
       "automatedMessagingConnected": false,
       "itemStockConnected": false,
-      "browserChecks": "Synthetic 320px light/dark programme, member, setup and register; live signed-out startup; no real account or financial mutations.",
-      "portableMerchantTests": 727,
-      "sourceImportReferencesVerified": 286,
-      "sourceMissingReferences": 0
+      "membershipIdentity": "explicit account join or merchant-issued one-time linking capability",
+      "guestPhoneMatching": false,
+      "publicSourceAndApkChecks": 20,
+      "browserChecks": "Synthetic 320px light/dark list, member, join, claim, cancel, pending and empty views; live signed-out startup. No live account or financial mutations."
     }
   }
 }

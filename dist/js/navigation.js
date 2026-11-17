@@ -15,7 +15,7 @@ const MAIN_SECTIONS = new Set(['home', 'activity', 'pay', 'boxes', 'plan', 'grou
 const PAGES = {
   home: new Set(['home']),
   activity: new Set(['home', 'insights', 'upcoming']),
-  pay: new Set(['home', 'recipient', 'recipient-confirm', 'conversation', 'amount', 'review', 'pause', 'status', 'transaction', 'collect', 'scan', 'fund', 'fund-status', 'service', 'recipients-list', 'cards', 'requests', 'request-detail', 'splits', 'split-detail', 'funding-detail']),
+  pay: new Set(['home', 'recipient', 'recipient-confirm', 'conversation', 'amount', 'review', 'pause', 'status', 'transaction', 'collect', 'scan', 'fund', 'fund-status', 'service', 'recipients-list', 'cards', 'requests', 'request-detail', 'splits', 'split-detail', 'funding-detail', 'rewards']),
   boxes: new Set(['home', 'create', 'detail', 'edit', 'hack', 'hacks', 'archive', 'transfer']),
   plan: new Set(['home', 'create', 'periods', 'guided']),
   life: new Set(['money-check','money-preferences','overview', 'ious', 'iou-detail', 'iou-create', 'recovery', 'groups', 'group-detail', 'group-chat', 'group-create', 'story', 'settings', 'help', 'account-security', 'account-login-setup', 'account-access', 'account-recovery', 'account-devices', 'account-statements', 'account-support', 'account-support-new', 'account-support-detail', 'account-privacy', 'account-close']),
@@ -59,7 +59,7 @@ function normalize(route) {
 /** Identity is the visible destination; origin/return metadata does not create duplicates. */
 export function routeKey(route) {
   const r = normalize(route);
-  return JSON.stringify([r.section, r.page || '', r.id || '', r.step ?? '', r.filter || '', r.section === 'pay' && r.page === 'home' ? r.hubTab || 'send' : '', r.page === 'recipients-list' ? r.list : '', r.page === 'scan' ? r.mode : '', r.section === 'activity' && r.page === 'insights' ? r.month || '' : '']);
+  return JSON.stringify([r.section, r.page || '', (r.section === 'pay' && r.page === 'rewards' ? r.membershipId || r.businessId || r.shopId || '' : r.id || ''), r.step ?? '', r.filter || '', r.section === 'pay' && r.page === 'home' ? r.hubTab || 'send' : '', r.page === 'recipients-list' ? r.list : '', r.page === 'scan' ? r.mode : '', r.section === 'activity' && r.page === 'insights' ? r.month || '' : '']);
 }
 
 export function sectionForRoute(route) {
@@ -81,6 +81,7 @@ export function routeLabel(route) {
   if (r.section === 'home') return 'Home';
   if (r.section === 'pay' && r.page === 'service') return getPaymentService(r.id)?.name || 'Payments';
   if (r.section === 'pay' && r.page === 'cards') return 'Virtual cards';
+  if (r.section === 'pay' && r.page === 'rewards') return 'Your rewards';
   if (r.section === 'pay' && ['requests','request-detail','splits','split-detail','funding-detail'].includes(r.page)) return ({requests:'Money requests','request-detail':'Request',splits:'Expense splits','split-detail':'Split expense','funding-detail':'Add money'})[r.page];
   if (r.section === 'pay' && r.page === 'recipients-list') return r.list === 'favourites' ? 'Favourites' : 'Recent payments';
   if (r.section === 'activity') return ({ insights: 'Insights', upcoming: 'Upcoming' })[r.page] || 'Activity';
@@ -126,6 +127,7 @@ export function parentRoute(route, state = {}, draft = {}) {
   if (r.section === 'plan') return r.page === 'create' ? createParent(r, ['name', 'amount', 'date', 'review'], { section: 'plan', page: 'home' }) : ['periods','guided'].includes(r.page)?{section:'plan',page:'home'}:home();
   if (r.section === 'activity') return r.page === 'home' ? home() : { section: 'activity', page: 'home' };
   if (r.section === 'pay') {
+    if (r.page === 'rewards') return {section:'pay',page:'home',hubTab:'campus'};
     if (r.page === 'request-detail') return {section:'pay',page:'requests'};
     if (r.page === 'split-detail') return {section:'pay',page:'splits'};
     if (['requests','splits','funding-detail'].includes(r.page)) return {section:'pay',page:'home'};

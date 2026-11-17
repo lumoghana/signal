@@ -4,7 +4,8 @@ import {externalRail,externalSandboxEnabled,isExternalSandboxTransfer,externalSi
 import {encodeSharedQrLink} from './approved-qr.js';
 import {parseQrPayload} from './qr-decoder.js';
 import {publicMerchantQrIdentity,validateMerchantQrQuote} from './merchant-qr-quote.js';
-import {recoveryPending} from './payment-recovery.js';
+import {recoveryPending,loyaltyPreparationPending} from './payment-recovery.js';
+import {renderConsumerRewards,bindConsumerRewards,openConsumerRewardClaim} from './consumer-rewards.js';
 import {runActionFlow} from './approved-flow.js';
 import {paymentFee} from './payments-parity-model.js';
 import {renderPaymentParity,bindPaymentParity,createSplitSheet,createRequestSheet} from './payments-parity-ui.js';
@@ -37,7 +38,7 @@ const pence = value => Math.round(Number(String(value ?? '').replace(/,/g, '')) 
 const amountInput = value => value ? (value / 100).toFixed(2).replace(/\.00$/, '') : '';
 const nonce = prefix => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 const payRoute = (page, more = {}) => ({ section: 'pay', page, ...more });
-const paymentSubmissions=new WeakSet();
+const paymentSubmissions=new WeakSet(),loyaltyPreparations=new WeakSet();
 export const hasUnresolvedPayment=recoveryPending;
 function originalPaymentFirst(ctx){
   if(!hasUnresolvedPayment(ctx.draft.payment))return false;
@@ -205,6 +206,11 @@ function paymentContext(ctx) {
   child.openQrPayment = parsed => openQrPayment(ctx, parsed);
   child.findQrPerson = () => startPayment(ctx, null, 'lumo', false, { ...ctx.route });
   child.openQrMerchant = (id,options) => { if(ctx.connected)return openSharedMerchant(ctx,id,options);const service=getPaymentService(id);if(isCampusCodeService(service))ctx.go(payRoute('service',{id,backTo:payRoute('home',{hubTab:getServiceHubTab(service)})})); };
+  child.useLoyaltyReward = selection => startLoyaltyPayment(ctx,selection);
+  child.payLoyaltyMerchant = selection => startLoyaltyPayment(ctx,selection);
+  child.resumeLoyaltyCollection = selection => resumeLoyaltyCollection(ctx,selection);
+  child.canStartLoyaltyPayment = () => {if(loyaltyReadOnly(ctx)){ctx.toast('This account is closed. Your rewards are available to read.');return false;}return !originalPaymentFirst(ctx);};
+  child.openRewardClaim = raw => openConsumerRewardClaim(child,raw);
   child.enterMerchantCode = () => openMerchantCodeSheet(child);
   child.editQrRequest = () => { if(ctx.connected){createRequestSheet(ctx);return;}ensureRequest(); collectAmountSheet(ctx); };
   child.shareQrCode = () => {const link=collectLink(ctx);return link?shareText(ctx,link,'Pay me with Lumo'):ctx.toast('Reconnect to open your signed-in code.');};
@@ -220,7 +226,137 @@ export function payMerchantAgain(ctx,tx) {
   return openSharedMerchant(ctx,destination);
 }
 
-export function openSharedMerchant(ctx,input,{isCurrent=()=>true}={}){return runActionFlow(function*(){
+const loyaltyReadOnly=ctx=>ctx.state?.account?.status==='closed'||ctx.shared?.account?.status==='closed';
+
+function terminalOwnedRewardRequest(payment,membership) {
+  const memberId=payment?.loyaltyApplied?.membershipId||payment?.loyaltyPreparation?.payload?.membershipId;
+  if(!payment?.requestId||memberId!==membership?.id)return false;
+  const c=(Array.isArray(membership.collections)?membership.collections:[]).find(c=>c.requestId===payment.requestId&&c.shopId===payment.shopId&&(!c.membershipId||c.membershipId===membership.id));
+  if(!c||!['released','cancelled','paid'].includes(c.state))return false;
+  if(c.request&&(c.request.id!==payment.requestId||!(c.state==='paid'?['paid']:['cancelled','expired','failed']).includes(c.request.status)))return false;
+  return true;
+}
+
+/** Start a reward at a participating shop without changing an existing fixed QR. */
+export async function startLoyaltyPayment(ctx,{membership,reward,shopId}={}) {
+  if(!ctx.connected||!ctx.shared?.user?.id){ctx.toast('Sign in to use your merchant rewards.');return {ok:false};}
+  if(loyaltyReadOnly(ctx)){ctx.toast('This account is closed. Your rewards are available to read.');return {ok:false};}
+  if(originalPaymentFirst(ctx))return {ok:false};
+  const id=shopId||membership?.shops?.[0]?.id||membership?.participatingShops?.[0]?.id;
+  if(typeof membership?.id!=='string'||!membership.id||typeof id!=='string'||!id){ctx.toast('Choose a participating shop from your current membership.');return {ok:false};}
+  if(reward&&(reward.type!=='discount'||reward.state!=='available'||typeof reward.id!=='string')){ctx.toast('Choose an available discount. Item rewards are handed over by the shop team.');return {ok:false};}
+  const previous=ctx.draft.payment;
+  const replaceClosedRewardRequest=!!reward&&previous?.rail==='merchant'&&previous.shopId===id&&terminalOwnedRewardRequest(previous,membership);
+  if(reward&&previous?.rail==='merchant'&&previous.shopId===id&&previous.requestId&&!previous.completed&&!replaceClosedRewardRequest){ctx.toast('This payment already has an exact request. Continue or cancel the original, or ask the cashier to apply your reward.');return {ok:false};}
+  if(previous?.rail==='merchant'&&previous.shopId===id&&!previous.requestId&&!previous.completed){
+    const version=ctx.shared.authVersion,origin=ctx.route;
+    const quote=await ctx.shared.quote({shopId:id});
+    if(ctx.draft.payment!==previous||ctx.shared.authVersion!==version||ctx.route!==origin)return {ok:false,cancelled:true};
+    try{if(!quote?.ok)throw Error(quote?.message||'This shop is unavailable.');validateMerchantQrQuote({shopId:id},quote);}catch(error){ctx.toast(error.message);return {ok:false};}
+    if(reward){previous.loyaltyIntent={membershipId:membership.id,rewardId:reward.id,rewardName:reward.name||'Merchant reward'};previous.loyaltyRewardName=String(reward.name||'Merchant reward').slice(0,100);}else{delete previous.loyaltyIntent;delete previous.loyaltyRewardName;delete previous.loyaltyApplied;}
+    remember(ctx);ctx.go(payRoute('amount',{backTo:previous.amountBackTo||previous.flowOrigin||payRoute('home',{hubTab:'campus'})}));return {ok:true};
+  }
+  return openSharedMerchant(ctx,{shopId:id},{replaceClosedRewardRequest,...(reward?{loyaltyIntent:{membershipId:membership.id,rewardId:reward.id,rewardName:reward.name||'Merchant reward'}}:{})});
+}
+
+export function resumeLoyaltyCollection(ctx,{membership,collection}={}) {
+  if(loyaltyReadOnly(ctx)){ctx.toast('This account is closed. Your rewards are available to read.');return {ok:false};}
+  if(!ctx.connected||!ctx.shared?.user?.id||originalPaymentFirst(ctx))return {ok:false};
+  if(typeof membership?.id!=='string'||typeof collection?.requestId!=='string'||typeof collection.shopId!=='string'||collection.state!=='held'){ctx.toast('Choose your current reserved reward request.');return {ok:false};}
+  return openSharedMerchant(ctx,{shopId:collection.shopId,requestId:collection.requestId},{loyaltyCollection:{...collection,membershipId:membership.id}});
+}
+
+function quotedLoyaltySummary(quote) {
+  const l=quote?.loyalty,r=quote?.request;
+  if(!l)return null;
+  if(!r||!Number.isSafeInteger(l.grossAmount)||!Number.isSafeInteger(l.discount)||l.discount<0||l.grossAmount<=0||l.amount!==r.amount||l.grossAmount-l.discount!==r.amount||(l.membershipId!==undefined&&typeof l.membershipId!=='string')||(l.rewardId!==undefined&&typeof l.rewardId!=='string'))throw Error('The merchant reward details could not be verified. Check the original request again.');
+  return l.discount>0?{grossAmount:l.grossAmount,discount:l.discount,...(l.membershipId?{membershipId:l.membershipId}:{}),...(l.rewardId?{rewardId:l.rewardId}:{})}:null;
+}
+
+function preparationEntity(result,payload) {
+  const e=result?.entity,r=e?.request,id=e?.requestId||e?.id;
+  if(!e||!r||typeof id!=='string'||r.id!==id||e.membershipId!==payload.membershipId||e.shopId!==payload.shopId||r.shopId!==payload.shopId||e.rewardId!==payload.rewardId||e.grossAmount!==payload.grossAmount||!Number.isSafeInteger(e.amount)||e.amount<=0||r.amount!==e.amount||!Number.isSafeInteger(e.discount)||e.discount<=0||e.discount!==payload.grossAmount-e.amount)throw Error('The reward request did not match your original purchase. Check the same reference again.');
+  return e;
+}
+
+/** Prepare/recover a metadata hold. Actual money still needs normal review and PIN. */
+export async function prepareConsumerLoyaltyPayment(ctx,d,{cancel=false}={}) {
+  if(!d||ctx.draft.payment!==d||loyaltyPreparations.has(d)||!ctx.connected)return {ok:false};
+  if(loyaltyReadOnly(ctx)){ctx.toast('This account is closed. Open Your rewards to read the current records.');return {ok:false};}
+  const owner=ctx.shared?.user?.id,version=ctx.shared?.authVersion;
+  if(!owner||typeof ctx.shared?.loyalty!=='function'){ctx.toast('Reconnect to check your merchant reward.');return {ok:false};}
+  let p=d.loyaltyPreparation;const existingPreparation=!!p;
+  if(p&&p.ownerId!==owner){ctx.toast('Sign in to the original account to check this reward request.');return {ok:false};}
+  if(!p){
+    const intent=d.loyaltyIntent;
+    if(d.requestId||!intent?.membershipId||!intent?.rewardId||!Number.isSafeInteger(d.amount)||d.amount<=0){ctx.toast('Start a new shop payment to apply this reward.');return {ok:false};}
+    p=d.loyaltyPreparation={ownerId:owner,attemptId:nonce('loyalty-prepare'),state:'submitting',payload:{membershipId:intent.membershipId,shopId:d.shopId,grossAmount:d.amount,rewardId:intent.rewardId,...(d.note?{description:String(d.note).slice(0,100)}:{})}};
+  }
+  cancel=cancel||p.cancelRequested===true;
+  if(cancel){p.cancelRequested=true;p.cancelAttemptId||=nonce('loyalty-cancel');}
+  const wasUnknown=existingPreparation&&['unknown','submitting'].includes(p.state);
+  p.state='submitting';
+  if(ctx.savePaymentRecovery?.(d)===false){p.state=wasUnknown?'unknown':'not-sent';if(!wasUnknown)delete d.loyaltyPreparation;remember(ctx);ctx.toast('Lumo could not save this reward reference safely. No new request was sent.');return {ok:false};}
+  remember(ctx);loyaltyPreparations.add(d);ctx.refresh?.();
+  const current=()=>ctx.draft.payment===d&&ctx.shared?.user?.id===owner&&ctx.shared?.authVersion===version;
+  const originalRoute=ctx.route;
+  const unresolved=message=>{p.state='unknown';p.error=message||'The reward request could not be confirmed. Check this original reference.';remember(ctx);ctx.toast(p.error);if(current())ctx.refresh?.();return {ok:false,unknown:true};};
+  try {
+    let result;
+    if(wasUnknown){
+      result=await ctx.shared.loyalty('recover',{attemptId:p.attemptId});
+      if(!current())return {ok:false,code:'ACCOUNT_CHANGED'};
+      if(!result?.ok)return unresolved(result?.message);
+      const receipt=result.loyalty?.mutationReceipt;
+      if(receipt?.found===true){if(receipt.operation!=='prepare')return unresolved('This reference belongs to another loyalty step.');result={...result,entity:receipt.entity};}
+      else if(receipt?.found===false)result=null;
+      else return unresolved('The service did not confirm the original reward reference.');
+    }
+    if(!result){
+      p.sent=true;remember(ctx);
+      result=await ctx.shared.loyalty('prepare',{...p.payload},{attemptId:p.attemptId});
+      if(!current())return {ok:false,code:'ACCOUNT_CHANGED'};
+      if(!result?.ok){if(result?.unknown)return unresolved(result.message);delete d.loyaltyPreparation;remember(ctx);ctx.toast(result?.message||'This reward cannot be used for this purchase.');ctx.refresh?.();return result||{ok:false};}
+    }
+    const entity=preparationEntity(result,p.payload),status=entity.request.status;
+    if(['paid','cancelled','expired','failed'].includes(status)){
+      p.state='resolved';d.completed=true;ctx.draft.payment=null;remember(ctx);
+      if(status==='paid'&&typeof ctx.shared.snapshot==='function')await ctx.shared.snapshot();
+      if(ctx.shared?.user?.id===owner&&ctx.shared?.authVersion===version){ctx.toast(status==='paid'?'This request was already paid. Your rewards show its current result.':'The original reward request is closed. Check your current rewards.');if(ctx.route===originalRoute)ctx.go(payRoute('rewards',{membershipId:p.payload.membershipId}));}
+      return {ok:true,resolved:true};
+    }
+    if(cancel){
+      p.cancelRequested=true;p.cancelAttemptId||=nonce('loyalty-cancel');p.state='submitting';remember(ctx);
+      if(ctx.savePaymentRecovery?.(d)===false)return unresolved('The cancellation reference could not be saved. Check the original reward request.');
+      const cancelled=await ctx.shared.loyalty('cancel',{membershipId:p.payload.membershipId,requestId:entity.requestId||entity.id},{attemptId:p.cancelAttemptId});
+      if(!current())return {ok:false,code:'ACCOUNT_CHANGED'};
+      if(!cancelled?.ok)return unresolved(cancelled?.message||'The cancellation result is not confirmed.');
+      const closed=preparationEntity(cancelled,p.payload);
+      if((closed.requestId||closed.id)!==(entity.requestId||entity.id)||closed.request.status!=='cancelled')return unresolved('The service did not confirm cancellation of the original request.');
+      p.state='resolved';d.completed=true;ctx.draft.payment=null;remember(ctx);ctx.toast('Reward request cancelled. No payment was submitted from this flow.');if(ctx.route===originalRoute)ctx.go(payRoute('rewards',{membershipId:p.payload.membershipId}));return {ok:true,cancelled:true};
+    }
+    const quote=await ctx.shared.quote({shopId:entity.shopId,requestId:entity.requestId||entity.id});
+    if(!current())return {ok:false,code:'ACCOUNT_CHANGED'};
+    if(!quote?.ok)return unresolved(quote?.message||'The original reward request could not be checked.');
+    validateMerchantQrQuote({shopId:entity.shopId,requestId:entity.requestId||entity.id},quote);
+    if(quote.request?.amount!==entity.amount)return unresolved('The quoted amount did not match the reward request.');
+    const quotedReward=quotedLoyaltySummary(quote);
+    if(!quotedReward||quotedReward.grossAmount!==entity.grossAmount||quotedReward.discount!==entity.discount||quotedReward.membershipId!==p.payload.membershipId||quotedReward.rewardId!==p.payload.rewardId)return unresolved('The original request’s reward details could not be confirmed.');
+    Object.assign(d,{recipient:{id:quote.shop.id,name:quote.merchant?.name||quote.shop.name||'Lumo merchant',emoji:(quote.merchant?.name||quote.shop.name||'L').charAt(0)},shopName:quote.shop.name||'',shopCode:quote.shop.code||'',shopArea:quote.shop.area||'',requestId:quote.request.id,amount:quote.request.amount,amountText:amountInput(quote.request.amount),loyaltyApplied:{membershipId:p.payload.membershipId,rewardId:p.payload.rewardId,grossAmount:entity.grossAmount,discount:entity.discount},lastRoute:payRoute('review'),amountBackTo:payRoute('rewards',{membershipId:p.payload.membershipId})});
+    p.state='ready';p.requestId=quote.request.id;delete p.error;remember(ctx);
+    if(ctx.route===originalRoute)ctx.go(payRoute('review',{backTo:payRoute('rewards',{membershipId:p.payload.membershipId})}));else ctx.toast('Your reward request is ready. Continue the saved payment to review it.');
+    return {ok:true,requestId:d.requestId};
+  } catch(error) {if(current())return unresolved(error?.message);return {ok:false,code:'ACCOUNT_CHANGED'};}
+  finally {loyaltyPreparations.delete(d);if(current())ctx.refresh?.();}
+}
+
+function unresolvedLoyaltyPreparationView(ctx) {
+  const d=ctx.draft.payment,p=d.loyaltyPreparation,ours=p.ownerId===ctx.shared?.user?.id;
+  if(!ours)return `<section class="page">${pageHead('Original reward request',{back:false})}<h1 class="large-question">Use the original account.</h1><p>Sign in to the account that started this reward request. Its details are private.</p><div class="bottom-action">${btn('Back to Payments','pay-unknown-leave')}</div></section>`;
+  return `<section class="page payment-status">${pageHead('Checking your reward',{back:false})}<div class="content status-content"><div class="status-orbit">${icon('clock',42)}</div><h1 class="large-question">Keep the original.</h1><p>We are checking the request for ${esc(d.recipient?.name||'this merchant')}.</p><div class="notice" role="status">${p.cancelRequested?'The cancellation result needs confirmation.':'Your reward may already be reserved for this purchase.'} Check this reference before starting another payment. Normal payment review and authorisation are still required.</div><p class="transaction-reference">Reference ${esc(p.attemptId)}</p><p class="error" id="payment-error" role="alert">${esc(p.error||'')}</p></div><div class="bottom-action">${btn(p.cancelRequested?'Check cancellation':'Check original reward request','pay-check-loyalty',{disabled:loyaltyPreparations.has(d)})}${!p.cancelRequested?btn('Cancel this reward request','pay-cancel-loyalty',{secondary:true,disabled:loyaltyPreparations.has(d)}):''}${btn('Back to Payments','pay-unknown-leave',{secondary:true})}</div></section>`;
+}
+
+export function openSharedMerchant(ctx,input,{isCurrent=()=>true,loyaltyIntent=null,loyaltyCollection=null,replaceClosedRewardRequest=false}={}){return runActionFlow(function*(){
   if(originalPaymentFirst(ctx))return {ok:false,message:'Check your original payment first.'};
   const unavailable=availabilityMessage(ctx,'merchant');if(unavailable){ctx.toast(unavailable);return {ok:false,message:unavailable};}
   const origin=ctx.route,previous=ctx.draft.payment,version=ctx.shared.authVersion;
@@ -238,15 +374,18 @@ export function openSharedMerchant(ctx,input,{isCurrent=()=>true}={}){return run
   if(!current())return {ok:false,cancelled:true};
   if(!quote.ok||!quote.shop?.id){const message=quote.message||'This merchant is unavailable. Check their code and try again.';ctx.toast(message);return {ok:false,message};}
   try{validateMerchantQrQuote(value,quote);}catch(error){ctx.toast(error.message);return {ok:false,message:error.message};}
+  if(loyaltyIntent&&quote.request){const message='This QR already has an exact amount. Ask the cashier to apply your reward, or start a new shop payment from Your rewards.';ctx.toast(message);return {ok:false,message};}
+  if(loyaltyCollection&&(!quote.request||quote.request.id!==loyaltyCollection.requestId||quote.request.amount!==loyaltyCollection.amount||!Number.isSafeInteger(loyaltyCollection.grossAmount)||!Number.isSafeInteger(loyaltyCollection.discount)||loyaltyCollection.grossAmount-loyaltyCollection.discount!==quote.request.amount)){const message='The saved reward request changed. Refresh Your rewards.';ctx.toast(message);return {ok:false,message};}
+  let quotedReward;try{quotedReward=quotedLoyaltySummary(quote);}catch(error){ctx.toast(error.message);return {ok:false,message:error.message};}
   const name=quote.merchant?.name||quote.shop.name||'Lumo merchant';
   const adopt=(fromChoice=false)=>{
     if(!(fromChoice?unchanged():current()))return;
     try{validateMerchantQrQuote(value,quote);}catch(error){ctx.toast(error.message);return;}
     const d=resetDraft(ctx,{id:quote.shop.id,name,emoji:name.charAt(0)},'merchant');
-    Object.assign(d,{shopId:quote.shop.id,shopName:quote.shop.name||'',shopCode:quote.shop.code||'',shopArea:quote.shop.area||'',...(quote.request?.id?{requestId:quote.request.id}:{}),...(value.testKey?{testKey:value.testKey}:{}),amount:quote.request?.amount||0,amountText:quote.request?.amount?amountInput(quote.request.amount):'',flowOrigin:{...origin},amountBackTo:{...origin},note:quote.request?.note||''});
+    Object.assign(d,{shopId:quote.shop.id,shopName:quote.shop.name||'',shopCode:quote.shop.code||'',shopArea:quote.shop.area||'',...(quote.request?.id?{requestId:quote.request.id}:{}),...(value.testKey?{testKey:value.testKey}:{}),amount:quote.request?.amount||0,amountText:quote.request?.amount?amountInput(quote.request.amount):'',flowOrigin:{...origin},amountBackTo:{...origin},note:quote.request?.note||'',...(loyaltyIntent?{loyaltyIntent:{...loyaltyIntent},loyaltyRewardName:String(loyaltyIntent.rewardName||'Merchant reward').slice(0,100)}:{}),...(quotedReward?{loyaltyApplied:quotedReward,loyaltyRewardName:'Merchant reward'}:{}),...(loyaltyCollection?{loyaltyApplied:{membershipId:loyaltyCollection.membershipId,rewardId:loyaltyCollection.rewardId,grossAmount:loyaltyCollection.grossAmount,discount:loyaltyCollection.discount},loyaltyRewardName:'Merchant reward'}:{})});
     remember(ctx);ctx.go(payRoute(d.amount?'review':'amount',{backTo:{...origin}}));
   };
-  if(pendingPayment(ctx)){
+  if(pendingPayment(ctx)&&!replaceClosedRewardRequest){
     let choosing=true;
     ctx.sheet(`<h2>Use this merchant payment?</h2><p>Your unfinished payment is saved. Choose which one to continue.</p><div class="stack">${btn('Use this merchant','merchant-use-payment')}${btn('Continue saved payment','merchant-resume-payment',{secondary:true})}</div>`,el=>{el.querySelector('[data-action="merchant-use-payment"]').onclick=()=>{if(!choosing||!unchanged())return;choosing=false;ctx.closeSheet();adopt(true);};el.querySelector('[data-action="merchant-resume-payment"]').onclick=()=>{if(!choosing||!unchanged())return;choosing=false;resumePayment(ctx);};},{onDispose:()=>{choosing=false;},onClose:()=>ctx.refresh()});
     return {ok:true,choosing:true};
@@ -337,6 +476,8 @@ function amount(ctx) {
   return `<div class="page pay-amount">${taskHead(`To ${recipientLabel(d).split(' ')[0]}`,{editing:!!ctx.route?.edit})}
     <div class="content"><h1 class="large-question">How much?</h1><div class="review-person amount-recipient">${recipientAvatar(d.recipient, 'small')}<div><strong>${esc(recipientLabel(d))}</strong><p class="muted">${esc(destinationLabel(d))}${d.recipient?.number ? ` · ${esc(d.recipient.number)}` : ''}</p></div></div>
     <label class="money-entry"><span>GH₵</span><input class="money-input" id="payment-amount" name="paymentAmount" type="text" inputmode="decimal" autocomplete="off" maxlength="12" placeholder="0" value="${esc(d.amountText ?? amountInput(d.amount))}" aria-label="Payment amount in Ghana cedis"></label>
+    ${d.loyaltyIntent?`<div class="notice"><span>${esc(d.loyaltyRewardName||'Merchant reward')} will be checked for this purchase before you review the amount to pay.</span></div>`:''}
+    ${ctx.connected&&d.rail==='merchant'&&!d.requestId?`<button type="button" class="button ghost" data-action="pay-rewards">${d.loyaltyIntent?'Change merchant reward':'Check merchant rewards'}</button>`:''}
     <p class="muted balance-hint">${cash(sum.available)} available · <span class="accent">${cash(sum.spendable)} left after plan</span></p>
     ${suggestion?`<div class="maintenance-category-suggestion"><p>You chose ${esc(suggestion.category)} for this person before.</p><div class="inline-actions"><button type="button" class="text-button" data-action="pay-use-category">Use ${esc(suggestion.category)}</button><button type="button" class="text-button" data-action="pay-skip-category">Choose this time</button></div></div>`:''}
     <details class="payment-optional-details" ${d.detailsOpen ? 'open' : ''}><summary><span>Plan & note <small>Optional</small></span>${icon('chevron', 18)}</summary><div class="payment-optional-content">
@@ -358,6 +499,8 @@ function review(ctx) {
     <div class="content"><h1 class="large-question">${d.serviceId ? 'Ready to go?' : 'All looking right?'}</h1>${isExternalSandboxTransfer(d)?`<p class="notice" data-external-simulation>${externalSimulationNotice}</p>`:''}
     <div class="review-person">${recipientAvatar(d.recipient, 'large')}<div><strong>${esc(recipientLabel(d))}</strong><p class="muted">${esc(destinationLabel(d))}${!d.serviceId && d.recipient?.number ? ` · ${esc(d.recipient.number)}` : ''}</p></div></div>
     ${d.rail==='merchant'?`<div class="panel">${row({title:'Receiving shop',right:esc(d.shopName||'Connected merchant')})}${d.shopCode?row({title:'Merchant code',right:esc(d.shopCode)}):''}${d.shopArea?row({title:'Location',right:esc(d.shopArea)}):''}${d.requestId?row({title:'Payment request',sub:'The merchant confirmed this exact amount',right:cash(d.amount)}):''}</div>`:''}
+    ${ctx.connected&&d.rail==='merchant'?`<button type="button" class="button ghost" data-action="pay-rewards">${d.requestId?'View your merchant rewards':'Check merchant rewards'}</button>`:''}
+    ${d.loyaltyApplied?`<div class="panel loyalty-payment-summary">${row({title:'Purchase before reward',right:cash(d.loyaltyApplied.grossAmount)})}${row({title:d.loyaltyRewardName||'Merchant reward',right:'−'+cash(d.loyaltyApplied.discount)})}<p class="muted small">This reward is reserved for this exact payment request. Your wallet pays only the amount below.</p></div>`:''}
     <div class="panel review-summary">${row({ emoji: icon('send'), title: 'You’re sending', right: cash(d.amount) })}${row({ emoji: icon('check'), title: 'Demo fee', right: cash(fee) })}${row({ emoji: icon('wallet'), title: 'Total', right: cash(total), className: 'total-row' })}</div>
     ${d.iouId ? `<p class="notice">Towards your IOU with ${esc(ctx.state.ious?.find(item => item.id === d.iouId)?.name || d.iouName || 'this person')}. Only confirmed money reduces what you owe.</p>` : ''}
     ${d.note && !d.serviceId ? `<p class="payment-note">“${esc(d.note)}”</p>` : ''}
@@ -466,12 +609,14 @@ function fundingStatus(ctx, route) {
 }
 
 export function renderPayments(ctx, route) {
+  if(loyaltyPreparationPending(ctx.draft.payment)&&['recipient','recipient-confirm','conversation','amount','review','pause','status'].includes(route.page))return unresolvedLoyaltyPreparationView(ctx);
   if(hasUnresolvedPayment(ctx.draft.payment)&&['recipient','recipient-confirm','conversation','amount','review','pause','status'].includes(route.page))return unresolvedPaymentView(ctx);
   if(ctx.connected&&route.page==='service'){
     const service=getPaymentService(route.id);
     return `<section class="page">${pageHead(service?.name||'Payment service')}<h1 class="large-question">${service?.type==='campus'?'Use the merchant’s connected code.':'This provider is not connected.'}</h1><p class="muted">${service?.type==='campus'?'This is a sample campus listing. Scan the shop’s Lumo QR or enter its merchant code to check the receiving shop and amount.':'Top-ups and bills cannot complete in this shared test. No payment details have been submitted.'}</p><div class="bottom-action">${btn('Scan a merchant QR','provider-scan')}${btn('Back to Payments','provider-back',{secondary:true})}</div></section>`;
   }
   switch (route.page || 'home') {
+    case 'rewards': return renderConsumerRewards(paymentContext(ctx),route);
     case 'requests': case 'request-detail': case 'splits': case 'split-detail': case 'funding-detail': return renderPaymentParity(paymentContext(ctx), route);
     case 'service': return renderPaymentService(paymentContext(ctx), route);
     case 'recipients-list': case 'cards': return renderPaymentExtras(paymentContext(ctx), route);
@@ -502,7 +647,7 @@ function submitReviewedPayment(ctx,d){return runActionFlow(function*(){
   if(ctx.connected&&hasUnresolvedPayment(d)&&d.submissionOwnerId!==owner){ctx.toast('Sign in to the original account to check this request.');ctx.refresh?.();return;}
   const wasUnresolved=hasUnresolvedPayment(d);
   const payload=d.submittedPayload||{...d,fee:paymentFee(d.rail),merchant:recipientLabel(d),status:d.outcome||'success'};
-  for(const key of ['submittedPayload','submissionState','submissionAttemptId','submissionOwnerId','lastSubmissionError'])delete payload[key];
+  for(const key of ['submittedPayload','submissionState','submissionAttemptId','submissionOwnerId','lastSubmissionError','loyaltyIntent','loyaltyPreparation','loyaltyApplied','loyaltyRewardName'])delete payload[key];
   d.submittedPayload=structuredClone(payload);d.submissionState='submitting';if(ctx.connected)d.submissionOwnerId=owner;
   if(ctx.connected&&ctx.savePaymentRecovery?.(d)===false){
     if(wasUnresolved)d.submissionState='unknown';else{delete d.submissionState;delete d.submittedPayload;delete d.submissionOwnerId;}
@@ -557,6 +702,12 @@ function noteSheet(ctx) {
 });}
 
 export function bindPayments(ctx, route) {
+  if(route.page==='rewards')return bindConsumerRewards(paymentContext(ctx),route);
+  if(loyaltyPreparationPending(ctx.draft.payment)&&['recipient','recipient-confirm','conversation','amount','review','pause','status'].includes(route.page)){
+    on(ctx,'pay-check-loyalty',()=>prepareConsumerLoyaltyPayment(ctx,ctx.draft.payment));
+    on(ctx,'pay-cancel-loyalty',()=>prepareConsumerLoyaltyPayment(ctx,ctx.draft.payment,{cancel:true}));
+    on(ctx,'pay-unknown-leave',()=>{remember(ctx);ctx.go(payRoute('home',{hubTab:'campus'}));});return;
+  }
   if(hasUnresolvedPayment(ctx.draft.payment)&&['recipient','recipient-confirm','conversation','amount','review','pause','status'].includes(route.page)){
     on(ctx,'pay-check-original',()=>{const d=ctx.draft.payment;if(paymentSubmissions.has(d))return;if(ctx.connected&&d.submissionOwnerId!==ctx.shared?.user?.id){ctx.toast('Sign in to the original account to check this request.');return;}ctx.auth({title:'Check your original payment',onCancel:()=>ctx.refresh(),onSuccess:()=>submitReviewedPayment(ctx,d)});});
     on(ctx,'pay-unknown-leave',()=>{remember(ctx);ctx.go(payRoute('home'));});return;
@@ -571,6 +722,7 @@ export function bindPayments(ctx, route) {
   if (route.page === 'service') return bindPaymentService(paymentContext(ctx), route);
   if (['recipients-list','cards'].includes(route.page)) return bindPaymentExtras(paymentContext(ctx), route);
   ctx.setCapture?.(() => capturePayment(ctx, route));
+  on(ctx, 'pay-rewards', () => {const d=draft(ctx);ctx.go(payRoute('rewards',{shopId:d.shopId,...(d.loyaltyApplied?.membershipId||d.loyaltyIntent?.membershipId?{membershipId:d.loyaltyApplied?.membershipId||d.loyaltyIntent?.membershipId}:{}),backTo:{...route}}));});
   on(ctx, 'pay-new', () => startPayment(ctx));
   on(ctx, 'pay-campus-home', () => ctx.go(payRoute('home', {hubTab:'campus'})));
   on(ctx, 'pay-resume', () => resumePayment(ctx));
@@ -638,6 +790,7 @@ export function bindPayments(ctx, route) {
       if (!d.recipient) return ctx.go(payRoute('recipient'));
       if (!/^(?:\d+)(?:\.\d{1,2})?$/.test(input?.value || '') || d.amount <= 0 || !Number.isSafeInteger(d.amount)) return formError(ctx, 'Enter an amount with up to two decimal places.');
       if (d.amount > 100000000) return formError(ctx, 'Try a smaller amount for this demo.');
+      if(d.loyaltyIntent&&!d.requestId){void prepareConsumerLoyaltyPayment(ctx,d);return;}
       if(route.edit)delete ctx.draft.paymentEditBackup;
       ctx.go(payRoute('review', { backTo: payRoute('amount', { backTo: amountParent(d) }) }), { replace: !!route.edit });
     });
@@ -653,6 +806,8 @@ export function bindPayments(ctx, route) {
       if(ctx.draft.payment!==selected||ctx.shared.authVersion!==version||ctx.route!==route)return;
       if(!quote?.ok||quote.shop?.id!==d.shopId)return formError(ctx,quote?.message||'This shop or payment request is unavailable. Open the merchant again.');
       try{validateMerchantQrQuote({shopId:d.shopId,...(d.requestId?{requestId:d.requestId}:{})},quote);}catch(error){return formError(ctx,error.message);}
+      let quotedReward;try{quotedReward=quotedLoyaltySummary(quote);}catch(error){return formError(ctx,error.message);}
+      if(d.loyaltyApplied&&(!quotedReward||['grossAmount','discount','membershipId','rewardId'].some(key=>(d.loyaltyApplied[key]||null)!==(quotedReward[key]||null))))return formError(ctx,'This request’s reward details changed. Refresh Your rewards before paying.');
       const name=quote.merchant?.name||quote.shop.name;
       if(name!==d.recipient?.name||quote.shop.name!==(d.shopName||'')||(quote.shop.code||'')!==(d.shopCode||'')||!!quote.request!==!!d.requestId||quote.request&&quote.request.amount!==d.amount)return formError(ctx,'This merchant’s details changed. Open the shop again and review the current details.');
     }

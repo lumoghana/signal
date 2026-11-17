@@ -1,3 +1,4 @@
+import {createConsumerLoyalty} from './consumer-loyalty.mjs';
 import {createAvailability,servicesForAction} from './availability.mjs';
 import {externalRecipient,EXTERNAL_SIMULATION_FEES} from './external-transfer.mjs';
 import {createGuestCheckout} from './guest-checkout.mjs';
@@ -45,6 +46,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  }
  async function serviceRpc(name,args){const {data}=await upstream('/rest/v1/rpc/'+name,args);if(!plain(data))throw failure('SERVICE_UNAVAILABLE',null,503);return data;}
  const availability=availabilityEnabled?createAvailability({serviceRpc}):null;
+ const consumerLoyalty=createConsumerLoyalty({serviceRpc,cryptoApi});
  async function service(command,payload){return serviceRpc('lumo_approved_service',{p_command:command,p_payload:payload});}
  const requireOk=value=>{if(!value?.ok){const error=failure(value?.code||'SERVICE_UNAVAILABLE',messages[value?.code],value?.code==='SESSION_REVOKED'?401:400);if(value?.code==='SERVICE_PAUSED')error.noMutation=true;throw error;}return value;};
  async function identify(token){
@@ -58,7 +60,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    service:(command,payload={})=>service(command,{...payload,...identityPayload}),
    repair:(command,payload={})=>serviceRpc('lumo_approved_pin_repair',{p_command:command,p_payload:{...payload,...identityPayload}}),
    resolve:query=>service('resolve',{...identityPayload,query:String(query||'')}),
-   quote:async payload=>{if(!payload.shopId&&payload.query){const lookup=await serviceRpc('lumo_approved_merchant_lookup',{p_query:payload.query});if(!lookup?.ok)return lookup;payload={...payload,shopId:lookup.shopId};}const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true};},
+   quote:async payload=>{const loyalty=await consumerLoyalty.assertRequest(identity,payload.requestId);if(!payload.shopId&&payload.query){const lookup=await serviceRpc('lumo_approved_merchant_lookup',{p_query:payload.query});if(!lookup?.ok)return lookup;payload={...payload,shopId:lookup.shopId};}const access=await serviceRpc('lumo_approved_merchant_access',{p_shop:payload.shopId,p_test_key:payload.testKey||''});if(!access?.ok)return access;const {data}=await upstream('/rest/v1/rpc/lumo_rpc',{p_command:'payment.quote',p_payload:payload},{token:identity.accessToken});return {...data,merchantAccessApproved:data?.ok===true,...(loyalty?{loyalty}:{})};},
    rpc:async(command,payload={})=>(await upstream('/rest/v1/rpc/lumo_rpc',{p_command:command,p_payload:payload},{token:identity.accessToken})).data,
   };
  }
@@ -122,6 +124,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    if(body.action==='merchant'&&!token&&merchantHandler){merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity:null}));}
    const identity=await identify(token),repo=repository(identity);
    try{onIdentified?.(request,identity);}catch{}
+   if(body.action==='loyalty')return respond(await consumerLoyalty({body,identity,repo}));
    if(body.action==='caseInbox')return respond(requireOk(await serviceRpc('lumo_case_inbox',{p_payload:{operation:body.operation||'list',page:body.page,pageSize:body.pageSize,notificationId:body.notificationId,caseId:body.caseId,audience:'consumer',actor:identity.userId,session:identity.sessionId}})));
    if(body.action==='partnerInbox'){const loaded=requireOk(await repo.service('load'));return respond({ok:true,inbox:publicPartnerInbox(loaded.partners||[],identity.userId)});}
    if(body.action==='partnerRespond')return respond(await partnerRespond({body,identity,repo}));

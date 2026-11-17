@@ -73,7 +73,7 @@ async function invite(f,owner,handle,role='cashier'){
 
 test('approved loyalty uses only canonical paid journals, persists UUID net requests and replays missing responses',async()=>{
  const f=fixture(),{owner,memberId}=await setup(f),before=f.read();
- const health=await f.api(null,'/api/health');assert.equal(health.features.merchantLoyalty,'1.0.0');assert.match(health.storage,/Supabase/);
+ const health=await f.api(null,'/api/health');assert.equal(health.features.merchantLoyalty,'1.1.0');assert.match(health.storage,/Supabase/);
  // A JSON transaction that was never posted must not become a loyalty purchase.
  f.mutate(state=>{state.businesses[owner.businessId].transactions.push({id:uuid(),shopId:owner.shopId,amount:9999,status:'paid',payer:'Untrusted JSON sale',createdAt:new Date().toISOString()});});
  const ordinary=await f.api(owner,'/api/session');assert.equal(ordinary.state.transactions.length,0);assert.equal(ordinary.state.loyalty,undefined);assert.doesNotMatch(JSON.stringify(ordinary),/0240000678|Private member|_attempts|consentedAt/);

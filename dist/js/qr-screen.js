@@ -51,6 +51,13 @@ export function bindQrScreen(ctx, route = {}, {
   const stop = () => { fileGeneration += 1; scanner?.stop(); frame?.classList.remove('qr-camera-live'); };
   const openPayment = raw => {
     if (!connected()) return false;
+    // A short-lived membership claim is not a payment URL or authority to pay.
+    // Its private token stays in the rewards controller's memory only.
+    if(typeof raw==='string'&&/^LC1-[A-F0-9]{48}$/i.test(raw.trim())){
+      if(ctx.connected!==true||typeof ctx.openRewardClaim!=='function'){showStatus('Sign in to link a merchant membership.',{canRetry:true});return false;}
+      stop();showStatus('Membership code found. Check the programme terms.');
+      Promise.resolve(ctx.openRewardClaim(raw.trim())).catch(()=>{if(connected())showStatus('The membership could not be checked. Ask for a fresh code.',{canRetry:true});});return true;
+    }
     const result = parseQrPayload(raw, { origin: globalThis.location?.origin });
     if (!result.ok) { showStatus(result.message, { live: scanner?.active }); return false; }
     stop(); showStatus('Code found. Let’s check the details.');

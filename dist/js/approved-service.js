@@ -129,7 +129,7 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     refreshing = operation;
     return operation.promise;
   }
-  async function request(body, { authenticated = true, owner = currentOwner(), epoch = authEpoch } = {}) {
+  async function request(body, { authenticated = true, owner = currentOwner(), epoch = authEpoch, installSnapshot = true } = {}) {
     const valid = () => syncAuth() && epoch === authEpoch && (!authenticated || !sample && currentOwner() === owner);
     if (authenticated) {
       if (!valid()) return accountChanged();
@@ -153,15 +153,15 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     if (!valid()) return accountChanged();
     if(authenticated&&terminalAuth.has(data.code)){await expireSession();return data;}
     if(authenticated&&authRetried&&['UNAUTHENTICATED','AUTH_REQUIRED','INVALID_JWT','JWT_EXPIRED'].includes(data.code)){await expireSession();return data;}
-    if(data.session?.access_token){
+    if(installSnapshot&&data.session?.access_token){
       if(!await saveSession(data.session,{newIdentity:!authenticated,epoch}))return valid()?failure('Lumo could not safely save your sign-in. Keep this browser open and try signing in again.','SESSION_STORAGE_UNAVAILABLE'):accountChanged();
       if(!valid())return accountChanged();
     }
-    if (data.account) account=data.account;
-    if (object(data.capabilities)) capabilities={...data.capabilities};
-    if (Array.isArray(data.partnerInbox)) partnerRequests=data.partnerInbox;
-    if (Array.isArray(data.inbox)) partnerRequests=body.action==='partnerRespond'?[...partnerRequests.filter(item=>!data.inbox.some(next=>next.id===item.id)),...data.inbox]:data.inbox;
-    if (data.state) onSnapshot(data.state, data);
+    if (installSnapshot && data.account) account=data.account;
+    if (installSnapshot && object(data.capabilities)) capabilities={...data.capabilities};
+    if (installSnapshot && Array.isArray(data.partnerInbox)) partnerRequests=data.partnerInbox;
+    if (installSnapshot && Array.isArray(data.inbox)) partnerRequests=body.action==='partnerRespond'?[...partnerRequests.filter(item=>!data.inbox.some(next=>next.id===item.id)),...data.inbox]:data.inbox;
+    if (installSnapshot && data.state) onSnapshot(data.state, data);
     return data;
   }
   async function authenticate(action, values) {
@@ -281,6 +281,18 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
       if(data.ok && data.state && data.account?.userId===owner && data.sandbox===true && data.currency==='GHS') { account=data.account;onSnapshot(data.state,data); }
       else if(data.ok){const latest=await request({action:'snapshot'},{owner,epoch});if(!current(owner,epoch))return accountChanged();if(!latest.ok)return failure('I couldn’t refresh your money. Try again before relying on a number.','RECORDS_UNAVAILABLE');}
       return data;
+    },
+    loyalty(operation, payload = {}, options = {}) {
+      const allowed = new Set(['list','detail','programme','join','claim','prepare','cancel','recover']);
+      if (!allowed.has(operation) || !object(payload)) return Promise.resolve(failure('That loyalty step is unavailable.', 'INVALID_INPUT'));
+      let clean;
+      try { clean = clone(payload); if (JSON.stringify(withoutSecrets(clean)) !== JSON.stringify(clean)) throw Error('Credentials'); }
+      catch { return Promise.resolve(failure('Use only the programme details for this step.', 'INVALID_INPUT')); }
+      const mutating = ['join','claim','prepare','cancel'].includes(operation), attemptId = options?.attemptId;
+      if (mutating && (typeof attemptId !== 'string' || !/^[A-Za-z0-9_.:-]{10,120}$/.test(attemptId))) return Promise.resolve(failure('Keep the original loyalty request reference and try again.', 'INVALID_INPUT'));
+      // Loyalty is an account-scoped merchant projection. It cannot install a
+      // sign-in, wallet snapshot, capability list or partner inbox.
+      return request({action:'loyalty',operation,payload:clean,...(attemptId?{attemptId}:{})},{installSnapshot:false});
     },
     quote(values) { return request({ action: 'quote', ...values }); },
     async guestMerchantQuote(link) {

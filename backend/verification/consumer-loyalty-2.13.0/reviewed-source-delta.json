@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "release": "2.13.0",
+  "feature": "consumerLoyalty",
+  "version": "1.1.0",
+  "status": "deployed-and-exact-source-verified",
+  "function": "lumo-approved",
+  "baselineVersion": 23,
+  "baselineBundleSha256": "526874dd1d8705321f4043596d659caae1a6f1d3f33279ac61f87f8d4cfc48d6",
+  "baselineManifest": "live23-baseline-sha256.json",
+  "files": {
+    "availability.mjs": "b8561860b3b7688145c695d85c6400df7d30c846bd993ab6bc87c9d5db1ff909",
+    "consumer-loyalty.mjs": "fd997da5f6e3a1c3047e94c800d32cf3803a939040cdae939591e712b1d2dee2",
+    "domain/account-model.js": "da1951589cea4dd0bd95938aeead39e99dc94ec0f1ede0d117b8db4981a2e4e5",
+    "domain/box-partner-invitation.js": "a1a2c39a061307a882ed14fbe7b38148336ca37f06e05d51e943a6528e1904de",
+    "domain/box-protection.js": "255260d3c5bd34477a10df20f5eb252d30707ca8a0484096969c587b5f439c7b",
+    "domain/device-auth.js": "90b71b0160f4e0f27a3be1cede9fb6b2f5f208c74427bd04e01e1afd5cd2f9d9",
+    "domain/funding-phone.js": "ed086f3b25fd0335dec2c119e008c5d2453006549e6f44a42e28f0dfc8fcc5fa",
+    "domain/group-chat-model.js": "cbc61226a1001192d10ad671c2409b70295cc78a446a5f829eb6458247e018e1",
+    "domain/group-ledger.js": "e999f05a44d5c7fd8d129c64c6bb9e494010962edd5bea96b45db24eadce4f1a",
+    "domain/group-policy.js": "8d5e302e9d214df198b65444009251c4e4bda32aa28c6072eb4e0c0cac08db9c",
+    "domain/learning-content.js": "0b1c426921e6561661b7589c28e6ba01263e0e4d2b412b1b1648f6a7f87cb017",
+    "domain/learning-game-content.js": "2e2df323ad4f3ec6786a82e4f2c6c6b16f84974ec73ae40a454f7a198deeedb6",
+    "domain/learning-game-model.js": "fdf9fd92082515acd28cc1b8578f2e8b0b28d0bcae21ab9bd5bb75b29f6118b5",
+    "domain/learning-model.js": "dc18f0413d35b4c927a2947f4b39542bd324c1936d968b203dea438de7d46e11",
+    "domain/login-credentials.js": "e73492ae25a2b2c386431e722e05a1fc4a419217588251f33f6ed26202b5638d",
+    "domain/model.js": "24efc4d9958185ec4c244a12d008e427be6f56848985de813b4b5b67ffd8b81d",
+    "domain/money-iq-model.js": "1b4dd7e0dc100f22b66e7cba9f7c758e31b8705738763392f89970f3f91acca6",
+    "domain/partner-code.js": "77abdc365732649e41349bb1e6cf39d76e9c5ad637e83f1de1d7548614046dbf",
+    "domain/pause-history.js": "48a4765d5a53d18453e517d3e25fecab044b2b43fc0da219b771b5a8a350b478",
+    "domain/payment-catalog.js": "4f5a1a3b2c8c59b9b78ca791efed1e9e93a7ccd5ebd0ca47d4029b403cd6e3b4",
+    "domain/payments-parity-model.js": "e6c13e2e5f2512cacefae8ec5a60066ae76242a6445922341f571567a51703bf",
+    "domain/recipient-lookup.js": "8eebea5430490480bfd8b1ce4585650877d32be6f4f27f7afd6f420da670dbff",
+    "domain/savings-parity-model.js": "1e90e73b49a7d796c6a09b24d3590055d70b4eeb4d576a5587b9314b8675e83d",
+    "domain/ui.js": "1578621c39c5a82be5b9bb79ad1f3212ace55447dd98939a631d407d8238db13",
+    "engine.mjs": "1abfb2767c561b69d30bb6318bb09cc07297ed00242b59f2b1eef713049c8318",
+    "external-transfer.mjs": "162c0593bcc5a43ac223bead9119eed23a7b6f80c790af1864d346642e6d38a7",
+    "guest-checkout.mjs": "ed52af63ae740309765dd6c3a0694fe2bc230ea54f0e43af00fc16a12015377e",
+    "guest-payer-lookup.mjs": "c7a0492cb4fca967a1366c6632293434826e136cca44a922959bc62da3087e0f",
+    "handler.mjs": "aa21df66cab29fef52e23271e838af4fea60b0197d578d23a3c9c0aefc70fb79",
+    "index.ts": "8d7e7e576fdb8a21464d3fdce8c93888ee342b88ffa10aee5f9ef8dc9bde4fbd",
+    "merchant/dist/business-plan-model.js": "3f4dc7b2c8a93bf848937b1a6df96e66188a2d24b31ee9c8895b3bd870b72c3b",
+    "merchant/dist/domain.js": "bb07a16c4611886385c5b000c4ef14ade8eede10216e94c0b66f74905e9be0e5",
+    "merchant/dist/loyalty-model.js": "111f9c5b2b5d753e6cf618def41af6bc896b9b406642ff8e57526845298ebee9",
+    "merchant/dist/reconciliation.js": "ddc90c9e44f72d84b88c363f9be9bb4558b219c30675a5979d73365b197a4e0b",
+    "merchant/handler.mjs": "4fbee7fa9a1c5e1fffe9c8d4e2d07d8bca9a14e503fa7828f740f8976427ab51",
+    "merchant/server/api.js": "f00673d5b68fc19781d5c4bc8d34f3938b4857112c29ba1aa17770b3c431754d",
+    "merchant/server/counter.js": "0c59fa305265ca85a0c8ee51c788fc29bec51b7397212fa0f5dc51cb954105d5",
+    "merchant/server/loyalty.js": "97ddbdfcef71fd5305e172cac46c29ac6a4ca5cf608bb0b343e45d35fc84818d",
+    "merchant/server/network.js": "7a04c4c7b2100ad645b45b39d0e675aa2f001027c4c56d40b0c809e728412c5c",
+    "merchant/server/planning.js": "976c5a4a4aacb1c6b6abd63bfbf996b3ca9a9acbfcdd422290203f28136d0281",
+    "onboarding-receipt.mjs": "36a50285020689b26672872e040c5dc6679e807be8fa44a0a73e3bc2d7b8a7a2",
+    "operations.mjs": "c1ed6fde1ad87ed56b4fc7eec1638e74e08e822bccd96c828cb6ee590b0763f0",
+    "partners.mjs": "3d9932d1ea495278f283a8b9b001634c5538718dc07e81309986932297c1e491"
+  },
+  "changes": {
+    "consumer-loyalty.mjs": {
+      "change": "added",
+      "beforeSha256": null,
+      "afterSha256": "fd997da5f6e3a1c3047e94c800d32cf3803a939040cdae939591e712b1d2dee2",
+      "reason": "Add authenticated account-owned membership joins, private one-time hashed link claims, pinned terms and consent, automatic canonical purchaser rewards, safe positive-net payment preparation/cancellation and recoverable account-bound mutation receipts.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "handler.mjs": {
+      "change": "modified",
+      "beforeSha256": "493969ad682a1995c7a872a91491ebda48dac86e6b9a2dbeb6d4104c7e58c677",
+      "afterSha256": "aa21df66cab29fef52e23271e838af4fea60b0197d578d23a3c9c0aefc70fb79",
+      "reason": "Route authenticated consumer loyalty actions and guard consumer-bound reward requests before canonical quote/payment review; preserve financial authorization and unknown-outcome headers.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "merchant/dist/loyalty-model.js": {
+      "change": "modified",
+      "beforeSha256": "8a3d96d2bc6eb97368e7eeadb86fc9fb165b797b29534eb68da586167b2548be",
+      "afterSha256": "111f9c5b2b5d753e6cf618def41af6bc896b9b406642ff8e57526845298ebee9",
+      "reason": "Retain private hashed claim grants and account-owned consumer mutation receipts through strict model normalization without exposing them in merchant or consumer projections.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "merchant/handler.mjs": {
+      "change": "modified",
+      "beforeSha256": "b3bc010a908de2b12441bd2ecba6f6e6dee07238f19b7976e75ac8f095fc3551",
+      "afterSha256": "4fbee7fa9a1c5e1fffe9c8d4e2d07d8bca9a14e503fa7828f740f8976427ab51",
+      "reason": "Carry canonical authenticated purchaser identity into private loyalty reconciliation, exclude guest provider activity from automatic account matching, and preserve shared-shop attribution for consumer prepared requests.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "merchant/server/api.js": {
+      "change": "modified",
+      "beforeSha256": "6dc8dfd7dadc97b0debba568e9617261ad615028c2b96ab549bbcddc02d490bf",
+      "afterSha256": "f00673d5b68fc19781d5c4bc8d34f3938b4857112c29ba1aa17770b3c431754d",
+      "reason": "Allow current scoped cashiers to issue hashed private link grants, strip private consumer/actor identity fields from every merchant response, and expose safe loyalty feature readiness markers.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "merchant/server/counter.js": {
+      "change": "modified",
+      "beforeSha256": "fc1063e1a9f29636adc082b895d563e3ed0faa0d6bd947b7301657208b10a866",
+      "afterSha256": "0c59fa305265ca85a0c8ee51c788fc29bec51b7397212fa0f5dc51cb954105d5",
+      "reason": "Remove private consumer and canonical actor identifiers from paired-counter transaction and request projections while preserving collection ownership.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "merchant/server/loyalty.js": {
+      "change": "modified",
+      "beforeSha256": "c4547004d85a3b69370f8cddee62faa2f15d765f2fdd4c3bd5b677001e8d3f0c",
+      "afterSha256": "97ddbdfcef71fd5305e172cac46c29ac6a4ca5cf608bb0b343e45d35fc84818d",
+      "reason": "Add merchant-issued hashed one-time linking grants, safe linked-status projection and exactly-once earning for the canonical authenticated purchaser after explicit membership linking, preserving refund and reward-hold rules.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    },
+    "merchant/server/network.js": {
+      "change": "modified",
+      "beforeSha256": "b61e2eeb533de034b0467be8465378655a9957b60c7ef5c1b612e3c994876a0e",
+      "afterSha256": "7a04c4c7b2100ad645b45b39d0e675aa2f001027c4c56d40b0c809e728412c5c",
+      "reason": "Strip private consumer bindings and canonical actor identifiers from every ordinary merchant business snapshot, including owner access.",
+      "tests": [
+        "tests/consumer-loyalty-handler.test.mjs",
+        "tests/consumer-loyalty-adversarial.test.mjs",
+        "tests/consumer-loyalty-payer.test.sql"
+      ]
+    }
+  },
+  "reviewPatch": {
+    "path": "reviewed-function-changes.patch",
+    "sha256": "a455d9c69a73ee20e7da80f3ebbe19cd76ed75c1985281452c18689202f33c4d"
+  },
+  "migration": {
+    "path": "supabase/migrations/20261117091402_consumer_loyalty_payer_guard.sql",
+    "sha256": "3bb359a3dc59977d20f81a6a0f882669d5c3c9dd39808f2689d7a35796cdbe31",
+    "purpose": "Private canonical journal trigger rejects a consumer-bound reward request paid by a different authenticated actor; no financial writer or ledger schema rewrite."
+  },
+  "verification": {
+    "independentAdversarialTests": 14,
+    "httpBoundaryTests": 6,
+    "existingMerchantWrapperTests": 6,
+    "postgresMigrations": 35,
+    "postgresChecks": 49,
+    "databaseEvidence": "database-result.json"
+  },
+  "moneyContract": "Existing positive immutable UUID requests, canonical net amounts, Pause/PIN approval, idempotent money writer, original payer refunds and revision/ledger-stamp fence remain authoritative. Guest payments never infer consumer identity; group funds attribute loyalty to the authenticated purchaser, not account owner.",
+  "deployedVersion": 24,
+  "deployedBundleSha256": "5afa79dc902653cdffe7496c70a52c7d571850ffdf21f466de35d2e5bd091081"
+}
