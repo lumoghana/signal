@@ -67,11 +67,11 @@ test('audit source matches explicit reviewed deltas while preserving immutable l
   await visit(entrypoint);return closure;
  }
  const main=await importedClosure(mainBase,baseline.entrypoint);
- assert.equal(main.size,40);assert.deepEqual([...main.keys()].sort(),Object.keys(mainAudit.files).sort());
+ assert.equal(main.size,42);assert.deepEqual([...main.keys()].sort(),Object.keys(mainAudit.files).sort());
  assert.equal(mainAudit.baselineVersion,18);assert.equal(mainAudit.baselineBundleSha256,'d1ffe87e7c107af776bebbba35823e52404e3b2dc8506c4868f00a42f6032679');
- const reviewed=['domain/box-partner-invitation.js','domain/box-protection.js','domain/partner-code.js','engine.mjs','handler.mjs','index.ts','merchant/dist/domain.js','merchant/handler.mjs','merchant/server/api.js','merchant/server/counter.js','merchant/server/network.js','onboarding-receipt.mjs','operations.mjs','partners.mjs'];
+ const reviewed=['domain/box-partner-invitation.js','domain/box-protection.js','domain/partner-code.js','engine.mjs','handler.mjs','index.ts','merchant/dist/domain.js','merchant/dist/loyalty-model.js','merchant/handler.mjs','merchant/server/api.js','merchant/server/counter.js','merchant/server/loyalty.js','merchant/server/network.js','onboarding-receipt.mjs','operations.mjs','partners.mjs'];
  assert.deepEqual(Object.keys(mainAudit.deltas).sort(),reviewed.sort());
- assert.deepEqual([...main.keys()].filter(name=>!Object.hasOwn(baseline.files,name)).sort(),['domain/partner-code.js','onboarding-receipt.mjs']);
+ assert.deepEqual([...main.keys()].filter(name=>!Object.hasOwn(baseline.files,name)).sort(),['domain/partner-code.js','merchant/dist/loyalty-model.js','merchant/server/loyalty.js','onboarding-receipt.mjs']);
  for(const [name,bytes]of main){
   const change=mainAudit.deltas[name],digest=createHash('sha256').update(bytes).digest('hex');
   assert.equal(digest,mainAudit.files[name],name+' must match reviewed audit source');

@@ -50,15 +50,15 @@
       "bundleSha256": "6a2149d5b01a4b4ef3845f25b623426eabc6cdcb4f3bc09f2b148ba23f22c2ee"
     },
     "approved": {
-      "version": 22,
+      "version": 23,
       "state": "ACTIVE",
-      "bundleSha256": "8c2e5aeea6014ed70db83f265484de52881ddc219c0a167974b5f8d78d7b6bae"
+      "bundleSha256": "526874dd1d8705321f4043596d659caae1a6f1d3f33279ac61f87f8d4cfc48d6"
     },
     "merchantSite": {
       "url": "https://lumo-merchant-mobile.oness15.chatgpt.site",
-      "version": 38,
+      "version": 39,
       "state": "succeeded",
-      "sourceCommit": "debc3ca069804024461df67e8c4033c258270b32"
+      "sourceCommit": "6536d2922be4fafff586cad9f494324f60bbc35e"
     },
     "vercel": {
       "currentRelease": "2.12.5",
@@ -70,9 +70,9 @@
         "runtime": "22.x"
       },
       "merchant": {
-        "id": "dpl_CsWXCGZupSxEFB1m5zJspPikwhU6",
+        "id": "dpl_F2THtMoe2gk3ejRCwtLwxGQec5kM",
         "url": "https://lumo-merchant.vercel.app/",
-        "immutableUrl": "https://lumo-merchant-oiaajtzri-williedark-6795.vercel.app",
+        "immutableUrl": "https://lumo-merchant-76jxkdqvf-williedark-6795.vercel.app",
         "runtime": "26.x"
       },
       "publicReleaseSourceAndApkHashesVerified": true,
@@ -82,8 +82,8 @@
   },
   "tests": {
     "consumer": 1822,
-    "merchant": 637,
-    "backend": 371,
+    "merchant": 726,
+    "backend": 377,
     "protectedSql": 72,
     "newSql": 29,
     "adversarialHandlerPostgres": 45,
@@ -105,5 +105,26 @@
       "dist/sw.js"
     ],
     "verification": "Prior committed bytes compared directly; full 1822 consumer suite passed."
+  },
+  "merchantFeatures": {
+    "loyalty": {
+      "version": "1.0.0",
+      "release": "merchant-loyalty-1.0.0",
+      "status": "live-and-verified",
+      "releaseDate": "2026-11-17",
+      "guide": "merchant-approved/MERCHANT-LOYALTY.md",
+      "canonicalSiteCommit": "6536d2922be4fafff586cad9f494324f60bbc35e",
+      "backendVersion": 23,
+      "backendFiles": 42,
+      "publicAssetsVerified": 9,
+      "consumerArtifactUnchanged": "2.12.5",
+      "prototypeMemberLimit": 500,
+      "automatedMessagingConnected": false,
+      "itemStockConnected": false,
+      "browserChecks": "Synthetic 320px light/dark programme, member, setup and register; live signed-out startup; no real account or financial mutations.",
+      "portableMerchantTests": 727,
+      "sourceImportReferencesVerified": 286,
+      "sourceMissingReferences": 0
+    }
   }
 }

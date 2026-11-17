@@ -1,0 +1,28 @@
+{
+  "merchantFeature": "merchant-loyalty-1.0.0",
+  "featureVersion": "1.0.0",
+  "releaseDate": "2026-11-17",
+  "scope": "merchant-owned loyalty",
+  "consumerExperience": "2.12.5",
+  "consumerArtifactUnchanged": true,
+  "apkVersion": "2.12.5",
+  "apkVersionCode": 21205,
+  "apkSha256": "21acf920bfc4e417283915125a69dadf2826b4961e24576f04819cf967b69e10",
+  "apkBytes": 4621263,
+  "providerMode": "sandbox",
+  "loyalty": {
+    "programmesPerBusiness": 1,
+    "earningMethods": ["visits", "spend"],
+    "rewardTypes": ["discount", "item"],
+    "ruleVersionsPreserveExistingMembers": true,
+    "membershipIdentity": "merchant-scoped opaque card code",
+    "membershipConsentRequired": true,
+    "marketingConsentSeparate": true,
+    "rewardBudget": "redeemed-cost-plus-current-commitments",
+    "externalSales": "merchant-attested-records-only",
+    "bankBalancesAffectedByLoyaltyAdjustments": false,
+    "automatedMessagingConnected": false,
+    "itemStockConnected": false,
+    "prototypeMemberLimit": 500
+  }
+}

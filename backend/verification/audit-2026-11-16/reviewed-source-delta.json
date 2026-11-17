@@ -48,11 +48,13 @@
         "index.ts": "8d7e7e576fdb8a21464d3fdce8c93888ee342b88ffa10aee5f9ef8dc9bde4fbd",
         "merchant/dist/business-plan-model.js": "3f4dc7b2c8a93bf848937b1a6df96e66188a2d24b31ee9c8895b3bd870b72c3b",
         "merchant/dist/domain.js": "bb07a16c4611886385c5b000c4ef14ade8eede10216e94c0b66f74905e9be0e5",
+        "merchant/dist/loyalty-model.js": "8a3d96d2bc6eb97368e7eeadb86fc9fb165b797b29534eb68da586167b2548be",
         "merchant/dist/reconciliation.js": "ddc90c9e44f72d84b88c363f9be9bb4558b219c30675a5979d73365b197a4e0b",
-        "merchant/handler.mjs": "d6400709ece14e46846d7aeec9276d9aac90cfa14163ba371b8b8a43289d8a69",
-        "merchant/server/api.js": "293b0b578b4b8634890a70f4f45f20eabacb68f0044741d38bfbfcd0727f1be7",
+        "merchant/handler.mjs": "b3bc010a908de2b12441bd2ecba6f6e6dee07238f19b7976e75ac8f095fc3551",
+        "merchant/server/api.js": "6dc8dfd7dadc97b0debba568e9617261ad615028c2b96ab549bbcddc02d490bf",
         "merchant/server/counter.js": "fc1063e1a9f29636adc082b895d563e3ed0faa0d6bd947b7301657208b10a866",
-        "merchant/server/network.js": "02029904ae3441bfc3caa6c53cb5353f633c172cad4a86720ffe9243b5a277d4",
+        "merchant/server/loyalty.js": "c4547004d85a3b69370f8cddee62faa2f15d765f2fdd4c3bd5b677001e8d3f0c",
+        "merchant/server/network.js": "b61e2eeb533de034b0467be8465378655a9957b60c7ef5c1b612e3c994876a0e",
         "merchant/server/planning.js": "976c5a4a4aacb1c6b6abd63bfbf996b3ca9a9acbfcdd422290203f28136d0281",
         "onboarding-receipt.mjs": "36a50285020689b26672872e040c5dc6679e807be8fa44a0a73e3bc2d7b8a7a2",
         "operations.mjs": "c1ed6fde1ad87ed56b4fc7eec1638e74e08e822bccd96c828cb6ee590b0763f0",
@@ -125,26 +127,37 @@
             "../merchant-approved/tests/cashier-counter-api.test.mjs"
           ]
         },
+        "merchant/dist/loyalty-model.js": {
+          "change": "added",
+          "beforeSha256": null,
+          "afterSha256": "8a3d96d2bc6eb97368e7eeadb86fc9fb165b797b29534eb68da586167b2548be",
+          "reason": "Add pure integer-pesewa programme terms, reward budget and merchant loyalty reporting calculations for the new private server model.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        },
         "merchant/handler.mjs": {
           "change": "modified",
           "beforeSha256": "9ebef98ed8ac76dd86312e38c2e34e4992fd322e35de88806eb42f0f9cc17d79",
-          "afterSha256": "d6400709ece14e46846d7aeec9276d9aac90cfa14163ba371b8b8a43289d8a69",
-          "reason": "R08 scoped anonymous client key; authenticated enrichment uses issued cookie; R23 counter receipt recovery route; 2026-11-17 recovery review: Retire pilot legacy-key endpoints and response checkpoints while preserving stored credentials, role checks, counters and finance authorization.",
+          "afterSha256": "b3bc010a908de2b12441bd2ecba6f6e6dee07238f19b7976e75ac8f095fc3551",
+          "reason": "R08 scoped anonymous client key; authenticated enrichment uses issued cookie; R23 counter receipt recovery route; 2026-11-17 recovery review: Retire pilot legacy-key endpoints and response checkpoints while preserving stored credentials, role checks, counters and finance authorization.; 2026-11-17 merchant loyalty review: Expose only the authenticated merchant loyalty route through the existing shared-account and paired-counter boundary.",
           "tests": [
             "tests/approved-merchant-handler.test.mjs",
             "tests/guest-merchant-wrapper.test.mjs",
-            "tests/prototype-face-only-merchant.test.mjs"
+            "tests/prototype-face-only-merchant.test.mjs",
+            "tests/approved-merchant-loyalty.test.mjs"
           ]
         },
         "merchant/server/api.js": {
           "change": "modified",
           "beforeSha256": "a3ef481146cf7cf27bf01a2726d982d4e5400900aae013311be91476ab7927f5",
-          "afterSha256": "293b0b578b4b8634890a70f4f45f20eabacb68f0044741d38bfbfcd0727f1be7",
-          "reason": "R08 scoped signup; R23 verified ticket creator attribution and safe imported provenance; 2026-11-17 recovery review: Pilot owner/staff signup and replay issue no recovery key/hash/checkpoint; internal opt-in defaults false so protected legacy behavior is preserved.",
+          "afterSha256": "6dc8dfd7dadc97b0debba568e9617261ad615028c2b96ab549bbcddc02d490bf",
+          "reason": "R08 scoped signup; R23 verified ticket creator attribution and safe imported provenance; 2026-11-17 recovery review: Pilot owner/staff signup and replay issue no recovery key/hash/checkpoint; internal opt-in defaults false so protected legacy behavior is preserved.; 2026-11-17 merchant loyalty review: Reconcile trusted payments and refunds, atomically prepare immutable net payment requests with held rewards, fence counter operators, and canonically invalidate expired requests before releasing a voucher. Add a public feature readiness marker.",
           "tests": [
             "tests/approved-merchant-handler.test.mjs",
             "../merchant-approved/tests/cashier-counter-api.test.mjs",
-            "tests/prototype-face-only-merchant.test.mjs"
+            "tests/prototype-face-only-merchant.test.mjs",
+            "tests/approved-merchant-loyalty.test.mjs"
           ]
         },
         "merchant/server/counter.js": {
@@ -156,13 +169,23 @@
             "../merchant-approved/tests/cashier-counter-api.test.mjs"
           ]
         },
+        "merchant/server/loyalty.js": {
+          "change": "added",
+          "beforeSha256": null,
+          "afterSha256": "c4547004d85a3b69370f8cddee62faa2f15d765f2fdd4c3bd5b677001e8d3f0c",
+          "reason": "Add merchant-owned programme rules, consented membership, scoped access, immutable progress/reward history, server-authoritative redemption holds, refund adjustment and idempotent mutation receipts.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        },
         "merchant/server/network.js": {
           "change": "modified",
           "beforeSha256": "d4834f3b8d1fea3ad78ceb872cf7d5f29ad2cdb5baa11ecc10aea842f3accb37",
-          "afterSha256": "02029904ae3441bfc3caa6c53cb5353f633c172cad4a86720ffe9243b5a277d4",
-          "reason": "R08 ephemeral keyed signup/request throttles avoid shared unknown-client bucket",
+          "afterSha256": "b61e2eeb533de034b0467be8465378655a9957b60c7ef5c1b612e3c994876a0e",
+          "reason": "R08 ephemeral keyed signup/request throttles avoid shared unknown-client bucket; 2026-11-17 merchant loyalty review: Strip raw loyalty contacts, consent, member and ledger internals from every ordinary scoped business snapshot; dedicated role projection supplies the authorized view.",
           "tests": [
-            "tests/approved-merchant-handler.test.mjs"
+            "tests/approved-merchant-handler.test.mjs",
+            "tests/approved-merchant-loyalty.test.mjs"
           ]
         },
         "onboarding-receipt.mjs": {
@@ -271,8 +294,8 @@
   },
   "reviewPatch": {
     "path": "verification/audit-2026-11-16/reviewed-function-changes.patch",
-    "sha256": "37dd829085199df136706dd9274f96e002ac79a14a31ac72705b6c52bc284754",
-    "scope": "Review aid comparing normalized captured deployed source and retained pre-audit maintenance source to exact candidate. Not an automatic deployment instruction."
+    "sha256": "63975a74bdfe8158a0693f8cbb5a9ba15f3222fd950dbb66cba9d2e800f7c6c3",
+    "scope": "Review aid comparing normalized captured deployed source and retained pre-audit maintenance source to exact candidate. Not an automatic deployment instruction. Appended merchant loyalty delta compares the frozen live22 source to the current 42-file candidate; previous review hunks are preserved."
   },
   "migrations": {
     "supabase/migrations/20261116104846_review_support_projection.sql": {
@@ -328,6 +351,63 @@
         }
       },
       "behaviorChecks": "6 new regression tests and 9 existing merchant handler tests passed; full suite only had expected manifest drift before this provenance update."
+    },
+    {
+      "date": "2026-11-17",
+      "feature": "merchantLoyalty",
+      "version": "1.0.0",
+      "status": "reviewed-candidate-not-deployed",
+      "baselineVersion": 22,
+      "baselineBundleSha256": "8c2e5aeea6014ed70db83f265484de52881ddc219c0a167974b5f8d78d7b6bae",
+      "provenance": "verification/merchant-loyalty-1.0.0/reviewed-source-delta.json",
+      "changes": {
+        "merchant/dist/loyalty-model.js": {
+          "change": "added",
+          "beforeSha256": null,
+          "afterSha256": "8a3d96d2bc6eb97368e7eeadb86fc9fb165b797b29534eb68da586167b2548be",
+          "reason": "Add pure integer-pesewa programme terms, reward budget and merchant loyalty reporting calculations for the new private server model.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        },
+        "merchant/handler.mjs": {
+          "change": "modified",
+          "beforeSha256": "d6400709ece14e46846d7aeec9276d9aac90cfa14163ba371b8b8a43289d8a69",
+          "afterSha256": "b3bc010a908de2b12441bd2ecba6f6e6dee07238f19b7976e75ac8f095fc3551",
+          "reason": "Expose only the authenticated merchant loyalty route through the existing shared-account and paired-counter boundary.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        },
+        "merchant/server/api.js": {
+          "change": "modified",
+          "beforeSha256": "293b0b578b4b8634890a70f4f45f20eabacb68f0044741d38bfbfcd0727f1be7",
+          "afterSha256": "6dc8dfd7dadc97b0debba568e9617261ad615028c2b96ab549bbcddc02d490bf",
+          "reason": "Reconcile trusted payments and refunds, atomically prepare immutable net payment requests with held rewards, fence counter operators, and canonically invalidate expired requests before releasing a voucher. Add a public feature readiness marker.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        },
+        "merchant/server/loyalty.js": {
+          "change": "added",
+          "beforeSha256": null,
+          "afterSha256": "c4547004d85a3b69370f8cddee62faa2f15d765f2fdd4c3bd5b677001e8d3f0c",
+          "reason": "Add merchant-owned programme rules, consented membership, scoped access, immutable progress/reward history, server-authoritative redemption holds, refund adjustment and idempotent mutation receipts.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        },
+        "merchant/server/network.js": {
+          "change": "modified",
+          "beforeSha256": "02029904ae3441bfc3caa6c53cb5353f633c172cad4a86720ffe9243b5a277d4",
+          "afterSha256": "b61e2eeb533de034b0467be8465378655a9957b60c7ef5c1b612e3c994876a0e",
+          "reason": "Strip raw loyalty contacts, consent, member and ledger internals from every ordinary scoped business snapshot; dedicated role projection supplies the authorized view.",
+          "tests": [
+            "tests/approved-merchant-loyalty.test.mjs"
+          ]
+        }
+      },
+      "behaviorChecks": "6 actual canonical merchant API and 6 actual approved Edge-wrapper tests passed, including lost response replay, concurrent voucher use, cached QR cancellation, expired request cancellation, canonical paid-during-cancel ledgerStamp races, refund proof and balance, and counter handover privacy."
     }
   ]
 }

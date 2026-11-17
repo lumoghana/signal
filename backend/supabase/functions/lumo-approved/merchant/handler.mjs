@@ -4,8 +4,8 @@ import {APIError,emptyNetwork,hashToken,resolveSession,makePassword} from './ser
 const clone=value=>structuredClone(value);
 const PUBLIC_GET=/^\/api\/(?:health|directory|lookup|payments\/quote|invitations\/[^/]+)(?:\?|$)/;
 const ALIASES={'/api/login':'/api/auth/login','/api/logout':'/api/auth/logout','/api/business':'/api/session','/api/password':'/api/auth/password','/api/recovery/start':'/api/auth/recovery/start','/api/recovery/complete':'/api/auth/recovery/complete','/api/auth/username/recover':'/api/auth/username','/api/ownership/transfer':'/api/auth/transfer','/api/step-up':'/api/auth/step-up','/api/auth/phone/change':'/api/auth/phone'};
-const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter(?:\/receipts)?|case-inbox|payment-links|business-plan|invitations\/[A-Za-z0-9_-]+)$/;
-const POST_ROUTE=/^\/api\/(?:signup|action|case-inbox|payment-links|business-plan|counter\/(?:setup|pin|unlock|lock|revoke)|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
+const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter(?:\/receipts)?|case-inbox|payment-links|business-plan|loyalty|invitations\/[A-Za-z0-9_-]+)$/;
+const POST_ROUTE=/^\/api\/(?:signup|action|case-inbox|payment-links|business-plan|loyalty|counter\/(?:setup|pin|unlock|lock|revoke)|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
 export function normalizeMerchantPath(value){
  const raw=String(value||'');if(raw.length>3000||!raw.startsWith('/api/')||raw.includes('#'))return null;
  const index=raw.indexOf('?'),rawPath=index<0?raw:raw.slice(0,index),query=index<0?'':raw.slice(index);

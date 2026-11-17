@@ -1,4 +1,5 @@
 import {mutateBusinessPlan,prepareImportedBusinessPlan} from './planning.js';
+import {mutateLoyalty,reconcileLoyalty,loyaltyProjection,bindLoyaltyCollection,releaseLoyaltyCollection} from './loyalty.js';
 import {counterAction,publicCounter,counterScope,cashierRoster,lockedCounterState,counterReceiptPage} from './counter.js';
 import {createBusiness,reduceBusiness,metricsFor,applyAutomaticClosings} from '../dist/domain.js';
 import {APIError,readNetwork,updateNetwork,uid,iso,randomToken,hashToken,makePassword,matchesPassword,validatePassword,username,text,phone,publicUser,audit,rateLimit,cookieToken,sessionCookie,clearCookie,resolveSession,publicSession,requireSession,revokeSessions,newSession,assigned,validateShops,projectUsers,scopedBusiness,publicShop,publicInvitation,walletInfo} from './network.js';
@@ -205,6 +206,50 @@ function actorFor(n,c,b,shopId){
  if(c.user.role==='owner')return {role:'owner',...context};
  assigned(n,c.user,shopId);return {role:c.user.role,...context,shopId,staffId};
 }
+// Loyalty operates on merchant-scoped records, never a payer display name or a
+// browser-calculated discount. A paired phone must name its current operator.
+function loyaltyContext(n,tokenHash,values={},method='GET',operation=''){
+ const c=requireSession(n,tokenHash),b=n.businesses[c.user.businessId];
+ if(!b||!['owner','manager','cashier'].includes(c.user.role))throw new APIError('Sign in to this merchant business before opening loyalty.',403,'LOYALTY_FORBIDDEN');
+ const input={...values};
+ if(c.counter&&method==='POST'&&!['enrollMember','attachPayment','attachRequest','prepareCollection','fulfilItem'].includes(operation))throw new APIError('Counter access does not include programme management or loyalty adjustments.',403,'LOYALTY_FORBIDDEN');
+ if(c.counter){
+  const staffId='access-'+c.user.id,shift=b.shifts.find(s=>s.shopId===c.counter.shopId&&s.staffId===staffId&&s.status==='open');
+  const staff=method==='GET'?input.staffId:input.counterStaffId;
+  const shiftId=method==='GET'?input.shiftId:input.counterShiftId;
+  if(input.shopId!==c.counter.shopId||staff!==staffId||(shiftId||null)!==(shift?.id||null)||method==='GET'&&input.counterId!==c.counter.id)throw new APIError('The counter or cashier changed. Reopen loyalty from the current counter.',409,'COUNTER_OPERATOR_CHANGED');
+  c.counterShiftId=shift?.id||null;
+  delete input.counterStaffId;delete input.counterShiftId;delete input.counterId;delete input.staffId;delete input.shiftId;
+ }
+ if(input.shopId)assigned(n,c.user,input.shopId);
+ if(c.counter&&['attachPayment','attachRequest'].includes(operation)){
+  const isRequest=operation==='attachRequest',row=(isRequest?b.requests:b.transactions).find(r=>r.id===(isRequest?input.requestId:input.transactionId));
+  const at=Date.parse(row?.confirmedAt||row?.createdAt||'');
+  const sharedReceipt=!isRequest&&!row?.counterId&&row?.status==='paid'&&(!row?.requestId||row?.attribution==='shop'||row?.source==='guest-momo')&&Number.isFinite(at)&&at>=Date.now()-86400000&&at<=Date.now()+30000;
+  if(!row||row.shopId!==c.counter.shopId||row.counterId!==c.counter.id&&!sharedReceipt)throw new APIError('Choose a payment collected by this counter or a recent shared shop receipt.',403,'COUNTER_SCOPE');
+ }
+ return {c,b,input};
+}
+// An expired QR must be invalidated in the same canonical commit that frees its
+// reward. Merely comparing the hold's timestamp could reissue a still-payable QR.
+function reconcileMerchantLoyalty(b,{now=Date.now()}={}){
+ if(!b.loyalty)return false;let cancelled=false;
+ for(const collection of b.loyalty.collections||[]){
+  if(collection.state!=='held'||!collection.requestId)continue;
+  const request=b.requests.find(r=>r.id===collection.requestId);
+  if(request?.status==='open'&&Number.isFinite(Date.parse(request.expiresAt))&&Date.parse(request.expiresAt)<=now&&!b.transactions.some(t=>t.requestId===request.id&&['paid','processing'].includes(t.status))){
+   request.status='cancelled';request.cancellationReason='loyalty-expired';cancelled=true;
+  }
+ }
+ return reconcileLoyalty(b,{now})||cancelled;
+}
+function loyaltyRequestResult(b,result){
+ const collection=result.entity;
+ if(!collection?.requestId)return result;
+ const request=b.requests.find(r=>r.id===collection.requestId);
+ if(!request)throw new APIError('The original loyalty collection is unavailable. Ask the owner to review it before trying again.',409,'LOYALTY_COLLECTION_UNAVAILABLE');
+ return {...result,entity:{...copy(request),collectionId:collection.collectionId||collection.id,memberId:collection.memberId,grossAmount:collection.grossAmount,discount:collection.discount}};
+}
 function stepUp(c,proof,purpose,proofHash){
  if(!proof||c.session.stepUpHash!==proofHash||Date.parse(c.session.stepUpExpiresAt||0)<=Date.now()||![purpose,'owner-action'].includes(c.session.stepUpPurpose))throw new APIError('Confirm your current password before completing this owner action.',403,'STEP_UP_REQUIRED');
  c.session.stepUpHash=null;c.session.stepUpExpiresAt=null;
@@ -243,7 +288,33 @@ export async function handleAPI(request,env){
    const key=await hashToken(ip+':'+path);await updateNetwork(env,n=>{rateLimit(n,'request:'+key,path==='/api/signup'||path==='/api/migrate'?10:20,60000);return {}});
   }
   const activeContext=resolveSession((await readNetwork(env)).state,tokenHash);
-  if(activeContext?.counter&&!['/api/session','/api/business','/api/logout','/api/auth/logout','/api/counter','/api/counter/receipts','/api/counter/unlock','/api/counter/lock','/api/action','/api/devices','/api/health'].includes(path)&&!/^\/api\/devices\/[^/]+$/.test(path))throw new APIError('This phone is restricted to cashier collections. Sign in separately for business management.',403,'COUNTER_ONLY');
+  if(activeContext?.counter&&!['/api/session','/api/business','/api/logout','/api/auth/logout','/api/counter','/api/counter/receipts','/api/counter/unlock','/api/counter/lock','/api/action','/api/devices','/api/health','/api/loyalty'].includes(path)&&!/^\/api\/devices\/[^/]+$/.test(path))throw new APIError('This phone is restricted to cashier collections. Sign in separately for business management.',403,'COUNTER_ONLY');
+  if(path==='/api/loyalty'&&method==='GET'){
+   if([...url.searchParams.keys()].some(key=>url.searchParams.getAll(key).length!==1)||Object.keys(p).some(key=>!['shopId','memberId','query','code','mutationId','counterId','staffId','shiftId'].includes(key)))throw new APIError('Use one loyalty shop, member or search value at a time.',400,'INVALID_LOYALTY_QUERY');
+   const out=await updateNetwork(env,n=>{
+    const {c,b,input}=loyaltyContext(n,tokenHash,p),changed=reconcileMerchantLoyalty(b,{now:Date.now()});
+    return {unchanged:!changed,data:{...bundle(n,tokenHash,studentHash),loyalty:loyaltyProjection(b,c,{...input,now:Date.now()})}};
+   });return response({...out.data,revision:out.revision});
+  }
+  if(path==='/api/loyalty'&&method==='POST'){
+   if(Object.keys(p).some(key=>!['operation','payload','mutationId','expectedRevision'].includes(key))||!p.payload||typeof p.payload!=='object'||Array.isArray(p.payload))throw new APIError('Choose a loyalty action and its details.',400,'INVALID_LOYALTY_ACTION');
+   const out=await updateNetwork(env,n=>{
+    const {c,b,input}=loyaltyContext(n,tokenHash,p.payload,'POST',p.operation),reconciled=reconcileMerchantLoyalty(b,{now:Date.now()});projectUsers(n,b);
+    let result=mutateLoyalty(n,c,{...p,payload:input},{now:Date.now()});
+    if(p.operation==='prepareCollection'&&!result.entity?.requestId){
+     const prepared=result.entity;if(!prepared||!Number.isSafeInteger(prepared.amount)||prepared.amount<=0||prepared.amount>1000000)throw new APIError('Loyalty collections must leave a payment from GH₵0.01 to GH₵10,000. Use item fulfilment for a free-item reward.',400,'INVALID_LOYALTY_COLLECTION');
+     const change=reduceBusiness(b,'CREATE_REQUEST',{shopId:prepared.shopId,amount:prepared.amount,description:prepared.description,attemptId:'loyalty-'+prepared.collectionId},actorFor(n,c,b,prepared.shopId));
+     if(!change.entity)throw new APIError('The collection could not be created. No reward was used.',409,'LOYALTY_COLLECTION_UNAVAILABLE');
+     // The approved shared ledger uses UUID request ids; the isolated sample
+     // store retains its original identifiers. Net amounts stay immutable.
+     if(env.approvedStore&&change.changed){const old=change.entity.id;change.entity.id=crypto.randomUUID();change.state.requests.find(r=>r.id===old).id=change.entity.id;}
+     if(c.counter){change.entity.counterId=c.counter.id;change.state.requests.find(r=>r.id===change.entity.id).counterId=c.counter.id;}
+     n.businesses[b.business.id]=change.state;bindLoyaltyCollection(change.state,change.entity,prepared);result=loyaltyRequestResult(change.state,{...result,entity:{...prepared,requestId:change.entity.id}});
+    }else if(p.operation==='prepareCollection')result=loyaltyRequestResult(b,result);
+    const current=n.businesses[b.business.id];c.session.lastSeen=iso();
+    return {...(result.unchanged&&!reconciled?{unchanged:true}:{}),data:{...bundle(n,tokenHash,studentHash,result),loyalty:loyaltyProjection(current,c,{shopId:input.shopId,memberId:input.memberId||result.entity?.memberId||result.entity?.id,now:Date.now()})}};
+   });return response({...out.data,revision:out.revision});
+  }
   if(path==='/api/business-plan'&&method==='GET'){
    const {state:n,revision}=await readNetwork(env),c=requireSession(n,tokenHash);
    if(c.counter||!['owner','manager'].includes(c.user.role))throw new APIError('Cashier access does not include business planning.',403,'PLANNING_FORBIDDEN');
@@ -268,11 +339,11 @@ export async function handleAPI(request,env){
    if(out.data.counterError){const error=out.data.counterError;return response({error:error.error,code:error.code,revision:out.revision},error.status);}
    return response({...out.data,revision:out.revision});
   }
-  if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,storage:'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
+  if(path==='/api/health'){const current=await readNetwork(env);return response({ok:true,shared:true,version:9,features:{merchantLoyalty:'1.0.0'},storage:env.approvedStore?'Supabase private merchant records and canonical ledger':'D1 isolated record shards with atomic batches',revision:current.revision,limits:{merchantHistoryBytes:1500000,notForRealMoney:true}})}
   if(method==='GET'&&['/api/session','/api/business'].includes(path)){
    const out=await updateNetwork(env,n=>{
     const c=resolveSession(n,tokenHash);let changed=false;
-    if(c){const b=n.businesses[c.user.businessId];if(b){if(ensureTestAcceptanceTokens(b))changed=true;const auto=applyAutomaticClosings(b,iso());if(auto.changed){n.businesses[c.user.businessId]=auto.state;changed=true}projectUsers(n,n.businesses[c.user.businessId])}}
+    if(c){const b=n.businesses[c.user.businessId];if(b){if(ensureTestAcceptanceTokens(b))changed=true;const auto=applyAutomaticClosings(b,iso());if(auto.changed){n.businesses[c.user.businessId]=auto.state;changed=true}if(reconcileMerchantLoyalty(n.businesses[c.user.businessId],{now:Date.now()}))changed=true;projectUsers(n,n.businesses[c.user.businessId])}}
     if(path==='/api/business'&&!c)throw new APIError('Sign in to open your business.',401,'SIGN_IN_REQUIRED');
     return {unchanged:!changed,data:bundle(n,tokenHash,studentHash)};
    });return response({...out.data,revision:out.revision});
@@ -525,7 +596,7 @@ if(method==='POST'&&path==='/api/signup'){
     if(type==='ADD_SHOP'){change.entity.code='LUM'+(++n.counters.shop);const sh=change.state.shops.find(s=>s.id===change.entity.id);sh.code=change.entity.code;sh.testAcceptanceToken=randomToken();change.entity.testAcceptanceToken=sh.testAcceptanceToken;c.user.shopIds=change.state.shops.map(s=>s.id)}
     if(refundKey)n.refundAttempts[refundKey]={businessId:b.business.id,userId:c.user.id,refundId:change.entity.id,fingerprint:refundHash,createdAt:iso()};
     if(settlementKey)n.settlementAttempts[settlementKey]={businessId:b.business.id,userId:c.user.id,settlementId:change.entity.id,amount:change.entity.amount,destination:change.entity.destination,createdAt:iso()};
-    refundWallets(n,change.state,prior);projectUsers(n,change.state);n.businesses[b.business.id]=change.state;
+    refundWallets(n,change.state,prior);if(type==='CANCEL_REQUEST'&&change.entity.status==='cancelled')releaseLoyaltyCollection(change.state,change.entity.id,{now:Date.now()});reconcileMerchantLoyalty(change.state,{now:Date.now()});projectUsers(n,change.state);n.businesses[b.business.id]=change.state;
     c.session.lastSeen=iso();return {data:bundle(n,tokenHash,studentHash,{entity:copy(change.entity),changed:change.changed})};
    });return response({...out.data,revision:out.revision});
   }

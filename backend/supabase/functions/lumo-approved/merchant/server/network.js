@@ -242,7 +242,7 @@ export function cashierTicket(ticket){
  return value;
 }
 export function scopedBusiness(b,u){
- const c=clone(b);delete c.counterDevices;delete c.businessPlan;delete c.businessPlanAccess;delete c.businessPlanSummary;delete c.businessPlanDebits;Object.assign(c,businessPlanProjection(b,u));if(u.role==='owner')return c;
+ const c=clone(b);delete c.counterDevices;delete c.loyalty;delete c.businessPlan;delete c.businessPlanAccess;delete c.businessPlanSummary;delete c.businessPlanDebits;Object.assign(c,businessPlanProjection(b,u));if(u.role==='owner')return c;
  const allowed=new Set(u.shopIds);
  c.shops=c.shops.filter(s=>allowed.has(s.id));
  for(const key of ['transactions','requests','closings','refunds','tickets','shifts','reconciliations'])c[key]=(c[key]||[]).filter(x=>allowed.has(x.shopId));

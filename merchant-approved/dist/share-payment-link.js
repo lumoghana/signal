@@ -100,7 +100,7 @@ export function createPaymentLinkSharing(config={}) {
    if(created.shopId!==pending.shopId||pending.requestId&&created.requestId!==pending.requestId||Number.isSafeInteger(pending.amount)&&created.amount!==pending.amount||created.currency&&created.currency!=='GHS')throw Error('The returned link does not match the selected shop or amount. Retrieve the original request.');
    const checkout=publicCheckoutURL(created.url);if(created.publicToken&&new URL(checkout).searchParams.get('link')!==created.publicToken)throw Error('The returned checkout reference did not match. Retrieve the original request.');
    link={...created,url:checkout};pending=null;savePending();message=paymentShareMessage(link);
-  }catch(failure){if(epoch===generation&&current()){error=failure.message||'The link could not be confirmed. Retrieve the same request when connected.';if([400,403,404,422].includes(failure.status)){pending=null;savePending()}}}
+  }catch(failure){if(epoch===generation&&current()){error=failure.message||'The link could not be confirmed. Retrieve the same request when connected.';if(failure.definitiveNoMutation||[400,403,404,422].includes(failure.status)){pending=null;savePending()}}}
   finally{if(epoch===generation&&current()){busy=false;redraw()}}
  }
  function change(element) {
