@@ -234,3 +234,15 @@ test('browser-only sample help history remains available without inventing a ser
  const f=fixture({tickets:[{id:'sample-help',shopId:'shop-a',createdByStaffId:'a',counterId:null,subject:'Sample phone help',message:'Check this phone.',status:'open',createdAt:new Date().toISOString()}]});f.config.isSample=()=>true;
  const view=createCashier(f.config);await click(view,'help-requests');assert.match(view.render(),/sample-help|Sample phone help/);assert.equal(f.saved.size,0);
 });
+
+test('personal cashier accounts can manage their own recovery but dedicated counters cannot',async()=>{
+ const f=fixture();let opened=0;f.setCounter(null);
+ const personal=createCashier({...f.config,onRecoverySettings:()=>opened++});await click(personal,'menu');
+ assert.match(personal.render(),/Password recovery/);await click(personal,'recovery-settings');assert.equal(opened,1);
+ f.setCounter({id:'counter-a',mode:'dedicated',staffId:'a',locked:false});
+ const paired=createCashier({...f.config,onRecoverySettings:()=>opened++});await click(paired,'menu');
+ assert.doesNotMatch(paired.render(),/data-action="cashier-recovery-settings"/);assert.match(paired.render(),/sign in to your own account/);
+ await click(paired,'recovery-settings');assert.equal(opened,1);
+ f.setCounter({...f.config.getCounter(),locked:true});await click(paired,'recovery-settings');assert.equal(opened,1);
+ f.setCounter(null);const sample=createCashier({...f.config,isSample:()=>true,onRecoverySettings:()=>opened++});await click(sample,'menu');assert.doesNotMatch(sample.render(),/data-action="cashier-recovery-settings"/);await click(sample,'recovery-settings');assert.equal(opened,1);
+});

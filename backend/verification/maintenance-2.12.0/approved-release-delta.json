@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "version": "2.12.0",
+  "baselineFunctionVersion": 18,
+  "baselineManifest": "approved18-baseline-sha256.json",
+  "entrypoint": "index.ts",
+  "scope": "Prepared isolated record-only endpoint dependencies only. Main lumo-approved remains byte-exact live18. No schema, ledger or unrelated partner/merchant changes.",
+  "files": {
+    "domain/model.js": "83d55619ce81ba881f9fff895d4c4c83eb24052962b0bced1cacec7c5b638725",
+    "domain/money-maintenance-model.js": "7fb92d499b8175fe58ddd2a48596831bf1132bf6dd1d4c9f369fa4eea8d9fcc3",
+    "engine.mjs": "67de487f788faafc6e81d8e17d78dba39a4b297cf20a4411467958696f070d85",
+    "handler.mjs": "28d53d2321015cbcde3ff72cbb5a25cba666466ef4b674bc0115265e5abe9bb1"
+  },
+  "webMirrors": {
+    "domain/model.js": "dist/js/model.js",
+    "domain/money-maintenance-model.js": "dist/js/money-maintenance-model.js"
+  },
+  "addedFiles": [
+    "domain/money-maintenance-model.js"
+  ],
+  "excludedUnimportedCandidateFiles": [
+    "domain/partner-code.js"
+  ],
+  "deltaTarget": "lumo-maintenance/approved"
+}

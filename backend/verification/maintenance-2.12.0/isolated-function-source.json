@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "release": "2.12.0",
+  "function": "lumo-maintenance",
+  "status": "prepared-not-deployed",
+  "entrypoint": "index.ts",
+  "verifyJwt": false,
+  "scope": "Separate record-only endpoint. The existing lumo-approved function remains version18 and is not replaced.",
+  "wire": {
+    "requiredKeys": [
+      "action",
+      "type",
+      "payload",
+      "attemptId"
+    ],
+    "actions": [
+      "action",
+      "recover"
+    ],
+    "types": [
+      "externalMovement",
+      "confirmExternalBalance",
+      "saveCommitment",
+      "reuseEssentialPlan",
+      "setEssentialRecurring",
+      "setMaintenancePreferences",
+      "completeMoneyCheck"
+    ],
+    "recover": "Read-only lookup of the signed-in owner original attempt using the identical type,payload and attemptId.",
+    "additionalKeysAllowed": false,
+    "pinOrDeviceProofAllowed": false
+  },
+  "browserOrigins": [
+    "https://lumo-connected-pilot.vercel.app",
+    "https://lumo-new-experience.oness15.chatgpt.site"
+  ],
+  "nativeNoOrigin": "Allowed only through the existing verified Auth user/session checks.",
+  "newSecretsOrSchema": false,
+  "dependencyFiles": 29,
+  "totalSourceFiles": 31,
+  "files": {
+    "approved/availability.mjs": "b8561860b3b7688145c695d85c6400df7d30c846bd993ab6bc87c9d5db1ff909",
+    "approved/domain/account-model.js": "da1951589cea4dd0bd95938aeead39e99dc94ec0f1ede0d117b8db4981a2e4e5",
+    "approved/domain/box-partner-invitation.js": "f3678e36dd418d342e0d1a21033bac50ff4bfa2e14edb07033f602b381d8d404",
+    "approved/domain/box-protection.js": "943faee52c113301a087ad478cbf1438faef856e1d44a3efb1139338f41def78",
+    "approved/domain/device-auth.js": "90b71b0160f4e0f27a3be1cede9fb6b2f5f208c74427bd04e01e1afd5cd2f9d9",
+    "approved/domain/funding-phone.js": "ed086f3b25fd0335dec2c119e008c5d2453006549e6f44a42e28f0dfc8fcc5fa",
+    "approved/domain/group-chat-model.js": "cbc61226a1001192d10ad671c2409b70295cc78a446a5f829eb6458247e018e1",
+    "approved/domain/group-ledger.js": "e999f05a44d5c7fd8d129c64c6bb9e494010962edd5bea96b45db24eadce4f1a",
+    "approved/domain/group-policy.js": "8d5e302e9d214df198b65444009251c4e4bda32aa28c6072eb4e0c0cac08db9c",
+    "approved/domain/learning-content.js": "0b1c426921e6561661b7589c28e6ba01263e0e4d2b412b1b1648f6a7f87cb017",
+    "approved/domain/learning-game-content.js": "2e2df323ad4f3ec6786a82e4f2c6c6b16f84974ec73ae40a454f7a198deeedb6",
+    "approved/domain/learning-game-model.js": "fdf9fd92082515acd28cc1b8578f2e8b0b28d0bcae21ab9bd5bb75b29f6118b5",
+    "approved/domain/learning-model.js": "dc18f0413d35b4c927a2947f4b39542bd324c1936d968b203dea438de7d46e11",
+    "approved/domain/login-credentials.js": "e73492ae25a2b2c386431e722e05a1fc4a419217588251f33f6ed26202b5638d",
+    "approved/domain/model.js": "83d55619ce81ba881f9fff895d4c4c83eb24052962b0bced1cacec7c5b638725",
+    "approved/domain/money-iq-model.js": "1b4dd7e0dc100f22b66e7cba9f7c758e31b8705738763392f89970f3f91acca6",
+    "approved/domain/money-maintenance-model.js": "7fb92d499b8175fe58ddd2a48596831bf1132bf6dd1d4c9f369fa4eea8d9fcc3",
+    "approved/domain/pause-history.js": "48a4765d5a53d18453e517d3e25fecab044b2b43fc0da219b771b5a8a350b478",
+    "approved/domain/payment-catalog.js": "4f5a1a3b2c8c59b9b78ca791efed1e9e93a7ccd5ebd0ca47d4029b403cd6e3b4",
+    "approved/domain/payments-parity-model.js": "e6c13e2e5f2512cacefae8ec5a60066ae76242a6445922341f571567a51703bf",
+    "approved/domain/recipient-lookup.js": "8eebea5430490480bfd8b1ce4585650877d32be6f4f27f7afd6f420da670dbff",
+    "approved/domain/savings-parity-model.js": "1e90e73b49a7d796c6a09b24d3590055d70b4eeb4d576a5587b9314b8675e83d",
+    "approved/domain/ui.js": "1578621c39c5a82be5b9bb79ad1f3212ace55447dd98939a631d407d8238db13",
+    "approved/engine.mjs": "67de487f788faafc6e81d8e17d78dba39a4b297cf20a4411467958696f070d85",
+    "approved/external-transfer.mjs": "162c0593bcc5a43ac223bead9119eed23a7b6f80c790af1864d346642e6d38a7",
+    "approved/guest-checkout.mjs": "ed52af63ae740309765dd6c3a0694fe2bc230ea54f0e43af00fc16a12015377e",
+    "approved/guest-payer-lookup.mjs": "c7a0492cb4fca967a1366c6632293434826e136cca44a922959bc62da3087e0f",
+    "approved/handler.mjs": "28d53d2321015cbcde3ff72cbb5a25cba666466ef4b674bc0115265e5abe9bb1",
+    "approved/partners.mjs": "9d665298333d88dc30dc9ac47e21ccd9253ce7ce408c5d4fe6edbd5f10055e98",
+    "handler.mjs": "5dc85c293c790a0ef1a03a234158c5213a86486011f153ac9e6f739323468aef",
+    "index.ts": "7562d8b5a410153a3f0177ed01a179e6cc118f70a4b32fca348f8dc945fb951c"
+  },
+  "validation": {
+    "wrapperTestsPassed": 6,
+    "wrapperTestsFailed": 0,
+    "financialAuthMerchantAdminRoutesBlockedBeforeUpstream": true,
+    "ledgerIntentsForAllowedWrites": 0,
+    "originalGatewayModifiedByStandaloneWork": false
+  }
+}

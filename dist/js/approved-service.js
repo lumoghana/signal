@@ -225,7 +225,7 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
       if(publicOperations.has(operation)&&options.authenticated===true)return failure('Use the private recovery request for that step.','INVALID_INPUT');
       const authenticated=protectedOperations.has(operation)||operation==='status'&&options.authenticated===true;
       const owner=currentOwner(),epoch=authEpoch,scope=recoveryScope();
-      const valid=()=>scope!==null&&authEpoch===epoch&&recoveryScope()===scope&&(!authenticated||!sample&&currentOwner()===owner);
+      const valid=()=>syncAuth()&&scope!==null&&authEpoch===epoch&&recoveryScope()===scope&&(!authenticated||!sample&&currentOwner()===owner);
       if(authenticated&&(!owner||!session?.access_token||sample))return failure('Sign in before updating recovery options.','AUTH_REQUIRED');
       if(authenticated&&session.expires_at&&session.expires_at*1000<Date.now()+45000&&!await refreshSession(owner,epoch))return failure('Sign in again before updating recovery options.','AUTH_REQUIRED');
       if(!valid())return accountChanged();

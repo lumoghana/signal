@@ -72,7 +72,7 @@ export function createAccess(config={}){
  function settleStepUp(value=null){const resolve=stepUpResolve;stepUpResolve=null;stepUp=null;resolve?.(value)}
  function business(){return config.business?.()||{}}
  function session(){try{return auth.getSession?.()||null}catch{return null}}
- function recoveryRequired(){const current=session();return Boolean(current&&(current.recoveryKeyPending||auth.getRecoveryKey?.()||auth.getRecoveryKeyNotice?.(current)||auth.getInvitationRecoveryNotice?.(current)))}
+ function recoveryRequired(){if(centralAvailable())return false;const current=session();return Boolean(current&&(current.recoveryKeyPending||auth.getRecoveryKey?.()||auth.getRecoveryKeyNotice?.(current)||auth.getInvitationRecoveryNotice?.(current)))}
  function enforceRecoveryCheckpoint(){
   if(!recoveryRequired()){if(!session()){recoveryKey='';recoveryKeyReference='';recoveryIdentity='';if(['recovery-key','regenerate-key'].includes(view)){view='login';phase='username';busy=false;}}return false;}
   const current=session(),identity=[current?.businessId,current?.userId,current?.id].join(':'),key=String(auth.getRecoveryKey?.()||'');
@@ -86,6 +86,7 @@ export function createAccess(config={}){
  function fail(message){busy=false;error=message||'Something went wrong. Please try again.';redraw()}
  function info(message){notice=message;error='';redraw()}
  function show(next='login',params={}){
+  if(centralAvailable()&&['recovery-key','regenerate-key'].includes(next)){next='recovery-settings';params={};}
   if(recoveryRequired()&&!['recovery-key','regenerate-key'].includes(next)){enforceRecoveryCheckpoint();redraw();return}
   disposeCentral();
   if(next!=='step-up')settleStepUp();invitationRequest++;
@@ -107,8 +108,9 @@ export function createAccess(config={}){
  }
  function hide(){if(enforceRecoveryCheckpoint()){redraw();return}disposeCentral();settleStepUp();active=false;error='';notice='';busy=false;recoveryCode='';redraw()}
  function backToApp(){if(enforceRecoveryCheckpoint()){redraw();return}disposeCentral();settleStepUp();active=false;error='';notice='';busy=false;if(config.onBack)config.onBack();else redraw()}
- async function finishInvitationAccess(value){
+ async function finishInvitationAccess(value,{setupRecovery=false}={}){
   await authenticated(value?.session||value);
+  if(centralAvailable()){if(setupRecovery&&session())show('recovery-settings');return;}
   const message=auth.getRecoveryKeyNotice?.(session())||auth.getInvitationRecoveryNotice?.(session())||((value?.keyUnavailable||value?.recoveryKeyAvailable===false)&&session()?'Your invitation request was recovered. Confirm your password to replace the private recovery key, then save the new key.':'');
   if(message&&!auth.getRecoveryKey?.())show('regenerate-key',{notice:message});
  }
@@ -216,7 +218,7 @@ export function createAccess(config={}){
  function phoneScreen(){
   const s=session();if(!s)return loginScreen();
   if(phase==='success')return `<div class="access-success-icon">${icon('check')}</div>`+heading('Account phone<br>updated.','Your account, shops and transaction history stay in place.')+'<p class="access-hint">This change is authorised with your password. No carrier or SMS verification has taken place.</p>'+button('Back to my account','back','primary full');
-  return heading('A new number.<br>The same account.','Confirm your current password before replacing your account phone number.')+form(field('Current account phone','oldPhone',s.phone||'Not set','readonly')+field('New mobile number','newPhone',phone,'required type="tel" inputmode="tel" autocomplete="tel" maxlength="22" autofocus placeholder="024 000 0000"')+accessPasswordField('Current password','currentPassword',{autocomplete:'current-password',placeholder:'Your current test password'})+`<p class="access-hint">${supports('passwordRecovery')?'No SMS service is connected. Updating the number does not verify ownership of the SIM. Your private recovery key remains necessary for account recovery.':'No SMS service is connected. Updating the number does not verify ownership of the SIM. Account recovery is not available yet; keep your current sign-in details safe.'}</p>`,'Update account phone',{back:{label:'My account',action:'back'}});
+  return heading('A new number.<br>The same account.','Confirm your current password before replacing your account phone number.')+form(field('Current account phone','oldPhone',s.phone||'Not set','readonly')+field('New mobile number','newPhone',phone,'required type="tel" inputmode="tel" autocomplete="tel" maxlength="22" autofocus placeholder="024 000 0000"')+accessPasswordField('Current password','currentPassword',{autocomplete:'current-password',placeholder:'Your current test password'})+`<p class="access-hint">${centralAvailable()?'Updating this number does not verify SIM ownership. Manage your saved face from Recovery options; no SMS recovery service is connected.':supports('passwordRecovery')?'No SMS service is connected. Updating the number does not verify ownership of the SIM. Your private recovery key remains necessary for account recovery.':'No SMS service is connected. Updating the number does not verify ownership of the SIM. Account recovery is not available yet; keep your current sign-in details safe.'}</p>`,'Update account phone',{back:{label:'My account',action:'back'}});
  }
  function regenerateKeyScreen(){
   const s=session();if(!s)return loginScreen();
@@ -283,7 +285,7 @@ export function createAccess(config={}){
     const pending=auth.getPendingInvitation?.();
     if(pending&&(pending.token!==token||pending.username.toLowerCase()!==usernameValue.toLowerCase())){fail('Use the original username @'+pending.username+' for this request.');return}
     const password=phase==='resume'?p.password:p.newPassword,invalid=validateAccessCredentials(usernameValue,password,phase==='resume'?undefined:p.confirmPassword);if(invalid){fail(invalid);return}
-    busy=true;redraw();const result=await auth.acceptInvitation({token,username:usernameValue,password});token='';await finishInvitationAccess(result);return;
+    busy=true;redraw();const result=await auth.acceptInvitation({token,username:usernameValue,password});token='';await finishInvitationAccess(result,{setupRecovery:true});return;
    }
    if(view==='secure'){
     if(!auth.canMigrateLegacyBusiness?.(business())){fail('This business is already shared. Sign in with its existing account.');return}
@@ -369,7 +371,7 @@ export function createAccess(config={}){
   if(a==='copy-recovery-key'){try{await navigator.clipboard.writeText(recoveryKey);info('Recovery key copied. Store it somewhere private.')}catch{info('Clipboard is unavailable. Use Show key, then save the key privately.')}return}
   if(a==='toggle-saved-key'){const input=document.querySelector('[name="savedRecoveryKey"]');if(input){const visible=input.type==='password';input.type=visible?'text':'password';element.textContent=visible?'Hide key':'Show key'}return}
   if(a==='resume-invitation'){const pending=auth.getPendingInvitation?.();show('invite',{token:pending?.token||token,username:pending?.username||username});return}
-  if(a==='invitation-sign-in'){const pending=auth.getPendingInvitation?.(),original=pending?.username||username;show('login',{username:original,notice:'Sign in with the username and password chosen for your invitation. If its recovery key was not saved, you will be guided to replace it.'});return}
+  if(a==='invitation-sign-in'){const pending=auth.getPendingInvitation?.(),original=pending?.username||username;show('login',{username:original,notice:centralAvailable()?'Sign in with the username and password chosen for your invitation. You can save your face for password recovery after signing in.':'Sign in with the username and password chosen for your invitation. If its recovery key was not saved, you will be guided to replace it.'});return}
   if(a==='signup'){disposeCentral();active=false;config.onSignup?.();return}
   if(a==='demo'){disposeCentral();active=false;config.onDemo?.();return}
   if(a==='back'||a==='cancel-step-up'){backToApp();return}

@@ -1,0 +1,480 @@
+--- a/backend/supabase/functions/lumo-approved/domain/box-partner-invitation.js
++++ b/backend/supabase/functions/lumo-approved/domain/box-partner-invitation.js
+@@ -1,5 +1,6 @@
+ /** Pre-creation partner confirmation. Codes and partner responses are local simulations. */
+ import {validatePartnerDetails} from './box-protection.js';
++import {normalizePartnerCode} from './partner-code.js';
+ 
+ export const BOX_PARTNER_INVITATION_ACTIONS = new Set(['sendBoxPartnerInvitation','respondBoxPartnerInitialInvitation','verifyBoxPartnerInvitation']);
+ export const PARTNER_CODE_LIFETIME = 5 * 60 * 1000;
+@@ -116,7 +117,7 @@
+   if(currentStatus(invitation)==='expired')return expire(invitation);
+   if(invitation.status==='verified')return good('Partner already confirmed. Your Money Box can now be created.',{verified:true,invitationId:invitation.id,view:publicView(invitation),duplicate:true});
+   if(invitation.status!=='accepted'||!invitation.acceptedAt)return fail('Your partner needs to accept the role before sharing their code.');
+-  if(typeof p.code!=='string'||!/^\d{6}$/.test(p.code)||p.code!==invitation.code){
++  if(!normalizePartnerCode(p.code)||normalizePartnerCode(p.code)!==invitation.code){
+     invitation.attempts+=1;if(invitation.attempts>=5){invitation.status='locked';delete invitation.code;}
+     return fail(invitation.status==='locked'?'Too many tries. Send a new partner code.':'That code does not match. Check the code your partner shared.',{persistFailure:true,invitationId:invitation.id,view:publicView(invitation)});
+   }
+
+--- a/backend/supabase/functions/lumo-approved/domain/box-protection.js
++++ b/backend/supabase/functions/lumo-approved/domain/box-protection.js
+@@ -1,3 +1,4 @@
++import {normalizePartnerCode} from './partner-code.js';
+ /** Local accountability-partner simulation. It never sends SMS or contacts support. */
+ const MAX_MONEY = 10000000000;
+ const CODE_LIFETIME = 10 * 60 * 1000;
+@@ -176,7 +177,7 @@
+   if (type === 'verifyBoxPartnerCode') {
+     if (request.status !== 'code-issued' || box.protection.status !== 'active') return fail('Ask your partner for a fresh code for this request.');
+     if (!fresh(request)) { request.status = 'expired'; delete request.code; audit(box, 'code-expired', { requestId: request.id }); return good('That code expired. Start a fresh request.', { requestId: request.id, authorized: false }); }
+-    if (typeof payload.code !== 'string' || !/^\d{6}$/.test(payload.code) || payload.code !== request.code) {
++    if (!normalizePartnerCode(payload.code) || normalizePartnerCode(payload.code) !== request.code) {
+       request.attempts += 1;
+       if (request.attempts >= 5) { request.status = 'locked'; delete request.code; audit(box, 'code-attempts-exhausted', { requestId: request.id }); }
+       return good(request.status === 'locked' ? 'Too many attempts. Start a fresh request.' : 'That code does not match. Check with your partner.', { requestId: request.id, authorized: false, attempts: request.attempts });
+
+--- a/backend/supabase/functions/lumo-approved/domain/partner-code.js
++++ b/backend/supabase/functions/lumo-approved/domain/partner-code.js
+@@ -0,0 +1,6 @@
++/** Accept common pasted formatting without guessing or changing any digit. */
++export function normalizePartnerCode(value){
++  if(typeof value!=='string'||value.length>32)return '';
++  const code=value.replace(/[\s-]/gu,'');
++  return /^[0-9]{6}$/.test(code)?code:'';
++}
+
+--- a/backend/supabase/functions/lumo-approved/engine.mjs
++++ b/backend/supabase/functions/lumo-approved/engine.mjs
+@@ -62,7 +62,8 @@
+ }
+ export function buildState(snapshot){
+  const state=snapshot.state?clone(snapshot.state):createEmptyState({name:snapshot.account.displayName,phone:snapshot.phone||''});
+- if(!snapshot.state){state.onboardingDone=true;state.accounts=[{id:'operational',type:'operational',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000001'},{id:'savings',type:'savings',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000002'}];}
++ if(!snapshot.state){state.buffer=0;state.onboardingDone=true;state.accounts=[{id:'operational',type:'operational',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000001'},{id:'savings',type:'savings',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000002'}];}
++ if(snapshot.onboarding){state.termsAcceptance=clone(snapshot.onboarding.termsAcceptance);state.verification=clone(snapshot.onboarding.verification);state.setupReceiptAt=snapshot.onboarding.receivedAt;}
+  state.wallet=snapshot.account.balance;state.settings||={};delete state.settings.pin;
+  state.account||={};state.account.signedOut=false;
+  state.profile.name=snapshot.account.displayName;state.profile.phone=snapshot.phone||state.profile.phone||'';
+@@ -235,9 +236,9 @@
+  else result=applyAction(state,type,{...p,idempotencyKey:attemptId});
+  if(!result.ok&&!result.persistFailure)return {ok:false,result,state:before};
+  if(type==='accountSupportCreate'&&result.case){
+-  for(const update of result.case.updates||[])if(update.kind==='system')update.text='Saved with your shared test account. No live support team has been contacted.';
+- }
+- if(type==='accountDeletionRequest'){result.message='Your deletion request is saved with your shared test account. No live support team has been contacted.';}
++  for(const update of result.case.updates||[])if(update.kind==='system')update.text='Saved with your shared test account for Lumo support to review. Updates appear in Support updates.';
++ }
++ if(type==='accountDeletionRequest'){result.message='Your deletion request is queued for review. Nothing has been deleted.';if(result.request)result.request.note='Queued for Lumo support review. Financial records remain unchanged until the review is complete.';}
+  if(type==='accountCancelDeletion')result.message='Your saved deletion request is cancelled.';
+  if(type==='reportGroupMessage'&&result.report){
+   const report={...clone(result.report),id:`group-report:${p.groupId||p.id}:${result.report.messageId}:${snapshot.account.userId}`,groupId:p.groupId||p.id,reporterId:snapshot.account.userId,status:'saved'};
+
+--- a/backend/supabase/functions/lumo-approved/handler.mjs
++++ b/backend/supabase/functions/lumo-approved/handler.mjs
+@@ -4,6 +4,7 @@
+ import {savingsAutomaticWork} from './domain/savings-parity-model.js';
+ import {partnerRespond,publicPartnerInbox} from './partners.mjs';
+ import {actionFingerprint,buildState,clone,envelope,prepareMutation,sha256,canonicalJson} from './engine.mjs';
++import {onboardingReceipt} from './onboarding-receipt.mjs';
+ const HANDLE=/^[a-z0-9][a-z0-9._-]{2,29}$/;
+ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+@@ -34,7 +35,7 @@
+  const bytes=new Uint8Array(size);let n=0;for(const part of parts){bytes.set(part,n);n+=part.byteLength;}
+  let body;try{body=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw failure('INVALID_INPUT');}if(!plain(body))throw failure('INVALID_INPUT');return body;
+ }
+-export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,merchantHandler=null,availabilityEnabled=false}={}){
++export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,merchantHandler=null,availabilityEnabled=false,onIdentified=null}={}){
+  const base=new URL(supabaseUrl);if(base.protocol!=='https:'||base.pathname!=='/'||!serviceRoleKey)throw Error('Invalid gateway configuration');
+  const origins=new Set(allowedOrigins);
+  async function upstream(path,body,{token=serviceRoleKey,method='POST',allowFailure=false}={}){
+@@ -81,7 +82,7 @@
+    try{return body.mode==='merchant'?{ok:true,session}:{...envelope(requireOk(await repo.service('load'))),session};}catch(error){await revoke(session);throw error;}
+   }
+   const displayName=typeof body.displayName==='string'?body.displayName.trim():'',registeredPhone=phone(body.phone);
+-  const isMerchant=body.mode==='merchant';let pin=body.pin;
++  const isMerchant=body.mode==='merchant',onboarding=isMerchant?undefined:onboardingReceipt(body.onboarding);let pin=body.pin;
+   if(isMerchant)pin=String(100000+cryptoApi.getRandomValues(new Uint32Array(1))[0]%900000);
+   if(!displayName||displayName.length>80||/[\p{Cc}<>]/u.test(displayName)||!isMerchant&&!/^0\d{9}$/.test(registeredPhone)||typeof pin!=='string'||!/^\d{4,6}$/.test(pin))throw failure('INVALID_INPUT');
+   const reservation=await bootstrap('register.reserve',{handle,ipHash});
+@@ -92,7 +93,7 @@
+   const session=await passwordSession(handle,password).catch(error=>{if(error.code==='CREDENTIALS_INCORRECT')throw failure('HANDLE_TAKEN',messages.HANDLE_TAKEN);throw error;}),identity=await identify(session.access_token),repo=repository(identity);
+   try{
+    await bootstrap('register.bind',{handle,registrationId:reservation.registrationId,userId:identity.userId});
+-   const snapshot=requireOk(await repo.service('provision',{handle,displayName,phone:registeredPhone||null,pin,mode:isMerchant?'merchant':'consumer'}));
++   const snapshot=requireOk(await repo.service('provision',{handle,displayName,phone:registeredPhone||null,pin,mode:isMerchant?'merchant':'consumer',...(onboarding?{onboarding}:{})}));
+    await bootstrap('register.complete',{handle,registrationId:reservation.registrationId,userId:identity.userId});
+    return isMerchant?{ok:true,session}:{...envelope(snapshot),session};
+   }catch(error){await revoke(session);if(error.code==='EXISTING_ACCOUNT')throw failure('HANDLE_TAKEN',messages.HANDLE_TAKEN);throw error;}
+@@ -120,6 +121,7 @@
+    const token=request.headers.get('authorization')?.match(/^Bearer (.+)$/i)?.[1];
+    if(body.action==='merchant'&&!token&&merchantHandler){merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity:null}));}
+    const identity=await identify(token),repo=repository(identity);
++   try{onIdentified?.(request,identity);}catch{}
+    if(body.action==='caseInbox')return respond(requireOk(await serviceRpc('lumo_case_inbox',{p_payload:{operation:body.operation||'list',page:body.page,pageSize:body.pageSize,notificationId:body.notificationId,caseId:body.caseId,audience:'consumer',actor:identity.userId,session:identity.sessionId}})));
+    if(body.action==='partnerInbox'){const loaded=requireOk(await repo.service('load'));return respond({ok:true,inbox:publicPartnerInbox(loaded.partners||[],identity.userId)});}
+    if(body.action==='partnerRespond')return respond(await partnerRespond({body,identity,repo}));
+
+--- a/backend/supabase/functions/lumo-approved/index.ts
++++ b/backend/supabase/functions/lumo-approved/index.ts
+@@ -3,5 +3,6 @@
+ import {withOperationEvents} from './operations.mjs';
+ const defaults=['https://lumo-connected-pilot.vercel.app','https://lumo-new-experience.oness15.chatgpt.site','https://lumo-merchant-mobile.oness15.chatgpt.site','https://lumo-merchant.vercel.app','http://127.0.0.1:4173'];
+ const supabaseUrl=Deno.env.get('SUPABASE_URL')||'',serviceRoleKey=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
+-const handler=createApprovedHandler({supabaseUrl,serviceRoleKey,merchantHandler:createMerchantHandler,availabilityEnabled:true,allowedOrigins:[...new Set([...defaults,...(Deno.env.get('LUMO_ALLOWED_ORIGINS')||'').split(',').map(s=>s.trim()).filter(Boolean)])]});
+-Deno.serve(withOperationEvents(handler,{supabaseUrl,serviceRoleKey}));
++const eventContexts=new WeakMap();
++const handler=createApprovedHandler({supabaseUrl,serviceRoleKey,merchantHandler:createMerchantHandler,availabilityEnabled:true,onIdentified:(request,identity)=>eventContexts.set(request,{actorId:identity.userId}),allowedOrigins:[...new Set([...defaults,...(Deno.env.get('LUMO_ALLOWED_ORIGINS')||'').split(',').map(s=>s.trim()).filter(Boolean)])]});
++Deno.serve(withOperationEvents(handler,{supabaseUrl,serviceRoleKey,contextFor:request=>eventContexts.get(request),readSampleRate:0.01,onEventLoss:event=>console.warn(JSON.stringify({event:'lumo_telemetry_loss',...event}))}));
+
+--- a/backend/supabase/functions/lumo-approved/merchant/dist/domain.js
++++ b/backend/supabase/functions/lumo-approved/merchant/dist/domain.js
+@@ -540,7 +540,7 @@
+         if (linkedTransaction && actor.role !== 'owner') shopAccess(next, actor, linkedTransaction.shopId);
+         if (linkedTransaction) paymentReference = linkedTransaction.reference;
+       }
+-      entity = { id: id('ticket'), subject: requireText(payload.subject, 'Subject', 100), message: requireText(payload.message, 'Message', 1500), transactionId: linkedTransaction?.id || paymentReference, paymentReference, shopId: linkedTransaction?.shopId || payload.shopId || null, status: 'open', createdAt: timestamp() };
++      entity = { id: id('ticket'), subject: requireText(payload.subject, 'Subject', 100), message: requireText(payload.message, 'Message', 1500), transactionId: linkedTransaction?.id || paymentReference, paymentReference, shopId: linkedTransaction?.shopId || payload.shopId || null, status: 'open', createdAt: timestamp(), createdByUserId: actor.userId || null, createdByStaffId: actor.staffId || null, createdByName: actor.name || next.staff.find(person => person.id === actor.staffId)?.name || (actor.role === 'owner' ? next.business.ownerName : 'Shop team'), createdByRole: actor.role, counterId: actor.counterId || null, shiftId: actor.shiftId || null };
+       next.tickets.unshift(entity);
+       break;
+     }
+
+--- a/backend/supabase/functions/lumo-approved/merchant/handler.mjs
++++ b/backend/supabase/functions/lumo-approved/merchant/handler.mjs
+@@ -4,7 +4,7 @@
+ const clone=value=>structuredClone(value);
+ const PUBLIC_GET=/^\/api\/(?:health|directory|lookup|payments\/quote|invitations\/[^/]+)(?:\?|$)/;
+ const ALIASES={'/api/login':'/api/auth/login','/api/logout':'/api/auth/logout','/api/business':'/api/session','/api/password':'/api/auth/password','/api/recovery/start':'/api/auth/recovery/start','/api/recovery/complete':'/api/auth/recovery/complete','/api/auth/username/recover':'/api/auth/username','/api/ownership/transfer':'/api/auth/transfer','/api/step-up':'/api/auth/step-up','/api/auth/phone/change':'/api/auth/phone'};
+-const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter|case-inbox|payment-links|business-plan|invitations\/[A-Za-z0-9_-]+)$/;
++const GET_ROUTE=/^\/api\/(?:health|session|directory|lookup|payments\/quote|devices|counter(?:\/receipts)?|case-inbox|payment-links|business-plan|invitations\/[A-Za-z0-9_-]+)$/;
+ const POST_ROUTE=/^\/api\/(?:signup|action|case-inbox|payment-links|business-plan|counter\/(?:setup|pin|unlock|lock|revoke)|auth\/(?:login|logout|step-up|phone|recovery-key(?:\/ack)?)|invitations(?:\/accept|\/[A-Za-z0-9_-]+\/(?:resend|revoke))?|users\/[A-Za-z0-9_-]+|sessions\/[A-Za-z0-9_-]+\/revoke|devices(?:\/[A-Za-z0-9_.-]+)?)$/;
+ export function normalizeMerchantPath(value){
+  const raw=String(value||'');if(raw.length>3000||!raw.startsWith('/api/')||raw.includes('#'))return null;
+@@ -152,7 +152,11 @@
+     if(!commerce?.ok)return {...failure(commerce?.code||'LINK_SERVICE_ERROR',commerce?.code==='SESSION_REVOKED'?401:commerce?.code==='FORBIDDEN'||commerce?.code==='COUNTER_LOCKED'?403:400),noMutation:true};
+     return {...commerce,status:200};
+    }
+-   const headers={'Accept':'application/json','Cookie':merchantToken?'lumo_session='+merchantToken:'','X-Lumo-Request':'1'};
++   // This is an internal rate-limit namespace, derived only from verified Auth
++   // or the capability checked by read(). Never accept a rate key from body.
++   // The Edge Auth boundary still applies its trusted-source login throttle.
++   const clientContext=identity?.userId?'shared-user:'+identity.userId:merchantToken?'merchant-capability:'+tokenHash:'public-read';
++   const headers={'Accept':'application/json','Cookie':merchantToken?'lumo_session='+merchantToken:'','X-Lumo-Request':'1','cf-connecting-ip':clientContext};
+    if(method==='POST')headers['Content-Type']='application/json';
+    const response=await handleAPI(new Request('https://merchant.lumo.internal'+path,{method,headers,...(method==='POST'?{body:JSON.stringify(input)}:{})}),{approvedStore:{read,update}});
+    if(!response)return failure('INVALID_REQUEST',404);
+
+--- a/backend/supabase/functions/lumo-approved/merchant/server/api.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/api.js
+@@ -1,5 +1,5 @@
+ import {mutateBusinessPlan,prepareImportedBusinessPlan} from './planning.js';
+-import {counterAction,publicCounter,counterScope,cashierRoster,lockedCounterState} from './counter.js';
++import {counterAction,publicCounter,counterScope,cashierRoster,lockedCounterState,counterReceiptPage} from './counter.js';
+ import {createBusiness,reduceBusiness,metricsFor,applyAutomaticClosings} from '../dist/domain.js';
+ import {APIError,readNetwork,updateNetwork,uid,iso,randomToken,hashToken,makePassword,matchesPassword,validatePassword,username,text,phone,publicUser,audit,rateLimit,cookieToken,sessionCookie,clearCookie,resolveSession,publicSession,requireSession,revokeSessions,newSession,assigned,validateShops,projectUsers,scopedBusiness,publicShop,publicInvitation,walletInfo} from './network.js';
+ const copy=x=>structuredClone(x);
+@@ -61,7 +61,7 @@
+  closings:'id shopId createdAt businessDay businessDate cutoff automatic zeroSales priorPeriodRefunds priorPeriodAllocations adjustmentNote periodStartedAt transactionIds refundIds gross refunds net count pending by',
+  refunds:'id transactionId shopId staffId shiftId amount status createdAt paidAt approvedAt decidedAt decidedBy priorPeriod reason payer by attemptId sourceStaffId sourceShiftId requestedStaffId requestedShiftId requestedBy performedBy performedRole performedUserId legacyPerformer tradingDay tradingCutoff',
+  settlements:'id amount fee createdAt status destination reference completedAt attemptId',
+- tickets:'id subject message transactionId paymentReference shopId status createdAt updatedAt responses resolvedAt',
++ tickets:'id subject message transactionId paymentReference shopId status createdAt updatedAt responses resolvedAt createdByUserId createdByStaffId createdByName createdByRole counterId shiftId',
+  shifts:'id shopId staffId staffName performedBy startedAt status transactionIds refundIds gross refunds net by endedAt note tradingDay tradingCutoff lateConfirmedCount',
+  reconciliations:'id source period createdAt by rows results matched unmatched duplicates mismatched mismatches unlisted exceptions statementTotal matchedTotal counts',
+  audit:'id type entityId by shopId createdAt description',
+@@ -133,6 +133,8 @@
+   for(const field of ['transactionIds','refundIds'])if(Array.isArray(item[field]))item[field]=item[field].map(remap);
+   if(kind==='closings'&&item.businessDate&&!item.businessDay)item.businessDay=item.businessDate;
+   if(kind==='reconciliations')for(const list of ['rows','results'])for(const row of item[list]||[])for(const field of ['paymentId','transactionId'])if(row[field])row[field]=remap(row[field]);
++  // Imported historical authors are not verified live account/counter identities.
++  if(kind==='tickets'){item.createdByUserId=null;item.createdByStaffId=item.createdByStaffId?remap(item.createdByStaffId):null;item.createdByRole='imported';item.counterId=null;}
+   delete item.studentWalletId;if(item.attemptId)item.attemptId=prefix+':'+item.attemptId;
+  }
+  for(const st of b.staff){st.active=false;delete st.authUserId}
+@@ -197,8 +199,11 @@
+ function quotePublic(n,q,w){return {business:{id:q.b.business.id,name:q.b.business.name,accountNumber:q.b.business.accountNumber,sandbox:true},shop:q.s?publicShop(q.b,q.s):null,shops:q.shopChoices||[],request:q.r?{id:q.r.id,amount:q.r.amount,description:q.r.description,status:q.r.status,expiresAt:q.r.expiresAt}:null,student:publicWallet(n,w),...(q.testKey?{testKey:q.testKey}:{}),fee:0,currency:'GHS',requiresStudentWallet:true,published:q.s?.published===true,listingStatus:q.s?.published===true?'published':'test-only'}}
+ function actorFor(n,c,b,shopId){
+  if(c.user.businessId!==b.business.id)throw new APIError('This business is outside your access.',403);
+- if(c.user.role==='owner')return {role:'owner',userId:c.user.id};
+- assigned(n,c.user,shopId);return {role:c.user.role,userId:c.user.id,shopId,staffId:'access-'+c.user.id};
++ const staffId=c.user.role==='owner'?null:'access-'+c.user.id;
++ const shift=staffId?b.shifts?.find(s=>s.shopId===shopId&&s.staffId===staffId&&s.status==='open'):null;
++ const context={userId:c.user.id,name:c.user.name,counterId:c.counter?.id||null,shiftId:shift?.id||null};
++ if(c.user.role==='owner')return {role:'owner',...context};
++ assigned(n,c.user,shopId);return {role:c.user.role,...context,shopId,staffId};
+ }
+ function stepUp(c,proof,purpose,proofHash){
+  if(!proof||c.session.stepUpHash!==proofHash||Date.parse(c.session.stepUpExpiresAt||0)<=Date.now()||![purpose,'owner-action'].includes(c.session.stepUpPurpose))throw new APIError('Confirm your current password before completing this owner action.',403,'STEP_UP_REQUIRED');
+@@ -236,7 +241,7 @@
+    const key=await hashToken(ip+':'+path);await updateNetwork(env,n=>{rateLimit(n,'request:'+key,path==='/api/signup'||path==='/api/migrate'?10:20,60000);return {}});
+   }
+   const activeContext=resolveSession((await readNetwork(env)).state,tokenHash);
+-  if(activeContext?.counter&&!['/api/session','/api/business','/api/logout','/api/auth/logout','/api/counter','/api/counter/unlock','/api/counter/lock','/api/action','/api/devices','/api/health'].includes(path)&&!/^\/api\/devices\/[^/]+$/.test(path))throw new APIError('This phone is restricted to cashier collections. Sign in separately for business management.',403,'COUNTER_ONLY');
++  if(activeContext?.counter&&!['/api/session','/api/business','/api/logout','/api/auth/logout','/api/counter','/api/counter/receipts','/api/counter/unlock','/api/counter/lock','/api/action','/api/devices','/api/health'].includes(path)&&!/^\/api\/devices\/[^/]+$/.test(path))throw new APIError('This phone is restricted to cashier collections. Sign in separately for business management.',403,'COUNTER_ONLY');
+   if(path==='/api/business-plan'&&method==='GET'){
+    const {state:n,revision}=await readNetwork(env),c=requireSession(n,tokenHash);
+    if(c.counter||!['owner','manager'].includes(c.user.role))throw new APIError('Cashier access does not include business planning.',403,'PLANNING_FORBIDDEN');
+@@ -245,6 +250,11 @@
+   if(path==='/api/business-plan'&&method==='POST'){
+    const out=await updateNetwork(env,n=>{const c=requireSession(n,tokenHash),result=mutateBusinessPlan(n,c,p);c.session.lastSeen=iso();return {...(result.unchanged?{unchanged:true}:{}),data:bundle(n,tokenHash,studentHash,result)};});
+    return response({...out.data,revision:out.revision});
++  }
++  if(method==='GET'&&path==='/api/counter/receipts'){
++   if([...url.searchParams.keys()].some(key=>url.searchParams.getAll(key).length!==1))throw new APIError('Receipt query fields must be unique.',400,'INVALID_RECEIPT_QUERY');
++   const {state:n}=await readNetwork(env),c=requireSession(n,tokenHash);
++   return response(counterReceiptPage(n,c,p));
+   }
+   if(method==='GET'&&path==='/api/counter'){
+    const {state:n,revision}=await readNetwork(env),c=resolveSession(n,tokenHash);if(!c)throw new APIError('Sign in to open this counter.',401,'SIGN_IN_REQUIRED');
+
+--- a/backend/supabase/functions/lumo-approved/merchant/server/counter.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/counter.js
+@@ -1,5 +1,5 @@
+ import {reduceBusiness} from '../dist/domain.js';
+-import {APIError,resolveSession,requireSession,assigned,uid,iso,randomToken,hashToken,matchesPassword,audit,projectUsers} from './network.js';
++import {APIError,resolveSession,requireSession,assigned,uid,iso,randomToken,hashToken,matchesPassword,audit,projectUsers,cashierTicket} from './network.js';
+ const PIN_ITERATIONS=100000;
+ const pinValid=pin=>typeof pin==='string'&&/^\d{6}$/.test(pin)&&!/^([0-9])\1{5}$/.test(pin)&&!['123456','654321'].includes(pin);
+ export async function makeCashierPin(pin){
+@@ -30,12 +30,44 @@
+  const payments=new Set(scoped.transactions.map(t=>t.id));
+  scoped.refunds=b.refunds.filter(r=>payments.has(r.transactionId)).map(r=>({...r}));
+  scoped.shifts=b.shifts.filter(s=>s.shopId===counter.shopId&&(s.counterId===counter.id||s.staffId==='access-'+c.user.id)).map(s=>({...s}));
+- scoped.tickets=b.tickets.filter(t=>payments.has(t.transactionId)).map(t=>({...t}));
+  scoped.shopQRReceipts=b.transactions.filter(t=>t.shopId===counter.shopId&&!t.requestId&&t.status==='paid'&&Date.parse(t.confirmedAt||t.createdAt)>=Date.now()-86400000).sort((a,b)=>String(b.confirmedAt||b.createdAt).localeCompare(String(a.confirmedAt||a.createdAt))).slice(0,20).map(t=>({id:t.id,shopId:t.shopId,payer:t.payer,amount:t.amount,status:'paid',createdAt:t.createdAt,confirmedAt:t.confirmedAt||t.createdAt,reference:t.reference,method:'shop-qr',requestId:null,unattributed:true}));
+  scoped.shopLinkReceipts=b.transactions.filter(t=>t.shopId===counter.shopId&&t.status==='paid'&&!t.counterId&&(t.attribution==='shop'&&t.requestId||t.source==='guest-momo')&&Date.parse(t.confirmedAt||t.createdAt)>=Date.now()-86400000).sort((a,b)=>String(b.confirmedAt||b.createdAt).localeCompare(String(a.confirmedAt||a.createdAt))).slice(0,20).map(t=>({id:t.id,shopId:t.shopId,payer:t.payer,amount:t.amount,status:'paid',createdAt:t.createdAt,confirmedAt:t.confirmedAt||t.createdAt,reference:t.reference,method:t.source==='guest-momo'?'shared-link':'online-request',requestId:t.requestId||null,...(t.source==='guest-momo'?{source:t.source,linkId:t.linkId}:{}),intentChannel:t.intentChannel||null,rail:t.rail||'lumo',providerMode:t.providerMode||null,settlementStatus:t.settlementStatus||null,attribution:'shop',unattributed:true,refundedAmount:(b.refunds||[]).filter(r=>r.transactionId===t.id&&r.status==='paid').reduce((n,r)=>n+r.amount,0)}));
+- const visiblePayments=new Set([...payments,...scoped.shopLinkReceipts.map(t=>t.id)]);scoped.refunds=b.refunds.filter(r=>visiblePayments.has(r.transactionId)).map(r=>({...r}));
++ const visiblePayments=new Set([...payments,...scoped.shopQRReceipts.map(t=>t.id),...scoped.shopLinkReceipts.map(t=>t.id)]);
++ scoped.tickets=b.tickets.filter(t=>t.shopId===counter.shopId&&(visiblePayments.has(t.transactionId)||t.createdByUserId===c.user.id&&t.counterId===counter.id)).map(cashierTicket);
++ scoped.shopReceiptWindow={hours:24,perChannelLimit:20,mayBeTruncated:scoped.shopQRReceipts.length===20||scoped.shopLinkReceipts.length===20};
++ scoped.refunds=b.refunds.filter(r=>visiblePayments.has(r.transactionId)).map(r=>({...r}));
+  scoped.accessScope='counter';return scoped;
+ }
++// Read-only catch-up. The capability/session, shop and current operator remain
++// authoritative; a cursor only chooses a position within the same 24-hour feed.
++export function counterReceiptPage(n,c,p={},now=Date.now()){
++ if(!c?.counter||c.locked||c.user.role!=='cashier')throw new APIError('Unlock this shop counter before checking its receipts.',403,'COUNTER_LOCKED');
++ const b=n.businesses[c.user.businessId],staffId='access-'+c.user.id,shift=b.shifts.find(s=>s.shopId===c.counter.shopId&&s.staffId===staffId&&s.status==='open');
++ const scope={businessId:b.business.id,sessionId:c.session.id,counterId:c.counter.id,shopId:c.counter.shopId,staffId,shiftId:shift?.id||null};
++ if(p.shopId!==scope.shopId||p.counterId!==scope.counterId||p.staffId!==staffId||(p.shiftId||null)!==scope.shiftId)throw new APIError('The counter or cashier changed. Reopen Shop payments before continuing.',409,'COUNTER_OPERATOR_CHANGED');
++ if(Object.keys(p).some(key=>!['shopId','counterId','staffId','shiftId','cursor','reference'].includes(key)))throw new APIError('Choose a receipt page or an exact reference.',400,'INVALID_RECEIPT_QUERY');
++ const reference=typeof p.reference==='string'?p.reference.trim():'';
++ if(p.reference!==undefined&&(typeof p.reference!=='string'||reference.length>120||reference&&!/^[A-Za-z0-9_.:-]+$/.test(reference)))throw new APIError('Enter the exact receipt reference.',400,'INVALID_RECEIPT_QUERY');
++ let cursor=null,through=now;
++ if(p.cursor){
++  try{
++   if(typeof p.cursor!=='string'||p.cursor.length>1800||!/^[A-Za-z0-9_-]+$/.test(p.cursor)||reference)throw Error();
++   cursor=JSON.parse(atob(p.cursor.replace(/-/g,'+').replace(/_/g,'/')));
++   if(cursor.v!==1||!Number.isSafeInteger(cursor.through)||cursor.through>now+30000||cursor.through<now-900000||!Number.isSafeInteger(cursor.at)||typeof cursor.id!=='string'||!cursor.id||cursor.id.length>180||JSON.stringify(cursor.scope)!==JSON.stringify(scope))throw Error();
++   through=cursor.through;
++  }catch{throw new APIError('This receipt page expired or belongs to another counter. Refresh Shop payments.',409,'RECEIPT_CURSOR_INVALID');}
++ }
++ const from=Math.max(now-86400000,through-86400000),time=t=>Date.parse(t.confirmedAt||t.createdAt),eligible=t=>t.shopId===scope.shopId&&t.status==='paid'&&!t.counterId&&(!t.requestId||t.attribution==='shop'||t.source==='guest-momo')&&Number.isSafeInteger(t.amount)&&t.amount>0&&Number.isFinite(time(t))&&time(t)>=from&&time(t)<=through;
++ let rows=b.transactions.filter(eligible);
++ if(reference){const exact=reference.toUpperCase();rows=rows.filter(t=>String(t.reference||'').toUpperCase()===exact||t.id.toUpperCase()===exact);}
++ rows.sort((a,b)=>time(b)-time(a)||(a.id<b.id?1:a.id>b.id?-1:0));
++ if(cursor)rows=rows.filter(t=>time(t)<cursor.at||time(t)===cursor.at&&t.id<cursor.id);
++ const page=rows.slice(0,20),hasMore=rows.length>20,last=page.at(-1);
++ const receipts=page.map(t=>({id:t.id,shopId:t.shopId,payer:t.payer,amount:t.amount,status:'paid',createdAt:t.createdAt,confirmedAt:t.confirmedAt||t.createdAt,reference:t.reference,requestId:t.requestId||null,method:t.source==='guest-momo'?'shared-link':t.requestId?'online-request':'shop-qr',intentChannel:t.requestId?'online':null,source:t.source==='guest-momo'?'guest-momo':undefined,rail:t.rail||'lumo',providerMode:t.providerMode||null,settlementStatus:t.settlementStatus||null,attribution:'shop',unattributed:true,refundedAmount:b.refunds.filter(r=>r.transactionId===t.id&&r.status==='paid').reduce((sum,r)=>sum+r.amount,0),refunds:b.refunds.filter(r=>r.transactionId===t.id).map(r=>({id:r.id,transactionId:r.transactionId,amount:r.amount,status:r.status,createdAt:r.createdAt,paidAt:r.paidAt||null}))}));
++ const nextCursor=hasMore?btoa(JSON.stringify({v:1,scope,through,at:time(last),id:last.id})).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''):null;
++ return {ok:true,readOnly:true,noMutation:true,scope,receipts,nextCursor,reference:reference||null,window:{hours:24,from:new Date(from).toISOString(),through:new Date(through).toISOString()}};
++}
++
+ function anchor(n,tokenHash){const c=resolveSession(n,tokenHash);if(!c?.counter)throw new APIError('Set up this shop counter first.',403,'COUNTER_REQUIRED');return c;}
+ function manage(n,tokenHash,shopId){const c=requireSession(n,tokenHash);if(c.counter||!['owner','manager'].includes(c.user.role))throw new APIError('A business owner or assigned manager must approve this counter.',403,'COUNTER_MANAGER_REQUIRED');if(shopId)assigned(n,c.user,shopId);return c;}
+ function endShift(n,c,note){
+
+--- a/backend/supabase/functions/lumo-approved/merchant/server/network.js
++++ b/backend/supabase/functions/lumo-approved/merchant/server/network.js
+@@ -179,7 +179,7 @@
+ export function rateLimit(n,key,limit=20,windowMs=60000){
+  const now=Date.now(),r=n.rateLimits[key];
+  if(!r||now-r.startedAt>windowMs)n.rateLimits[key]={count:1,startedAt:now,windowMs};
+- else{r.count++;if(r.count>limit)throw new APIError('Too many attempts. Please wait a minute before trying again.',429,'RATE_LIMITED')}
++ else{r.count++;if(r.count>limit){const minutes=Math.max(1,Math.ceil((windowMs-(now-r.startedAt))/60000));throw new APIError('Too many attempts. Please wait '+minutes+' minute'+(minutes===1?'':'s')+' before trying again.',429,'RATE_LIMITED')}}
+  const keys=Object.keys(n.rateLimits);if(keys.length>2000){let removed=0;for(const k of keys)if(now-n.rateLimits[k].startedAt>(n.rateLimits[k].windowMs||60000)){delete n.rateLimits[k];if(++removed>=100)break}}
+ }
+ export function cookieToken(request,name='lumo_session'){
+@@ -233,6 +233,13 @@
+   const old=b.staff.find(s=>s.id===p.id);if(old)Object.assign(old,p);else b.staff.push({...p,createdAt:iso()});
+  }
+  for(const shop of b.shops){const manager=linked.find(u=>u.active&&u.role==='manager'&&u.shopIds.includes(shop.id));shop.manager=manager?.name||b.business.ownerName||'Unassigned'}
++}
++// Counter and cashier case views contain only the public shop-team thread.
++export function cashierTicket(ticket){
++ const keys=['id','subject','message','transactionId','paymentReference','shopId','status','createdAt','updatedAt','resolvedAt','createdByUserId','createdByStaffId','createdByName','createdByRole','counterId','shiftId'];
++ const value=Object.fromEntries(keys.filter(key=>ticket[key]!==undefined).map(key=>[key,clone(ticket[key])]));
++ value.responses=(ticket.responses||[]).map(response=>Object.fromEntries(['id','message','response','status','by','createdAt'].filter(key=>response[key]!==undefined).map(key=>[key,clone(response[key])])));
++ return value;
+ }
+ export function scopedBusiness(b,u){
+  const c=clone(b);delete c.counterDevices;delete c.businessPlan;delete c.businessPlanAccess;delete c.businessPlanSummary;delete c.businessPlanDebits;Object.assign(c,businessPlanProjection(b,u));if(u.role==='owner')return c;
+@@ -249,7 +256,7 @@
+   const payments=new Set(c.transactions.map(t=>t.id));
+   c.refunds=c.refunds.filter(r=>payments.has(r.transactionId)||r.requestedStaffId===staffId);
+   c.shifts=c.shifts.filter(shift=>shift.staffId===staffId);c.closings=[];c.reconciliations=[];
+-  c.tickets=c.tickets.filter(ticket=>payments.has(ticket.transactionId));
++  c.tickets=c.tickets.filter(ticket=>payments.has(ticket.transactionId)||ticket.createdByUserId===u.id).map(cashierTicket);
+   c.business.accountNumber='';c.business.bankName='';
+   c.accessScope='cashier';
+  }else c.accessScope='shops';return c;
+
+--- a/backend/supabase/functions/lumo-approved/onboarding-receipt.mjs
++++ b/backend/supabase/functions/lumo-approved/onboarding-receipt.mjs
+@@ -0,0 +1,15 @@
++const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
++const only=(value,keys)=>plain(value)&&Object.keys(value).every(key=>keys.includes(key));
++const invalid=()=>{throw Object.assign(new Error('Check and accept the current setup notice before continuing.'),{code:'INVALID_INPUT',status:400});};
++export const ONBOARDING_TERMS_VERSION='2026-11-08.1';
++/** Non-sensitive setup evidence only. Camera media and provider assurance never enter account state. */
++export function onboardingReceipt(value,now=Date.now()){
++ if(value===undefined)return undefined;
++ if(!only(value,['termsAcceptance','verification']))invalid();
++ const terms=value.termsAcceptance,verification=value.verification;
++ if(!only(terms,['version','acceptedAt'])||terms.version!==ONBOARDING_TERMS_VERSION)invalid();
++ const timestamp=(value,earliest=now-86400000)=>{if(typeof value!=='string'||value.length>40)invalid();const at=Date.parse(value);if(!Number.isFinite(at)||at>now+300000||at<earliest)invalid();return new Date(at).toISOString();};
++ const acceptedAt=timestamp(terms.acceptedAt,Date.parse('2026-11-08T00:00:00Z'));
++ if(!only(verification,['mode','capture','status','method','liveness','sampleIdentity','detailsConfirmed','completedAt'])||verification.mode!=='simulation'||verification.capture!=='live-camera'||verification.status!=='complete'||verification.method!=='ghana-card-number'||verification.liveness!=='guided-camera'||verification.sampleIdentity!==true||verification.detailsConfirmed!==true)invalid();
++ return {termsAcceptance:{version:ONBOARDING_TERMS_VERSION,acceptedAt},verification:{mode:'simulation',capture:'live-camera',status:'complete',method:'ghana-card-number',liveness:'guided-camera',sampleIdentity:true,detailsConfirmed:true,completedAt:timestamp(verification.completedAt)}};
++}
+
+--- a/backend/supabase/functions/lumo-approved/operations.mjs
++++ b/backend/supabase/functions/lumo-approved/operations.mjs
+@@ -1,7 +1,9 @@
+ import {servicesForAction} from './availability.mjs';
+ 
+-const MUTATIONS=new Set(['fund','payment','settleIOU','saveBox','withdrawBox','createBox','createGroup','contributeGroup','requestGroupPayout','approveGroupPayout','executeGroupPayout','accountSupportCreate','accountDeletionRequest','closeAccount','runAutomaticSavings']);
++const MUTATIONS=new Set(['fund','payment','settleIOU','saveBox','withdrawBox','createBox','createGroup','contributeGroup','requestPayout','approvePayout','executePayout','requestGroupPayout','approveGroupPayout','executeGroupPayout','accountSupportCreate','accountSupportReply','accountSupportReopen','accountDeletionRequest','accountDeletionCancel','closeAccount','runAutomaticSavings']);
+ const READS=new Set(['snapshot','resolve','searchPeople','quote','externalRecipient','recover','serviceStatus','partnerInbox','pinRepairStatus']);
++const CASE_OPERATIONS=new Set(['list','detail','read','readAll']);
++const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ const GUEST=new Set(['quote','initiate','status','sandboxResult']);
+ const INFRA=new Set(['SERVICE_UNAVAILABLE','COMMIT_FAILED','GUEST_SERVICE_ERROR','MERCHANT_COMMIT_FAILED','STORAGE_UNAVAILABLE']);
+ const ATTEMPT=/^[A-Za-z0-9_.:-]{10,100}$/;
+@@ -10,6 +12,7 @@
+  'https://lumo-connected-pilot.vercel.app':'consumer_web',
+  'https://lumo-new-experience.oness15.chatgpt.site':'consumer_web',
+  'https://lumo-merchant-mobile.oness15.chatgpt.site':'merchant_web',
++ 'https://lumo-merchant.vercel.app':'merchant_web',
+ };
+ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ 
+@@ -28,6 +31,7 @@
+   if(body.action==='action'){action='action.'+(MUTATIONS.has(body.type)?body.type:'other');}
+   else if(body.action==='guestCheckout'){action='guest.'+(GUEST.has(body.operation)?body.operation:'other');read=body.operation==='quote'||body.operation==='status';}
+   else if(body.action==='merchant'){action='merchant.request';read=body.method==='GET';}
++  else if(body.action==='caseInbox'){action='caseInbox.'+(CASE_OPERATIONS.has(body.operation||'list')?(body.operation||'list'):'other');read=body.operation!=='read'&&body.operation!=='readAll';}
+   else if(READS.has(body.action)){action=body.action;read=true;}
+   else return null;
+   let channel=ORIGINS[request.headers.get('origin')]||'unknown';
+@@ -46,7 +50,7 @@
+  return {outcome,errorCode,httpStatus:response.status};
+ }
+ 
+-export function withOperationEvents(handler,{supabaseUrl,serviceRoleKey,fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,timeoutMs=900,now=()=>performance.now()}={}){
++export function withOperationEvents(handler,{supabaseUrl,serviceRoleKey,fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,timeoutMs=900,now=()=>performance.now(),contextFor=()=>null,onEventLoss=()=>{},readSampleRate=0}={}){
+  const base=new URL(supabaseUrl);if(base.protocol!=='https:'||base.pathname!=='/'||!serviceRoleKey||typeof handler!=='function')throw Error('Invalid operational event configuration');
+  return async request=>{
+   const started=now(),requestId=cryptoApi.randomUUID(),metadata=routingMetadata(request);
+@@ -55,14 +59,20 @@
+   try{response=await handler(request);}catch(error){thrown=error;response=new Response(null,{status:503,headers:{'X-Lumo-Outcome':'unknown','X-Lumo-Error-Code':'SERVICE_UNAVAILABLE'}});}
+   const route=await Promise.race([metadata,pause(25).then(()=>null)]);
+   const outcome=operationOutcome(response);
+-  if(!route||route.read&&outcome.outcome==='ok'){if(thrown)throw thrown;return response;}
++  const sampledRead=route?.read&&outcome.outcome==='ok'&&parseInt(requestId.replace(/-/g,'').slice(-8),16)/0x100000000<Math.max(0,Math.min(1,readSampleRate));
++  if(!route||route.read&&outcome.outcome==='ok'&&!sampledRead){if(thrown)throw thrown;return response;}
+   const event={requestId,serviceId:route.serviceId,action:route.action,attemptId:route.attemptId,channel:route.channel,...outcome,durationMs:Math.max(0,Math.min(300000,Math.round(now()-started)))};
++  // Context is supplied by the handler after Auth verification, never from JSON,
++  // an unverified JWT, an origin label or a client-supplied user ID.
++  try{const context=contextFor(request);if(UUID.test(context?.actorId||''))event.actorId=context.actorId;}catch{}
++  if(sampledRead)event.sampledRead=true;
+   const controller=new AbortController();let timer;
+-  const timeout=new Promise(resolve=>{timer=setTimeout(()=>{controller.abort();resolve();},Math.min(975,Math.max(1,timeoutMs)));});
++  let lossReported=false;const lost=reason=>{if(lossReported)return;lossReported=true;try{onEventLoss({requestId,reason});}catch{}};
++  const timeout=new Promise(resolve=>{timer=setTimeout(()=>{controller.abort();lost('timeout');resolve();},Math.min(975,Math.max(1,timeoutMs)));});
+   try{
+-   const recording=transport(base.origin+'/rest/v1/rpc/lumo_record_operation_event',{method:'POST',redirect:'error',signal:controller.signal,headers:{apikey:serviceRoleKey,Authorization:`Bearer ${serviceRoleKey}`,'Content-Type':'application/json'},body:JSON.stringify({p_payload:event})}).catch(()=>null);
++   const recording=transport(base.origin+'/rest/v1/rpc/lumo_record_operation_event',{method:'POST',redirect:'error',signal:controller.signal,headers:{apikey:serviceRoleKey,Authorization:`Bearer ${serviceRoleKey}`,'Content-Type':'application/json'},body:JSON.stringify({p_payload:event})}).then(async value=>{if(!value.ok){lost('rejected');return;}try{const data=await value.json();if(data.ok!==true)lost('rejected');}catch{lost('unreadable');}}).catch(()=>lost('transport'));
+    await Promise.race([recording,timeout]);
+-  }catch{}finally{clearTimeout(timer);}
++  }catch{lost('transport');}finally{clearTimeout(timer);}
+   // A random trace reference is safe to give support; no request data is returned in it.
+   try{response.headers.set('X-Lumo-Request-Id',requestId);}catch{}
+   if(thrown)throw thrown;return response;
+
+--- a/backend/supabase/functions/lumo-approved/partners.mjs
++++ b/backend/supabase/functions/lumo-approved/partners.mjs
+@@ -89,6 +89,19 @@
+  return state;
+ }
+ 
++
++// A lost response or a second tap must never rotate a code or rewrite a decision.
++function alreadyResponded(row,decision){
++ const invitation=row.state?.invitation||{},request=row.state?.request||{};
++ if(row.kind==='initial')return decision==='accepted'?['accepted','verified','consumed'].includes(invitation.status):invitation.status==='declined';
++ if(row.kind==='protection')return decision==='accepted'?invitation.status==='active':invitation.status==='declined';
++ if(row.kind==='release')return decision==='accepted'?(request.status==='code-issued'||['approved','consumed'].includes(request.status)&&request.approvedBy==='partner'):request.status==='denied'&&!request.supportDecisionAt;
++ return false;
++}
++function responseView(row,actor,decision,duplicate=false){
++ return {ok:true,sandbox:true,currency:'GHS',result:{ok:true,duplicate,message:duplicate?'Your earlier response is already recorded. The current request status is shown.':decision==='accepted'?'Your response is confirmed. Share this code only for this exact request.':'You declined this request. No money moved.'},inbox:publicPartnerInbox([row],actor)};
++}
++
+ /** The authenticated partner can answer only their own canonical invitation or exact release request. */
+ export async function partnerRespond({body,identity,repo}){
+  const actor=actorId(identity);if(typeof body.id!=='string'||!['accepted','declined'].includes(body.decision))throw fail('INVALID_INPUT','Choose whether to accept or decline this request.');
+@@ -108,6 +121,7 @@
+    // Keep the same current protection fingerprint that originally scoped this exact request.
+    const box=boxFor(state,row.state.boxId);if(!box||box.protection?.invitationId!==row.state.protection?.invitationId)throw fail('PARTNER_CHANGED','The partner role changed. This request can no longer be approved.');
+   }else throw fail('PARTNER_UNAVAILABLE','This partner request is unavailable.');
++  if(alreadyResponded(row,body.decision))return responseView(row,actor,body.decision,true);
+   const result=applyAction(state,type,payload);if(!result.ok)throw fail('PARTNER_CHANGED',result.message);
+   if(row.kind==='initial'){const invitation=(state.boxPartnerInvitations||[]).find(item=>item.id===row.id);next={...row.state,invitation:copy(invitation)};}
+   else if(row.kind==='protection'){const box=boxFor(state,row.state.boxId),invitation=invitationFor(box,row.id);if(!invitation)throw fail('PARTNER_CHANGED','The invitation changed. Open the current invitation.');next={...row.state,invitation:copy(invitation)};}
+@@ -116,7 +130,7 @@
+   if(saved?.code==='REVISION_CONFLICT')continue;
+   if(!saved?.ok)throw fail(saved?.code||'PARTNER_UNAVAILABLE','The partner response could not be confirmed.');
+   const committed=saved.row||{...row,state:next,revision:row.revision+1};
+-  return {ok:true,sandbox:true,currency:'GHS',result:{ok:true,message:body.decision==='accepted'?'Your response is confirmed. Share this code only for this exact request.':'You declined this request. No money moved.'},inbox:publicPartnerInbox([committed],actor)};
++  return responseView(committed,actor,body.decision);
+  }
+  throw fail('REVISION_CONFLICT','This request changed. Open its current details and try again.');
+ }
+
+--- a/backend/supabase/functions/lumo-admin/handler.mjs
++++ b/backend/supabase/functions/lumo-admin/handler.mjs
+@@ -3,8 +3,10 @@
+ const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+ const ROLES=new Set(['support','supervisor','merchant_ops','finance','risk','technical','auditor','super_admin']);
+ const COMMANDS=new Set(['overview','search','customers.list','customers.get','merchants.list','merchants.get','transactions.list','transactions.get','guest.list','guest.get','cases.list','cases.get','cases.create','cases.update','cases.note','products.list','products.get','services.list','services.update','services.schedule','incidents.list','incidents.get','incidents.create','incidents.update','reconciliation.list','reports','staff.list','staff.update','approvals.list','approvals.get','approvals.create','approvals.decide','audit.list','operations.list','staff.directory']);
++for(const command of ['financial.refund.create','financial.refund.get','financial.refund.decide','financial.refund.complete','financial.guest.propose','financial.guest.resolve','financial.exceptions.list','financial.exceptions.create','financial.exceptions.update'])COMMANDS.add(command);
+ const MESSAGES={AUTH_REQUIRED:'Sign in with your staff account.',STAFF_REQUIRED:'This account does not have access to Lumo Admin.',MFA_REQUIRED:'Verify your authenticator code to continue.',SESSION_REVOKED:'Your staff session has ended. Sign in again.',FORBIDDEN:'Your role does not allow this action.',INVALID_INPUT:'Check the details and try again.',INVALID_SETUP_TOKEN:'This setup link has expired or has already been used.',SETUP_FAILED:'This account could not be created. If this email already has an account, ask your administrator for help.',RATE_LIMITED:'Too many attempts. Wait a little before trying again.',SERVICE_UNAVAILABLE:'Lumo Admin could not complete this request. Try again shortly.',ORIGIN_NOT_ALLOWED:'This application origin is not allowed.',NOT_FOUND:'The record could not be found.',CONFLICT:'The record changed. Refresh it before trying again.'};
+ Object.assign(MESSAGES,{SETUP_INVALID:MESSAGES.INVALID_SETUP_TOKEN,SELF_APPROVAL_FORBIDDEN:'A different authorised colleague must review your request.',ALREADY_DECIDED:'This request has already been decided.',REASON_REQUIRED:'Record a reason before continuing.',LAST_ADMIN:'Keep at least one active access administrator.',SELF_CHANGE_FORBIDDEN:'Another access administrator must change your permissions.',ALREADY_ENROLLED:'This staff member is already enrolled.',REVISION_CONFLICT:'This record changed. Refresh it before saving.',RESOLUTION_REQUIRED:'Record the resolution before closing this case or incident.'});
++Object.assign(MESSAGES,{INVALID_REFUND:'Choose the original merchant payment and its linked support case.',REFUND_EXCEEDS_PAYMENT:'The amount exceeds the remaining original payment or overlaps another approved refund.',APPROVAL_REQUIRED:'A different authorised colleague must approve this request first.',REFUND_EVIDENCE_MISMATCH:'The posted refund does not match the approved original payment, amount and recipient.',EVIDENCE_REQUIRED:'Record the original reference and the evidence reviewed.',INVALID_GUEST_OUTCOME:'Choose an allowed sandbox outcome for the original payment attempt.',CASE_LINK_REQUIRED:'Link the support case to this exact original payment attempt.',OUTCOME_REVIEW_REQUIRED:'A different authorised colleague must review this proposed outcome.',OUTCOME_UNCONFIRMED:'The original payment outcome is still unconfirmed. Keep its reference for review.',FINANCIAL_OPERATION_FAILED:'This operation could not be confirmed. Check the original record before retrying.',PROVIDER_RESULT_MISMATCH:'The returned outcome does not match the original payment details.',PAYMENT_FINAL:'This payment already has a final recorded outcome. Refresh its details.',IDEMPOTENCY_CONFLICT:'This request reference was already used with different details.',STALE_CONTROL:'This request changed. Refresh its current details before continuing.'});
+ const fail=(code,status=400)=>Object.assign(new Error(MESSAGES[code]||MESSAGES.SERVICE_UNAVAILABLE),{code,status});
+ const cleanText=(x,max=100)=>typeof x==='string'&&x.trim().length>0&&x.trim().length<=max&&!/[\p{Cc}<>]/u.test(x);
+ const emailValue=x=>String(x||'').trim().toLowerCase();
+@@ -23,7 +25,7 @@
+   let response,data;try{response=await transport(base.origin+path,{method,redirect:'error',signal:AbortSignal.timeout(15000),headers:{apikey:serviceRoleKey,Authorization:`Bearer ${token}`,'Content-Type':'application/json',Accept:'application/json'},...(body!==undefined?{body:JSON.stringify(body)}:{})});data=await response.json();}catch{throw fail('SERVICE_UNAVAILABLE',503);}
+   if(!response.ok&&!allowFailure)throw fail(response.status===429?'RATE_LIMITED':'SERVICE_UNAVAILABLE',response.status===429?429:503);return {ok:response.ok,status:response.status,data};
+  }
+- async function rpc(command,payload){const special=command==='operations.list'?'lumo_admin_events':command==='summary'?'lumo_admin_summary':command==='staff.directory'?'lumo_admin_staff_directory':null;const {data}=await upstream('/rest/v1/rpc/'+(special||'lumo_admin_service'),special?{p_payload:payload}:{p_command:command,p_payload:payload});if(!plain(data)||typeof data.ok!=='boolean')throw fail('SERVICE_UNAVAILABLE',503);if(!data.ok){const code=typeof data.code==='string'&&/^[A-Z_]{1,80}$/.test(data.code)?data.code:'SERVICE_UNAVAILABLE';throw fail(code,['AUTH_REQUIRED','SESSION_REVOKED'].includes(code)?401:['FORBIDDEN','STAFF_REQUIRED','MFA_REQUIRED'].includes(code)?403:400);}return data;}
++ async function rpc(command,payload){const financial=command.startsWith('financial.'),special=command==='operations.list'?'lumo_admin_events':command==='summary'?'lumo_admin_summary':command==='staff.directory'?'lumo_admin_staff_directory':null;const {data}=await upstream('/rest/v1/rpc/'+(financial?'lumo_admin_financial':special||'lumo_admin_service'),special?{p_payload:payload}:{p_command:command,p_payload:payload});if(!plain(data)||typeof data.ok!=='boolean')throw fail('SERVICE_UNAVAILABLE',503);if(!data.ok){const code=typeof data.code==='string'&&/^[A-Z_]{1,80}$/.test(data.code)?data.code:'SERVICE_UNAVAILABLE';throw fail(code,['AUTH_REQUIRED','SESSION_REVOKED'].includes(code)?401:['FORBIDDEN','STAFF_REQUIRED','MFA_REQUIRED'].includes(code)?403:400);}return data;}
+  async function identify(token){
+   if(typeof token!=='string'||token.length>16384)throw fail('AUTH_REQUIRED',401);
+   const verified=await upstream('/auth/v1/user',undefined,{token,method:'GET',allowFailure:true});if(!verified.ok||!UUID.test(verified.data?.id||''))throw fail('AUTH_REQUIRED',401);
+
+--- a/backend/supabase/functions/lumo-maintenance/approved/engine.mjs
++++ b/backend/supabase/functions/lumo-maintenance/approved/engine.mjs
+@@ -62,7 +62,8 @@
+ }
+ export function buildState(snapshot){
+  const state=snapshot.state?clone(snapshot.state):createEmptyState({name:snapshot.account.displayName,phone:snapshot.phone||''});
+- if(!snapshot.state){state.onboardingDone=true;state.accounts=[{id:'operational',type:'operational',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000001'},{id:'savings',type:'savings',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000002'}];}
++ if(!snapshot.state){state.buffer=0;state.onboardingDone=true;state.accounts=[{id:'operational',type:'operational',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000001'},{id:'savings',type:'savings',holderName:snapshot.account.displayName,status:'simulated-ready',demoNumber:'000000000002'}];}
++ if(snapshot.onboarding){state.termsAcceptance=clone(snapshot.onboarding.termsAcceptance);state.verification=clone(snapshot.onboarding.verification);state.setupReceiptAt=snapshot.onboarding.receivedAt;}
+  state.wallet=snapshot.account.balance;state.settings||={};delete state.settings.pin;
+  state.account||={};state.account.signedOut=false;
+  state.profile.name=snapshot.account.displayName;state.profile.phone=snapshot.phone||state.profile.phone||'';

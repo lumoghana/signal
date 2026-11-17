@@ -1,24 +1,96 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "product": "Lumo",
   "repository": "lumoghana/signal",
-  "approved_live_url": "https://lumo-new-experience.oness15.chatgpt.site/",
-  "site_version": 66,
-  "source_commit": "ac79d2622925e96bf72316b76295f0ab7330a3ca",
-  "source_date": "2026-11-09",
+  "release": "2.12.5",
+  "release_date": "2026-11-17",
+  "status": "backend-and-merchant-site-live-vercel-publication-blocked",
+  "approved_live_url": "https://lumo-connected-pilot.vercel.app/",
   "export_target": "GitHub / Vercel",
   "static_directory": "dist",
   "asset_manifest": "dist-sha256.json",
-  "shipped_dist": "Byte-exact copy of the approved source commit. No application behavior changed during export.",
-  "prototype_boundary": "Local sample money and participant/provider simulation; no live bank, MoMo or NIA connection.",
-  "android": "Delivered separately; no Android binaries or signing material included.",
-  "validation": {
-    "automated_tests": {
-      "passed": 1305,
-      "failed": 0
+  "release_notes": "RECOVERY-REVIEW-2.12.5.md",
+  "baseline": {
+    "release": "2.12.4",
+    "consumerDeployment": "dpl_4aAn2Fbim2cp7uUJjnfbXAvaqiyq",
+    "merchantDeployment": "dpl_HD3CCnFya2v7yJZ4uac1fwwxyht3",
+    "githubCommit": "f433d04cb88d573e35716bec2f3b3f549335a55a",
+    "approvedServiceVersion": 21,
+    "accessServiceVersion": 6
+  },
+  "android": {
+    "version": "2.12.5",
+    "versionCode": 21205,
+    "apkSha256": "21acf920bfc4e417283915125a69dadf2826b4961e24576f04819cf967b69e10",
+    "apkBytes": 4621263,
+    "publicDownload": "https://lumo-connected-pilot.vercel.app/downloads/Lumo-Test-Android.apk",
+    "sourceDeliveredSeparately": true,
+    "originalSigningIdentityRetained": true,
+    "downloadStatus": "2.12.5 delivered separately; Vercel public download remains 2.12.4 pending publication approval"
+  },
+  "recovery": {
+    "mode": "prototype-face-only",
+    "scope": "explicit existing sandbox pilot",
+    "requiresRecoveryKey": false,
+    "cameraCapture": "actual-camera-jpeg",
+    "faceMatching": "stored-template",
+    "liveness": "prototype-simulation",
+    "livenessVerified": false,
+    "identityVerified": false,
+    "bankMomoNia": "sandbox/simulation"
+  },
+  "limitations": [
+    "Physical handset capture and real-user recovery acceptance remain unverified.",
+    "Genuine liveness is deliberately simulated and must be integrated before production."
+  ],
+  "deployments": {
+    "access": {
+      "version": 7,
+      "state": "ACTIVE",
+      "bundleSha256": "6a2149d5b01a4b4ef3845f25b623426eabc6cdcb4f3bc09f2b148ba23f22c2ee"
     },
-    "approved_dist_file_count": 148,
-    "approved_dist_byte_parity": true,
-    "offline_rebuild_preserved_dist": true
+    "approved": {
+      "version": 22,
+      "state": "ACTIVE",
+      "bundleSha256": "8c2e5aeea6014ed70db83f265484de52881ddc219c0a167974b5f8d78d7b6bae"
+    },
+    "merchantSite": {
+      "url": "https://lumo-merchant-mobile.oness15.chatgpt.site",
+      "version": 38,
+      "state": "succeeded",
+      "sourceCommit": "debc3ca069804024461df67e8c4033c258270b32"
+    },
+    "vercel": {
+      "currentRelease": "2.12.4",
+      "preparedRelease": "2.12.5",
+      "state": "automatic-approval-review-rejected",
+      "reason": "Explicit approval required to publish this release application and face-processing source to the existing Vercel projects."
+    }
+  },
+  "tests": {
+    "consumer": 1822,
+    "merchant": 637,
+    "backend": 371,
+    "protectedSql": 72,
+    "newSql": 29,
+    "adversarialHandlerPostgres": 45,
+    "nativeModelSuites": 77,
+    "nativeFramework": 390,
+    "nativePhoneLayouts": 48,
+    "processorPython": 14,
+    "processorIntegration": 4
+  },
+  "assetManifestReconciliation": {
+    "unchangedPriorSourceEntries": 20,
+    "priorLocalCommit": "906d4fb",
+    "reason": "These existing asset bytes already matched the prior source commit but their manifest digests were stale. Reconciled digests do not introduce code changes.",
+    "actualChangedAssetEntries": [
+      "dist/consumer-release.json",
+      "dist/js/account-ui.js",
+      "dist/js/approved-service.js",
+      "dist/js/onboarding.js",
+      "dist/sw.js"
+    ],
+    "verification": "Prior committed bytes compared directly; full 1822 consumer suite passed."
   }
 }

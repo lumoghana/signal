@@ -230,7 +230,9 @@ export async function handleAPI(request,env){
  const url=new URL(request.url);if(!url.pathname.startsWith('/api/'))return null;
  try{
   const method=request.method,path=url.pathname.replace(/\/$/,'');
+  const prototypeFaceOnly=env.prototypeFaceOnly===true;
   if(!['GET','POST'].includes(method))throw new APIError('Method not supported.',405);
+  if(prototypeFaceOnly&&method==='POST'&&['/api/auth/recovery/start','/api/recovery/start','/api/auth/recovery/complete','/api/recovery/complete','/api/auth/username','/api/auth/username/recover','/api/auth/recovery-key','/api/auth/recovery-key/ack'].includes(path))throw new APIError('Use the saved-face recovery flow. Private-key recovery is unavailable in this prototype.',503,'UNAVAILABLE_SERVICE');
   if(method==='POST'){
    const origin=request.headers.get('origin');if(origin&&origin!==url.origin)throw new APIError('This request must come from this Lumo site.',403,'ORIGIN_MISMATCH');
    if(request.headers.get('x-lumo-request')!=='1')throw new APIError('Refresh the app before trying again.',403,'REQUEST_PROOF_REQUIRED');
@@ -276,7 +278,7 @@ export async function handleAPI(request,env){
    });return response({...out.data,revision:out.revision});
   }
 if(method==='POST'&&path==='/api/signup'){
-   const registration=p.business||p,creds=p.credentials||p,uname=username(creds.username),attempt=attemptValue(p.attemptId),password=await makePassword(creds.password),recoveryKey=newRecoveryKey(),keyHash=await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
+   const registration=p.business||p,creds=p.credentials||p,uname=username(creds.username),attempt=attemptValue(p.attemptId),password=await makePassword(creds.password),recoveryKey=prototypeFaceOnly?null:newRecoveryKey(),keyHash=prototypeFaceOnly?null:await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
    const normalized={...registration};delete normalized.credentials;delete normalized.password;delete normalized.username;delete normalized.attemptId;delete normalized.remember;delete normalized.deviceLabel;
    const bodyHash=await fingerprint({registration:normalized,username:uname});
    const out=await updateNetwork(env,async n=>{
@@ -285,15 +287,15 @@ if(method==='POST'&&path==='/api/signup'){
      const u=n.users.find(u=>u.id===prior.userId);
      if(prior.fingerprint!==bodyHash||!u?.active||u.username!==uname||!await matchesPassword(creds.password,u.password))throw new APIError('This signup reference was already used for another request.',409,'IDEMPOTENCY_MISMATCH');
      newSession(n,u,newHash,!!p.remember,String(p.deviceLabel||'Owner browser'));
-     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,recoveryAction:'regenerate'})};
+     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,...(prototypeFaceOnly?{requiresRecoveryKey:false}:{recoveryAction:'regenerate'})})};
     }
     rateLimit(n,'signup:'+ip,8,3600000);
     if(n.users.some(u=>u.username===uname))throw new APIError('That username is already in use. Choose another.');
     const b=allocateBusiness(n,createBusiness(registration));
-    const u={id:uid('user'),businessId:b.business.id,username:uname,name:b.business.ownerName,phone:b.business.phone,role:'owner',shopIds:b.shops.map(s=>s.id),active:true,password,recoveryHash:keyHash,recoveryKeyPending:true,recoveryKeyReference:uid('recovery-key'),recoveryKeyIssuedAt:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
+    const u={id:uid('user'),businessId:b.business.id,username:uname,name:b.business.ownerName,phone:b.business.phone,role:'owner',shopIds:b.shops.map(s=>s.id),active:true,password,recoveryHash:keyHash,recoveryKeyPending:!prototypeFaceOnly,recoveryKeyReference:prototypeFaceOnly?null:uid('recovery-key'),recoveryKeyIssuedAt:prototypeFaceOnly?null:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
     n.users.push(u);projectUsers(n,b);n.businesses[b.business.id]=b;newSession(n,u,newHash,!!p.remember,String(p.deviceLabel||'Owner browser'));
     n.signupAttempts[attempt]={userId:u.id,businessId:b.business.id,fingerprint:bodyHash,createdAt:iso()};audit(n,'BUSINESS_CREATED',b.business.id,u.id);
-    return {data:bundle(n,newHash,studentHash,{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true,replayed:false})};
+    return {data:bundle(n,newHash,studentHash,{...(prototypeFaceOnly?{requiresRecoveryKey:false,recoveryKeyAvailable:false}:{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true}),replayed:false})};
    });return response({...out.data,revision:out.revision},out.data.replayed?200:201,[sessionCookie(token,!!p.remember)]);
   }
   if(method==='POST'&&path==='/api/migrate'){
@@ -547,7 +549,7 @@ if(method==='POST'&&path==='/api/signup'){
    const b=n.businesses[i.businessId];return response({invitation:{...publicInvitation(i),phone:undefined,shopNames:i.shopIds.map(id=>b.shops.find(s=>s.id===id)?.name||'Shop'),businessName:b.business.name,status:i.status==='pending'&&Date.parse(i.expiresAt)<=Date.now()?'expired':i.status,retryAllowed:i.status==='accepted'}});
   }
   if(method==='POST'&&path==='/api/invitations/accept'){
-   const uname=username(p.username),password=await makePassword(p.password),recoveryKey=newRecoveryKey(),keyHash=await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
+   const uname=username(p.username),password=await makePassword(p.password),recoveryKey=prototypeFaceOnly?null:newRecoveryKey(),keyHash=prototypeFaceOnly?null:await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
    const out=await updateNetwork(env,async n=>{
     rateLimit(n,'invite-accept:'+ip,20);
     const i=n.invitations.find(i=>i.token===p.token);
@@ -558,16 +560,16 @@ if(method==='POST'&&path==='/api/signup'){
      if(!u.active||!b||!['owner','manager','cashier'].includes(u.role))throw new APIError('This account’s access has changed. Ask the business owner to restore access before signing in.',403,'INVITATION_ACCESS_CHANGED');
      try{validateShops(b,u.role==='owner'?b.shops.map(shop=>shop.id):u.shopIds)}catch{throw new APIError('This account’s shop access has changed. Ask the owner to confirm its assignments.',403,'INVITATION_ACCESS_CHANGED')}
      newSession(n,u,newHash,false,String(p.deviceLabel||'Shop browser'));audit(n,'INVITATION_ACCEPTANCE_RESUMED',b.business.id,u.id,{invitationId:i.id});
-     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,keyUnavailable:true,recoveryAction:'regenerate'})};
+     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,...(prototypeFaceOnly?{requiresRecoveryKey:false}:{keyUnavailable:true,recoveryAction:'regenerate'})})};
     }
     if(i.status==='revoked')throw new APIError('This invitation was revoked. Ask the owner for a new invitation.',409,'INVITATION_REVOKED');
     if(i.status!=='pending')throw new APIError('This invitation is no longer available. Ask the owner to confirm your access.',409,'INVITATION_INVALID');
     if(Date.parse(i.expiresAt)<=Date.now())throw new APIError('This invitation expired. Ask the owner for a new invitation.',409,'INVITATION_EXPIRED');
     if(n.users.some(u=>u.username===uname))throw new APIError('That username is already in use. Choose another username for this invitation.',400,'USERNAME_TAKEN');
     const b=n.businesses[i.businessId];validateShops(b,i.shopIds);if(n.users.filter(u=>u.businessId===b.business.id).length>=100)throw new APIError('This sandbox business has reached its 100-user allowance.',429);
-    const u={id:uid('user'),businessId:i.businessId,username:uname,name:i.name,phone:i.phone,role:i.role,shopIds:[...i.shopIds],active:true,password,recoveryHash:keyHash,recoveryKeyPending:true,recoveryKeyReference:uid('recovery-key'),recoveryKeyIssuedAt:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
+    const u={id:uid('user'),businessId:i.businessId,username:uname,name:i.name,phone:i.phone,role:i.role,shopIds:[...i.shopIds],active:true,password,recoveryHash:keyHash,recoveryKeyPending:!prototypeFaceOnly,recoveryKeyReference:prototypeFaceOnly?null:uid('recovery-key'),recoveryKeyIssuedAt:prototypeFaceOnly?null:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
     n.users.push(u);i.status='accepted';i.acceptedAt=iso();i.acceptedBy=u.id;projectUsers(n,b);newSession(n,u,newHash,false,String(p.deviceLabel||'Shop browser'));audit(n,'INVITATION_ACCEPTED',b.business.id,u.id);
-    return {data:bundle(n,newHash,studentHash,{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true,replayed:false})};
+    return {data:bundle(n,newHash,studentHash,{...(prototypeFaceOnly?{requiresRecoveryKey:false,recoveryKeyAvailable:false}:{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true}),replayed:false})};
    });return response({...out.data,revision:out.revision},out.data.replayed?200:201,[sessionCookie(token)]);
   }
   const inviteAction=path.match(/^\/api\/invitations\/([^/]+)\/(resend|revoke)$/);

@@ -1,0 +1,119 @@
+--- a/lumo-approved/index.ts
++++ b/lumo-approved/index.ts
+@@ -3,6 +3,10 @@
+ import {withOperationEvents} from './operations.mjs';
+ const defaults=['https://lumo-connected-pilot.vercel.app','https://lumo-new-experience.oness15.chatgpt.site','https://lumo-merchant-mobile.oness15.chatgpt.site','https://lumo-merchant.vercel.app','http://127.0.0.1:4173'];
+ const supabaseUrl=Deno.env.get('SUPABASE_URL')||'',serviceRoleKey=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'';
++// Match the access service's explicit pilot-only face recovery opt-in. Client
++// payloads cannot select this mode, and another project keeps legacy protection.
++const prototypeFaceOnly=(Deno.env.get('LUMO_ACCESS_MODE')||'sandbox')==='sandbox'&&supabaseUrl.replace(/\/$/,'')==='https://iwutbrljiiodamtyoorg.supabase.co'&&(Deno.env.get('LUMO_ACCESS_RECOVERY_MODE')||'prototype-face-only')==='prototype-face-only';
++const merchantHandler=options=>createMerchantHandler({...options,prototypeFaceOnly});
+ const eventContexts=new WeakMap();
+-const handler=createApprovedHandler({supabaseUrl,serviceRoleKey,merchantHandler:createMerchantHandler,availabilityEnabled:true,onIdentified:(request,identity)=>eventContexts.set(request,{actorId:identity.userId}),allowedOrigins:[...new Set([...defaults,...(Deno.env.get('LUMO_ALLOWED_ORIGINS')||'').split(',').map(s=>s.trim()).filter(Boolean)])]});
++const handler=createApprovedHandler({supabaseUrl,serviceRoleKey,merchantHandler,availabilityEnabled:true,onIdentified:(request,identity)=>eventContexts.set(request,{actorId:identity.userId}),allowedOrigins:[...new Set([...defaults,...(Deno.env.get('LUMO_ALLOWED_ORIGINS')||'').split(',').map(s=>s.trim()).filter(Boolean)])]});
+ Deno.serve(withOperationEvents(handler,{supabaseUrl,serviceRoleKey,contextFor:request=>eventContexts.get(request),readSampleRate:0.01,onEventLoss:event=>console.warn(JSON.stringify({event:'lumo_telemetry_loss',...event}))}));
+--- a/lumo-approved/merchant/handler.mjs
++++ b/lumo-approved/merchant/handler.mjs
+@@ -57,13 +57,14 @@
+ /** Original v7 HTTP API behind the verified shared-auth boundary. No client state
+  * is accepted: closures mutate a fresh service-only snapshot, committed with
+  * canonical refund postings in one database transaction. */
+-export function createMerchantHandler({serviceRpc,commerceEnabled=false}){
++export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototypeFaceOnly=false}){
+  if(typeof serviceRpc!=='function')throw new Error('Merchant service RPC is required.');
+  return async ({body,identity})=>{
+   const path=normalizeMerchantPath(body.path),method=body.method||'GET',pathname=path?.split('?')[0],input=body.body||{};
+   if(!path||!['GET','POST'].includes(method))return failure('INVALID_REQUEST');
+   if(!identity&&!PUBLIC_GET.test(path)&&!(typeof body.merchantToken==='string'&&/^[a-f0-9]{64}$/.test(body.merchantToken)))return failure('SESSION_REVOKED',401);
+   if(UNAVAILABLE.has(pathname)||/^\/api\/users\/[^/]+\/reset$/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
++  if(prototypeFaceOnly===true&&/^\/api\/auth\/recovery-key(?:\/ack)?$/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
+   if(/^\/api\/(?:student|sandbox-fund|payments$)/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
+   if(pathname==='/api/simulate'||pathname==='/api/action'&&['PAY','RESOLVE_PAYMENT','SETTLE','RESOLVE_SETTLEMENT'].includes(input.type))return failure('UNAVAILABLE_SERVICE',503);
+   if(!(method==='GET'?GET_ROUTE:POST_ROUTE).test(pathname))return failure('INVALID_REQUEST',404);
+@@ -158,9 +159,16 @@
+    const clientContext=identity?.userId?'shared-user:'+identity.userId:merchantToken?'merchant-capability:'+tokenHash:'public-read';
+    const headers={'Accept':'application/json','Cookie':merchantToken?'lumo_session='+merchantToken:'','X-Lumo-Request':'1','cf-connecting-ip':clientContext};
+    if(method==='POST')headers['Content-Type']='application/json';
+-   const response=await handleAPI(new Request('https://merchant.lumo.internal'+path,{method,headers,...(method==='POST'?{body:JSON.stringify(input)}:{})}),{approvedStore:{read,update}});
++   const response=await handleAPI(new Request('https://merchant.lumo.internal'+path,{method,headers,...(method==='POST'?{body:JSON.stringify(input)}:{})}),{approvedStore:{read,update},prototypeFaceOnly:prototypeFaceOnly===true});
+    if(!response)return failure('INVALID_REQUEST',404);
+    const result=await response.json();
++   if(prototypeFaceOnly===true){
++    // Old accounts may still carry a pending legacy key. Retire only its public
++    // checkpoint; do not rewrite their stored credentials or any money records.
++    for(const session of [result.session,...(Array.isArray(result.sessions)?result.sessions:[])])if(session){session.recoveryKeyPending=false;session.recoveryKeyReference=null;}
++    delete result.recoveryKey;delete result.recoveryKeyReference;delete result.recoveryAction;delete result.keyUnavailable;
++    result.recoveryKeyAvailable=false;result.requiresRecoveryKey=false;
++   }
+    const cookie=response.headers.get('set-cookie')||'',match=cookie.match(/(?:^|,\s*)lumo_session=([^;]*)/);
+    const responseToken=match?decodeURIComponent(match[1]):merchantToken;
+    if(commerceEnabled&&response.ok&&result.session&&result.state){
+--- a/lumo-approved/merchant/server/api.js
++++ b/lumo-approved/merchant/server/api.js
+@@ -230,7 +230,9 @@
+  const url=new URL(request.url);if(!url.pathname.startsWith('/api/'))return null;
+  try{
+   const method=request.method,path=url.pathname.replace(/\/$/,'');
++  const prototypeFaceOnly=env.prototypeFaceOnly===true;
+   if(!['GET','POST'].includes(method))throw new APIError('Method not supported.',405);
++  if(prototypeFaceOnly&&method==='POST'&&['/api/auth/recovery/start','/api/recovery/start','/api/auth/recovery/complete','/api/recovery/complete','/api/auth/username','/api/auth/username/recover','/api/auth/recovery-key','/api/auth/recovery-key/ack'].includes(path))throw new APIError('Use the saved-face recovery flow. Private-key recovery is unavailable in this prototype.',503,'UNAVAILABLE_SERVICE');
+   if(method==='POST'){
+    const origin=request.headers.get('origin');if(origin&&origin!==url.origin)throw new APIError('This request must come from this Lumo site.',403,'ORIGIN_MISMATCH');
+    if(request.headers.get('x-lumo-request')!=='1')throw new APIError('Refresh the app before trying again.',403,'REQUEST_PROOF_REQUIRED');
+@@ -276,7 +278,7 @@
+    });return response({...out.data,revision:out.revision});
+   }
+ if(method==='POST'&&path==='/api/signup'){
+-   const registration=p.business||p,creds=p.credentials||p,uname=username(creds.username),attempt=attemptValue(p.attemptId),password=await makePassword(creds.password),recoveryKey=newRecoveryKey(),keyHash=await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
++   const registration=p.business||p,creds=p.credentials||p,uname=username(creds.username),attempt=attemptValue(p.attemptId),password=await makePassword(creds.password),recoveryKey=prototypeFaceOnly?null:newRecoveryKey(),keyHash=prototypeFaceOnly?null:await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
+    const normalized={...registration};delete normalized.credentials;delete normalized.password;delete normalized.username;delete normalized.attemptId;delete normalized.remember;delete normalized.deviceLabel;
+    const bodyHash=await fingerprint({registration:normalized,username:uname});
+    const out=await updateNetwork(env,async n=>{
+@@ -285,15 +287,15 @@
+      const u=n.users.find(u=>u.id===prior.userId);
+      if(prior.fingerprint!==bodyHash||!u?.active||u.username!==uname||!await matchesPassword(creds.password,u.password))throw new APIError('This signup reference was already used for another request.',409,'IDEMPOTENCY_MISMATCH');
+      newSession(n,u,newHash,!!p.remember,String(p.deviceLabel||'Owner browser'));
+-     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,recoveryAction:'regenerate'})};
++     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,...(prototypeFaceOnly?{requiresRecoveryKey:false}:{recoveryAction:'regenerate'})})};
+     }
+     rateLimit(n,'signup:'+ip,8,3600000);
+     if(n.users.some(u=>u.username===uname))throw new APIError('That username is already in use. Choose another.');
+     const b=allocateBusiness(n,createBusiness(registration));
+-    const u={id:uid('user'),businessId:b.business.id,username:uname,name:b.business.ownerName,phone:b.business.phone,role:'owner',shopIds:b.shops.map(s=>s.id),active:true,password,recoveryHash:keyHash,recoveryKeyPending:true,recoveryKeyReference:uid('recovery-key'),recoveryKeyIssuedAt:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
++    const u={id:uid('user'),businessId:b.business.id,username:uname,name:b.business.ownerName,phone:b.business.phone,role:'owner',shopIds:b.shops.map(s=>s.id),active:true,password,recoveryHash:keyHash,recoveryKeyPending:!prototypeFaceOnly,recoveryKeyReference:prototypeFaceOnly?null:uid('recovery-key'),recoveryKeyIssuedAt:prototypeFaceOnly?null:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
+     n.users.push(u);projectUsers(n,b);n.businesses[b.business.id]=b;newSession(n,u,newHash,!!p.remember,String(p.deviceLabel||'Owner browser'));
+     n.signupAttempts[attempt]={userId:u.id,businessId:b.business.id,fingerprint:bodyHash,createdAt:iso()};audit(n,'BUSINESS_CREATED',b.business.id,u.id);
+-    return {data:bundle(n,newHash,studentHash,{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true,replayed:false})};
++    return {data:bundle(n,newHash,studentHash,{...(prototypeFaceOnly?{requiresRecoveryKey:false,recoveryKeyAvailable:false}:{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true}),replayed:false})};
+    });return response({...out.data,revision:out.revision},out.data.replayed?200:201,[sessionCookie(token,!!p.remember)]);
+   }
+   if(method==='POST'&&path==='/api/migrate'){
+@@ -547,7 +549,7 @@
+    const b=n.businesses[i.businessId];return response({invitation:{...publicInvitation(i),phone:undefined,shopNames:i.shopIds.map(id=>b.shops.find(s=>s.id===id)?.name||'Shop'),businessName:b.business.name,status:i.status==='pending'&&Date.parse(i.expiresAt)<=Date.now()?'expired':i.status,retryAllowed:i.status==='accepted'}});
+   }
+   if(method==='POST'&&path==='/api/invitations/accept'){
+-   const uname=username(p.username),password=await makePassword(p.password),recoveryKey=newRecoveryKey(),keyHash=await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
++   const uname=username(p.username),password=await makePassword(p.password),recoveryKey=prototypeFaceOnly?null:newRecoveryKey(),keyHash=prototypeFaceOnly?null:await recoveryHash(recoveryKey),token=randomToken(),newHash=await hashToken(token);
+    const out=await updateNetwork(env,async n=>{
+     rateLimit(n,'invite-accept:'+ip,20);
+     const i=n.invitations.find(i=>i.token===p.token);
+@@ -558,16 +560,16 @@
+      if(!u.active||!b||!['owner','manager','cashier'].includes(u.role))throw new APIError('This account’s access has changed. Ask the business owner to restore access before signing in.',403,'INVITATION_ACCESS_CHANGED');
+      try{validateShops(b,u.role==='owner'?b.shops.map(shop=>shop.id):u.shopIds)}catch{throw new APIError('This account’s shop access has changed. Ask the owner to confirm its assignments.',403,'INVITATION_ACCESS_CHANGED')}
+      newSession(n,u,newHash,false,String(p.deviceLabel||'Shop browser'));audit(n,'INVITATION_ACCEPTANCE_RESUMED',b.business.id,u.id,{invitationId:i.id});
+-     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,keyUnavailable:true,recoveryAction:'regenerate'})};
++     return {data:bundle(n,newHash,studentHash,{replayed:true,recoveryKeyAvailable:false,...(prototypeFaceOnly?{requiresRecoveryKey:false}:{keyUnavailable:true,recoveryAction:'regenerate'})})};
+     }
+     if(i.status==='revoked')throw new APIError('This invitation was revoked. Ask the owner for a new invitation.',409,'INVITATION_REVOKED');
+     if(i.status!=='pending')throw new APIError('This invitation is no longer available. Ask the owner to confirm your access.',409,'INVITATION_INVALID');
+     if(Date.parse(i.expiresAt)<=Date.now())throw new APIError('This invitation expired. Ask the owner for a new invitation.',409,'INVITATION_EXPIRED');
+     if(n.users.some(u=>u.username===uname))throw new APIError('That username is already in use. Choose another username for this invitation.',400,'USERNAME_TAKEN');
+     const b=n.businesses[i.businessId];validateShops(b,i.shopIds);if(n.users.filter(u=>u.businessId===b.business.id).length>=100)throw new APIError('This sandbox business has reached its 100-user allowance.',429);
+-    const u={id:uid('user'),businessId:i.businessId,username:uname,name:i.name,phone:i.phone,role:i.role,shopIds:[...i.shopIds],active:true,password,recoveryHash:keyHash,recoveryKeyPending:true,recoveryKeyReference:uid('recovery-key'),recoveryKeyIssuedAt:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
++    const u={id:uid('user'),businessId:i.businessId,username:uname,name:i.name,phone:i.phone,role:i.role,shopIds:[...i.shopIds],active:true,password,recoveryHash:keyHash,recoveryKeyPending:!prototypeFaceOnly,recoveryKeyReference:prototypeFaceOnly?null:uid('recovery-key'),recoveryKeyIssuedAt:prototypeFaceOnly?null:iso(),sessionVersion:1,createdAt:iso(),updatedAt:iso(),passwordChangedAt:iso()};
+     n.users.push(u);i.status='accepted';i.acceptedAt=iso();i.acceptedBy=u.id;projectUsers(n,b);newSession(n,u,newHash,false,String(p.deviceLabel||'Shop browser'));audit(n,'INVITATION_ACCEPTED',b.business.id,u.id);
+-    return {data:bundle(n,newHash,studentHash,{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true,replayed:false})};
++    return {data:bundle(n,newHash,studentHash,{...(prototypeFaceOnly?{requiresRecoveryKey:false,recoveryKeyAvailable:false}:{recoveryKey,recoveryKeyReference:u.recoveryKeyReference,recoveryKeyAvailable:true}),replayed:false})};
+    });return response({...out.data,revision:out.revision},out.data.replayed?200:201,[sessionCookie(token)]);
+   }
+   const inviteAction=path.match(/^\/api\/invitations\/([^/]+)\/(resend|revoke)$/);

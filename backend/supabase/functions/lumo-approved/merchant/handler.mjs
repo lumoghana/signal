@@ -57,13 +57,14 @@ export function hydrateMerchantNetwork(raw){
 /** Original v7 HTTP API behind the verified shared-auth boundary. No client state
  * is accepted: closures mutate a fresh service-only snapshot, committed with
  * canonical refund postings in one database transaction. */
-export function createMerchantHandler({serviceRpc,commerceEnabled=false}){
+export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototypeFaceOnly=false}){
  if(typeof serviceRpc!=='function')throw new Error('Merchant service RPC is required.');
  return async ({body,identity})=>{
   const path=normalizeMerchantPath(body.path),method=body.method||'GET',pathname=path?.split('?')[0],input=body.body||{};
   if(!path||!['GET','POST'].includes(method))return failure('INVALID_REQUEST');
   if(!identity&&!PUBLIC_GET.test(path)&&!(typeof body.merchantToken==='string'&&/^[a-f0-9]{64}$/.test(body.merchantToken)))return failure('SESSION_REVOKED',401);
   if(UNAVAILABLE.has(pathname)||/^\/api\/users\/[^/]+\/reset$/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
+  if(prototypeFaceOnly===true&&/^\/api\/auth\/recovery-key(?:\/ack)?$/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
   if(/^\/api\/(?:student|sandbox-fund|payments$)/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
   if(pathname==='/api/simulate'||pathname==='/api/action'&&['PAY','RESOLVE_PAYMENT','SETTLE','RESOLVE_SETTLEMENT'].includes(input.type))return failure('UNAVAILABLE_SERVICE',503);
   if(!(method==='GET'?GET_ROUTE:POST_ROUTE).test(pathname))return failure('INVALID_REQUEST',404);
@@ -158,9 +159,16 @@ export function createMerchantHandler({serviceRpc,commerceEnabled=false}){
    const clientContext=identity?.userId?'shared-user:'+identity.userId:merchantToken?'merchant-capability:'+tokenHash:'public-read';
    const headers={'Accept':'application/json','Cookie':merchantToken?'lumo_session='+merchantToken:'','X-Lumo-Request':'1','cf-connecting-ip':clientContext};
    if(method==='POST')headers['Content-Type']='application/json';
-   const response=await handleAPI(new Request('https://merchant.lumo.internal'+path,{method,headers,...(method==='POST'?{body:JSON.stringify(input)}:{})}),{approvedStore:{read,update}});
+   const response=await handleAPI(new Request('https://merchant.lumo.internal'+path,{method,headers,...(method==='POST'?{body:JSON.stringify(input)}:{})}),{approvedStore:{read,update},prototypeFaceOnly:prototypeFaceOnly===true});
    if(!response)return failure('INVALID_REQUEST',404);
    const result=await response.json();
+   if(prototypeFaceOnly===true){
+    // Old accounts may still carry a pending legacy key. Retire only its public
+    // checkpoint; do not rewrite their stored credentials or any money records.
+    for(const session of [result.session,...(Array.isArray(result.sessions)?result.sessions:[])])if(session){session.recoveryKeyPending=false;session.recoveryKeyReference=null;}
+    delete result.recoveryKey;delete result.recoveryKeyReference;delete result.recoveryAction;delete result.keyUnavailable;
+    result.recoveryKeyAvailable=false;result.requiresRecoveryKey=false;
+   }
    const cookie=response.headers.get('set-cookie')||'',match=cookie.match(/(?:^|,\s*)lumo_session=([^;]*)/);
    const responseToken=match?decodeURIComponent(match[1]):merchantToken;
    if(commerceEnabled&&response.ok&&result.session&&result.state){

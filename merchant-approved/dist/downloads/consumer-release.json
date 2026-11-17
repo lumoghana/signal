@@ -1,8 +1,8 @@
 {
-  "consumerExperience": "2.12.4",
-  "apkVersion": "2.12.4",
-  "apkVersionCode": 21204,
-  "apkSha256": "0518c4a379fe815b5f794e7555f7fd49db12bbdb1a062e5046aabbd56e30d223",
+  "consumerExperience": "2.12.5",
+  "apkVersion": "2.12.5",
+  "apkVersionCode": 21205,
+  "apkSha256": "21acf920bfc4e417283915125a69dadf2826b4961e24576f04819cf967b69e10",
   "apkBytes": 4621263,
   "apkDownload": "/downloads/Lumo-Test-Android.apk",
   "providerMode": "sandbox",
@@ -21,8 +21,8 @@
     "faceRemovalRequiresCurrentPassword": true,
     "niaMode": "simulation",
     "sms": "disabled-for-prototype-recovery",
-    "livenessMode": "prototype-simulation",
     "livenessSimulation": true,
+    "livenessMode": "prototype-simulation",
     "recoveryMode": "prototype-face-only",
     "prototypeOnly": true,
     "productionKeylessRecoveryAllowed": false

@@ -26,3 +26,30 @@ test('a face-removal response arriving after an account change cannot authorize 
  let release;const h=fixture({handler:()=>new Promise(resolve=>{release=resolve;})});
  const pending=h.service.passwordRecoveryRequest('faceRemove',{currentPassword:'SyntheticCurrent123'},{authenticated:true});h.storage.setItem(KEY,JSON.stringify(session('new-owner')));release(Response.json({ok:true,removed:true,templateEnrolled:false}));assert.equal((await pending).code,'ACCOUNT_CHANGED');assert.equal(JSON.parse(h.storage.getItem(KEY)).user.id,'new-owner');h.service.dispose();
 });
+
+test('recovery detects a fresh login for the same owner without relying on a storage event',async()=>{
+ for(const operation of ['status','enrollmentStart','faceRemove','faceVerify','complete']){
+  let release;const h=fixture({handler:()=>new Promise(resolve=>{release=resolve;})});
+  const pending=h.service.passwordRecoveryRequest(operation,{currentPassword:'SyntheticCurrent123'}, {authenticated:['status','enrollmentStart','faceRemove'].includes(operation)});
+  h.storage.setItem(KEY,JSON.stringify({...session('original-owner'),access_token:'new-login-access',refresh_token:'new-login-refresh',lumoAuthGeneration:'new-login-generation'}));
+  release(Response.json({ok:true,removed:true,templateEnrolled:false,completed:true,resetToken:'private-late-proof'}));
+  const reply=await pending;assert.equal(reply.code,'ACCOUNT_CHANGED',operation);assert.equal(reply.resetToken,undefined);assert.equal(reply.completed,undefined);
+  assert.equal(JSON.parse(h.storage.getItem(KEY)).access_token,'new-login-access');assert.equal(h.service.signedIn,false);h.service.dispose();
+ }
+});
+
+test('a same-owner login change before recovery begins prevents sending stale credentials',async()=>{
+ const h=fixture();h.storage.setItem(KEY,JSON.stringify({...session('original-owner'),lumoAuthGeneration:'fresh-login-generation'}));
+ assert.equal((await h.service.passwordRecoveryRequest('faceRemove',{currentPassword:'SyntheticCurrent123'},{authenticated:true})).code,'ACCOUNT_CHANGED');
+ assert.equal(h.calls.length,0);assert.equal(JSON.parse(h.storage.getItem(KEY)).lumoAuthGeneration,'fresh-login-generation');h.service.dispose();
+});
+
+test('ordinary token refresh within one login still allows its recovery response',async()=>{
+ let release;const h=fixture({handler:()=>new Promise(resolve=>{release=resolve;})});
+ // Load the stable generation through a new service, as a real login stores it.
+ h.service.dispose();h.storage.setItem(KEY,JSON.stringify({...session('original-owner'),lumoAuthGeneration:'same-login-generation'}));
+ const service=createApprovedService({storage:h.storage,modeStorage:memory(),lockManager:locksFor(h.storage),fetch:()=>new Promise(resolve=>{release=resolve;})});
+ const pending=service.passwordRecoveryRequest('status',{}, {authenticated:true});
+ h.storage.setItem(KEY,JSON.stringify({...session('original-owner'),access_token:'refreshed-access',refresh_token:'refreshed-refresh',lumoAuthGeneration:'same-login-generation'}));
+ release(Response.json({ok:true,templateEnrolled:true}));assert.equal((await pending).templateEnrolled,true);assert.equal(service.signedIn,true);service.dispose();
+});

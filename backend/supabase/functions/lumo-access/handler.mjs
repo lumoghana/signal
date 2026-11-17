@@ -266,13 +266,23 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
     values(['requestId','resetToken','newPassword']);
     if(!UUID.test(body.requestId||'')||typeof body.resetToken!=='string'||!TOKEN.test(body.resetToken)||!validPassword(body.newPassword,module))throw failure('INVALID_INPUT');
     const payload={module,requestId:body.requestId,resetTokenHash:await resetHash(module,body.requestId,body.resetToken),passwordFingerprint:await passwordFingerprint(module,body.requestId,body.newPassword)};
-    const begun=await rpc('complete.begin',payload);
+    const begun=await rpc(keyless?'complete.claim':'complete.begin',{...payload,...(keyless?{executionId:cryptoApi.randomUUID()}:{})});
     if(begun.resetState!=='completed'){
      if(!UUID.test(begun.ownerId||'')||typeof begun.email!=='string'||module!=='admin'&&(!HANDLE.test(begun.handle||'')||begun.email!==begun.handle+'@pilot.lumo.invalid'))throw failure('RESET_IN_PROGRESS',409);
+     if(keyless&&(!UUID.test(begun.executionId||'')||!['applying','confirming'].includes(begun.resetState)))throw failure('RESET_IN_PROGRESS',409);
+     const executionPayload={...payload,...(keyless?{executionId:begun.executionId}:{})};
      try{
-      const changed=await upstream('/auth/v1/admin/users/'+begun.ownerId,{password:module==='admin'?body.newPassword:await approvedPassword(begun.handle,body.newPassword)},{method:'PUT',allowFailure:true});
-      if(!changed.ok||changed.data?.id!==begun.ownerId)throw failure('RESET_IN_PROGRESS',409);
-      await rpc('complete.finish',payload);
+      if(!keyless||begun.resetState!=='confirming'){
+       const changed=await upstream('/auth/v1/admin/users/'+begun.ownerId,{password:module==='admin'?body.newPassword:await approvedPassword(begun.handle,body.newPassword)},{method:'PUT',allowFailure:true});
+       if(!changed.ok||changed.data?.id!==begun.ownerId){
+        // Only a definite Auth rejection releases execution authority. A timeout,
+        // 5xx or malformed success can conceal an applied/pending write.
+        if(keyless&&!changed.ok&&changed.status>=400&&changed.status<500)await rpc('complete.failed',executionPayload);
+        throw failure('RESET_IN_PROGRESS',409);
+       }
+       if(keyless)await rpc('complete.applied',executionPayload);
+      }
+      await rpc('complete.finish',executionPayload);
      }catch{throw failure('RESET_IN_PROGRESS',409);}
     }
     return respond({ok:true,...labels,completed:true,message:keyless?'Your password changed and existing sessions ended. Sign in again. Your saved face profile and transaction PIN are unchanged.':'Your password changed and existing sessions ended. Sign in again, then set up a fresh recovery key. Your transaction PIN is unchanged.'});
@@ -281,7 +291,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
   }catch(error){
    const code=error?.code==='SANDBOX_INVALID_INPUT'?'INVALID_INPUT':Object.hasOwn(messages,error?.code)?error.code:'SERVICE_UNAVAILABLE';
    const status=Number.isInteger(error?.status)&&error.status>=400&&error.status<=599?error.status:503;
-   return respond({ok:false,...(ready?labels:{}),code,message:keyless&&['RECOVERY_FAILED','FACE_SETUP_REQUIRED','IDENTITY_UNAVAILABLE','RECOVERY_UNAVAILABLE'].includes(code)?({RECOVERY_FAILED:'Your saved face could not be confirmed. Retake your selfies or contact Lumo support.',FACE_SETUP_REQUIRED:'Sign in and save a new face profile before using face recovery.',IDENTITY_UNAVAILABLE:'Face verification is unavailable. Try again later.',RECOVERY_UNAVAILABLE:'Face recovery is unavailable for these details. Sign in or contact Lumo support.'}[code]):messages[code],...(Number.isSafeInteger(error?.retryAfter)?{retryAfter:Math.max(1,Math.min(error.retryAfter,3600))}:{})},status);
+   return respond({ok:false,...(ready?labels:{}),code,message:keyless&&['RECOVERY_FAILED','FACE_SETUP_REQUIRED','IDENTITY_UNAVAILABLE','RECOVERY_UNAVAILABLE','RESET_IN_PROGRESS'].includes(code)?({RECOVERY_FAILED:'Your saved face could not be confirmed. Retake your selfies or contact Lumo support.',FACE_SETUP_REQUIRED:'Sign in and save a new face profile before using face recovery.',IDENTITY_UNAVAILABLE:'Face verification is unavailable. Try again later.',RECOVERY_UNAVAILABLE:'Face recovery is unavailable for these details. Sign in or contact Lumo support.',RESET_IN_PROGRESS:'A password update is awaiting confirmation. Wait a moment and retry this step. If it stays pending, contact Lumo support.'}[code]):messages[code],...(Number.isSafeInteger(error?.retryAfter)?{retryAfter:Math.max(1,Math.min(error.retryAfter,3600))}:{})},status);
   }
  };
 }

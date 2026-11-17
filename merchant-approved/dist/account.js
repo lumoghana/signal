@@ -27,16 +27,18 @@ export function clearPendingInvitation(username){const value=readPendingInvitati
 function invitationMatches(value,current){return Boolean(value&&current&&value.username===String(current.username||'').toLowerCase()&&(!value.userId||value.userId===current.userId)&&(!value.businessId||value.businessId===current.businessId))}
 export function getInvitationRecoveryNotice(current=getSession()){
  const value=readPendingInvitation();if(!invitationMatches(value,current))return '';
+ if(typeof Connected.accessRecovery==='function'){clearPendingInvitation(current.username);return '';}
  return 'Your invitation account is signed in, but its private recovery key was not saved. Confirm your password to create a replacement key, then save it before continuing.';
 }
 export function getRecoveryKeyNotice(current=getSession()){
+ if(typeof Connected.accessRecovery==='function'){Shared.clearRecoveryKey();getInvitationRecoveryNotice(current);return '';}
  if(current&&Object.hasOwn(current,'recoveryKeyPending')&&!current.recoveryKeyPending){if(invitationMatches(readPendingInvitation(),current))clearPendingInvitation(current.username);return '';}
  if(current?.recoveryKeyPending&&!Shared.getRecoveryKey())return 'Your private recovery key still needs saving. Confirm your password to create a replacement key, then save it before continuing.';
  return getInvitationRecoveryNotice(current);
 }
 function rememberInvitationAccount(result){
  const value=readPendingInvitation(),current=result?.session||getSession();
- if(invitationMatches(value,current))writePendingInvitation({...value,stage:'needs-key',userId:current.userId,businessId:current.businessId});
+ if(invitationMatches(value,current)){if(typeof Connected.accessRecovery==='function')clearPendingInvitation(current.username);else writePendingInvitation({...value,stage:'needs-key',userId:current.userId,businessId:current.businessId});}
 }
 
 const randomId=()=>crypto.randomUUID();
@@ -59,8 +61,8 @@ export const passwordRecoveryRequest=Connected.accessRecovery;
 export function recoveryCompleted(){Shared.lockLocal('password-recovered');}
 export const hasOwner=businessId=>Boolean(getSession()?.businessId===businessId||Shared.getCache().state?.business?.id===businessId||getState().business?.id===businessId&&isSharedBusiness(getState().business));
 export const subscribeAuth=fn=>Shared.subscribeShared(type=>{if(type==='account')fn()});
-export const getRecoveryKey=Shared.getRecoveryKey;
-export const getRecoveryKeyReference=Shared.getRecoveryKeyReference;
+export const getRecoveryKey=()=>typeof Connected.accessRecovery==='function'?'':Shared.getRecoveryKey();
+export const getRecoveryKeyReference=()=>typeof Connected.accessRecovery==='function'?'':Shared.getRecoveryKeyReference();
 export function clearRecoveryKey(){Shared.clearRecoveryKey();const current=getSession();if(invitationMatches(readPendingInvitation(),current))clearPendingInvitation(current.username)}
 export async function acknowledgeRecoveryKey({reference=Shared.getRecoveryKeyReference()}={}){
  const current=getSession();if(!current)throw new Error('Sign in again before confirming your recovery key.');
@@ -136,4 +138,3 @@ export async function changePhone(payload){return post('/api/auth/phone',payload
 export async function verifyStepUp(payload){const result=await post('/api/auth/step-up',payload);return {...result,stepUpToken:result.stepUpToken||result.proof}}
 export async function regenerateRecoveryKey(payload){return post('/api/auth/recovery-key',payload)}
 export async function transferOwner(payload){requireCapability('ownershipTransfer');const result=await authPost('/api/auth/transfer',payload,'ownership-transfer');Shared.lockLocal('ownership-transferred');return result}
-
