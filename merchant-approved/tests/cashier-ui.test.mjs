@@ -195,7 +195,6 @@ test('shop receipt screen discloses both capped catch-up channels and an older-r
  assert.match(html,/latest 20 shop QR and 20 online receipts/);assert.match(html,/Ask your manager to check an older or missing reference/);
 });
 
-
 function historyResult(f,receipts,nextCursor=null){
  const actor=f.config.getActor(),counter=f.config.getCounter();
  return {ok:true,readOnly:true,noMutation:true,scope:{businessId:f.state.business.id,sessionId:'session-a',counterId:counter.id,shopId:actor.shopId,staffId:actor.staffId,shiftId:counter.shiftId||'shift-a'},receipts,nextCursor,window:{hours:24}};
@@ -230,7 +229,6 @@ test('exact-reference search handles missing results and rejects uncertain recei
   f.config.api=async()=>historyResult(f,[historyReceipt('uncertain',{status:'processing'})]);await click(view,'refresh-shop-receipts');assert.match(view.render(),/could not verify this receipt page/);assert.doesNotMatch(view.render(),/LUMO-uncertain/);
  }finally{globalThis.FormData=OriginalFormData;}
 });
-
 
 test('browser-only sample help history remains available without inventing a server counter identity',async()=>{
  const f=fixture({tickets:[{id:'sample-help',shopId:'shop-a',createdByStaffId:'a',counterId:null,subject:'Sample phone help',message:'Check this phone.',status:'open',createdAt:new Date().toISOString()}]});f.config.isSample=()=>true;

@@ -1,6 +1,6 @@
 import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
 import path from 'node:path';
-const root=process.cwd(),types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.webmanifest':'application/manifest+json','.txt':'text/plain; charset=utf-8'},assets={};
+const root=process.cwd(),types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.apk':'application/vnd.android.package-archive','.woff2':'font/woff2','.webmanifest':'application/manifest+json','.txt':'text/plain; charset=utf-8'},assets={};
 async function scan(dir){for(const ent of await readdir(dir,{withFileTypes:true})){if(['server','.openai'].includes(ent.name))continue;const file=path.join(dir,ent.name);if(ent.isDirectory())await scan(file);else assets['/'+path.relative(path.join(root,'dist'),file).replaceAll(path.sep,'/')]={type:types[path.extname(file)]||'application/octet-stream',data:(await readFile(file)).toString('base64')}}}
 await scan(path.join(root,'dist'));await writeFile('worker/assets.generated.js','export const assets='+JSON.stringify(assets)+';\n');
 const ids=new Map(),chunks=[];

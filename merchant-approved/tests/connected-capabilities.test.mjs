@@ -24,10 +24,13 @@ test('unsupported account maintenance preserves the real account identity and ne
 
 test('unavailable account UI explains the capability before collecting credentials or promising recovery',async()=>{
  const access=createAccess({auth:Auth,business:()=>snapshot.business,onRender(){}});
- for(const view of ['password','recovery','username-recovery']){
+ for(const view of ['password','username-recovery']){
   access.show(view);const html=access.render();assert.match(html,/not available in the connected test/);assert.doesNotMatch(html,/name="(?:currentPassword|newPassword|recoveryKey|username|phone)"/);
   await access.handleSubmit({});assert.equal(Auth.getSession().id,session.id);
  }
+ const previous=globalThis.fetch;let recoveryChecks=0;
+ globalThis.fetch=async(url,options)=>{recoveryChecks++;const body=JSON.parse(options.body);assert.equal(body.module,'merchant');assert.equal(body.operation,'status');assert.equal(options.headers.Authorization,undefined);return Response.json({ok:false,code:'RECOVERY_UNAVAILABLE',message:'Recovery is unavailable.'},{status:503});};
+ try{access.show('recovery');assert.match(access.render(),/Checking your recovery options/);await new Promise(resolve=>setImmediate(resolve));const html=access.render();assert.match(html,/We could not load account recovery/);assert.doesNotMatch(html,/name="(?:currentPassword|newPassword|backupKey|username|phone)"/);assert.equal(recoveryChecks,1);assert.equal(Auth.getSession().id,session.id);access.hide();}finally{globalThis.fetch=previous;}
  access.show('recovery-key',{recoveryKey:'Synthetic one-time key'});assert.doesNotMatch(access.render(),/It can recover your account/);assert.match(access.render(),/recovery is not available/);
  assert.match(securityPage({session,capabilities:Auth.getCapabilities()}),/Password changes are not available/);
  const people=createPeople({auth:Auth,getState:()=>snapshot,getSession:()=>session,onRender(){}});await people.handleClick('people-user',{dataset:{id:'test-staff'}});

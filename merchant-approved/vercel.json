@@ -1,0 +1,47 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "dist",
+  "buildCommand": "node scripts/prepare-approved-download.mjs",
+  "installCommand": "",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(self), camera=(self), microphone=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://iwutbrljiiodamtyoorg.supabase.co https://lumo-connected-pilot.vercel.app; media-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self' https://chatgpt.com; form-action 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/downloads/Lumo-Test-Android.apk",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/vnd.android.package-archive"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"Lumo-Test-Android.apk\""
+        }
+      ]
+    }
+  ]
+}

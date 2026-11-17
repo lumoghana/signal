@@ -52,7 +52,7 @@ export function encodeRecoveryCanvas(source,{maxBytes=RECOVERY_MAX_PHOTO_BYTES,m
 /** Real, transient camera photos. This module makes no liveness/identity verdict. */
 export function captureRecoverySelfies({
   signal, document = globalThis.document, mediaDevices = globalThis.navigator?.mediaDevices,
-  secureContext = globalThis.isSecureContext === true, wait, frameIntervalMs = 300, frameTimeoutMs = 15000,purpose='recovery',faceMatching='unavailable',
+  secureContext = globalThis.isSecureContext === true, wait, frameIntervalMs = 300, frameTimeoutMs = 15000,purpose='recovery',faceMatching='unavailable',livenessSimulation=false,
 } = {}) {
   const failure = (message, name = 'CameraError') => Object.assign(new Error(message), {name});
   const cancelled = () => failure('Camera capture was cancelled.', 'AbortError');
@@ -81,7 +81,7 @@ export function captureRecoverySelfies({
     const heading = element('h2', 'A little face time.'); heading.id = 'lumo-recovery-camera-title';
     const enrollment=purpose==='enrollment',stored=faceMatching==='stored-template';
     const description = element('p', enrollment&&stored?'Take three photos to prepare your encrypted face profile. Keep your face in view.':stored?'Take three photos with your front camera to compare with your saved face profile.':'Take three photos with your front camera. Keep your face in view.');
-    const notice = element('p', stored?'The photos are discarded after processing. Live-person checks are not verified.':'These are camera photos. This capture alone does not verify liveness or identity.', 'lumo-recovery-camera-notice');
+    const notice = element('p', stored&&livenessSimulation===true?'Liveness is simulated for this prototype. Camera capture and saved-face comparison are real. The photos are discarded after processing.':stored?'The photos are discarded after processing. Live-person checks are not verified.':'These are camera photos. This capture alone does not verify liveness or identity.', 'lumo-recovery-camera-notice');
     const video = element('video', '', 'lumo-recovery-camera-preview');
     video.muted = true; video.autoplay = true; video.playsInline = true;
     video.setAttribute('playsinline', ''); video.setAttribute('aria-label', 'Live front camera preview');

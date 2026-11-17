@@ -1,8 +1,9 @@
 import * as Shared from './shared.js';
-import {MERCHANT_CAPABILITIES} from './connected-service.js';
+import * as Connected from './connected-service.js';
 import {getState,getWorkspaceMode} from './store.js';
+const MERCHANT_CAPABILITIES=Connected.MERCHANT_CAPABILITIES;
 export const isShared=true;
-export const getCapabilities=()=>({...MERCHANT_CAPABILITIES});
+export const getCapabilities=()=>({...MERCHANT_CAPABILITIES,passwordRecoveryCentral:typeof Connected.accessRecovery==='function'});
 export const supportsCapability=name=>MERCHANT_CAPABILITIES[name]===true;
 function requireCapability(name){if(!supportsCapability(name))throw Object.assign(new Error('This account service is not available in the connected test yet. Your existing sign-in and account details have not changed.'),{status:503,code:'UNAVAILABLE_SERVICE',definitiveNoMutation:true})}
 
@@ -54,6 +55,8 @@ export const listUsers=businessId=>Shared.getCache().users.filter(user=>!busines
 export const listInvitations=businessId=>Shared.getCache().invitations.filter(invite=>!businessId||invite.businessId===businessId);
 export const listSessions=()=>Shared.getCache().sessions;
 export const getAuthAudit=()=>Shared.getCache().audit;
+export const passwordRecoveryRequest=Connected.accessRecovery;
+export function recoveryCompleted(){Shared.lockLocal('password-recovered');}
 export const hasOwner=businessId=>Boolean(getSession()?.businessId===businessId||Shared.getCache().state?.business?.id===businessId||getState().business?.id===businessId&&isSharedBusiness(getState().business));
 export const subscribeAuth=fn=>Shared.subscribeShared(type=>{if(type==='account')fn()});
 export const getRecoveryKey=Shared.getRecoveryKey;
@@ -133,3 +136,4 @@ export async function changePhone(payload){return post('/api/auth/phone',payload
 export async function verifyStepUp(payload){const result=await post('/api/auth/step-up',payload);return {...result,stepUpToken:result.stepUpToken||result.proof}}
 export async function regenerateRecoveryKey(payload){return post('/api/auth/recovery-key',payload)}
 export async function transferOwner(payload){requireCapability('ownershipTransfer');const result=await authPost('/api/auth/transfer',payload,'ownership-transfer');Shared.lockLocal('ownership-transferred');return result}
+

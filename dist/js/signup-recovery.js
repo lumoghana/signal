@@ -1,5 +1,5 @@
 import {validRecoveryPhotos} from './recovery-camera.js';
-import {FACE_CONSENT_VERSION,isStoredFaceRecovery,bindFaceStorageConsent} from './password-recovery.js';
+import {FACE_CONSENT_VERSION,isStoredFaceRecovery,isPrototypeFaceRecovery,isPrototypeLivenessSimulation,bindFaceStorageConsent} from './password-recovery.js';
 /** Signup recovery owns secrets only in this short-lived controller, never drafts. */
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uuid=value=>typeof value==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
@@ -11,12 +11,12 @@ const button=(label,action,{secondary=false,disabled=false}={})=>`<button type="
 export function createSignupRecovery({request,password,captures,preparePhotos,now=Date.now,isCurrent=()=>true,clipboard=globalThis.navigator?.clipboard,onChange=()=>{},onComplete=()=>{},onSignIn=()=>{}}={}){
  if(typeof request!=='function'||typeof preparePhotos!=='function')throw new TypeError('Signup recovery needs the authenticated request and captured-photo encoder.');
  let disposed=false,generation=0,currentPassword=password,originalCaptures=captures,requestId='',expiresAt='',demoCode='',backupKey='';
- let state={phase:'prepare',busy:false,error:'',phoneMasked:'',showKey:false,message:'',faceMatching:'unavailable'};
+ let state={phase:'prepare',busy:false,error:'',phoneMasked:'',showKey:false,message:'',faceMatching:'unavailable',prototypeFaceOnly:false,livenessSimulation:false,livenessResult:''};
  const view=()=>({...state});
  const emit=()=>{if(!disposed)onChange(view());};
  const valid=token=>!disposed&&token===generation&&isCurrent();
  const clearCaptures=()=>{currentPassword='';originalCaptures=null;};
- const clearProof=()=>{requestId='';expiresAt='';demoCode='';backupKey='';};
+ const clearProof=()=>{requestId='';expiresAt='';demoCode='';backupKey='';state.livenessResult='';};
  const fail=message=>{state.error=safeMessage(message);emit();return false;};
  async function start(){
   if(disposed||state.busy||!isCurrent())return false;
@@ -25,7 +25,7 @@ export function createSignupRecovery({request,password,captures,preparePhotos,no
   try{
    const reply=await request('status',{}, {authenticated:true});if(!valid(token))return false;
    if(reply?.ok!==true||reply.faceAvailable!==true||!isStoredFaceRecovery(reply)||reply.faceConsentVersion!==FACE_CONSENT_VERSION){state.phase='unavailable';return fail('Your account is created. Saved-face matching is unavailable right now. Sign in to review recovery settings later.');}
-   state.faceMatching='stored-template';state.phase='consent';return true;
+   state.faceMatching='stored-template';state.prototypeFaceOnly=isPrototypeFaceRecovery(reply);state.livenessSimulation=isPrototypeLivenessSimulation(reply);state.livenessResult='';state.phase='consent';return true;
   }catch{if(valid(token)){state.phase='unavailable';state.error='Your account is created. Recovery setup could not connect. Retry, or sign in to finish it later.';}return false;}
   finally{if(valid(token)){state.busy=false;emit();}}
  }
@@ -36,10 +36,10 @@ export function createSignupRecovery({request,password,captures,preparePhotos,no
    if(!validPhotos(photos))throw Error('Your setup photos could not be prepared within the upload limit.');
    const reply=await request('enrollmentStart',{currentPassword,photos,faceConsent:{version:FACE_CONSENT_VERSION,accepted:true}},{authenticated:true});if(!valid(token))return false;
    if(reply?.ok!==true){state.phase='prepare';return fail(reply?.message);}
-   if(!isStoredFaceRecovery(reply)||reply.faceConsentVersion!==FACE_CONSENT_VERSION||!uuid(reply.requestId)||!future(reply.expiresAt,now())||!/^\d{6}$/.test(reply.demoCode||'')){
+   if(!isStoredFaceRecovery(reply)||state.prototypeFaceOnly&&!isPrototypeFaceRecovery(reply)||reply.faceConsentVersion!==FACE_CONSENT_VERSION||!uuid(reply.requestId)||!future(reply.expiresAt,now())||!/^\d{6}$/.test(reply.demoCode||'')){
     clearCaptures();state.phase='interrupted';return fail('Your account is created, but recovery setup could not be confirmed. Sign in again to review recovery settings.');
    }
-   requestId=reply.requestId;expiresAt=reply.expiresAt;demoCode=reply.demoCode;state.phoneMasked=String(reply.phoneMasked||'');state.phase='code';clearCaptures();return true;
+   state.livenessResult=isPrototypeLivenessSimulation(reply)&&reply.livenessResult==='simulated-pass'?'simulated-pass':'';requestId=reply.requestId;expiresAt=reply.expiresAt;demoCode=reply.demoCode;state.phoneMasked=String(reply.phoneMasked||'');state.phase='code';clearCaptures();return true;
   }catch(error){if(valid(token)){state.phase='prepare';state.error='Your account is created. The recovery step could not connect. Retry this step, or sign in again to finish it later.';}return false;}
   finally{photos=null;if(valid(token)){state.busy=false;emit();}}
  }
@@ -56,11 +56,12 @@ export function createSignupRecovery({request,password,captures,preparePhotos,no
    try{
     const reply=await request('enrollmentVerify',{requestId,code},{authenticated:true});if(!valid(token))return false;
     if(reply?.ok!==true)return fail(reply?.message);
-    if(!isStoredFaceRecovery(reply)||reply.enrolled!==true||reply.templateEnrolled!==true||reply.templateVersion!==1||reply.faceConsentVersion!==FACE_CONSENT_VERSION||!/^LUMO-[A-Za-z0-9_-]{43}$/.test(reply.backupKey||'')){
-     clearProof();state.phase='interrupted';return fail('Your recovery settings may have changed, but the private key could not be shown. Sign in again to replace it before relying on recovery.');
+    if(!isStoredFaceRecovery(reply)||reply.enrolled!==true||reply.templateEnrolled!==true||reply.templateVersion!==1||reply.faceConsentVersion!==FACE_CONSENT_VERSION||(state.prototypeFaceOnly?!isPrototypeFaceRecovery(reply):!/^LUMO-[A-Za-z0-9_-]{43}$/.test(reply.backupKey||''))){
+     clearProof();state.phase='interrupted';return fail(state.prototypeFaceOnly?'Your saved face profile could not be confirmed. Sign in again to review recovery settings.':'Your recovery settings may have changed, but the private key could not be shown. Sign in again to replace it before relying on recovery.');
     }
-    backupKey=reply.backupKey;demoCode='';requestId='';expiresAt='';state.phase='key';state.showKey=false;state.message='';return true;
-   }catch{if(valid(token)){clearCaptures();clearProof();state.phase='interrupted';state.error='Your account is created. Recovery may have been saved, but the private key was not received. Sign in again and review or replace it in Password recovery before relying on it.';}return false;}
+    if(state.prototypeFaceOnly){clearCaptures();clearProof();state.phase='done';state.error='';state.message='';emit();onComplete({enrolled:true,simulation:true,faceMatching:'stored-template',faceSimulation:false,recoveryMode:'prototype-face-only',prototypeOnly:true,requiresBackupKey:false,livenessVerified:false});return true;}
+    backupKey=reply.backupKey;demoCode='';requestId='';expiresAt='';state.phase='key';state.livenessResult='';state.showKey=false;state.message='';return true;
+   }catch{if(valid(token)){clearCaptures();clearProof();state.phase='interrupted';state.error=state.prototypeFaceOnly?'Your account is created. Recovery setup could not be confirmed. Sign in again and review Password recovery.':'Your account is created. Recovery may have been saved, but the private key was not received. Sign in again and review or replace it in Password recovery before relying on it.';}return false;}
    finally{if(valid(token)){state.busy=false;emit();}}
   }
   if(state.phase==='key'){
@@ -90,7 +91,7 @@ export function createSignupRecovery({request,password,captures,preparePhotos,no
   }
   else if(state.phase==='code'){
    title='Finish your test setup.';description='Your account is created. One recovery step before your first Lumo moment.';
-   body=`<p class="onb-demo-code">Your test code is <strong>${esc(demoCode)}</strong>.</p><p class="onb-fine">No SMS was sent. This does not verify phone ownership.</p><form data-signup-recovery-form><label class="onb-field"><span>Six-digit test code</span><input class="input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required${busy?' disabled':''}></label>${feedback}<button class="button"${busy?' disabled':''}>${busy?'Checking…':'Confirm test setup'}</button></form>${button('Sign in to finish later','sign-in',{secondary:true,disabled:busy})}`;
+   body=(state.livenessResult==='simulated-pass'?'<p class="onb-fine" role="status">Liveness simulated · Face profile prepared. This does not verify identity.</p>':'')+`<p class="onb-demo-code">Your test code is <strong>${esc(demoCode)}</strong>.</p><p class="onb-fine">No SMS was sent. This does not verify phone ownership.</p><form data-signup-recovery-form><label class="onb-field"><span>Six-digit test code</span><input class="input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required${busy?' disabled':''}></label>${feedback}<button class="button"${busy?' disabled':''}>${busy?'Checking…':'Confirm test setup'}</button></form>${button('Sign in to finish later','sign-in',{secondary:true,disabled:busy})}`;
   }else if(state.phase==='key'){
    title='Save your way back in.';description='This private key is shown once. Keep it separate from your password.';
    body=`<form data-signup-recovery-form><label class="onb-field"><span>Private recovery key</span><input class="input" name="recoveryKey" type="${state.showKey?'text':'password'}" value="${esc(backupKey)}" readonly autocomplete="off" spellcheck="false"></label><div class="onb-inline-links">${button(state.showKey?'Hide key':'Show key','show-key',{secondary:true})}${button('Copy key','copy-key',{secondary:true})}</div><label class="onb-consent"><input type="checkbox" name="savedKey" required><span>I saved my private recovery key somewhere private.</span></label>${feedback}<button class="button">I saved my key. Let’s go.</button></form>`;
@@ -98,7 +99,7 @@ export function createSignupRecovery({request,password,captures,preparePhotos,no
    title='Your account is safe.';description='Recovery setup is not confirmed. Sign in again and open Security & access → Password recovery.';body=feedback+button('Back to sign in','sign-in');
    if(state.phase==='unavailable')body+=button('Try recovery setup again','retry',{secondary:true});
   }
-  return `<section class="onb-page onb-step-recovery" aria-label="Finish signup recovery" data-signup-recovery-stage="${esc(state.phase)}"><header class="onb-header"><span></span><div><span>Your way back</span><small>Finish setup</small></div><span></span></header><main class="onb-main"><span class="onb-kicker">FACE RECOVERY</span><h1>${esc(title)}</h1><p class="onb-description">${esc(description)}</p><p class="onb-fine" role="note">${state.faceMatching==='stored-template'?'Selfies are compared with your encrypted face profile. Live-person checks are not verified. SMS and Ghana Card checks remain simulated. Your private recovery key is also required.':'Saving a reusable face profile needs your separate consent and an available matching service. Your account has already been created.'}</p>${state.phase==='prepare'?feedback:''}${body}</main></section>`;
+  return `<section class="onb-page onb-step-recovery" aria-label="Finish signup recovery" data-signup-recovery-stage="${esc(state.phase)}"><header class="onb-header"><span></span><div><span>Your way back</span><small>Finish setup</small></div><span></span></header><main class="onb-main"><span class="onb-kicker">FACE RECOVERY</span><h1>${esc(title)}</h1><p class="onb-description">${esc(description)}</p><p class="onb-fine" role="note">${state.prototypeFaceOnly?'Prototype recovery uses a fresh selfie matched to your encrypted face profile. Liveness and Ghana Card checks are simulated.':state.faceMatching==='stored-template'?state.livenessSimulation?'Selfies are compared with your encrypted face profile. Liveness is simulated for this prototype. SMS and Ghana Card checks remain simulated. Your private recovery key is also required.':'Selfies are compared with your encrypted face profile. Live-person checks are not verified. SMS and Ghana Card checks remain simulated. Your private recovery key is also required.':'Saving a reusable face profile needs your separate consent and an available matching service. Your account has already been created.'}</p>${state.phase==='prepare'?feedback:''}${body}</main></section>`;
  }
  function bind(root){
   bindFaceStorageConsent(root,{busy:state.busy});

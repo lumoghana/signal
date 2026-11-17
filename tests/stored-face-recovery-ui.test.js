@@ -12,9 +12,9 @@ const real={ok:true,simulation:true,environment:'sandbox',smsSimulation:true,sms
 const enrollment={...real,requestId:id,expiresAt,demoCode:'123456',phoneMasked:'+23324•••••00'};
 const saved={...real,enrolled:true,faceEnrolled:true,templateEnrolled:true,templateVersion:1,keyRotationAvailable:true,backupKey:key};
 const grant={...real,faceMatched:true,resetToken:'r'.repeat(43),expiresAt};
-function recovery({status=real,verify=grant,remove={...real,removed:true,templateEnrolled:false},capture=async()=>photos}={}){
+function recovery({status=real,verify=grant,challenge=enrollment,enrollResult=saved,remove={...real,removed:true,templateEnrolled:false},capture=async()=>photos}={}){
  const calls=[],views=[];
- const flow=createPasswordRecovery({now,capture,onChange:view=>views.push(view),request:async(operation,values,options)=>{calls.push({operation,values,options});return operation==='status'?status:operation==='start'||operation==='enrollmentStart'?enrollment:operation==='enrollmentVerify'||operation==='keyRotate'?saved:operation==='faceVerify'?verify:operation==='faceRemove'?remove:{ok:true,completed:true};}});
+ const flow=createPasswordRecovery({now,capture,onChange:view=>views.push(view),request:async(operation,values,options)=>{calls.push({operation,values,options});return operation==='status'?status:operation==='start'||operation==='enrollmentStart'?challenge:operation==='enrollmentVerify'||operation==='keyRotate'?enrollResult:operation==='faceVerify'?verify:operation==='faceRemove'?remove:{ok:true,completed:true};}});
  return {flow,calls,views};
 }
 async function faceStage(h){assert.equal(await h.flow.start(),true);assert.equal(await h.flow.submit({identifier:'ama.student'}),true);assert.equal(h.flow.view.phase,'verify-face');}
@@ -116,4 +116,70 @@ test('signup cannot upgrade hash-only simulation to saved-face enrollment or acc
 
 test('signup ignores delayed status after account change or disposal without processing captures',async()=>{
  let resolve,encoded=0;const flow=createSignupRecovery({now,password,captures:[1,2,3],preparePhotos:async()=>{encoded++;return photos;},request:()=>new Promise(r=>{resolve=r;})});const pending=flow.start();flow.dispose();resolve(real);assert.equal(await pending,false);assert.equal(encoded,0);
+});
+
+const simulatedLiveness={livenessSimulation:true,livenessMode:'prototype-simulation'};
+test('simulated liveness is disclosed separately and cleared on restart without weakening face or key gates',async()=>{
+ let captures=0;
+ const h=recovery({status:{...real,...simulatedLiveness,livenessResult:'simulated-pass'},verify:{...grant,...simulatedLiveness,livenessResult:'simulated-pass'},capture:async options=>{captures++;assert.equal(options.livenessSimulation,true);return photos;}});
+ await faceStage(h);assert.match(h.flow.render(),/Liveness is simulated for this prototype/);assert.equal(h.flow.view.livenessResult,'');
+ assert.equal(await h.flow.submit({backupKey:''}),false);assert.equal(captures,0);
+ assert.equal(await h.flow.submit({backupKey:key}),true);assert.equal(h.flow.view.phase,'password');assert.match(h.flow.render(),/Liveness simulated · Saved face matched/);
+ assert.equal(h.calls.some(c=>Object.hasOwn(c.values,'livenessResult')||Object.hasOwn(c.values,'livenessSimulation')),false);
+ await h.flow.action('restart');assert.equal(h.flow.view.livenessResult,'');assert.doesNotMatch(h.flow.render(),/Saved face matched/);h.flow.dispose();
+});
+test('a simulated pass cannot replace real matching or assert verified liveness',async()=>{
+ for(const changed of [{faceMatched:false},{faceSimulation:true},{livenessVerified:true},{requiresBackupKey:false}]){
+  const h=recovery({status:{...real,...simulatedLiveness},verify:{...grant,...simulatedLiveness,livenessResult:'simulated-pass',...changed}});
+  await faceStage(h);assert.equal(await h.flow.submit({backupKey:key}),false);assert.equal(h.flow.view.phase,'verify-face');assert.equal(h.flow.view.livenessResult,'');assert.equal(h.calls.some(c=>c.operation==='complete'),false);h.flow.dispose();
+ }
+ const old=recovery({verify:{...grant,livenessResult:'simulated-pass'}});await faceStage(old);await old.flow.submit({backupKey:key});assert.equal(old.flow.view.phase,'password');assert.doesNotMatch(old.flow.render(),/Liveness simulated · Saved face matched/);old.flow.dispose();
+});
+test('signup discloses the simulated capture result only after real template preparation',async()=>{
+ const h=signup({status:{...real,...simulatedLiveness},startReply:{...enrollment,...simulatedLiveness,livenessResult:'simulated-pass'}});
+ await h.flow.start();assert.match(h.flow.render(),/Liveness is simulated for this prototype/);assert.equal(h.flow.view.livenessResult,'');
+ await h.flow.submit({faceConsent:true});assert.equal(h.flow.view.phase,'code');assert.match(h.flow.render(),/Liveness simulated · Face profile prepared/);
+ await h.flow.submit({code:'123456'});assert.equal(h.flow.view.phase,'key');assert.equal(h.flow.view.livenessResult,'');h.flow.dispose();
+});
+
+const faceOnly={...real,...simulatedLiveness,recoveryMode:'prototype-face-only',prototypeOnly:true,requiresBackupKey:false,smsAvailable:false,backupKeyAvailable:false};
+const faceOnlyChallenge={...faceOnly,requestId:id,expiresAt,demoCode:'123456'};
+const faceOnlyGrant={...faceOnly,faceMatched:true,livenessResult:'simulated-pass',resetToken:'r'.repeat(43),expiresAt};
+const faceOnlySaved={...faceOnly,enrolled:true,faceEnrolled:true,templateEnrolled:true,templateVersion:1,keyRotationAvailable:false};
+test('prototype face recovery sends real photos without a key and hides key or SMS reset paths',async()=>{
+ const h=recovery({status:faceOnly,challenge:faceOnlyChallenge,verify:faceOnlyGrant});
+ await faceStage(h);assert.equal(h.flow.view.requiresBackupKey,false);assert.doesNotMatch(h.flow.render(),/name="backupKey"|private recovery key|SMS code|Use my private key/i);
+ assert.equal(await h.flow.action('sms'),false);assert.equal(await h.flow.action('key'),false);
+ assert.equal(await h.flow.submit({}),true);assert.equal(h.flow.view.phase,'password');
+ const proof=h.calls.find(c=>c.operation==='faceVerify');assert.deepEqual(Object.keys(proof.values).sort(),['photos','requestId']);assert.deepEqual(proof.values.photos,photos);
+ assert.equal(await h.flow.submit({newPassword:password,confirmPassword:password}),true);assert.equal(h.flow.view.phase,'success');h.flow.dispose();
+});
+test('incomplete or production claims never turn off recovery-key validation',async()=>{
+ for(const changed of [{prototypeOnly:false},{recoveryMode:'production'},{simulation:false},{environment:'production'},{faceSimulation:true},{livenessVerified:true},{livenessSimulation:false},{faceConsentVersion:'old'}]){
+  let captured=0;const h=recovery({status:{...faceOnly,...changed},capture:async()=>{captured++;return photos;}});
+  assert.equal(await h.flow.start(),false);assert.equal(h.flow.view.phase,'unavailable');assert.equal(captured,0);assert.equal(h.calls.some(c=>c.operation==='faceVerify'),false);h.flow.dispose();
+ }
+});
+test('prototype mode requires a matching grant and a real match, including after a server mode change',async()=>{
+ for(const changed of [{faceMatched:false},{livenessVerified:true},{prototypeOnly:false},{requiresBackupKey:true},{faceConsentVersion:'old'}]){
+  const h=recovery({status:faceOnly,challenge:faceOnlyChallenge,verify:{...faceOnlyGrant,...changed}});await faceStage(h);
+  assert.equal(await h.flow.submit({}),false);assert.equal(h.flow.view.phase,'verify-face');assert.equal(h.calls.some(c=>c.operation==='complete'),false);h.flow.dispose();
+ }
+ const h=recovery({status:faceOnly,challenge:enrollment});await h.flow.start();assert.equal(await h.flow.submit({identifier:'ama.student'}),false);assert.match(h.flow.view.error,/could not be confirmed/);h.flow.dispose();
+});
+test('prototype face setup completes without issuing, displaying or acknowledging a recovery key',async()=>{
+ const h=recovery({status:faceOnly,challenge:faceOnlyChallenge,enrollResult:faceOnlySaved});await h.flow.start('settings');
+ assert.doesNotMatch(h.flow.render(),/Private key|Create private key|Replace private key/);assert.equal(await h.flow.action('rotate'),false);
+ assert.equal(await h.flow.action('enroll'),true);assert.equal(await h.flow.submit({currentPassword:password,faceConsent:true}),true);assert.equal(h.flow.view.phase,'enrollment-verify');assert.doesNotMatch(h.flow.render(),/receive a private recovery key/);
+ assert.equal(await h.flow.submit({code:'123456'}),true);assert.equal(h.flow.view.phase,'settings');assert.equal(h.flow.view.enrollment.templateEnrolled,true);assert.equal(h.flow.view.enrollment.backupKeyReady,false);assert.doesNotMatch(h.flow.render(),/Private key|savedBackupKey/);h.flow.dispose();
+ const s=signup({status:faceOnly,startReply:faceOnlyChallenge,verifyReply:faceOnlySaved});await s.flow.start();assert.doesNotMatch(s.flow.render(),/private recovery key/i);await s.flow.submit({faceConsent:true});assert.equal(await s.flow.submit({code:'123456'}),true);assert.equal(s.flow.view.phase,'done');assert.equal(s.completed.requiresBackupKey,false);assert.equal(s.completed.recoveryMode,'prototype-face-only');assert.equal(await s.flow.submit({savedKey:true}),false);s.flow.dispose();
+});
+test('a missing matcher leaves prototype recovery unavailable without offering a code or key bypass',async()=>{
+ const h=recovery({status:{...faceOnly,faceAvailable:false}});await h.flow.start();assert.equal(h.flow.view.phase,'unavailable');assert.doesNotMatch(h.flow.render(),/data-password-recovery-action="(?:key|sms)"/);assert.equal(await h.flow.action('sms'),false);assert.equal(await h.flow.action('key'),false);h.flow.dispose();
+});
+test('consumer, merchant and admin recovery all reach password entry with a matched selfie and no key',async()=>{
+ for(const module of ['consumer','merchant','admin']){
+  const calls=[];const flow=createPasswordRecovery({module,now,capture:async()=>photos,request:async(operation,values)=>{calls.push({operation,values});return operation==='status'?faceOnly:operation==='start'?faceOnlyChallenge:faceOnlyGrant;}});
+  await flow.start();assert.equal(await flow.submit({identifier:module==='admin'?'qa-admin@example.invalid':'qa.student'}),true);assert.doesNotMatch(flow.render(),/name="backupKey"/);assert.equal(await flow.submit({}),true);assert.equal(flow.view.phase,'password');assert.equal(calls.some(c=>Object.hasOwn(c.values,'backupKey')||c.operation==='smsVerify'||c.operation==='keyVerify'),false);flow.dispose();
+ }
 });

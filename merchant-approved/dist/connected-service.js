@@ -33,6 +33,43 @@ try{if(typeof window!=='undefined'&&typeof BroadcastChannel!=='undefined'){
  });authChannel.postMessage({type:'request'});authChannel.unref?.();
 }}catch{}
 const headers=token=>({'Content-Type':'application/json',Accept:'application/json',apikey:CONFIG.key,...(token?{Authorization:'Bearer '+token}:{})});
+/** Pilot telemetry has no authority to alter sessions or money snapshots. */
+export function merchantBusinessIdentity(){
+ const auth=authState(),epoch=auth?.epoch||transportEpoch;
+ return !auth?.locked && saved?.session?.access_token && saved?.session?.user?.id && (!saved.authEpoch || !epoch || saved.authEpoch===epoch) ? JSON.stringify([saved.session.user.id,authGeneration,epoch]) : '';
+}
+export async function merchantBusinessRequest(body){
+ if(!body||!['context','experience'].includes(body.action))return {ok:false,code:'INVALID_INPUT'};
+ const identity=merchantBusinessIdentity(),generation=authGeneration,epoch=authState()?.epoch||transportEpoch;
+ if(!identity)return {ok:false,code:'AUTH_REQUIRED'};
+ try{
+  if(saved.session.expires_at&&saved.session.expires_at*1000<Date.now()+45000&&!await refresh(AbortSignal.timeout(6000),generation,epoch))return {ok:false,code:'AUTH_REQUIRED'};
+  if(identity!==merchantBusinessIdentity())return {ok:false,code:'AUTH_CHANGED'};
+  const result=await fetch(CONFIG.url+'/functions/v1/lumo-business',{method:'POST',headers:headers(saved.session.access_token),body:JSON.stringify(body),signal:AbortSignal.timeout(6000),credentials:'omit',cache:'no-store',redirect:'error'});
+  const data=await result.json();
+  if(identity!==merchantBusinessIdentity())return {ok:false,code:'AUTH_CHANGED'};
+  return {ok:result.ok&&data?.ok===true,...(data?.data&&typeof data.data==='object'?{data:data.data}:{}),...(data?.code?{code:data.code}:{})};
+ }catch{return {ok:false,code:'UNAVAILABLE'};}
+}
+/** Password recovery has its own authority boundary and never installs account data. */
+export async function accessRecovery(operation,values={},options={}){
+ const publicOperations=new Set(['start','faceVerify','smsVerify','keyVerify','complete']);
+ const protectedOperations=new Set(['enrollmentStart','enrollmentVerify','keyRotate','faceRemove']);
+ if(operation!=='status'&&!publicOperations.has(operation)&&!protectedOperations.has(operation))throw Object.assign(new Error('That recovery step is unavailable.'),{code:'INVALID_INPUT'});
+ const authenticated=protectedOperations.has(operation)||operation==='status'&&options.authenticated===true;
+ if(publicOperations.has(operation)&&options.authenticated===true)throw Object.assign(new Error('Recovery verification must use its private recovery request.'),{code:'INVALID_INPUT'});
+ const localAuth=authState(),generation=authGeneration,epoch=localAuth?.epoch||transportEpoch,owner=saved?.session?.user?.id;
+ requireCurrent(generation,epoch);
+ if(authenticated&&(localAuth?.locked||saved?.authEpoch&&epoch&&saved.authEpoch!==epoch))throw Object.assign(new Error('Sign in again before updating recovery options.'),{status:401,code:'AUTH_REQUIRED'});
+ if(authenticated&&(!owner||!saved?.session?.access_token))throw Object.assign(new Error('Sign in again before updating recovery options.'),{status:401,code:'AUTH_REQUIRED'});
+ const result=await fetch(CONFIG.url+'/functions/v1/lumo-access',{method:'POST',headers:headers(authenticated?saved.session.access_token:null),body:JSON.stringify({...values,module:'merchant',operation}),signal:options.signal||AbortSignal.timeout(25000),credentials:'omit',cache:'no-store',redirect:'error'});
+ const data=await result.json();
+ requireCurrent(generation,epoch);
+ if(authenticated&&owner!==saved?.session?.user?.id)throw changed();
+ if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Recovery returned an unreadable response. Try again.');
+ if(!result.ok&&data.ok!==false)return {ok:false,code:'RECOVERY_UNAVAILABLE',message:'This recovery step could not be confirmed. Try again.'};
+ return data;
+}
 const response=(result,status=result.status||200)=>new Response(JSON.stringify(result),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}});
 async function post(path,body,token,signal){const r=await fetch(CONFIG.url+path,{method:'POST',headers:headers(token),body:JSON.stringify(body),signal});return {data:await r.json(),status:r.status};}
 async function refresh(signal,generation,epoch){

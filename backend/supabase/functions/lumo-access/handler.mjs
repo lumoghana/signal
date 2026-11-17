@@ -70,17 +70,20 @@ async function jsonBody(request){
 /**
  * SMS/NIA remain explicitly simulated. Face comparison uses only the configured
  * authenticated server processor and its encrypted enrolled template, never a
- * simulator. A private recovery key remains mandatory because this comparison
- * does not establish liveness or government identity. No photo is persisted,
+ * simulator. The protected mode requires a private recovery key. The explicitly
+ * opted-in pilot mode demonstrates keyless recovery without verified liveness. No photo is persisted,
  * logged or returned. Reset grants are account-bound and one-use.
  */
 export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],providerMode='disabled',
- fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,providers,faceTemplateProvider,faceProcessorUrl='',faceProcessorSecret='',now=Date.now,timeoutMs=15000,maxResponseBytes=65536}={}){
+ fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,providers,faceTemplateProvider,faceProcessorUrl='',faceProcessorSecret='',prototypeFaceOnly=false,now=Date.now,timeoutMs=15000,maxResponseBytes=65536}={}){
  const base=new URL(supabaseUrl);
  if(base.protocol!=='https:'||base.pathname!=='/'||base.search||base.hash||!serviceRoleKey||!cryptoApi?.subtle||!Number.isSafeInteger(timeoutMs)||timeoutMs<10||timeoutMs>15000||!Number.isSafeInteger(maxResponseBytes)||maxResponseBytes<1024||maxResponseBytes>262144)throw Error('Invalid access service configuration.');
  const origins=new Set(allowedOrigins);
+ const prototypeAllowed=prototypeFaceOnly===true&&providerMode==='sandbox'&&base.hostname==='iwutbrljiiodamtyoorg.supabase.co';
+ const keyless=prototypeAllowed;
+ const unavailablePrototype=prototypeFaceOnly===true&&!prototypeAllowed;
  const provider=providerMode==='sandbox'?(providers||createSandboxProviders({enabled:true,crypto:cryptoApi,now})):null;
- const ready=providerMode==='sandbox'&&provider?.available===true&&provider.environment==='sandbox'&&provider.simulation===true;
+ const ready=!unavailablePrototype&&providerMode==='sandbox'&&provider?.available===true&&provider.environment==='sandbox'&&provider.simulation===true;
  const faceProvider=faceTemplateProvider||createFaceTemplateProvider({url:faceProcessorUrl,secret:faceProcessorSecret,fetch:transport,crypto:cryptoApi,now});
  const random=()=>base64url(cryptoApi.getRandomValues(new Uint8Array(32)));
  const hash=async value=>Array.from(new Uint8Array(await cryptoApi.subtle.digest('SHA-256',encoder.encode(value))),b=>b.toString(16).padStart(2,'0')).join('');
@@ -112,7 +115,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
   })(),expired]);}catch{throw failure('SERVICE_UNAVAILABLE',503);}finally{clearTimeout(timer);controller.abort();}
  }
  async function rpc(command,payload={}){
-  const result=await upstream('/rest/v1/rpc/lumo_access_service',{p_command:command,p_payload:payload});
+  const result=await upstream((keyless?'/rest/v1/rpc/lumo_access_prototype_service':'/rest/v1/rpc/lumo_access_service'),{p_command:command,p_payload:payload});
   if(!object(result.data))throw failure('SERVICE_UNAVAILABLE',503);
   if(result.data.ok!==true){const aliases={PROOF_INVALID:'RECOVERY_FAILED',ENROLLMENT_REQUIRED:'RECOVERY_UNAVAILABLE',STEP_UP_REQUIRED:'PASSWORD_INCORRECT',RESET_CONFLICT:'RESET_IN_PROGRESS'};const code=Object.hasOwn(messages,result.data.code)?result.data.code:aliases[result.data.code]||'RECOVERY_FAILED';const error=failure(code,['AUTH_REQUIRED','SESSION_REVOKED'].includes(code)?401:code==='RATE_LIMITED'?429:code==='RESET_IN_PROGRESS'?409:400);if(Number.isSafeInteger(result.data.retryAfter))error.retryAfter=result.data.retryAfter;throw error;}
   return result.data;
@@ -155,8 +158,10 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
   else if(typeof result.matched!=='boolean'||result.keyVersion!==context.keyVersion)throw failure('IDENTITY_UNAVAILABLE',503);
   return result.frameHashes;
  }
- const publicEnrollment=value=>({phoneMasked:String(value?.phoneMasked||''),phoneVerified:false,phoneSimulation:true,backupKeyReady:value?.backupKeyReady===true,keyRotationAvailable:value?.keyRotationAvailable===true,faceEnrolled:value?.templateEnrolled===true,faceSimulation:false,templateEnrolled:value?.templateEnrolled===true,templateVersion:value?.templateEnrolled===true&&value.templateVersion===1?1:null,faceConsentVersion:value?.templateEnrolled===true&&value.faceConsentVersion===FACE_CONSENT?FACE_CONSENT:null,reEnrollmentRequired:value?.reEnrollmentRequired===true});
- const labels={simulation:true,environment:'sandbox',identityVerified:false,livenessVerified:false,faceMatching:'stored-template',faceSimulation:false,faceConsentVersion:FACE_CONSENT,requiresBackupKey:true,smsSimulation:true};
+ const publicEnrollment=value=>({phoneMasked:String(value?.phoneMasked||''),phoneVerified:false,phoneSimulation:true,backupKeyReady:!keyless&&value?.backupKeyReady===true,keyRotationAvailable:!keyless&&value?.keyRotationAvailable===true,faceEnrolled:value?.templateEnrolled===true,faceSimulation:false,templateEnrolled:value?.templateEnrolled===true,templateVersion:value?.templateEnrolled===true&&value.templateVersion===1?1:null,faceConsentVersion:value?.templateEnrolled===true&&value.faceConsentVersion===FACE_CONSENT?FACE_CONSENT:null,reEnrollmentRequired:value?.reEnrollmentRequired===true});
+ // This pilot demonstrates a liveness-provider result only. It never grants
+ // identity assurance or substitutes for the real face match/private key.
+ const labels={simulation:true,environment:'sandbox',identityVerified:false,livenessVerified:false,livenessSimulation:true,livenessMode:'prototype-simulation',faceMatching:'stored-template',faceSimulation:false,faceConsentVersion:FACE_CONSENT,requiresBackupKey:!keyless,smsSimulation:true,...(keyless?{recoveryMode:'prototype-face-only',prototypeOnly:true}:{})};
  return async request=>{
   const origin=request.headers.get('origin');
   const cors={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',Vary:'Origin',...(origin&&origins.has(origin)?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'apikey, authorization, content-type, x-client-info','Access-Control-Max-Age':'600'}:{})};
@@ -168,6 +173,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
    const body=await jsonBody(request),module=body.module,operation=body.operation;
    if(!MODULES.has(module)||typeof operation!=='string')throw failure('INVALID_INPUT');
    if(!ready)throw failure('IDENTITY_UNAVAILABLE',503);
+   if(keyless&&['smsVerify','keyVerify','keyRotate'].includes(operation))throw failure('RECOVERY_UNAVAILABLE');
    const ip=request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim()||'native-or-unknown';
    const rateKey=await hash('lumo-access-client-v1\0'+ip.slice(0,160));
    const authenticated=PRIVATE.has(operation)||operation==='status'&&request.headers.has('authorization');
@@ -176,7 +182,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
    const values=keys=>{if(!exact(body,['module','operation',...keys]))throw failure('INVALID_INPUT');};
    if(operation==='status'){
     values([]);const status=who?await rpc('status',who.identity):null;
-    return respond({ok:true,...labels,smsAvailable:true,faceAvailable:faceProvider.available===true,backupKeyAvailable:true,passwordPolicy:{minLength:module==='admin'?12:10,maxLength:module==='admin'?72:128,...(module==='admin'?{maxBytes:72}:{}),lettersAndNumbers:true},...(who?{enrollment:publicEnrollment(status.enrollment)}:{})});
+    return respond({ok:true,...labels,smsAvailable:!keyless,faceAvailable:faceProvider.available===true,backupKeyAvailable:!keyless,passwordPolicy:{minLength:module==='admin'?12:10,maxLength:module==='admin'?72:128,...(module==='admin'?{maxBytes:72}:{}),lettersAndNumbers:true},...(who?{enrollment:publicEnrollment(status.enrollment)}:{})});
    }
    if(operation==='enrollmentStart'){
     values(['currentPassword','photos','phone','faceConsent']);photoInput(body.photos);
@@ -192,15 +198,15 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
      await rpc('biometric.enroll.store',{...who.identity,requestId,templateId,templateVersion:1,faceDigests:checked,modelId:face.modelId,modelSha256:face.modelSha256,keyVersion:face.keyVersion,templateCiphertext:face.templateCiphertext});
      const accepted=await provider.sendSms({to:phone,code,purpose:'enrollment'});
      if(accepted.accepted!==true||accepted.simulation!==true||accepted.delivered!==false)throw failure('SMS_UNAVAILABLE',503);
-     return respond({ok:true,...labels,requestId,expiresAt:result.expiresAt,phoneMasked:result.phoneMasked,demoCode:code,message:'Test mode: no SMS was sent. Enter the displayed code to finish recovery setup.'});
+     return respond({ok:true,...labels,livenessResult:'simulated-pass',requestId,expiresAt:result.expiresAt,phoneMasked:result.phoneMasked,demoCode:code,message:'Liveness simulated for this prototype. No SMS was sent. Enter the displayed code to finish recovery setup.'});
     });
    }
    if(operation==='enrollmentVerify'){
     values(['requestId','code']);if(!UUID.test(body.requestId||'')||typeof body.code!=='string'||!/^\d{6}$/.test(body.code))throw failure('INVALID_INPUT');
-    const backupKey='LUMO-'+random(),keyReference=cryptoApi.randomUUID();
-    const result=await rpc('enroll.verify',{...who.identity,requestId:body.requestId,otpHash:await otpHash(module,body.requestId,body.code),capabilityHash:await capHash(module,backupKey),keyReference});
+    const backupKey=keyless?'':'LUMO-'+random(),keyReference=keyless?null:cryptoApi.randomUUID();
+    const result=await rpc('enroll.verify',{...who.identity,requestId:body.requestId,otpHash:await otpHash(module,body.requestId,body.code),...(!keyless?{capabilityHash:await capHash(module,backupKey),keyReference}:{})});
     if(result.templateEnrolled!==true||result.templateVersion!==1||result.faceConsentVersion!==FACE_CONSENT)throw failure('IDENTITY_UNAVAILABLE',503);
-    return respond({ok:true,...labels,enrolled:true,phoneVerified:false,phoneSimulation:true,faceEnrolled:true,templateEnrolled:true,templateVersion:1,phoneMasked:result.phoneMasked,backupKey,backupKeyReference:keyReference,message:'Your encrypted face template is saved. Keep this private recovery key too; face comparison does not prove liveness, and SMS remains simulated.'});
+    return respond({ok:true,...labels,enrolled:true,phoneVerified:false,phoneSimulation:true,faceEnrolled:true,templateEnrolled:true,templateVersion:1,phoneMasked:result.phoneMasked,...(!keyless?{backupKey,backupKeyReference:keyReference}:{}),message:keyless?'Your encrypted face profile is saved. This prototype uses fresh selfies for recovery, with simulated liveness.':'Your encrypted face template is saved. Keep this private recovery key too; face comparison does not prove liveness, and SMS remains simulated.'});
    }
    if(operation==='keyRotate'){
     values(['currentPassword']);
@@ -214,25 +220,26 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
     values(['currentPassword']);
     return await withPassword(who,body.currentPassword,rateKey,async proofSession=>{
      const result=await rpc('biometric.remove',{...who.identity,proofSession});
-     return respond({ok:true,...labels,removed:true,templateEnrolled:false,enrollment:publicEnrollment(result.enrollment),message:'Your saved face template was removed. Your private recovery key and SMS option stay as they are.'});
+     return respond({ok:true,...labels,removed:true,templateEnrolled:false,enrollment:publicEnrollment(result.enrollment),message:keyless?'Your saved face profile was removed. Face recovery is unavailable until you enroll again.':'Your saved face template was removed. Your private recovery key and SMS option stay as they are.'});
     });
    }
    if(operation==='start'){
     values(['identifier','method']);
     const identifier=typeof body.identifier==='string'?body.identifier.trim().replace(/^@/,'').toLowerCase():'';
     if(!['face','sms','key'].includes(body.method)||(module==='admin'?!identifier||identifier.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(identifier):!HANDLE.test(identifier)))throw failure('INVALID_INPUT');
+    if(keyless&&body.method!=='face')throw failure('RECOVERY_UNAVAILABLE');
     const requestId=cryptoApi.randomUUID(),code=otp();
     const result=await rpc('recovery.start',{module,identifier,method:body.method,requestId,otpHash:await otpHash(module,requestId,code),rateKey});
     if(body.method==='sms'){
      const accepted=await provider.sendSms({to:normalizedPhone(result.phone)||'+233200000000',code,purpose:'recovery'});
      if(accepted.accepted!==true||accepted.simulation!==true||accepted.delivered!==false)throw failure('SMS_UNAVAILABLE',503);
     }
-    return respond({ok:true,...labels,requestId,expiresAt:result.expiresAt,retryAfter:60,...(body.method==='sms'?{demoCode:code}:{}),message:'Test recovery requires the private recovery key saved while signed in. Account existence is not disclosed.'});
+    return respond({ok:true,...labels,requestId,expiresAt:result.expiresAt,retryAfter:60,...(body.method==='sms'?{demoCode:code}:{}),message:keyless?'Prototype face recovery uses fresh camera photos and simulated liveness. Account existence is not disclosed.':'Test recovery requires the private recovery key saved while signed in. Account existence is not disclosed.'});
    }
    if(['smsVerify','keyVerify','faceVerify'].includes(operation)){
-    values(['requestId','backupKey',...(operation==='smsVerify'?['code']:operation==='faceVerify'?['photos']:[])]);
-    if(!UUID.test(body.requestId||'')||!backup(body.backupKey)||operation==='smsVerify'&&(typeof body.code!=='string'||!/^\d{6}$/.test(body.code)))throw failure('INVALID_INPUT');
-    const capabilityHash=await capHash(module,body.backupKey),payload={module,requestId:body.requestId,capabilityHash};
+    values(['requestId',...(!keyless?['backupKey']:[]),...(operation==='smsVerify'?['code']:operation==='faceVerify'?['photos']:[])]);
+    if(!UUID.test(body.requestId||'')||!keyless&&!backup(body.backupKey)||operation==='smsVerify'&&(typeof body.code!=='string'||!/^\d{6}$/.test(body.code)))throw failure('INVALID_INPUT');
+    const payload={module,requestId:body.requestId,...(!keyless?{capabilityHash:await capHash(module,body.backupKey)}:{})};
     if(operation==='faceVerify'){
      photoInput(body.photos);
      if(faceProvider.available!==true)throw failure('IDENTITY_UNAVAILABLE',503);
@@ -253,7 +260,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
     payload.method=operation==='faceVerify'?'face':operation==='smsVerify'?'sms':'key';
     const result=await rpc('recovery.verify',payload);
     if(operation==='faceVerify'&&result.faceMatched!==true)throw failure('IDENTITY_UNAVAILABLE',503);
-    return respond({ok:true,...labels,...(operation==='faceVerify'?{faceMatched:true}:{}),resetToken,expiresAt:result.expiresAt});
+    return respond({ok:true,...labels,...(operation==='faceVerify'?{faceMatched:true,livenessResult:'simulated-pass'}:{}),resetToken,expiresAt:result.expiresAt});
    }
    if(operation==='complete'){
     values(['requestId','resetToken','newPassword']);
@@ -268,13 +275,13 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
       await rpc('complete.finish',payload);
      }catch{throw failure('RESET_IN_PROGRESS',409);}
     }
-    return respond({ok:true,...labels,completed:true,message:'Your password changed and existing sessions ended. Sign in again, then set up a fresh recovery key. Your transaction PIN is unchanged.'});
+    return respond({ok:true,...labels,completed:true,message:keyless?'Your password changed and existing sessions ended. Sign in again. Your saved face profile and transaction PIN are unchanged.':'Your password changed and existing sessions ended. Sign in again, then set up a fresh recovery key. Your transaction PIN is unchanged.'});
    }
    throw failure('INVALID_INPUT');
   }catch(error){
    const code=error?.code==='SANDBOX_INVALID_INPUT'?'INVALID_INPUT':Object.hasOwn(messages,error?.code)?error.code:'SERVICE_UNAVAILABLE';
    const status=Number.isInteger(error?.status)&&error.status>=400&&error.status<=599?error.status:503;
-   return respond({ok:false,...(ready?labels:{}),code,message:messages[code],...(Number.isSafeInteger(error?.retryAfter)?{retryAfter:Math.max(1,Math.min(error.retryAfter,3600))}:{})},status);
+   return respond({ok:false,...(ready?labels:{}),code,message:keyless&&['RECOVERY_FAILED','FACE_SETUP_REQUIRED','IDENTITY_UNAVAILABLE','RECOVERY_UNAVAILABLE'].includes(code)?({RECOVERY_FAILED:'Your saved face could not be confirmed. Retake your selfies or contact Lumo support.',FACE_SETUP_REQUIRED:'Sign in and save a new face profile before using face recovery.',IDENTITY_UNAVAILABLE:'Face verification is unavailable. Try again later.',RECOVERY_UNAVAILABLE:'Face recovery is unavailable for these details. Sign in or contact Lumo support.'}[code]):messages[code],...(Number.isSafeInteger(error?.retryAfter)?{retryAfter:Math.max(1,Math.min(error.retryAfter,3600))}:{})},status);
   }
  };
 }

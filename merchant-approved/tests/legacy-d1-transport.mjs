@@ -11,6 +11,8 @@ registerHooks({load(url,context,nextLoad){
   import {getMerchantLuxAnswer} from ${JSON.stringify(new URL('../dist/lux-brain.js',import.meta.url).href)};
   export const MERCHANT_CAPABILITIES=Object.freeze({passwordChange:true,passwordRecovery:true,usernameRecovery:true,staffReset:true,ownershipTransfer:true,settlement:true,simulation:true,customerWallet:true});
   export const CONNECTED_CONSUMER_ORIGIN='https://lumo-connected-pilot.vercel.app';
+  export function merchantBusinessIdentity(){return '';}
+  export async function merchantBusinessRequest(){return {ok:false,code:'AUTH_REQUIRED'};}
   export async function merchantFetch(path,options={}){
    if(path==='/api/lux'){
     const input=JSON.parse(options.body||'{}'),snapshotResponse=await globalThis.fetch('/api/session',{method:'GET',signal:options.signal}),snapshot=await snapshotResponse.json();

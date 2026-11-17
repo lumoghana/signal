@@ -7,3 +7,6 @@ outputs/
 worker/assets.generated.js
 dist/server/
 dist/.openai/
+
+# Native artifact is verified and packaged separately from source.
+*.apk
