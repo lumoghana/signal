@@ -29,7 +29,7 @@
     "originalSigningIdentityRetained": true,
     "downloadStatus": "Both Vercel downloads verified against the original-certificate signed 2.13.0 APK.",
     "nativeAppSourceTreeSha256": "2b90073e341d1942feb17ddffc657a08d3d0170956eecab513c81cf0f6c42729",
-    "sourcePackageSha256": "bdc1e15527de5c6013304b4e029202c326ef8555df71fcd471516b991262064a",
+    "sourcePackageSha256": "3bd20729b825c640592441e46c429e167004ec7b5d8933b17523d9a3b007d9aa",
     "sourcePackage": "Lumo-Test-Android-Source-2.13.0.zip"
   },
   "recovery": {
@@ -133,5 +133,22 @@
       "publicSourceAndApkChecks": 20,
       "browserChecks": "Synthetic 320px light/dark list, member, join, claim, cancel, pending and empty views; live signed-out startup. No live account or financial mutations."
     }
+  },
+  "webHotfix": {
+    "id": "shop-directory-handoff-20261117",
+    "date": "2026-11-17",
+    "cause": "Directory shop UUID was passed as an entered shop code.",
+    "fix": "Pass an explicit shopId to the existing authenticated quote flow.",
+    "consumerTests": 1877,
+    "nativeFrameworkCases": 38,
+    "nativeRuntimeChanged": false,
+    "nativeVersion": "2.13.0",
+    "nativeApkSha256": "fef51546c13256e36e46eb12e97a79bb2ea621b797d3eb0359bc0db4a983df72",
+    "liveShopReadCheck": "LUM100003 is published, accepting and open; exact shopId public quote succeeds.",
+    "paymentWritesDuringLiveVerification": false,
+    "deployment": "dpl_F2ZfHMAqrAExR88aYazJfWyXFmNF",
+    "publishedFilesMatch": true,
+    "nativeRegressionSourcePackageUpdated": true,
+    "nativeRegressionSourcePackageFiles": 654
   }
 }

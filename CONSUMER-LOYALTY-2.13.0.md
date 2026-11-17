@@ -1,5 +1,9 @@
 # Your rewards: Lumo 2.13.0
 
+## Shop payment correction, 17 November 2026
+
+The consumer website's **Pay this shop** button now passes the selected shop's explicit identity to the authenticated payment quote. Previously the internal ID was interpreted as an entered shop code, causing an existing published shop to report “shop not found.” Entered shop codes, QR codes, reward payments and payment approval continue through their existing quote checks. The web suite passes 1,877 tests, including the actual directory-button-to-payment handoff. Android 2.13.0 already uses the explicit identity correctly; 38 native framework cases confirm the directory button opens the amount screen without moving money or requesting approval. Its signed APK is unchanged.
+
 Customers can track the merchant programmes they join through Pay → Campus Pay → Your rewards. A shop’s Campus Pay details also open its programme. Each card shows the merchant’s branding, progress, earned rewards, expiry dates, participating shops and the member’s original terms. The merchant owns and controls the programme.
 
 ## Joining and linking

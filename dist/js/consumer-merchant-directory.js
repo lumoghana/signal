@@ -81,7 +81,7 @@ export function bindConnectedCampus(ctx,root){
   if(action==='favorites'){v.favoritesOnly=!v.favoritesOnly;notify();return;}
   if(action==='favorite'||action==='remove')return save(id,action==='remove');
   if(action==='rewards'){const shop=v.shops.find(shop=>shop.id===id&&shop.published===true);if(shop)return ctx.go?.({section:'pay',page:'rewards',shopId:id,backTo:{section:'pay',page:'home',hubTab:'campus'}});return;}
-  if(action==='pay'){const shop=v.shops.find(shop=>shop.id===id&&shop.published===true);if(!accepting(shop)){v.notice='This shop is not accepting payments. Refresh before trying again.';notify();return;}return ctx.openQrMerchant?.(id,{isCurrent:()=>current()});}
+  if(action==='pay'){const shop=v.shops.find(shop=>shop.id===id&&shop.published===true);if(!accepting(shop)){v.notice='This shop is not accepting payments. Refresh before trying again.';notify();return;}return ctx.openQrMerchant?.({shopId:id},{isCurrent:()=>current()});}
   if(action==='locate'){
    if(!globalThis.navigator?.geolocation){v.notice='Location is unavailable. Choose a campus area instead.';notify();return;}
    const generation=++v.locationGeneration;v.locating=true;v.notice='';notify();

@@ -42,9 +42,22 @@ test('published shops search all merchant fields, sort by proximity, and retain 
 test('directory loading, details, saved shops, manual areas and unavailable favourite removal work without moving money',async()=>{
  const h=directoryHarness(),before=h.ctx.state.wallet;
  try{await flush();assert.match(h.html(),/Akua’s Kitchen/);h.input('connectedMerchantSearch','library');assert.match(h.html(),/1 shop/);h.input('connectedMerchantSearch','not a shop');assert.match(h.html(),/No matching shops/);h.input('connectedMerchantSearch','');h.change('merchantArea','Pentagon');assert.match(h.html(),/near Pentagon/);
- await h.click('favorite',SHOP);assert.equal(h.actions[0].type,'saveMerchantFavorite');assert.equal(h.ctx.state.merchantFavorites[0].shopId,SHOP);h.click('detail',SHOP);assert.match(h.html(),/Stated hours/);assert.match(h.html(),/7 am–9 pm/);assert.match(h.html(),/LUM400001/);h.click('pay',SHOP);assert.equal(h.opened[0][0],SHOP);h.click('back');h.click('favorites');assert.match(h.html(),/Your saved shops/);
+ await h.click('favorite',SHOP);assert.equal(h.actions[0].type,'saveMerchantFavorite');assert.equal(h.ctx.state.merchantFavorites[0].shopId,SHOP);h.click('detail',SHOP);assert.match(h.html(),/Stated hours/);assert.match(h.html(),/7 am–9 pm/);assert.match(h.html(),/LUM400001/);h.click('pay',SHOP);assert.deepEqual(h.opened[0][0],{shopId:SHOP});h.click('back');h.click('favorites');assert.match(h.html(),/Your saved shops/);
  h.ctx.state.merchantFavorites.push({shopId:OTHER,savedAt:new Date().toISOString()});assert.match(h.html(),/Saved shop unavailable/);await h.click('remove',OTHER);assert.equal(h.ctx.state.merchantFavorites.some(item=>item.shopId===OTHER),false);assert.equal(h.ctx.state.wallet,before);assert.equal(h.ctx.state.transactions.length,0);
  }finally{h.dispose();}
+});
+
+test('Pay this shop carries the directory identity through the real payment opener to an authenticated shop quote',async()=>{
+ const directory=directoryHarness(),payment=paymentHarness(),calls=[],before=payment.ctx.state.wallet;
+ payment.ctx.shared.quote=async values=>{calls.push(values);return values.shopId===SHOP?quote():{ok:false,message:'Shop not found.'};};
+ directory.ctx.openQrMerchant=(input,options)=>openSharedMerchant(payment.ctx,input,options);
+ try{
+  await flush();await directory.click('detail',SHOP);const result=await directory.click('pay',SHOP);
+  assert.deepEqual(calls,[{shopId:SHOP}]);assert.equal(result.ok,true);assert.equal(payment.route.page,'amount');
+  assert.equal(payment.ctx.draft.payment.shopId,SHOP);assert.equal(payment.ctx.draft.payment.recipient.name,published.businessName);
+  assert.equal(payment.ctx.draft.payment.shopCode,published.code);assert.equal(payment.ctx.draft.payment.amount,0);
+  assert.equal(payment.ctx.authorizations.length,0);assert.equal(payment.ctx.state.wallet,before);assert.equal(payment.ctx.state.transactions.length,0);
+ }finally{directory.dispose();}
 });
 
 test('permission denial leaves manual browsing usable and account switching drops location and saved-shop visibility',async()=>{
