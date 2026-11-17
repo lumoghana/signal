@@ -1,6 +1,6 @@
 # Lumo 2.12.4: prototype face recovery
 
-Status: built and tested; coordinated activation is pending. Installing the APK alone does not activate the new server mode.
+Status: live on the existing consumer, merchant and admin prototype apps, with the paired signed Android APK. Face-only recovery is active on the pilot backend.
 
 ## What changes
 
@@ -27,6 +27,10 @@ A real face-match result is still necessary. Unmatched faces, missing templates,
 
 Physical-phone recovery and acceptance using real user selfies remain unverified. Genuine liveness must be connected and tested before a production recovery design is enabled.
 
-## Activation
+## Live release
 
-Publish the paired frontend and signed APK, apply the additive prototype recovery migration, then activate the matching access service. Verify all three modules and public download checksums together. Earlier automatic approval review blocked the Vercel/GitHub source uploads; those uploads still need explicit authorization before the coordinated rollout.
+The consumer and merchant Vercel apps, merchant and restricted admin Sites, and signed Android download are published. The additive prototype recovery migration is applied and the matching access service is active. The reviewed source is synced to the existing GitHub feature branch; main is unchanged.
+
+Independent live checks confirm face-only status for all three modules, rejection of key/SMS reset routes and malformed face submissions, and matching 2.12.4 metadata and APK checksums at both Vercel apps. The protected recovery functions and restricted database permissions remain unchanged. Anonymous consumer and merchant recovery screens show the fresh-selfie flow without a recovery-key field. Admin UI access remains restricted to its existing audience.
+
+Existing accounts without a reusable enrolled face must complete face setup while signed in before they can use this recovery flow.
