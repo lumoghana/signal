@@ -195,7 +195,7 @@ test('Lumo invitation offers Android and browser access without starting another
  const reference=structuredClone(f.checkout.view().reference),calls=f.calls.length;
  f.checkout.showInvite();assert.equal(f.checkout.view().phase,'invite');const html=renderGuestCheckout(f.checkout.view());
  assert.match(html,/href="https:\/\/lumo-connected-pilot\.vercel\.app\/downloads\/Lumo-Test-Android\.apk" download="Lumo-Test-Android\.apk"/);
- assert.match(html,/Clear before you spend/);assert.match(html,/See what’s really available/);assert.match(html,/Ask Lux about your money/);assert.match(html,/Pause when it matters/);assert.match(html,/Android pilot · Test money · APK download/);assert.match(html,/href="https:\/\/lumo-connected-pilot\.vercel\.app\/">Try Lumo in your browser/);assert.match(html,/Maybe later\. Back to my receipt\./);
+ assert.match(html,/Clear before you spend/);assert.match(html,/See what’s really available/);assert.match(html,/Ask Lumo about your money/);assert.match(html,/Pause when it matters/);assert.match(html,/Android pilot · Test money · APK download/);assert.match(html,/href="https:\/\/lumo-connected-pilot\.vercel\.app\/">Try Lumo in your browser/);assert.match(html,/Maybe later\. Back to my receipt\./);
  assert.equal(f.checkout.view().phone,'');assert.doesNotMatch(html,/0241234567|name="phone"/);assert.equal(f.calls.length,calls);
  f.checkout.showReceipt();assert.equal(f.checkout.view().phase,'receipt');assert.deepEqual(f.checkout.view().reference,reference);assert.match(f.checkout.receiptText(),/LM-GUEST-1/);assert.equal(f.calls.length,calls);assert.equal(f.calls.filter(call=>call.operation==='initiate').length,1);
 });

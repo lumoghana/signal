@@ -313,8 +313,8 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     snapshot() { return request({ action: 'snapshot' }); },
     async askLux(question, context, { signal } = {}) {
       const owner=currentOwner(),epoch=authEpoch;
-      if(!owner || sample) return failure('Sign in to use connected Ask Lux.', 'UNAUTHENTICATED');
-      if(session.expires_at && session.expires_at*1000<Date.now()+45000 && !await refreshSession(owner,epoch)) return failure('Sign in again to ask Lux.', 'UNAUTHENTICATED');
+      if(!owner || sample) return failure('Sign in to use connected Ask Lumo.', 'UNAUTHENTICATED');
+      if(session.expires_at && session.expires_at*1000<Date.now()+45000 && !await refreshSession(owner,epoch)) return failure('Sign in again to ask Lumo.', 'UNAUTHENTICATED');
       if(!current(owner,epoch)) return accountChanged();
       const send=async()=>{
         try {
@@ -323,8 +323,8 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
           if(signal?.aborted) return failure('Question cancelled.', 'CANCELLED');
           const response=cookieMode?await cookieRequest('/api/lux',{question,context},true,{signal:combined}):await transport(config.luxUrl||APPROVED_CONFIG.luxUrl,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({question,context}),signal:combined,redirect:'error'});
           const data=await response.json();
-          return object(data) ? data : failure('Lux could not read that reply. Try again.', 'UNAVAILABLE');
-        } catch { return failure('I couldn’t connect to Lux. Try again; your question has not moved any money.', signal?.aborted?'CANCELLED':'LUX_UNAVAILABLE'); }
+          return object(data) ? data : failure('Lumo could not read that reply. Try again.', 'UNAVAILABLE');
+        } catch { return failure('I couldn’t connect to Lumo. Try again; your question has not moved any money.', signal?.aborted?'CANCELLED':'LUX_UNAVAILABLE'); }
       };
       let data=await send();
       if(!current(owner,epoch)) return accountChanged();

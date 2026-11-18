@@ -13,7 +13,7 @@ function worker() {
  runInNewContext(source,scope);return scope.entry;
 }
 
-test('both merchant documents permit only this app, its configured shared backend and the Lumo Lux service',async()=>{
+test('both merchant documents permit only this app, its configured shared backend and the Lumo companion service',async()=>{
  const transport=readFileSync(new URL('../dist/connected-service.js',import.meta.url),'utf8');
  const configuredOrigin=new URL(transport.match(/const CONFIG=\{url:'([^']+)'/)[1]).origin;
  for(const path of ['/','/app.html']){

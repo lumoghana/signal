@@ -27,7 +27,8 @@ test('live interpreter receives questions only and numbers come from a final aut
   const calls=[],fresh=account();fresh.state.wallet=35000;let reads=0;
   const fetcher=async(url,init)=>{calls.push({url,body:JSON.parse(init.body),headers:init.headers});if(url.includes('ai-gateway'))return provider();reads++;return response(reads===1?account():fresh);};
   const result=await handleLux(request,options(fetcher));assert.equal(result.status,200);assert.equal(result.body.mode,'ai');assert.equal(reads,2);assert.match(result.body.answer.basis[0],/GH₵350.00/);
-  const prompt=JSON.stringify(calls.find(x=>x.url.includes('ai-gateway')).body.messages);assert.doesNotMatch(prompt,/wallet|35000|20000|a\.b\.c|synthetic-oidc|moneySnapshot/);assert.equal(calls.some(x=>x.body.action==='action'),false);
+  const messages=calls.find(x=>x.url.includes('ai-gateway')).body.messages;assert.match(messages[0].content,/Lumo's question interpreter/);assert.doesNotMatch(messages[0].content,/\bLux\b/i);
+  const prompt=JSON.stringify(messages);assert.doesNotMatch(prompt,/wallet|35000|20000|a\.b\.c|synthetic-oidc|moneySnapshot/);assert.equal(calls.some(x=>x.body.action==='action'),false);
 });
 test('session revocation during inference suppresses the answer',async()=>{
   let reads=0;const result=await handleLux(request,options(async url=>url.includes('ai-gateway')?provider():++reads===1?response(account()):response({ok:false},401)));assert.equal(result.status,401);assert.equal(result.body.answer,undefined);
@@ -50,7 +51,7 @@ test('PINs and identity numbers are never sent for inference',async()=>{
 });
 test('warm-instance rate limit is scoped to authenticated owner before provider cost',async()=>{
   const limiter=new Map([[OWNER,{count:12,until:Date.now()+100000}]]);let inference=0;
-  const result=await handleLux(request,{...options(async url=>{if(url.includes('ai-gateway'))inference++;return response(account());}),now:new Date(),limiter});assert.equal(result.status,429);assert.equal(inference,0);
+  const result=await handleLux(request,{...options(async url=>{if(url.includes('ai-gateway'))inference++;return response(account());}),now:new Date(),limiter});assert.equal(result.status,429);assert.equal(inference,0);assert.match(result.body.message,/Lumo/);assert.doesNotMatch(result.body.message,/\bLux\b/i);
 });
 test('missing provider setup is explicit and never described as live AI',async()=>{
   const a=await interpretLux(safeLuxInput(request.body),{credential:''});assert.deepEqual(a,{mode:'recorded',reason:'AI_NOT_CONFIGURED'});

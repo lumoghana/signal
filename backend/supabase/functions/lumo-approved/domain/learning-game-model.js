@@ -32,20 +32,20 @@ export function ensureGameState(s){
 const score=r=>r.history.reduce((n,h)=>n+(h.skill?1:0),0)+(r.status==='consequence'&&r.pending?.skill?1:0);
 function missionRecord(g,missionId){const runs=g.runs.filter(r=>r.missionId===missionId&&r.status==='completed');return {completed:runs.length>0,bestStars:runs.reduce((n,r)=>Math.max(n,score(r)),0),playCount:runs.length};}
 const total=g=>CAMPUS_MISSIONS.reduce((n,m)=>n+missionRecord(g,m.id).bestStars,0);
-function unlockedRewards(g){const stars=total(g);return [{id:'classic',title:'Classic Lux',emoji:'✦',threshold:0},...CAMPUS_REWARDS].filter(r=>r.threshold<=stars);}
+function unlockedRewards(g){const stars=total(g);return [{id:'classic',title:'Classic Lumo',emoji:'✦',threshold:0},...CAMPUS_REWARDS].filter(r=>r.threshold<=stars);}
 const isUnlocked=(g,m)=>m.index===0||missionRecord(g,CAMPUS_MISSIONS[m.index-1]?.id).completed;
 function resolveTurn(m,r){const turn=m.turns[r.turnIndex],variant=(turn.variants||[]).find(v=>r.flags[v.when]===true),view={...turn,...(variant||{})};view.choices=view.choices.map(choice=>({...choice,...((choice.variants||[]).find(v=>r.flags[v.when]===true)||{})}));return view;}
 function resolveEnding(m,r,stars){const base=stars===3?m.ending.strong:m.ending.mixed,variant=(m.ending.variants||[]).find(v=>r.flags[v.when]===true);return {...base,...(variant||{})};}
 function mapView(g){return CAMPUS_MISSIONS.map(m=>({id:m.id,index:m.index,title:m.title,kicker:m.kicker,emoji:m.emoji,description:m.description,topicId:m.topicId,...missionRecord(g,m.id),unlocked:isUnlocked(g,m)}));}
 export function getCampusGame(s){
  const g=gameOf(s),missions=mapView(g),stars=total(g),next=missions.find(m=>m.unlocked&&!m.completed)||missions[missions.length-1];
- return {missions,totalStars:stars,maxStars:CAMPUS_MISSIONS.length*3,completedCount:missions.filter(m=>m.completed).length,nextMissionId:next?.id||'',activeRunId:g.runs.find(r=>r.id===g.activeRunId&&r.status!=='completed')?.id||'',rewards:[{id:'classic',title:'Classic Lux',emoji:'✦',threshold:0},...CAMPUS_REWARDS].map(r=>({...r,unlocked:r.threshold<=stars,equipped:g.equipped===r.id})),equipped:g.equipped,recoveryNotice:g.recoveryNotice,allCompleted:missions.every(m=>m.completed),sampleLabel:'Story money · no real payments'};
+ return {missions,totalStars:stars,maxStars:CAMPUS_MISSIONS.length*3,completedCount:missions.filter(m=>m.completed).length,nextMissionId:next?.id||'',activeRunId:g.runs.find(r=>r.id===g.activeRunId&&r.status!=='completed')?.id||'',rewards:[{id:'classic',title:'Classic Lumo',emoji:'✦',threshold:0},...CAMPUS_REWARDS].map(r=>({...r,unlocked:r.threshold<=stars,equipped:g.equipped===r.id})),equipped:g.equipped,recoveryNotice:g.recoveryNotice,allCompleted:missions.every(m=>m.completed),sampleLabel:'Story money · no real payments'};
 }
 export function getCampusRun(s,runId){
  const g=gameOf(s),r=g.runs.find(r=>r.id===(runId||g.activeRunId));if(!r)return null;
  const m=MISSION_BY_ID.get(r.missionId),t=resolveTurn(m,r),stars=score(r),record=missionRecord(g,m.id),last=r.pending;
  const endingCopy=resolveEnding(m,r,stars);
- return {id:r.id,missionId:m.id,title:m.title,emoji:m.emoji,topicId:m.topicId,status:r.status,stepId:stepId(r),turnIndex:r.turnIndex,turnCount:m.turns.length,turn:{id:t.id,kicker:t.kicker,title:t.title,body:t.body,lux:t.lux,choices:t.choices.map(c=>({id:c.id,label:c.label,detail:c.detail,emoji:c.emoji}))},money:decorateMoney(r.money),lastOutcome:last?{...clone(last.outcome),skill:last.skill,skillLabel:m.skills[r.turnIndex],choiceLabel:last.choiceLabel,changes:clone(last.changes)}:null,stars,bestStars:record.bestStars,starGain:r.starGain||0,improvedStars:r.starGain||0,ending:r.status==='completed'?{...endingCopy,routeLabel:'Try this in my life',skills:m.skills.map((label,i)=>({label,earned:r.history[i]?.skill===true})),branch:clone(r.flags),storyMoney:decorateMoney(r.money)}:null,nextMissionId:CAMPUS_MISSIONS[m.index+1]?.id||'',newRewards:clone(r.newRewards||[]),equipped:g.equipped,sampleLabel:'Story money · no real payments'};
+ return {id:r.id,missionId:m.id,title:m.title,emoji:m.emoji,topicId:m.topicId,status:r.status,stepId:stepId(r),turnIndex:r.turnIndex,turnCount:m.turns.length,turn:{id:t.id,kicker:t.kicker,title:t.title,body:t.body,lux:t.lux,choices:t.choices.map(c=>({id:c.id,label:c.label,detail:c.detail,emoji:c.emoji}))},money:decorateMoney(r.money),lastOutcome:last?{...clone(last.outcome),skill:last.skill,skillLabel:m.skills[r.turnIndex],choiceLabel:last.choiceLabel,changes:clone(last.changes)}:null,stars,bestStars:record.bestStars,starGain:r.starGain||0,improvedStars:r.starGain||0,ending:r.status==='completed'?{...endingCopy,routeLabel:'Try this in my life',skills:m.skills.map((label,i)=>({label,earned:r.history[i]?.skill===true})),branch:clone(r.flags),storyMoney:decorateMoney(r.money)}:null,nextMissionId:CAMPUS_MISSIONS[m.index+1]?.id||'',newRewards:clone(r.newRewards||[]).map(reward=>{const current=[{id:'classic',title:'Classic Lumo'},...CAMPUS_REWARDS].find(item=>item.id===reward?.id);return current?{...reward,title:current.title}:reward;}),equipped:g.equipped,sampleLabel:'Story money · no real payments'};
 }
 function applyEffect(before,flags,choice){
  const effect=(choice.effectVariants||[]).find(v=>flags[v.when]===true)?.effect||choice.effect||{},m=clone(before),f={...flags};
@@ -66,12 +66,12 @@ function prune(g){
 }
 export function handleCampusGameAction(s,type,p={},o={}){
  if(!GAME_ACTIONS.has(type))return null;
- if(!s.learning?.enrolled)return fail('Open Learn with Lux and choose your focus first.');
+ if(!s.learning?.enrolled)return fail('Open Learn with Lumo and choose your focus first.');
  if(s.account?.signedOut||s.account?.status==='closed')return fail('Return to your active Lumo account before playing.');
  ensureGameState(s);const g=s.learning.game;
  if(type==='campusEquip'){
   if(!unlockedRewards(g).some(r=>r.id===p.rewardId))return fail('That look is still waiting on a campus milestone.');
-  const duplicate=g.equipped===p.rewardId;g.equipped=p.rewardId;return success('Lux is ready for the next run.',{duplicate,rewardId:p.rewardId});
+  const duplicate=g.equipped===p.rewardId;g.equipped=p.rewardId;return success('Lumo is ready for the next run.',{duplicate,rewardId:p.rewardId});
  }
  if(type==='campusStart'){
   const m=MISSION_BY_ID.get(p.missionId);if(!m)return fail('Choose a campus mission from your map.');

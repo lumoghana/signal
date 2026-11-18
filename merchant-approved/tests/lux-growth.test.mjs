@@ -100,7 +100,7 @@ test('a wallet-paid linked request uses canonical payment proof while remaining 
  f.state.paymentLinks[0].requestPayment.shopId='pentagon';const foreign=f.ask('Has payment link wallet-link been paid?');assert.equal(stat(foreign,'Linked request · confirmed'),'GH₵0.00');assert.doesNotMatch(prose(foreign),/LM-WALLET-CANONICAL/);
 });
 
-test('planning, link status and permissions changes invalidate earlier Lux answers',()=>{
+test('planning, link status and permissions changes invalidate earlier Lumo answers',()=>{
  const f=fixture(),answer=f.ask('How much remains after my business plan?');assert.equal(merchantLuxStale(f.state,answer,{actor:f.owner,now}),false);f.state.businessPlan.expenses[0].amount=40000;assert.equal(merchantLuxStale(f.state,answer,{actor:f.owner,now}),true);
  const linkAnswer=f.ask('How much did we receive through shared links?');f.state.paymentLinks=[{id:'link',shopId:'night',status:'open',confirmedAmount:0}];assert.equal(merchantLuxStale(f.state,linkAnswer,{actor:f.owner,now}),true);
 });

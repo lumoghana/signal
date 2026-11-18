@@ -101,7 +101,7 @@ test('secondary learning library separates story discovery from personal practic
 
 test('story replies reveal on tap and making a move transforms the scene into a takeaway',()=>{
  const state=createDemoState();enrol(state);const {sessionId}=run(state,'learningStartLesson',{lessonId:'planning-allowance'}),h=harness(state,{section:'learn',page:'lesson',id:'planning-allowance'},{learningUI:{lessonStory:{[sessionId]:true}}});
- let html=renderLearning(h.ctx,h.route);assert.match(html,/Hear Lux’s take/);assert.doesNotMatch(html,/Of course it does/);h.click({learnStoryChat:'planning-allowance'});html=renderLearning(h.ctx,h.route);assert.match(html,/Of course it does/);assert.equal(state.learning.points,0);assert.equal(h.actions.length,0);
+ let html=renderLearning(h.ctx,h.route);assert.match(html,/Hear Lumo’s take/);assert.doesNotMatch(html,/Of course it does/);h.click({learnStoryChat:'planning-allowance'});html=renderLearning(h.ctx,h.route);assert.match(html,/Of course it does/);assert.equal(state.learning.points,0);assert.equal(h.actions.length,0);
  h.click({learnAction:'lesson-begin'});html=renderLearning(h.ctx,h.route);assert.match(html,/learning-money-tickets/);assert.doesNotMatch(html,/learning-option-letter/);h.click({learnAnswer:'lesson',option:'1'});html=renderLearning(h.ctx,h.route);assert.match(html,/learning-celebration/);assert.match(html,/Now the weekend has a number/);assert.doesNotMatch(html,/data-learn-answer=/);assert.equal(state.learning.points,10);h.cleanup();
 });
 

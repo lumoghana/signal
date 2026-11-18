@@ -10,6 +10,20 @@ Object.assign(MESSAGES,{INVALID_REFUND:'Choose the original merchant payment and
 Object.assign(MESSAGES,{AUTH_OUTCOME_UNCONFIRMED:'The original Auth outcome is unconfirmed. Keep its guard and investigate before another action.',AUTH_ALREADY_APPLIED:'Auth has already applied this reset. Reconcile the confirmed original outcome instead of cancelling it.',RESET_IN_PROGRESS:'This original reset is still guarded. Verify its exact outcome before continuing.'});
 Object.assign(MESSAGES,{STALE_APPROVAL:'This approval no longer matches the current target. Refresh and propose a new action for review.',APPROVAL_EXPIRED:'This approval has expired. Review the current target before proposing another.',STAFF_MFA_ENROLMENT_REQUIRED:'Every active staff member must connect and verify an authenticator before MFA is enforced.',SECOND_ACCESS_ADMIN_REQUIRED:'Production requires two verified access administrators for governed access recovery.',RESET_OUTCOME_UNCONFIRMED:'The original Auth write cannot yet be independently confirmed. Keep this request for support; no second password write was made.'});
 MESSAGES.RECOVERY_RESOLUTION_UNAVAILABLE='Recovery resolution is not enabled for this release. Keep the original reset reference and use the existing support process.';
+// Immutable older SQL emits these service-owned notes. Only exact notes in
+// their dedicated display arrays are renamed; names, messages and totals stay.
+const legacySystemNotes=new Map([
+ ['Pause trigger and Lux answer telemetry are not recorded by the current backend.','Pause trigger and Lumo answer telemetry are not recorded by the current backend.'],
+ ['Only recorded outcomes are counted. Client abandonments and Lux satisfaction are not yet instrumented.','Only recorded outcomes are counted. Client abandonments and Lumo satisfaction are not yet instrumented.']
+]);
+function systemNotesForDisplay(data){
+ if(!plain(data))return data;let out=data;
+ for(const key of ['definitions','limitations'])if(Array.isArray(data[key])){
+  const notes=data[key].map(note=>legacySystemNotes.get(note)??note);
+  if(notes.some((note,index)=>note!==data[key][index])){if(out===data)out={...data};out[key]=notes;}
+ }
+ return out;
+}
 const fail=(code,status=400)=>Object.assign(new Error(MESSAGES[code]||MESSAGES.SERVICE_UNAVAILABLE),{code,status});
 const cleanText=(x,max=100)=>typeof x==='string'&&x.trim().length>0&&x.trim().length<=max&&!/[\p{Cc}<>]/u.test(x);
 const emailValue=x=>String(x||'').trim().toLowerCase();
@@ -29,7 +43,7 @@ export function createAdminHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[]
   let response,data;try{response=await transport(base.origin+path,{method,redirect:'error',signal:AbortSignal.timeout(15000),headers:{apikey:serviceRoleKey,Authorization:`Bearer ${token}`,'Content-Type':'application/json',Accept:'application/json'},...(body!==undefined?{body:JSON.stringify(body)}:{})});data=await response.json();}catch{throw fail('SERVICE_UNAVAILABLE',503);}
   if(!response.ok&&!allowFailure)throw fail(response.status===429?'RATE_LIMITED':'SERVICE_UNAVAILABLE',response.status===429?429:503);return {ok:response.ok,status:response.status,data};
  }
- async function rpc(command,payload){const financial=command.startsWith('financial.'),security=command.startsWith('security.')||command.startsWith('recovery.resets.'),special=command==='operations.list'?'lumo_admin_events':command==='summary'?'lumo_admin_summary':command==='staff.directory'?'lumo_admin_staff_directory':null;const {data}=await upstream('/rest/v1/rpc/'+(financial?'lumo_admin_financial':security?'lumo_admin_security':special||'lumo_admin_service'),special?{p_payload:payload}:{p_command:command,p_payload:payload});if(!plain(data)||typeof data.ok!=='boolean')throw fail('SERVICE_UNAVAILABLE',503);if(!data.ok){const code=typeof data.code==='string'&&/^[A-Z_]{1,80}$/.test(data.code)?data.code:'SERVICE_UNAVAILABLE';throw fail(code,['AUTH_REQUIRED','SESSION_REVOKED'].includes(code)?401:['FORBIDDEN','STAFF_REQUIRED','MFA_REQUIRED'].includes(code)?403:400);}return data;}
+ async function rpc(command,payload){const financial=command.startsWith('financial.'),security=command.startsWith('security.')||command.startsWith('recovery.resets.'),special=command==='operations.list'?'lumo_admin_events':command==='summary'?'lumo_admin_summary':command==='staff.directory'?'lumo_admin_staff_directory':null;const {data}=await upstream('/rest/v1/rpc/'+(financial?'lumo_admin_financial':security?'lumo_admin_security':special||'lumo_admin_service'),special?{p_payload:payload}:{p_command:command,p_payload:payload});if(!plain(data)||typeof data.ok!=='boolean')throw fail('SERVICE_UNAVAILABLE',503);if(!data.ok){const code=typeof data.code==='string'&&/^[A-Z_]{1,80}$/.test(data.code)?data.code:'SERVICE_UNAVAILABLE';throw fail(code,['AUTH_REQUIRED','SESSION_REVOKED'].includes(code)?401:['FORBIDDEN','STAFF_REQUIRED','MFA_REQUIRED'].includes(code)?403:400);}return {...data,data:systemNotesForDisplay(data.data)};}
  async function identify(token){
   if(typeof token!=='string'||token.length>16384)throw fail('AUTH_REQUIRED',401);
   const verified=await upstream('/auth/v1/user',undefined,{token,method:'GET',allowFailure:true});if(!verified.ok||!UUID.test(verified.data?.id||''))throw fail('AUTH_REQUIRED',401);

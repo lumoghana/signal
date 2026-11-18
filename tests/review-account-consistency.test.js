@@ -15,7 +15,7 @@ function report(ctx){return handleAccountAction(ctx.state,'accountSupportCreate'
 test('connected records, privacy and support describe shared persistence and device-clearing correctly',()=>{
  const ctx=fixture();
  const records=renderAccount(ctx,{page:'account-statements'});assert.match(records,/latest shared account snapshot/);assert.doesNotMatch(records,/financial records saved on this browser/);
- const privacy=renderAccount(ctx,{page:'account-privacy'});assert.match(privacy,/stored in your shared account/);assert.match(privacy,/does not delete your shared account records/);assert.match(privacy,/Private Ask Lux conversations are kept for this tab/);assert.match(privacy,/selfies are memory-only/);assert.doesNotMatch(privacy,/preferences are saved locally/);
+ const privacy=renderAccount(ctx,{page:'account-privacy'});assert.match(privacy,/stored in your shared account/);assert.match(privacy,/does not delete your shared account records/);assert.match(privacy,/Private Ask Lumo conversations are kept for this tab/);assert.match(privacy,/selfies are memory-only/);assert.doesNotMatch(privacy,/preferences are saved locally/);
  const support=renderAccount(ctx,{page:'account-support'});assert.match(support,/other signed-in devices/);assert.match(support,/shared with Lumo support/);assert.match(support,/Support updates/);assert.doesNotMatch(support,/Everything stays on this device/);
  assert.match(renderLife(ctx,{page:'settings'}),/Resetting this browser does not delete your shared account/);
 });

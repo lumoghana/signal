@@ -119,9 +119,9 @@ export function installPreparedChatAction(ctx, action) {
     const allowed = ['externalMovement', 'confirmExternalBalance', 'saveCommitment', 'reuseEssentialPlan', 'completeMoneyCheck'];
     if (!allowed.includes(value.action)) return false;
     const owner = ctx.shared?.user?.id || ctx.state.account?.id || '', epoch = ctx.shared?.authVersion;
-    if (owner && (value.owner !== owner || value.authVersion !== epoch)) { ctx.toast?.('Ask Lux to check this again in your current account.'); return false; }
+    if (owner && (value.owner !== owner || value.authVersion !== epoch)) { ctx.toast?.('Ask Lumo to check this again in your current account.'); return false; }
     const isCurrent = () => (ctx.shared?.user?.id || ctx.state.account?.id || '') === owner && ctx.shared?.authVersion === epoch && value.moneySnapshot === financialSnapshotKey(ctx.state) && value.preparedOn === new Date().toISOString().slice(0, 10);
-    if (!isCurrent()) { ctx.toast?.('Your money picture changed. Ask Lux to check this again.'); return false; }
+    if (!isCurrent()) { ctx.toast?.('Your money picture changed. Ask Lumo to check this again.'); return false; }
     const conversation = ctx.draft?.chat;
     const onSaved = (result, submitted = {}) => {
       if (!result?.ok || !conversation || ctx.draft?.chat !== conversation || (ctx.shared?.user?.id || ctx.state.account?.id || '') !== owner || ctx.shared?.authVersion !== epoch) return;

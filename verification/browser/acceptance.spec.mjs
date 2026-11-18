@@ -12,7 +12,7 @@ test('actual consumer welcome and preview can be entered and exited without sign
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
  await expect(page.getByRole('heading',{name:'Your money. Made clear.'})).toBeVisible();await expect(page.getByText('Interactive prototype · No real money.')).toBeVisible();
  await page.getByRole('button',{name:'Explore Lumo',exact:true}).click();await expect(page.getByRole('heading',{name:'A quick look inside.'})).toBeVisible();
- await page.getByRole('button',{name:'Ask Lux, scene 4 of 6'}).click();await expect(page.getByRole('heading',{name:'Chat with your money.'})).toBeVisible();
+ await page.getByRole('button',{name:'Ask Lumo, scene 4 of 6'}).click();await expect(page.getByRole('heading',{name:'Chat with your money.'})).toBeVisible();
  await page.getByRole('button',{name:'Skip',exact:true}).click();await page.getByRole('button',{name:'Back to welcome',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Your money. Made clear.'})).toBeVisible();expect(errors).toEqual([]);
 });

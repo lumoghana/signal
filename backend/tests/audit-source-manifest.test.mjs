@@ -1,4 +1,4 @@
-import {readJson,readinessPath,currentFunctionDigest,verifyReadinessManifest} from '../verification/readiness-2.14.0/source-manifest.mjs';
+import {readJson,readinessPath,currentFunctionDigest,verifyReadinessManifest} from '../verification/branding-2.15.0/source-manifest.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';

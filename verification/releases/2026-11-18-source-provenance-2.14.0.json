@@ -1,0 +1,394 @@
+{
+  "schema_version": 3,
+  "product": "Lumo",
+  "repository": "lumoghana/signal",
+  "release": "2.14.0",
+  "release_date": "2026-11-18",
+  "status": "published-and-runtime-CI-verified",
+  "productionReleasePublished": true,
+  "approved_live_url": "https://lumo-connected-pilot.vercel.app/",
+  "export_target": "GitHub / Vercel",
+  "static_directory": "dist",
+  "asset_manifest": "dist-sha256.json",
+  "asset_manifest_sha256": "8efede95ad7f8892372977a4c2a0762bb4741708e21f2f9e2a2de1ade3e56bcb",
+  "release_notes": "READINESS-2.14.0.md",
+  "baseline": {
+    "sourceCommit": "99b7b1024978ba0dc3a143c0033db0af5e3ebc4e",
+    "priorRelease": "2.13.0 + dated shop-directory hotfix",
+    "priorReleaseRecord": "verification/releases/2026-11-17-source-provenance-2.13.0.json",
+    "priorReleaseRecordSha256": "3c669630d43085c45dd1aaad53b6c1b99d877cd905b197f0bb9b2c17e0a4a543"
+  },
+  "assessment": {
+    "scope": "Independent engineering assessment of the published2.14 prototype after successful runtime/source CI. This is not certification or real-money launch approval.",
+    "prototypeQuality": 8.8,
+    "realMoneyReadiness": 4.7,
+    "targetsMet": false,
+    "launchApproval": false,
+    "criteriaWeightsPercent": {
+      "prototype": {
+        "journeys": 35,
+        "controlledCorrectness": 30,
+        "crossPlatformAcceptance": 20,
+        "rebuildAndRelease": 15
+      },
+      "realMoney": {
+        "financialControls": 30,
+        "securityAndIdentity": 25,
+        "providers": 15,
+        "operationsAndAssurance": 20,
+        "devicesAndCapacity": 10
+      }
+    },
+    "earlierCandidateEstimate": {
+      "date": "2026-11-18",
+      "prototypeQuality": 8.6,
+      "realMoneyReadiness": 4.6,
+      "scope": "Prepared candidate before observed publication and successful hosted CI."
+    }
+  },
+  "android": {
+    "version": "2.14.0",
+    "versionCode": 21400,
+    "apkSha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b",
+    "apkBytes": 4645839,
+    "originalCertificateSha256": "64f2301aa4b55db94c2748d67bf66b56bda7569f528455969c575b8603338a6c",
+    "originalSigningIdentityRetained": true,
+    "nativeAppSourceTreeSha256": "2234aaeba5314bc56a2ff13bd48c280927403d7daa9991b44811e9820f976a4a",
+    "sourcePackage": "Lumo-Test-Android-Source-2.14.0.zip",
+    "sourcePackageSha256": "e27011dca71aaadc0743665fd357598d7b5dfa8b7af0d5ea2089788db27a8373",
+    "sourcePackageBytes": 6068290,
+    "sourceDeliveredSeparately": true,
+    "physicalHandsetVerified": false,
+    "immutablePreviewDownload": "https://lumo-merchant-mabtg0hzy-williedark-6795.vercel.app/downloads/Lumo-Test-Android.apk",
+    "previewDownloadByteVerified": true,
+    "productionDownloadUpdated": true,
+    "productionDownloadByteVerified": true,
+    "productionDownloads": [
+      {
+        "surface": "consumer",
+        "url": "https://lumo-connected-pilot.vercel.app/downloads/Lumo-Test-Android.apk",
+        "status": 200,
+        "bytes": 4645839,
+        "sha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b",
+        "match": true
+      },
+      {
+        "surface": "merchant",
+        "url": "https://lumo-merchant.vercel.app/downloads/Lumo-Test-Android.apk",
+        "status": 200,
+        "bytes": 4645839,
+        "sha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b",
+        "match": true
+      }
+    ]
+  },
+  "productionGateways": {
+    "status": "active2.14-exact-source-verified",
+    "candidateReplacementApproved": true,
+    "candidateReplacementExecuted": true,
+    "functions": [
+      {
+        "name": "lumo-approved",
+        "version": 25,
+        "status": "ACTIVE",
+        "verifyJwt": false,
+        "bundleSha256": "aa747c93b356a91f512cf5c9cdd3a480fad5545f175b0b6415aaf80b3800d09f",
+        "allSourceFilesMatch": true,
+        "disabledRecoveryFlags": {}
+      },
+      {
+        "name": "lumo-access",
+        "version": 8,
+        "status": "ACTIVE",
+        "verifyJwt": false,
+        "bundleSha256": "e2814704ff8b9fe0ecc107bcf812a12f4a095fc32db7b4300f5dad15b1a304b2",
+        "allSourceFilesMatch": true,
+        "disabledRecoveryFlags": {
+          "resetFenceEnabled": false
+        }
+      },
+      {
+        "name": "lumo-admin",
+        "version": 8,
+        "status": "ACTIVE",
+        "verifyJwt": false,
+        "bundleSha256": "7b6bde211de28979a4fb9b8fc24aae16b76b63a6b4747f49ae717e4d90567ad2",
+        "allSourceFilesMatch": true,
+        "disabledRecoveryFlags": {
+          "recoveryResetsEnabled": false
+        }
+      }
+    ],
+    "approvalHistory": "An earlier replacement was rejected. New explicit user approval subsequently authorized these three replacements, excluding managed Auth fencing. No Auth DDL was retried."
+  },
+  "preparedGatewayCandidates": {
+    "status": "exact-runtime-source-export-of-active-gateways",
+    "sourceManifest": "backend/verification/readiness-2.14.0/reviewed-source-delta.json",
+    "sourceManifestSha256": "d5a9e935cc6cafb1ea68ca9a42612dac82cfa41148346c3761494b6da051909c",
+    "functions": [
+      {
+        "name": "lumo-approved",
+        "files": 48,
+        "sourceTreeSha256": "e6e25817ad85e238a39e59cdd904d6871af14a52aba673ea10031536b7851936",
+        "payloadSha256": "9145c71f61344b11623015bbf5e54f74bded2801d282ed688ee29658afc92ad4",
+        "disabledRecoveryFlags": {},
+        "deployedVersion": 25,
+        "deployedBundleSha256": "aa747c93b356a91f512cf5c9cdd3a480fad5545f175b0b6415aaf80b3800d09f"
+      },
+      {
+        "name": "lumo-access",
+        "files": 9,
+        "sourceTreeSha256": "453d7ecb5c154e1385c08ce22daecae556c0e9202167dd94640fb38b44d83963",
+        "payloadSha256": "5fe69753e5484120633d961188986144102b1d073acbc4417f7270baa91b3ae1",
+        "disabledRecoveryFlags": {
+          "resetFenceEnabled": false
+        },
+        "deployedVersion": 8,
+        "deployedBundleSha256": "e2814704ff8b9fe0ecc107bcf812a12f4a095fc32db7b4300f5dad15b1a304b2"
+      },
+      {
+        "name": "lumo-admin",
+        "files": 3,
+        "sourceTreeSha256": "407b059df35e885e1610c3aca2e54b5d602780eb5dba46e981496b6c6475e4a5",
+        "payloadSha256": "b8b0a8a093b0c05f3a15d419523b4fd156ed5e61845cde21fca82ef20da64fd6",
+        "disabledRecoveryFlags": {
+          "recoveryResetsEnabled": false
+        },
+        "deployedVersion": 8,
+        "deployedBundleSha256": "7b6bde211de28979a4fb9b8fc24aae16b76b63a6b4747f49ae717e4d90567ad2"
+      }
+    ]
+  },
+  "database": {
+    "projectId": "iwutbrljiiodamtyoorg",
+    "activeMigrationCount": 59,
+    "newIndependentlySafeMigrations": [
+      {
+        "version": "20261118053952",
+        "name": "admin_approval_revision_controls"
+      },
+      {
+        "version": "20261118054008",
+        "name": "admin_refund_queue_pagination"
+      },
+      {
+        "version": "20261118054014",
+        "name": "admin_mfa_rollout_policy"
+      },
+      {
+        "version": "20261118054020",
+        "name": "financial_terminal_declines"
+      },
+      {
+        "version": "20261118054212",
+        "name": "merchant_read_scaling_boundaries"
+      },
+      {
+        "version": "20261118054257",
+        "name": "scheduled_transfer_worker_proof"
+      },
+      {
+        "version": "20261118054343",
+        "name": "biometric_retention_and_withdrawal"
+      }
+    ],
+    "stagedExcludedMigration": "backend/supabase/migrations/20261118050029_recovery_reconciliation_and_biometric_retention.sql",
+    "stagedRecoveryFenceHosted": false,
+    "fullChainMeaning": "All59 included migrations recreate the complete active hosted phase. The private unapplied F05 migration and its stage-only SQL fixtures are absent from this public source; no shipping CI step skips included SQL.",
+    "exportedMigrationCount": 59,
+    "exportedSqlFixtureCount": 37,
+    "privateStagedWorkIncluded": false
+  },
+  "hostedReadOnlyVerification": {
+    "consistencyChecksPassed": true,
+    "privateExecutionGrantsChecked": true,
+    "blockedAuthFenceNotInstalled": true,
+    "retentionControlsPresent": true,
+    "customerRecordsPublished": false,
+    "privateAccountOrLedgerAggregatesPublished": false,
+    "scope": "Read-only operating checks passed. No private account, ledger, staff or customer aggregates are included in this public handover."
+  },
+  "previewArtifact": {
+    "deployment": "dpl_5SFCW6FmsacnBVqMVseoRSMtKtWJ",
+    "url": "https://lumo-merchant-mabtg0hzy-williedark-6795.vercel.app/downloads/Lumo-Test-Android.apk",
+    "state": "READY",
+    "target": null,
+    "aliases": [],
+    "productionAliasChanged": false,
+    "purpose": "Verified immutable signed-APK restore source and review artifact; not production publication."
+  },
+  "tests": {
+    "consumer": 1910,
+    "merchant": 734,
+    "backend": 445,
+    "activeFinancialChecks": 38,
+    "activeFinancialMigrations": 59,
+    "merchantScalingSqlHttpChecks": 67,
+    "nativeModelSuites": 80,
+    "nativeReadinessAssertionsWithinModelChecks": 64,
+    "nativeFrameworkCases": 441,
+    "nativeIndependentCleanBuild": "passed-with-cached-pinned-toolchain",
+    "processorPython": 14,
+    "processorIntegration": 4,
+    "browserJourneysDiscovered": 8,
+    "standardRunnerBrowserExecution": "passed-8-journeys-in-hosted-CI",
+    "physicalHandsetAcceptance": false,
+    "activeSqlFixtures": 37,
+    "activeSqlMigrations": 59,
+    "activeSecuritySqlHttpChecks": 11,
+    "browserJourneysPassed": 8,
+    "hostedCiRunId": 44254857611,
+    "hostedCiRuntimeCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb"
+  },
+  "assetManifestReconciliation": {
+    "path": "verification/readiness-2.14.0/asset-reconciliation.json",
+    "sha256": "481206abf2a32801c909be336bef9acc5ab70064db9d12f83e5a089b00fcad17",
+    "changedOrAddedAssets": 31,
+    "unchangedBaselineAssets": 251,
+    "unchangedBaselineFilesAddedToCoverage": 4,
+    "historicalManifestDigestCorrections": 0,
+    "apkBytesIncluded": false,
+    "privateQaFilesIncluded": false
+  },
+  "recovery": {
+    "mode": "prototype-face-only",
+    "scope": "explicit existing sandbox pilot",
+    "requiresRecoveryKey": false,
+    "cameraCapture": "actual-camera-jpeg",
+    "faceMatching": "stored-template",
+    "liveness": "prototype-simulation",
+    "livenessVerified": false,
+    "identityVerified": false,
+    "bankMomoNia": "sandbox/simulation",
+    "resetFenceEnabled": false,
+    "adminRecoveryResolutionEnabled": false,
+    "F05": "staged-approval-blocked; no hosted Auth trigger/marker/fence function"
+  },
+  "limitations": [
+    "No 9/10 prototype or 8/10 real-money readiness claim.",
+    "Admin MFA remains off; real operator enrollment and a second verified access administrator remain required.",
+    "F05 managed Auth reconciliation/write fencing is staged and excluded pending independent hosted Auth/concurrency acceptance.",
+    "Providers, liveness/identity, hosted restore, independent security/capacity and installed-handset evidence are incomplete.",
+    "Global merchant metadata writes and whole tenant histories remain; loyalty lifetime caps and private claim/attempt history are preserved.",
+    "Background OS push and historical URL sunset acceptance remain open.",
+    "Supabase leaked-password-protection warning remains; pilot screening is not full production breach coverage.",
+    "Successful synthetic CI and published apps do not replace signed-in operational approval, installed-handset, provider, genuine liveness or real-money launch acceptance."
+  ],
+  "historicalWebHotfix": {
+    "recordStatus": "dated-history-only",
+    "record": {
+      "id": "shop-directory-handoff-20261117",
+      "date": "2026-11-17",
+      "cause": "Directory shop UUID was passed as an entered shop code.",
+      "fix": "Pass an explicit shopId to the existing authenticated quote flow.",
+      "consumerTests": 1877,
+      "nativeFrameworkCases": 38,
+      "nativeRuntimeChanged": false,
+      "nativeVersion": "2.13.0",
+      "nativeApkSha256": "fef51546c13256e36e46eb12e97a79bb2ea621b797d3eb0359bc0db4a983df72",
+      "liveShopReadCheck": "LUM100003 is published, accepting and open; exact shopId public quote succeeds.",
+      "paymentWritesDuringLiveVerification": false,
+      "deployment": "dpl_F2ZfHMAqrAExR88aYazJfWyXFmNF",
+      "publishedFilesMatch": true,
+      "nativeRegressionSourcePackageUpdated": true,
+      "nativeRegressionSourcePackageFiles": 654
+    }
+  },
+  "sourcePublication": {
+    "status": "published-active59-runtime-CI-success",
+    "explicitApprovalReceived": true,
+    "runtimeSourceCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb",
+    "runtimeSourceTree": "d3ac3f8c9b2464d44ac17ee62d81cc964088b526",
+    "privateCandidateParentIncluded": false,
+    "excludedAuthFenceSourceIncluded": false,
+    "hostedCiExecutedForThisExport": true,
+    "ci": {
+      "runId": 44254857611,
+      "url": "https://github.com/lumoghana/signal/actions/runs/44254857611",
+      "status": "completed",
+      "conclusion": "success",
+      "testedRuntimeCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb"
+    },
+    "acceptanceReceipt": "verification/readiness-2.14.0/published-acceptance.json",
+    "receiptScope": "Attests the original tested runtime commit. A later metadata-only handover commit is not represented as the runtime commit tested by this receipt.",
+    "runtimeCommitParent": "99b7b1024978ba0dc3a143c0033db0af5e3ebc4e"
+  },
+  "localRuntimeAcceptance": {
+    "nodeVersion": "22.23.5",
+    "scope": "Active59 public export tested locally with cached official Node22.23.5; no hosted invocation or CI claim",
+    "officialArchiveSha256": "cdeb8670a0c81f51b4dc4ac61919f9b1ad917b304bf8221eb939570663d240f8",
+    "focusedSecurityChecks": 21,
+    "consumerPassed": 1910,
+    "backendPassed": 445,
+    "noF05SqlHttpChecks": 11,
+    "systemNodeReplaced": false,
+    "merchantPassed": 734,
+    "activeSqlFixturesPassed": 37,
+    "activeSqlMigrations": 59,
+    "activeFinancialChecks": 38,
+    "privateAuthFenceIncluded": false
+  },
+  "interimCompatibility": {
+    "status": "resolved-by-paired-publication",
+    "adminGeneralApprovalPayloadGapResolved": true,
+    "basis": "Admin Site13 and lumo-admin8 are published together with the reviewed request/revision payload contract.",
+    "scope": "The former deployment payload gap is resolved. No signed-in real operational approval was exercised or claimed; current-state binding and idempotency remain enforced."
+  },
+  "deployments": {
+    "vercel": {
+      "consumer": {
+        "id": "dpl_9vZTbJijcMhZFG2bkXozfrACo9Yn",
+        "state": "READY",
+        "url": "https://lumo-connected-pilot.vercel.app/",
+        "immutableUrl": "https://lumo-connected-pilot-33zduegrx-williedark-6795.vercel.app",
+        "runtime": "22.x"
+      },
+      "merchant": {
+        "id": "dpl_4syC6BiW2igTLcfgn4cSmDaydr3j",
+        "state": "READY",
+        "url": "https://lumo-merchant.vercel.app/",
+        "immutableUrl": "https://lumo-merchant-f7zyvs7eh-williedark-6795.vercel.app",
+        "runtime": "26.x"
+      }
+    },
+    "sites": {
+      "merchant": {
+        "version": 41,
+        "sourceCommit": "e1411f0cc0104c3b4b2b1ad6200615b4ebf581cf",
+        "deploymentId": "appgdep_6afd45f5a1808191af4ab132f155ca07",
+        "status": "succeeded",
+        "url": "https://lumo-merchant-mobile.oness15.chatgpt.site",
+        "audience": "public"
+      },
+      "admin": {
+        "version": 13,
+        "sourceCommit": "ff0ee6cf5949db309f4a7c1e3ffaaaabb934dd6e",
+        "deploymentId": "appgdep_6afd4621e44881918ec6de978fc5e36a",
+        "status": "succeeded",
+        "url": "https://lumo-admin-operations.oness15.chatgpt.site",
+        "audience": "custom"
+      }
+    }
+  },
+  "hostedClientAcceptance": {
+    "anonymousBrowserSession": {
+      "requests": 12,
+      "passed": 12,
+      "failed": 0,
+      "authenticatedOperations": false,
+      "customerDataUsed": false,
+      "scope": "Server-side anonymous acceptance only; not a browser Strict-cookie or authenticated account journey, and no backend Auth/database action was exercised."
+    },
+    "publicConsumerSourceBytes": {
+      "checks": 31,
+      "mismatches": 0,
+      "scope": "All changed consumer assets compared after publication; no signed-in acceptance is inferred."
+    },
+    "productionApkDownloads": {
+      "surfaces": 2,
+      "allByteVerified": true,
+      "sha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b"
+    },
+    "liveBrowserScope": "Release owner observed welcome and Explore tour read-only. No signed-in payment, provider or physical-device acceptance is claimed."
+  }
+}

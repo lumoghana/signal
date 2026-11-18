@@ -3,11 +3,11 @@
   "featureVersion": "1.1.0",
   "releaseDate": "2026-11-18",
   "scope": "merchant loyalty and readiness controls",
-  "consumerExperience": "2.14.0",
+  "consumerExperience": "2.15.0",
   "consumerArtifactUnchanged": false,
-  "apkVersion": "2.14.0",
-  "apkVersionCode": 21400,
-  "apkSha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b",
+  "apkVersion": "2.15.0",
+  "apkVersionCode": 21500,
+  "apkSha256": "b1f1268c5d871c76538e83d1c83a858b0800c34dd9e00d6c20bdb3e33b6a4c1a",
   "apkBytes": 4645839,
   "providerMode": "sandbox",
   "loyalty": {
@@ -34,5 +34,6 @@
     "privateOneTimeAccountLink": true,
     "canonicalPayerBinding": true
   },
-  "readinessRelease": "2.14.0"
+  "readinessRelease": "2.14.0",
+  "brandingRelease": "2.15.0"
 }

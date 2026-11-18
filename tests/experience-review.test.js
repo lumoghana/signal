@@ -103,7 +103,7 @@ test('saving a support report clears its draft without navigation capture resurr
 test('session-only Ask Lumo persistence is explained honestly in account privacy and access',()=>{
  const s=createEmptyState();s.onboardingDone=true;
  const ctx={state:s,draft:{}},privacy=renderAccount(ctx,{section:'life',page:'account-privacy'}),access=renderAccount(ctx,{section:'life',page:'account-access'});
- assert.match(privacy,/Private Ask Lux conversations are kept for this tab’s session/);
+ assert.match(privacy,/Private Ask Lumo conversations are kept for this tab’s session/);
  assert.match(privacy,/Closing the tab can remove them/);
  assert.doesNotMatch(access,/Your money, chats and goals stay here/);
 });

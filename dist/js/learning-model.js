@@ -104,7 +104,7 @@ export function getLearningPractice(s,practiceId,o={}){
 }
 export function getLearningNudge(s,o={}){
  const l=stateOf(s);if(!l.enrolled)return null;const now=nowOf(o),week=weekOf(now),dismissed=new Set(l.dismissed);
- const make=(eventId,topicId,title,body,why,page,id)=>dismissed.has(eventId)||o.topic&&o.topic!==topicId?null:{id:eventId,eventId,topicId,title,body,why,sourceLabel:why,route:{section:'learn',page,id},action:{label:page==='practice'?'Try it with Lux':'Explore with Lux',route:{section:'learn',page,id}}};
+ const make=(eventId,topicId,title,body,why,page,id)=>dismissed.has(eventId)||o.topic&&o.topic!==topicId?null:{id:eventId,eventId,topicId,title,body,why,sourceLabel:why,route:{section:'learn',page,id},action:{label:page==='practice'?'Try it with Lumo':'Explore with Lumo',route:{section:'learn',page,id}}};
  if(personal(s)){
   const income=confirmedIncome(s,now),due=(s.budget?.items||[]).find(i=>i.amount>i.spent&&i.due&&i.due<=date(new Date(now.getTime()+7*DAY)));
   if(s.recovery?.active){const n=make(`recovery:${s.recovery.startedAt||week}`,'recovery','When plans change.','A short practice can help you review the next step.','Based on your active recovery plan.','lesson','recovery-essentials');if(n)return n;}
@@ -157,7 +157,7 @@ export function handleLearningAction(s,type,p={},helpers={}){
   if(p.mode==='actual'&&!actualAllowed(s,p.kind,now))return fail(personal(s)?'There is no confirmed activity for this practice yet. Try the example.':'Choose personalised learning first, or use the example.');
   const sessionId=id('learning-practice'),template=practiceTemplate(s,p.kind,p.mode,{...options,seed:sessionId}),key=p.mode==='actual'?snapshot(s,options):'';
   const existing=[...l.sessions].reverse().find(x=>x.type==='practice'&&x.kind===p.kind&&x.mode===p.mode&&x.status!=='completed'&&x.snapshotKey===key);if(existing)return ok('Your practice is ready.',{sessionId:existing.id,duplicate:true});
-  const session={id:sessionId,type:'practice',kind:p.kind,mode:p.mode,status:'question',startedAt:iso(now),week:weekOf(now),snapshotKey:key,template,attempts:0};l.sessions.push(session);return ok('Try it with Lux.',{sessionId:session.id});
+  const session={id:sessionId,type:'practice',kind:p.kind,mode:p.mode,status:'question',startedAt:iso(now),week:weekOf(now),snapshotKey:key,template,attempts:0};l.sessions.push(session);return ok('Try it with Lumo.',{sessionId:session.id});
  }
  const session=l.sessions.find(x=>x.id===p.sessionId&&x.type==='practice');if(!session)return fail('Open the practice again before continuing.');
  if(session.status==='completed')return ok('This practice is already recorded.',{duplicate:true,points:0,completed:true});

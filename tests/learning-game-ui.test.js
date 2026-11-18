@@ -20,7 +20,7 @@ function finish(s,id){for(let i=0;i<3;i++){choose(s,id);const v=getCampusRun(s,i
 
 test('campus entry is direct play with a separate fictional economy and no personal amounts',()=>{
  const s=student();s.wallet=98765432;const before=financial(s),h=harness(s,{section:'learn',page:'home'},true),html=renderCampusGameEntry(h.ctx);
- assert.match(html,/Campus Run/);assert.match(html,/data-world-stage data-world="campus" data-phase="preview"/);assert.match(html,/data-world-player/);assert.doesNotMatch(html,/campus-entry-score|campus-entry-scene|campus-diorama/);assert.match(html,/Story money/);assert.doesNotMatch(html,/987,654/);assert.match(html,/data-campus-action="start"/);assert.match(html,/data-campus-action="map"/);assert.match(html,/Lux looks/);
+ assert.match(html,/Campus Run/);assert.match(html,/data-world-stage data-world="campus" data-phase="preview"/);assert.match(html,/data-world-player/);assert.doesNotMatch(html,/campus-entry-score|campus-entry-scene|campus-diorama/);assert.match(html,/Story money/);assert.doesNotMatch(html,/987,654/);assert.match(html,/data-campus-action="start"/);assert.match(html,/data-campus-action="map"/);assert.match(html,/Lumo looks/);
  h.click({campusAction:'start',missionId:CAMPUS_MISSIONS[0].id});assert.equal(h.actions[0].type,'campusStart');assert.equal(h.route.page,'play');assert.ok(getCampusRun(s,h.route.id));assert.equal(financial(s),before);h.cleanup();
 });
 
@@ -159,7 +159,7 @@ test('every completed chapter offers a lesson then a run insight before the next
  const s=student(),id=start(s);finish(s,id);const before=JSON.stringify(s),h=harness(s,{section:'learn',page:'play',id});
  let html=renderCampusGame(h.ctx,h.route);assert.match(html,/See what I learned/);assert.match(html,/3 challenges/);assert.match(html,/3 of 3 skill stars/);
  h.click({campusAction:'reflection-lesson'});assert.deepEqual(h.route,{section:'learn',page:'play',id,step:'lesson'});html=renderCampusGame(h.ctx,h.route);assert.match(html,/Give your balance jobs/);assert.match(html,/data-lesson-kind="split"/);assert.match(html,/See my insight/);assert.match(html,/Keep playing/);
- const lessonRoute=h.route;h.click({campusAction:'reflection-insight'});assert.deepEqual(h.route,{section:'learn',page:'play',id,step:'insight'});html=renderCampusGame(h.ctx,h.route);assert.match(html,/Lux noticed · this run/);assert.match(html,/This run · story money/);assert.match(html,/Next chapter/);assert.match(html,/Try this in Lumo/);
+ const lessonRoute=h.route;h.click({campusAction:'reflection-insight'});assert.deepEqual(h.route,{section:'learn',page:'play',id,step:'insight'});html=renderCampusGame(h.ctx,h.route);assert.match(html,/Lumo noticed · this run/);assert.match(html,/This run · story money/);assert.match(html,/Next chapter/);assert.match(html,/Try this in Lumo/);
  assert.notEqual(routeKey(h.route),routeKey(lessonRoute));assert.equal(JSON.stringify(s),before);assert.equal(h.actions.length,0);h.cleanup();
 });
 

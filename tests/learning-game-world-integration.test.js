@@ -150,15 +150,15 @@ test('real UI binding saves before moving Lux, supports drag once and cancels ol
  const originalStorage=globalThis.localStorage,values=new Map();globalThis.localStorage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)};
  try{
   const state=student(),{runId}=act(state,'campusStart',{missionId:CAMPUS_MISSIONS[0].id}),h=liveWorld(state,runId);
-  assert.match(renderCampusGame(h.ctx),/Drag Lux to a place/);
+  assert.match(renderCampusGame(h.ctx),/Drag Lumo to a place/);
   const oldStage=h.stage;h.tap(h.targets[0]);
   assert.equal(h.ctx.draft.campusDragHintSeen,true,'an intentional choice dismisses the one-time control guide');
   assert.deepEqual(h.actions,['campusChoose']);assert.deepEqual(h.phasesAtRefresh,['consequence']);
   assert.equal(h.stage.dataset.worldMoving,'true');assert.equal(getCampusRun(loadState(),runId).money.wallet,9500);
   h.step(180);assert.ok(parseFloat(h.player.values.get('--lux-x'))>48,'the real world binder moves Lux after persistence');
   h.command('continue');assert.equal(getCampusRun(state,runId).status,'choice');assert.deepEqual(h.phasesAtRefresh,['consequence','choice']);assert.equal(oldStage.isConnected,false);
-  assert.doesNotMatch(renderCampusGame(h.ctx),/Drag Lux to a place/);
-  assert.doesNotMatch(renderCampusGame({state,draft:{},route:h.route}),/Drag Lux to a place/,'saved played turns prevent repeating the introduction in a new session');
+  assert.doesNotMatch(renderCampusGame(h.ctx),/Drag Lumo to a place/);
+  assert.doesNotMatch(renderCampusGame({state,draft:{},route:h.route}),/Drag Lumo to a place/,'saved played turns prevent repeating the introduction in a new session');
   const currentStage=h.stage,actor=h.player,startX=parseFloat(actor.values.get('--lux-x')),startY=parseFloat(actor.values.get('--lux-y'));
   currentStage.emit('pointerdown',{target:actor,pointerId:3,button:0,clientX:startX,clientY:startY-45});
   currentStage.emit('pointermove',{target:actor,pointerId:3,clientX:200,clientY:330});

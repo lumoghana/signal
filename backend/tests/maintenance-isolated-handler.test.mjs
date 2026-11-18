@@ -1,4 +1,4 @@
-import {readJson,readinessPath,hasCurrentFunctionDelta} from '../verification/readiness-2.14.0/source-manifest.mjs';
+import {readJson,readinessPath,hasCurrentFunctionDelta,currentFunctionDigest,brandingBaselinePath} from '../verification/branding-2.15.0/source-manifest.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {webcrypto} from 'node:crypto';
@@ -106,14 +106,15 @@ test('isolated dependencies retain baseline plus explicit maintenance/audit delt
  const delta=JSON.parse(await readFile(new URL('../verification/maintenance-2.12.0/approved-release-delta.json',import.meta.url),'utf8'));
  const audit=JSON.parse(await readFile(new URL('../verification/audit-2026-11-16/reviewed-source-delta.json',import.meta.url),'utf8'));
  const auditMain=audit.functions['lumo-approved'],auditMaintenance=audit.functions['lumo-maintenance'];
- const readiness=await readJson(readinessPath);
+ const readiness=await readJson(readinessPath),brandingBaseline=await readJson(brandingBaselinePath);
  assert.deepEqual(Object.keys(auditMaintenance.deltas),['approved/engine.mjs']);
  const closure=new Set();
  async function visit(name){
   if(closure.has(name))return;closure.add(name);const url=new URL(name,base),bytes=await readFile(url),source=bytes.toString('utf8');
   if(name.startsWith('approved/')){
    const original=name.slice('approved/'.length);assert.ok(!original.startsWith('merchant/'));assert.notEqual(original,'index.ts');assert.notEqual(original,'operations.mjs');
-   assert.equal(createHash('sha256').update(bytes).digest('hex'),auditMaintenance.deltas[name]?.afterSha256||delta.files[original]||baseline.files[original],name+' must retain explicitly reviewed source bytes');
+   assert.equal(brandingBaseline.functions['lumo-maintenance'].files['backend/supabase/functions/lumo-maintenance/'+name],auditMaintenance.deltas[name]?.afterSha256||delta.files[original]||baseline.files[original],name+' immutable pre-branding source must retain its historical reviewed lineage');
+   assert.equal(createHash('sha256').update(bytes).digest('hex'),currentFunctionDigest(readiness,'lumo-maintenance',name),name+' must retain explicitly reviewed branding source bytes');
    if(!Object.hasOwn(delta.files,original)&&!Object.hasOwn(auditMain.deltas,original)&&!hasCurrentFunctionDelta(readiness,'lumo-approved',original))assert.deepEqual(bytes,await readFile(new URL(original,sourceBase)));
   }
   const imports=[...source.matchAll(/^\s*(?:import|export)\s+(?:type\s+)?(?:(?:\*\s+as\s+[$\w]+|\*|\{[^}]*\}|[$\w]+(?:\s*,\s*\{[^}]*\})?)\s+from\s*)?["']([^"']+)["']/gm)].map(match=>match[1]);

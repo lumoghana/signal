@@ -2,11 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {repository,readinessPath,baselinePath,readJson,verifyReadinessManifest,importedClosure,deployedFunctions,hash,baselineSha256} from '../verification/readiness-2.14.0/source-manifest.mjs';
+import {repository,readinessPath,baselinePath,readJson,verifyReadinessManifest,importedClosure,deployedFunctions,hash,baselineSha256,brandingBaselinePath,parentReadinessPath,brandingBaselineSha256} from '../verification/branding-2.15.0/source-manifest.mjs';
 
 test('readiness source matches the complete reviewed deployment closure and preserves immutable baseline lineage',async()=>{
  const current=await verifyReadinessManifest(),baseline=await readJson(baselinePath);
- assert.equal(current.release,'2.14.0');
+ assert.equal(current.release,'2.15.0');
+ const prior=await readJson(parentReadinessPath),brandingBaseline=await readJson(brandingBaselinePath);
+ assert.equal(hash(await readFile(resolve(repository,brandingBaselinePath))),brandingBaselineSha256);
+ for(const name of ['lumo-access','lumo-admin','lumo-approved'])assert.deepEqual(brandingBaseline.functions[name].files,prior.functions[name].files);
+ assert.deepEqual(Object.fromEntries(Object.entries(current.functions).map(([name,r])=>[name,Object.keys(r.brandingDeltas).length])),{'lumo-access':0,'lumo-admin':2,'lumo-approved':5,'lumo-maintenance':5});
+ assert.equal(current.summaryLiteralProof.nonliteralAstUnchanged,true);
+ assert.equal(current.summaryLiteralProof.literalChanges,30);
  assert.equal(current.functions['lumo-access'].rollout.candidateDisposition,'compatible-fence-disabled-candidate');
  assert.equal(current.functions['lumo-access'].rollout.capabilities.resetFenceEnabled,false);
  assert.equal(current.functions['lumo-access'].rollout.baselineVersion,7);
@@ -33,6 +39,8 @@ test('readiness verification rejects tampered reviewed bytes, omitted dependenci
  const badDigest=structuredClone(current);badDigest.functions['lumo-approved'].files[handler]='0'.repeat(64);await assert.rejects(verifyReadinessManifest(badDigest),/source changed|stale/);
  const omitted=structuredClone(current);delete omitted.functions['lumo-approved'].files['backend/supabase/functions/lumo-approved/password-policy.mjs'];await assert.rejects(verifyReadinessManifest(omitted),/source changed|stale/);
  const noRationale=structuredClone(current);delete noRationale.functions['lumo-approved'].deltas[handler];await assert.rejects(verifyReadinessManifest(noRationale),/source changed|stale/);
+ const noBrandingRationale=structuredClone(current);delete noBrandingRationale.functions['lumo-approved'].brandingDeltas['backend/supabase/functions/lumo-approved/engine.mjs'];await assert.rejects(verifyReadinessManifest(noBrandingRationale),/source changed|stale/);
+ const wrongBrandingBaseline=structuredClone(current);wrongBrandingBaseline.functions['lumo-maintenance'].brandingDeltas['backend/supabase/functions/lumo-maintenance/approved/engine.mjs'].beforeSha256='0'.repeat(64);await assert.rejects(verifyReadinessManifest(wrongBrandingBaseline),/source changed|stale/);
  const changedHistory=structuredClone(current);changedHistory.immutableHistorical[baselinePath]='0'.repeat(64);await assert.rejects(verifyReadinessManifest(changedHistory),/source changed|stale/);
  const wrongProfile=structuredClone(current);wrongProfile.releaseProfile.activeMigrations=60;await assert.rejects(verifyReadinessManifest(wrongProfile),/source changed|stale/);
  const stageClaim=structuredClone(current);stageClaim.migrations['backend/supabase/migrations/20261118050029_recovery_reconciliation_and_biometric_retention.sql']={change:'added',sha256:'0'.repeat(64)};await assert.rejects(verifyReadinessManifest(stageClaim),/source changed|stale/);

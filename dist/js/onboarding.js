@@ -99,7 +99,7 @@ export function renderOnboarding(ctx, route) {
   d.currentStep = step;
   let title = '', description = '', body = '', primary = 'Continue', primaryAction = 'next', secondary = '', phase = '';
   if (step === 'name') {
-    title = 'Hey. I’m Lux.'; description = 'What do your people call you?';
+    title = 'Hey. I’m Lumo.'; description = 'What do your people call you?';
     body = `${field('Your name', 'name', d.name, { placeholder: 'Your first name', maxlength: 40, autocomplete: 'given-name', className: 'onb-question-input' })}<p class="onb-name-preview" data-name-preview aria-live="polite">${d.name.trim() ? `Nice to meet you, ${esc(d.name.trim())}.` : 'Your next chapter starts here.'}</p>`;
     primary = 'That’s me';
   } else if (step === 'phone') {

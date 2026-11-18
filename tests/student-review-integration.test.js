@@ -38,7 +38,7 @@ test('unfunded Home keeps the next useful action honest and never invents money'
 test('the secondary Lux library is reachable and has a route back to the shared learning entry',()=>{
   const state=createDemoState(),route={section:'learn',page:'library'};
   assert.deepEqual(safeRoute(route,state,{}),route);
-  assert.equal(routeLabel(route),'More with Lux');
+  assert.equal(routeLabel(route),'More with Lumo');
   assert.deepEqual(parentRoute(route,state,{}),{section:'learn',page:'home'});
 });
 

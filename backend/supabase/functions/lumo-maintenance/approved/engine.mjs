@@ -12,6 +12,22 @@ const fail=(code,message)=>Object.assign(new Error(message),{code});
 const displayText=value=>typeof value==='string'?value.trim().slice(0,240):'';
 const handleLabel=value=>{const handle=displayText(value).replace(/^@/,'');return /^[a-z0-9][a-z0-9._-]{2,29}$/i.test(handle)?'@'+handle:'';};
 const LEGACY_LEDGER_NOTE='Confirmed pilot test-money ledger entry';
+// Exact old service-owned copy is projected with the current assistant name.
+// These selectors are compatibility data, never replacements for user prose.
+const legacyAssistantCopy=new Map([
+ ['Open Learn with Lux and choose your focus first.','Open Learn with Lumo and choose your focus first.'],
+ ['Lux is ready for the next run.','Lumo is ready for the next run.'],
+ ['Try it with Lux.','Try it with Lumo.']
+]);
+const assistantCopy=value=>legacyAssistantCopy.get(value)??value;
+function projectRewardLabels(rewards){
+ if(!Array.isArray(rewards))return;
+ for(const reward of rewards){
+  if(reward?.id==='classic'&&reward.title==='Classic Lux')reward.title='Classic Lumo';
+  if(reward?.id==='orbit-trail'&&reward.title==='Lux orbit')reward.title='Lumo orbit';
+ }
+}
+
 /** Adapt confirmed ledger facts to the existing approved Activity vocabulary. */
 function receiptActivity(snapshot,state,receipt){
  const incoming=receipt.payeeAccountId===snapshot.account.id;
@@ -41,7 +57,7 @@ export function mapIdentity(value,from,to,key=''){
 }
 const sensitiveKeys=new Set(['pin','currentPin','newPin','confirmPin','password','currentPassword','passwordProof','currentPasswordProof','credential']);
 export function publicState(value){
- const state=clone(value);delete state.settings?.pin;delete state._appliedActions;delete state._sharedIncomeSeen;
+ const state=clone(value);for(const run of Array.isArray(state.learning?.game?.runs)?state.learning.game.runs:[])projectRewardLabels(run?.newRewards);delete state.settings?.pin;delete state._appliedActions;delete state._sharedIncomeSeen;
  if(state.account){delete state.account.login?.credential;delete state.account.recovery;state.account.signedOut=false;}
  for(const group of state.groups||[]){redactGroupReports(group);group.localSimulation=false;group.participantId='me';
   const actor=group.members.find(m=>m.id==='me');
@@ -98,10 +114,10 @@ export function derivedViews(state){
  try{return {moneyIQ:getMoneyIQ(state),moneyIQSessions:Object.fromEntries((state.learning?.moneyIQ?.sessions||[]).map(x=>[x.id,getMoneyIQ(state,{sessionId:x.id}).session])),learningPractices:Object.fromEntries((state.learning?.sessions||[]).filter(x=>x.type==='practice').map(x=>[x.id,getLearningPractice(state,x.id)]))};}catch{return {};}
 }
 export function envelope(snapshot,result={ok:true,message:'Your records are up to date.'},extra={}){
- const state=publicState(buildState(snapshot));return {ok:result?.ok!==false,...(result?.ok===false?{code:'DOMAIN_REJECTED',message:result.message}:{}),sandbox:true,currency:'GHS',state,result:publicResult(result),account:snapshot.account,revision:snapshot.revision,receipts:snapshot.receipts||[],views:derivedViews(state),partnerInbox:publicPartnerInbox(snapshot.partners||[],snapshot.account.userId),capabilities:{deviceProof:true,internalTestMoney:true,externalTransferSandbox:true,bank:false,momo:false,bills:false},...extra};
+ const state=publicState(buildState(snapshot));return {ok:result?.ok!==false,...(result?.ok===false?{code:'DOMAIN_REJECTED',message:assistantCopy(result.message)}:{}),sandbox:true,currency:'GHS',state,result:publicResult(result),account:snapshot.account,revision:snapshot.revision,receipts:snapshot.receipts||[],views:derivedViews(state),partnerInbox:publicPartnerInbox(snapshot.partners||[],snapshot.account.userId),capabilities:{deviceProof:true,internalTestMoney:true,externalTransferSandbox:true,bank:false,momo:false,bills:false},...extra};
 }
 function publicResult(result){
- const clean=clone(result);if(clean.box)scrubPartnerSecrets({boxes:[clean.box]});if(clean.boxes)scrubPartnerSecrets({boxes:clean.boxes});if(clean.group)clean.group=publicState({groups:[clean.group]}).groups[0];if(clean.groups)clean.groups=publicState({groups:clean.groups}).groups;delete clean.settings?.pin;
+ const clean=clone(result);if(legacyAssistantCopy.has(clean.message))clean.message=assistantCopy(clean.message);projectRewardLabels(clean.newRewards);if(clean.box)scrubPartnerSecrets({boxes:[clean.box]});if(clean.boxes)scrubPartnerSecrets({boxes:clean.boxes});if(clean.group)clean.group=publicState({groups:[clean.group]}).groups[0];if(clean.groups)clean.groups=publicState({groups:clean.groups}).groups;delete clean.settings?.pin;
  if(clean.transaction)delete clean.transaction.pin;
  if(clean.report)clean.report=publicGroupReport(clean.report);
  return clean;

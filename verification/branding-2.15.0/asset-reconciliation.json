@@ -1,0 +1,309 @@
+{
+  "schemaVersion": 1,
+  "release": "2.15.0",
+  "baselineCommit": "57ca03aa201240cbc03dbdb1c6ea1e46a839cfd1",
+  "baselineManifestSha256": "8efede95ad7f8892372977a4c2a0762bb4741708e21f2f9e2a2de1ade3e56bcb",
+  "method": "Compare each exact tracked public file with the authentic published 2.14 source and prior manifest; verify each generated merchant file against canonical merchant source. No historical manifest is rewritten.",
+  "publicManifest": "dist-sha256.json",
+  "publicAssetCount": 283,
+  "changedOrAddedAssets": [
+    {
+      "path": "dist/consumer-release.json",
+      "change": "modified",
+      "baselineSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "candidateSha256": "944e8864b779950940b8d8ebb00fdc40fad36e070c073f9f5f0e0f70cbd5b245",
+      "reason": "Paired 2.15 Android artifact identity and explicit one-name product/assistant branding metadata. The 2.14 readiness controls and sandbox boundaries remain unchanged."
+    },
+    {
+      "path": "dist/js/account-ui.js",
+      "change": "modified",
+      "baselineSha256": "d679e833bd61968e8b89466ceffb4070eda9e30df6f12b130a2d302cf51ab64e",
+      "candidateSha256": "9ca8851d7c36e119f3324d089494e8f325dbe7696959336b68b3b48cd78d5d19",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/activation.js",
+      "change": "modified",
+      "baselineSha256": "40f7f33950dfff12929dc635a51622e410cb6d8174b0f330d1ca82b86966a99d",
+      "candidateSha256": "81c6c00fe828b8bab0d87b3a2fde09cc2a0a5a2d4a0c64ee699aacf740495abd",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/app.js",
+      "change": "modified",
+      "baselineSha256": "83bb5ee67f5ec1f5f1254ccb3ec243a177f1ea207d3625aee4f94235c607474f",
+      "candidateSha256": "c816d137f5df1c3030970e2a79ef4ec41237fc3167e1ea8a838356c7d12226fb",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/approved-service.js",
+      "change": "modified",
+      "baselineSha256": "c08c762770cc6f7811eae64f03353c824ea2b8a701fe3546123c6e426a4225b4",
+      "candidateSha256": "59c31173e103a46a63c4475b4905c25ac5aa123c7a01edcb6c9d571e3522a410",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/assistant-branding.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "03eb09e750dc2982ddcad4c69100522067ca700fe81afa9f4b68551aa22c7743",
+      "reason": "Presentation-only exact aliases for application-owned legacy assistant copy. User-authored messages, people and merchant names, evidence, stored records and financial values are preserved."
+    },
+    {
+      "path": "dist/js/chat-action-model.js",
+      "change": "modified",
+      "baselineSha256": "41314816651ea22801e07023d9e9a4a9f9f021e9c6544d460133bd5f284739ed",
+      "candidateSha256": "195b16e72ccbeca507c57e7305176933bed0bf63bc5ecee02cf7435a877e6cca",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/chat-language.js",
+      "change": "modified",
+      "baselineSha256": "6d9d18aa92951c66b0a79cf70378b3785fef9025dbc459d4c6e67f64d7454193",
+      "candidateSha256": "1af6d7f7bd0d5afd34a569ddad337b89295dfbac9c42bcfd6267cfcdfcb24661",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/chat.js",
+      "change": "modified",
+      "baselineSha256": "ec64d9c386c18f87d17fa6ef128dc83465d1195a643f233bfbce6643f2eb30ef",
+      "candidateSha256": "b5e10a38b73d46538105f7a71f6a6ae360e2b45347c6754e027271d022c84ad0",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/explore-model.js",
+      "change": "modified",
+      "baselineSha256": "03f727783ac73ab62a34ab1d2970cc8237d9bd6482c6e8d55d05f274c5cda1a4",
+      "candidateSha256": "56a9eec0e11a6ab27b152adeff9299fe119a2da3063762ba0d0b550c565d217f",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/explore-view.js",
+      "change": "modified",
+      "baselineSha256": "e6a57db1b9424c9151f57d6023629b910ef290dcb11d3fca5d1febba394587ec",
+      "candidateSha256": "d9ebf7e6bf2f142c89a8f4af4d49404eed55954655d91f2c80936c1c6539be16",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/group-chat.js",
+      "change": "modified",
+      "baselineSha256": "038195c625e98038ad8fa0c97a483f195e061d10018d6ecc6b1e5c7b8230abd7",
+      "candidateSha256": "1e1e17b02ca2c86954cc69304ec023c4ef756eed7886d4df25ffa7640cb32fd4",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/insights.js",
+      "change": "modified",
+      "baselineSha256": "5dea550c060dd94f942854c52052f5dd2cf4d9fb0ef4451e998c196d25f5d8d6",
+      "candidateSha256": "b598e1e3a8ad8ea0bf23b4e49b3e44b61337fccfa6ca9c1f8e9eb28a85bfb09b",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-content.js",
+      "change": "modified",
+      "baselineSha256": "0b1c426921e6561661b7589c28e6ba01263e0e4d2b412b1b1648f6a7f87cb017",
+      "candidateSha256": "9ff72217d9a1538c8793f8afd8b0150805d4832d3c7f452c9db35233c9787584",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-entry.js",
+      "change": "modified",
+      "baselineSha256": "f3895c9d13a34d714bc774a99958865bd722e602ec3284c2529c83b332146fab",
+      "candidateSha256": "dc9b3453b51252f518c231559da40f736f81edcf48378720c77364eb5b769619",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-game-content.js",
+      "change": "modified",
+      "baselineSha256": "2e2df323ad4f3ec6786a82e4f2c6c6b16f84974ec73ae40a454f7a198deeedb6",
+      "candidateSha256": "95d72cc9322d3d9c985597c6096b430a9ecbb6d85f0041cb78657e8ff6578b57",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-game-model.js",
+      "change": "modified",
+      "baselineSha256": "fdf9fd92082515acd28cc1b8578f2e8b0b28d0bcae21ab9bd5bb75b29f6118b5",
+      "candidateSha256": "45bfeeb689d20bcb34436d5a1d0b84d45af84f5069fa706389906a2444ff159e",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-game-ui.js",
+      "change": "modified",
+      "baselineSha256": "ac186f0494207db6bb3267c2be20e6c5d2852c7546dcae337232c3496a78b564",
+      "candidateSha256": "118249b3017d92428ef12b4ceffa4af051d54afc8ca93f70cf20e420ef4f56ca",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-model.js",
+      "change": "modified",
+      "baselineSha256": "dc18f0413d35b4c927a2947f4b39542bd324c1936d968b203dea438de7d46e11",
+      "candidateSha256": "449ae7d93a1dda76b1b1df64b15ec5908ff3e7e60832f322834012a5cc6750a9",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/learning-ui.js",
+      "change": "modified",
+      "baselineSha256": "b0f38e1a03c5e99c4170612c98560f15698d9b8fcc468dc9a137452df6b195b3",
+      "candidateSha256": "4733b1046be4069aeb56a3da580703ef2aefdb88bafb04556c15e1e4b104b3ac",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/life.js",
+      "change": "modified",
+      "baselineSha256": "700aacffecdad2181f470d184cf10ec5ce0d96b7da8eac31e353b3e8e5839d2b",
+      "candidateSha256": "7f2e6d2720ff889d75f087c351731df3189f24651ca57aba736d3141725ab5fe",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/money-iq-ui.js",
+      "change": "modified",
+      "baselineSha256": "74008261f1edf3205b274c2ff7846c3afa548b4f359077d32bbd980390d31289",
+      "candidateSha256": "9adef797dd53fbe5ed832c8baee1aa3ce4feb6a28a0c372cd1204421470fd548",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/money-maintenance-ui.js",
+      "change": "modified",
+      "baselineSha256": "044e142d29fcd080c54abb7deab2d7c794d9195ff233e80a40c142bb7dd6acc8",
+      "candidateSha256": "554b62c0f3341077fba7e81948e531d42367feef520d40be30da4d3d9538478b",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/navigation.js",
+      "change": "modified",
+      "baselineSha256": "2c2d1cd3442876292bf5d100cfe2ab82eead1a1827c1d8912b89d5fc3d235aa9",
+      "candidateSha256": "dcfdee4ec3aeee1b76a9e91acff85b37e9d66d55fbe91c94ce7e4e6f4b4d213d",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/onboarding.js",
+      "change": "modified",
+      "baselineSha256": "c9c80e3e708ddf29dc670b153bf0953f19a0603f145e286d8ce5c5d5562f7447",
+      "candidateSha256": "6dce35655254c56fad8fb06c1123898327733f01fe73dbcf880401ed685e1d95",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/pause-view.js",
+      "change": "modified",
+      "baselineSha256": "3a0bbba6439cc0f3214d66dba5eaa6575a29ce52b7eb9a1c723c65e28ffe7c50",
+      "candidateSha256": "83f445841f86a6e9f8647f15237791cb36524a8118e70b7b26418a8e81fb3d81",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/setup-terms.js",
+      "change": "modified",
+      "baselineSha256": "ae8363227f5d18c3f2f257a217f7ee0fed4afea4a1fa99db32812077a377ad4c",
+      "candidateSha256": "62e1806563da2300c3336860fc1582ed0958ef6d3003593d2e21544725552024",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/tour.js",
+      "change": "modified",
+      "baselineSha256": "83d5560dffa1c6f37a61a91f70d2f16d1f3e3679b5a5ae7a4e7e74a2bb21500b",
+      "candidateSha256": "2c164b9628d16172368e1a8ab4ef41b0d84c8f54489d94edeb6f99a430fc2e08",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/js/welcome-view.js",
+      "change": "modified",
+      "baselineSha256": "3bfb8a6796dcc3c15676068cb3ff9a83e56e7f43a43bd000157c32ba99b1c902",
+      "candidateSha256": "9aecb7d9e95fdb8dc370c14b32f5800c7293bf94acd9a5acfd2341366257ae16",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/merchant/app.css",
+      "change": "modified",
+      "baselineSha256": "e22014bd969cde893c4a333016307edd34d0714fc45695e4441731bc2500ffd8",
+      "candidateSha256": "3820641697aa707d536a9068e31f39f0a82e766ecd8a10cef57da272cdcc9545",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/app.js",
+      "change": "modified",
+      "baselineSha256": "892b14337fe7c37d02ab73944c45b9f9425531c1b61ba7c9df4facfddcdcdfde",
+      "candidateSha256": "1d7dafe587b809b72c59608bf2e1c267e3f729f33e00bc1917ce9035a7144edf",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/collections-ui.js",
+      "change": "modified",
+      "baselineSha256": "36c55022d9a1a9f7a5587079444fedbf44e8b335e52930ba47f25a5d9fcc03e3",
+      "candidateSha256": "2dbcedca51da3ab24ea39e7fc477de7fe6b8d12e240505acf07a964a4e8843dc",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/connected-service.js",
+      "change": "modified",
+      "baselineSha256": "641c8aaea9c77c7ce7c3cc9af97db81643af5a447e6054817e77e8e5b88fe2c6",
+      "candidateSha256": "aab3f1dba70fbef86aa15876f2792851b51a8e6220f187716807c8e85071a329",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/consumer-release.json",
+      "change": "modified",
+      "baselineSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "candidateSha256": "944e8864b779950940b8d8ebb00fdc40fad36e070c073f9f5f0e0f70cbd5b245",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/downloads/consumer-release.json",
+      "change": "modified",
+      "baselineSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "candidateSha256": "944e8864b779950940b8d8ebb00fdc40fad36e070c073f9f5f0e0f70cbd5b245",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/lux-brain.js",
+      "change": "modified",
+      "baselineSha256": "e3c5d51eed877efbb5080cdf18658d6537bb44929f0ca15435a40bcdfcbced59",
+      "candidateSha256": "dfdf2296343148490d02bbfedaab761f0460a31da63bdb9b5273e34a2537612d",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/lux-chat.css",
+      "change": "modified",
+      "baselineSha256": "562d65adc48365b65e76d798b3e0055dd592184fa0b0be2e733a153847d8498a",
+      "candidateSha256": "2e88f08d4371f66e55b90d556df76e25bbdfe63907cd5b3a56b412fb6a2b90d7",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/lux-chat.js",
+      "change": "modified",
+      "baselineSha256": "80edb2b8d38d7d89203f6adfdafd926bb163fa19cd96e07f12b11e8ef92590c7",
+      "candidateSha256": "362dff8e32a74eb77d4d9e61a054b2c2ebf968e3b2a991f55445f61f8dcdd481",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/merchant-release.json",
+      "change": "modified",
+      "baselineSha256": "eb62d0774fb764617645fc2b57996de93694692aa99afd07a7a4802069d0f837",
+      "candidateSha256": "1cca4bee09cb368026cf40271d58c50ca1ab3bced318e6a8bfb1e4fdcd6a74ce",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/merchant/public-checkout.js",
+      "change": "modified",
+      "baselineSha256": "c4d561abc1a05aae9ea8123c6aa49efc0fa391de068136ee516874ae2cc2d341",
+      "candidateSha256": "1aad8f0c59eedb5639e88d7c4cd7cb0f568c32b247c6b84d56fdecc4d3a80d7d",
+      "reason": "Exact generated mirror of the reviewed merchant source: Lumo display branding or paired 2.15 Android release metadata. Existing compatible routes, IDs, provider boundaries and financial behavior are retained."
+    },
+    {
+      "path": "dist/public-checkout.js",
+      "change": "modified",
+      "baselineSha256": "c4d561abc1a05aae9ea8123c6aa49efc0fa391de068136ee516874ae2cc2d341",
+      "candidateSha256": "1aad8f0c59eedb5639e88d7c4cd7cb0f568c32b247c6b84d56fdecc4d3a80d7d",
+      "reason": "Reviewed consumer Lumo naming in visible copy, accessible labels, learning/reward presentation or display-only legacy aliases. Financial values, state IDs, action routes, storage keys and current mascot artwork remain compatible."
+    },
+    {
+      "path": "dist/sw.js",
+      "change": "modified",
+      "baselineSha256": "f648850f55e1de06d60f51baa4279081cc3d0f96132443163d46192b4fb2f531",
+      "candidateSha256": "3130cc387b269b01db9d40a0f9a69fbac7549ef309981804fc5b4fc70808107c",
+      "reason": "Generated public-shell cache identity incorporates the reviewed branding module, copy and paired release metadata so existing installations receive the current public shell."
+    }
+  ],
+  "unchangedBaselineAssets": 241,
+  "removedAssets": [],
+  "apkBytesIncluded": false,
+  "mascotArtworkChanged": false
+}

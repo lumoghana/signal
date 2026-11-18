@@ -27,7 +27,7 @@ test('greetings, identity, thanks and unknown topics are warm without exposing h
     assert.ok(answer.followUps.length > 0);
     assert.equal(JSON.stringify(state), before);
   }
-  assert.match(ask(state, 'Who are you?').title, /Lux/);
+  assert.equal(ask(state, 'Who are you?').title, 'I’m Lumo, your money buddy.');
   assert.match(ask(state, 'Hi Lux!').title, /Ama/);
 });
 

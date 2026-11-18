@@ -6,7 +6,7 @@ This repository contains the accepted connected Lumo prototype and its reviewed 
 
 - This copy targets GitHub and Vercel only. Do not push it to a Sites source remote or deploy it through Sites. The live ChatGPT Site is a separate deployment.
 - Serve `dist/`. Keep Vercel Root Directory at the repository root and output directory `dist`. The Vercel build command prepares approved public assets and the separately signed Android download, then runs `node scripts/build-offline-shell.mjs`; preserve vercel.json and the original artifact checks.
-- Preserve the approved account-led Home, 2D Lux identity, light/dark themes, typography, navigation and existing journeys unless the user authorizes a change.
+- Preserve the approved account-led Home, 2D Lumo mascot identity, light/dark themes, typography, navigation and existing journeys unless the user authorizes a change.
 - Keep financial amounts in integer pesewas. Expected income, unpaid IOUs, savings and group funds must not silently become personal available money.
 - Preserve payment review, conditional Pause, authentication, ledger idempotency, pending/failure/reversal handling, group mandates and partner-code safeguards. Presentation changes do not authorize changing financial rules.
 - Keep privacy controls, accessible labels, actual camera permission/lifecycle handling, safe-area behavior and reduced-motion support. Long text and short/keyboard-height screens must remain reachable through natural scrolling.

@@ -54,11 +54,11 @@ function runtime(t, { state = createDemoState(), chat = {} } = {}) {
   return { ctx, root, input, send, form, thread, timers, frames, click, type, flushFrames, reply };
 }
 
-test('Ask Lumo introduces Lux without exposing money and gives Home a clear route', () => {
+test('Ask Lumo introduces the Lumo companion without exposing money and gives Home a clear route', () => {
   const state = createDemoState(); state.profile.name = 'Ama Mensah';
   const html = renderChat({ state, draft: { chat: {} } });
   assert.match(html, /class="chat-page is-new-conversation"/);
-  assert.match(html, /lux-chat-2d.webp" width="148" height="148" alt="Lux, your Lumo money buddy"/);
+  assert.match(html, /lux-chat-2d.webp" width="148" height="148" alt="Lumo, your money buddy"/);
   assert.match(html, /Hey Ama\.<br>Let’s talk money\./);
   assert.match(html, /data-chat-action="home" aria-label="Home"/);
   assert.match(html, /Swipe right to your app/);

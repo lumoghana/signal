@@ -1,6 +1,7 @@
+import {publicState as maintenancePublicState,envelope as maintenanceEnvelope} from '../supabase/functions/lumo-maintenance/approved/engine.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildState,prepareMutation,publicState,clone} from '../supabase/functions/lumo-approved/engine.mjs';
+import {buildState,prepareMutation,publicState,envelope,clone} from '../supabase/functions/lumo-approved/engine.mjs';
 import {createEmptyState} from '../supabase/functions/lumo-approved/domain/model.js';
 
 const actor='10000000-0000-4000-8000-000000000001',account='20000000-0000-4000-8000-000000000001';
@@ -130,4 +131,17 @@ test('explicit waiting defers funding and later real income updates status witho
 test('a closed account cannot restart or persist first-money setup',async()=>{
  const saved=snapshot();saved.state.account.status='closed';const result=await prepare(saved,{step:'account-created'});
  assert.equal(result.ok,false);assert.match(result.result.message,/closed/);assert.equal(result.state.activation,undefined);assert.equal(saved.state.activation,undefined);assert.equal(saved.account.balance,0);
+});
+
+test('saved assistant reward and status copy is renamed only in presentation without changing money or user text',()=>{
+ for(const project of [publicState,maintenancePublicState]){
+  const state={wallet:2300,profile:{name:'Lux Café'},transactions:[{amount:2300,note:'Lux is ready for the next run.'}],learning:{game:{runs:[{id:'saved-run',newRewards:[{id:'classic',title:'Classic Lux',threshold:0},{id:'orbit-trail',title:'Lux orbit',threshold:8},{id:'custom',title:'Lux Art Club',threshold:9}]}]}}};
+  const original=clone(state),shown=project(state);assert.equal(shown.wallet,2300);assert.equal(shown.profile.name,'Lux Café');assert.deepEqual(shown.transactions,state.transactions);
+  assert.deepEqual(shown.learning.game.runs[0].newRewards.map(r=>r.title),['Classic Lumo','Lumo orbit','Lux Art Club']);assert.deepEqual(shown.learning.game.runs[0].newRewards.map(r=>r.threshold),[0,8,9]);assert.deepEqual(state,original);
+ }
+ for(const project of [envelope,maintenanceEnvelope]){
+  const saved=snapshot(2300),result={ok:true,message:'Lux is ready for the next run.',source:'lux',preparedBy:'lux',newRewards:[{id:'orbit-trail',title:'Lux orbit',threshold:8}],transaction:{amount:2300,merchant:'Lux Café',note:'Try it with Lux.'}},original=clone(result),shown=project(saved,result);
+  assert.equal(shown.state.wallet,2300);assert.equal(shown.result.message,'Lumo is ready for the next run.');assert.equal(shown.result.newRewards[0].title,'Lumo orbit');assert.deepEqual(shown.result.transaction,result.transaction);assert.equal(shown.result.source,'lux');assert.equal(shown.result.preparedBy,'lux');assert.deepEqual(result,original);
+  const rejected=project(saved,{ok:false,message:'Open Learn with Lux and choose your focus first.'});assert.equal(rejected.ok,false);assert.equal(rejected.code,'DOMAIN_REJECTED');assert.equal(rejected.message,'Open Learn with Lumo and choose your focus first.');assert.equal(rejected.result.message,rejected.message);assert.equal(rejected.state.wallet,2300);
+ }
 });

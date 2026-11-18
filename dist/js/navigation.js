@@ -71,13 +71,13 @@ export function sectionForRoute(route) {
 /** Label the supplied destination. For a Back label, pass parentRoute(current). */
 export function routeLabel(route) {
   const r = normalize(route);
-  if (r.section === 'learn') return ({home:'Money IQ',library:'More with Lux',start:'Your learning journey',lesson:'Money lesson',practice:'Money practice',progress:'Your progress',preferences:'Learning preferences',review:'Knowledge check',game:'Campus Run',play:'Campus mission',rewards:'Lux looks','money-iq':'Money IQ'})[r.page] || 'Learn with Lux';
+  if (r.section === 'learn') return ({home:'Money IQ',library:'More with Lumo',start:'Your learning journey',lesson:'Money lesson',practice:'Money practice',progress:'Your progress',preferences:'Learning preferences',review:'Knowledge check',game:'Campus Run',play:'Campus mission',rewards:'Lumo looks','money-iq':'Money IQ'})[r.page] || 'Learn with Lumo';
   if (r.section === 'welcome') return 'Welcome';
   if (r.section === 'terms') return 'Setup terms';
   if (r.section === 'tour') return 'Lumo tour';
   if (r.section === 'activation') return 'First steps';
   if (r.section === 'onboarding') return 'Previous step';
-  if (r.section === 'chat') return 'Ask Lux';
+  if (r.section === 'chat') return 'Ask Lumo';
   if (r.section === 'home') return 'Home';
   if (r.section === 'pay' && r.page === 'service') return getPaymentService(r.id)?.name || 'Payments';
   if (r.section === 'pay' && r.page === 'cards') return 'Virtual cards';

@@ -87,7 +87,7 @@ export const CAMPUS_MISSIONS=Object.freeze([
    move('image-proof','Mark it paid from the image','Use the screenshot as final confirmation.','🖼️',false,{flags:{screenshotAssumed:true}},'The image cannot finish the payment.','A member’s claim or screenshot is not a confirmed financial record. No fictional or personal balance is credited here.')
   ])
  ]},
- {id:'plot-twist-week',index:5,title:'Plot twist week',kicker:'Chapter 06 · Lux is in your corner',emoji:'🧭',description:'Allowance is late. Adapt the plan, protect essentials and find a useful next step.',topicId:'recovery',initial:{wallet:6000,committed:5500,cushion:500,expected:15000},skills:['Adapt a changed week','Let saving rules flex','Check the remaining gap'],ending:{strong:{title:'You found a way forward.',body:'You adapted the week, kept essentials in view and knew what needed confirmation or support.'},mixed:{title:'A reset is a money skill too.',body:'You reached the end of the run. Replay any chapter, seek a useful next step and keep your completed progress.'}},turns:[
+ {id:'plot-twist-week',index:5,title:'Plot twist week',kicker:'Chapter 06 · Lumo is in your corner',emoji:'🧭',description:'Allowance is late. Adapt the plan, protect essentials and find a useful next step.',topicId:'recovery',initial:{wallet:6000,committed:5500,cushion:500,expected:15000},skills:['Adapt a changed week','Let saving rules flex','Check the remaining gap'],ending:{strong:{title:'You found a way forward.',body:'You adapted the week, kept essentials in view and knew what needed confirmation or support.'},mixed:{title:'A reset is a money skill too.',body:'You reached the end of the run. Replay any chapter, seek a useful next step and keep your completed progress.'}},turns:[
   turn('late-reset','Allowance day · No receipt yet','The week needs a reset.','The GH₵55 plan includes GH₵40 of essentials and a GH₵15 optional club order. The allowance is still expected.','A changed week deserves a fresh plan, not a judgement.',[
    move('defer-club','Postpone the GH₵15 club order','Release the optional cost with the organiser.','🗓️',true,{release:1500,flags:{optionalDeferred:true}},'You changed a part that can move.','GH₵15 is released from the story plan. Food, transport and the cushion stay visible.'),
    move('agree-new-date','Ask the organiser for a new date','Get agreement before removing the optional cost.','💬',true,{release:1500,flags:{clubDateAgreed:true}},'The sample organiser agrees.','The GH₵15 optional order is moved to a later date in this story. This agreement does not predict what a real provider will offer.'),
@@ -188,7 +188,7 @@ for(const [id,variants] of Object.entries(endingBranches))MISSION_BY_ID_TEMP.get
 
 export const CAMPUS_REWARDS=Object.freeze([
  {id:'lime-trail',title:'Campus spark',emoji:'✦',threshold:3},
- {id:'orbit-trail',title:'Lux orbit',emoji:'◌',threshold:8},
+ {id:'orbit-trail',title:'Lumo orbit',emoji:'◌',threshold:8},
  {id:'star-trail',title:'Clarity constellation',emoji:'✧',threshold:14}
 ]);
 export const MISSION_BY_ID=new Map(CAMPUS_MISSIONS.map(mission=>[mission.id,mission]));

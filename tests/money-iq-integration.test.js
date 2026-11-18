@@ -296,7 +296,7 @@ test('a damaged optional challenge save recovers without losing personal financi
 test('legacy home opens Money IQ and secondary library stays reachable without a return loop',()=>atTime(()=>{
  const state=student(),route={section:'learn',page:'home'};
  const html=renderLearning({state,route,draft:{}},route);
- assert.match(html,/miq-page/);assert.match(html,/data-miq-action="home"/);assert.match(html,/More with Lux/);
+ assert.match(html,/miq-page/);assert.match(html,/data-miq-action="home"/);assert.match(html,/More with Lumo/);
  const library=renderLearning({state,route:{section:'learn',page:'library'},draft:{}},{section:'learn',page:'library'});
  assert.match(library,/data-learning-tab/);assert.match(library,/data-learn-action="money-iq"/);
  let click,destination;

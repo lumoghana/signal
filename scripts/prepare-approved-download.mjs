@@ -6,10 +6,10 @@ import {pathToFileURL} from 'node:url';
 // Restore the separately delivered signed artifact without putting APK bytes in Git.
 // This is the same approved immutable-asset pattern as the welcome artwork helper.
 export const APPROVED_DOWNLOAD=Object.freeze({
-  version:'2.14.0',
-  versionCode:21400,
-  source:'https://lumo-merchant-mabtg0hzy-williedark-6795.vercel.app/downloads/Lumo-Test-Android.apk',
-  sha256:'8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b',
+  version:'2.15.0',
+  versionCode:21500,
+  source:'https://lumo-merchant-papx34b4v-williedark-6795.vercel.app/downloads/Lumo-Test-Android.apk',
+  sha256:'b1f1268c5d871c76538e83d1c83a858b0800c34dd9e00d6c20bdb3e33b6a4c1a',
   bytes:4645839,
 });
 export function verifyApprovedDownload(bytes){

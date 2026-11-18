@@ -3,9 +3,9 @@ import { EXPLORE_SCENES, EXPLORE_SAMPLE as sample, safeExploreIndex } from './ex
 import { renderSavingsHackTerms } from './savings-hack-disclosure.js';
 
 const money = value => cash(value, { decimals: false });
-const labels = ['Your money', 'Your plan', 'Pause Moment', 'Ask Lux', 'Money Boxes', 'Accountability partner'];
+const labels = ['Your money', 'Your plan', 'Pause Moment', 'Ask Lumo', 'Money Boxes', 'Accountability partner'];
 const amount = (value, className = '') => `<span class="explore-money ${className}"><span class="explore-currency">GH₵</span>${money(value).replace('GH₵', '').trim()}</span>`;
-const nav = active => `<div class="explore-ui-nav" aria-hidden="true">${[['home', 'Home'], ['chat', 'Ask Lux'], ['more', 'Menu']].map(([glyph, label]) => `<span class="${active === label ? 'is-active' : ''}">${icon(glyph, 18)}<small>${label}</small></span>`).join('')}</div>`;
+const nav = active => `<div class="explore-ui-nav" aria-hidden="true">${[['home', 'Home'], ['chat', 'Ask Lumo'], ['more', 'Menu']].map(([glyph, label]) => `<span class="${active === label ? 'is-active' : ''}">${icon(glyph, 18)}<small>${label}</small></span>`).join('')}</div>`;
 const top = title => `<div class="explore-ui-top"><span>${title}</span><span class="explore-ui-top-icon" aria-hidden="true">${icon('more', 19)}</span></div>`;
 
 function home() {
@@ -28,7 +28,7 @@ function plan() {
 function pause() {
   return `<div class="explore-app-ui explore-pause-ui">${top('Lumo Pause Moment')}
     <div class="explore-pause-title">Pause.</div>
-    <img src="/assets/lux-pause-worried.png" width="180" height="180" alt="A worried Lux raising a hand to pause" class="explore-pause-lux" decoding="async">
+    <img src="/assets/lux-pause-worried.png" width="180" height="180" alt="A worried Lumo raising a hand to pause" class="explore-pause-lux" decoding="async">
     <div class="explore-pause-impact explore-focus"><p>This payment uses <strong>${money(sample.shortfall)}</strong> of your breathing room until ${sample.periodLabel}.</p><span class="explore-focus-dot" aria-hidden="true"></span></div>
     <div class="explore-pause-context">Sample payment · ${money(sample.payment)}</div>
     <div class="explore-pause-choices" aria-label="Preview of your choices"><span class="explore-choice-primary">Continue to PIN</span><span>Edit amount</span></div>
@@ -36,11 +36,11 @@ function pause() {
 }
 
 function chat() {
-  return `<div class="explore-app-ui explore-chat-ui">${top('Ask Lux')}
-    <div class="explore-lux-intro"><img src="/assets/lux-chat-2d.webp" width="160" height="160" alt="Lux, your money companion" decoding="async"><span>Your money.<br><strong>Let’s talk.</strong></span></div>
+  return `<div class="explore-app-ui explore-chat-ui">${top('Ask Lumo')}
+    <div class="explore-lux-intro"><img src="/assets/lux-chat-2d.webp" width="160" height="160" alt="Lumo, your money companion" decoding="async"><span>Your money.<br><strong>Let’s talk.</strong></span></div>
     <div class="explore-question"><span>What can I spend?</span></div>
-    <div class="explore-reply-slot"><div class="explore-chat-thinking" aria-hidden="true"><i></i><i></i><i></i></div><div class="explore-chat-reply explore-focus"><small>Lux</small><p data-explore-chat-answer>Based on your plan, you have <strong>${money(sample.left)}</strong> left until ${sample.periodLabel}.</p><span class="explore-focus-dot" aria-hidden="true"></span></div></div>
-    <details class="explore-explanation" data-explore-explanation><summary>How Lux worked this out ${icon('chevron', 14)}</summary><div class="explore-explanation-body"><dl class="explore-calculation"><div><dt>Available money</dt><dd data-explore-math="available">${money(sample.available)}</dd></div><div><dt>Planned obligations</dt><dd data-explore-math="planned">− ${money(sample.planned)}</dd></div><div><dt>Breathing room</dt><dd data-explore-math="cushion">− ${money(sample.cushion)}</dd></div><div><dt>Left until ${sample.periodLabel}</dt><dd data-explore-math="left">${money(sample.left)}</dd></div></dl><p>${sample.snapshotLabel}. ${sample.periodLabel} is the end of this example plan. This is not connected to a live balance.</p><form data-explore-example-form><p class="explore-example-form-title">Try different example figures</p>${[['available','Available money',sample.available],['planned','Planned obligations',sample.planned],['cushion','Breathing room',sample.cushion]].map(([name,label,value]) => `<label><span>${label} (GH₵)</span><input name="${name}" value="${value / 100}" type="number" inputmode="decimal" step="0.01" min="0" max="1000000" required></label>`).join('')}<button type="submit">Update example</button><p role="status" data-explore-example-feedback></p></form><p>In your account, Review plan lets you correct your plan and breathing room. This calculator changes this example answer only.</p></div></details>${nav('Ask Lux')}
+    <div class="explore-reply-slot"><div class="explore-chat-thinking" aria-hidden="true"><i></i><i></i><i></i></div><div class="explore-chat-reply explore-focus"><small>Lumo</small><p data-explore-chat-answer>Based on your plan, you have <strong>${money(sample.left)}</strong> left until ${sample.periodLabel}.</p><span class="explore-focus-dot" aria-hidden="true"></span></div></div>
+    <details class="explore-explanation" data-explore-explanation><summary>How Lumo worked this out ${icon('chevron', 14)}</summary><div class="explore-explanation-body"><dl class="explore-calculation"><div><dt>Available money</dt><dd data-explore-math="available">${money(sample.available)}</dd></div><div><dt>Planned obligations</dt><dd data-explore-math="planned">− ${money(sample.planned)}</dd></div><div><dt>Breathing room</dt><dd data-explore-math="cushion">− ${money(sample.cushion)}</dd></div><div><dt>Left until ${sample.periodLabel}</dt><dd data-explore-math="left">${money(sample.left)}</dd></div></dl><p>${sample.snapshotLabel}. ${sample.periodLabel} is the end of this example plan. This is not connected to a live balance.</p><form data-explore-example-form><p class="explore-example-form-title">Try different example figures</p>${[['available','Available money',sample.available],['planned','Planned obligations',sample.planned],['cushion','Breathing room',sample.cushion]].map(([name,label,value]) => `<label><span>${label} (GH₵)</span><input name="${name}" value="${value / 100}" type="number" inputmode="decimal" step="0.01" min="0" max="1000000" required></label>`).join('')}<button type="submit">Update example</button><p role="status" data-explore-example-feedback></p></form><p>In your account, Review plan lets you correct your plan and breathing room. This calculator changes this example answer only.</p></div></details>${nav('Ask Lumo')}
   </div>`;
 }
 
@@ -73,7 +73,7 @@ export function renderExploreScene(index) {
 }
 
 export function renderExploreEnd() {
-  return `<div class="explore-end"><img src="/assets/lux-chat-2d.webp" width="160" height="160" alt="Lux, your money companion" decoding="async"><p class="explore-end-eyebrow">That’s a little of Lumo.</p><h2 data-explore-end-title tabindex="-1">Your money.<br><em>Made clear.</em></h2><p class="explore-end-copy">Bring your own story.</p><div class="explore-end-actions"><button type="button" class="explore-start" data-action="start">Let’s get started ${icon('arrow', 20)}</button><button type="button" class="explore-replay" data-explore-control="replay">${icon('repeat', 17)} Watch again</button><button type="button" class="explore-close" data-action="welcome-tour-close">Back to welcome</button></div><p class="explore-bank-provider">Banking powered by <strong>GCB Bank</strong></p></div>`;
+  return `<div class="explore-end"><img src="/assets/lux-chat-2d.webp" width="160" height="160" alt="Lumo, your money companion" decoding="async"><p class="explore-end-eyebrow">That’s a little of Lumo.</p><h2 data-explore-end-title tabindex="-1">Your money.<br><em>Made clear.</em></h2><p class="explore-end-copy">Bring your own story.</p><div class="explore-end-actions"><button type="button" class="explore-start" data-action="start">Let’s get started ${icon('arrow', 20)}</button><button type="button" class="explore-replay" data-explore-control="replay">${icon('repeat', 17)} Watch again</button><button type="button" class="explore-close" data-action="welcome-tour-close">Back to welcome</button></div><p class="explore-bank-provider">Banking powered by <strong>GCB Bank</strong></p></div>`;
 }
 
 export function renderExplore() {

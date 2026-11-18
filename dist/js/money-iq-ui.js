@@ -18,13 +18,13 @@ const error=()=>'<p class="miq-error" role="alert" data-miq-error></p>';
 
 function toolbar(ctx){
  const off=ctx.draft.campusMotionOff===true;
- return `<header class="miq-header"><button type="button" class="miq-brand" data-miq-action="return" aria-label="${ctx.route.id?'Back to Money IQ':returnRoute(ctx)?.section==='chat'?'Back to Ask Lux':'Go Home'}">${icon('back',17)}<span class="miq-wordmark">lumo</span></button><div class="miq-header-actions"><button type="button" class="miq-motion" data-miq-action="motion" aria-pressed="${!off}" aria-label="${off?'Turn animations on':'Pause animations'}" title="${off?'Turn animations on':'Pause animations'}">${icon('repeat',18)}</button><button type="button" class="miq-home" data-miq-action="home">${icon('home',21)}<span>Home</span></button></div></header>`;
+ return `<header class="miq-header"><button type="button" class="miq-brand" data-miq-action="return" aria-label="${ctx.route.id?'Back to Money IQ':returnRoute(ctx)?.section==='chat'?'Back to Ask Lumo':'Go Home'}">${icon('back',17)}<span class="miq-wordmark">lumo</span></button><div class="miq-header-actions"><button type="button" class="miq-motion" data-miq-action="motion" aria-pressed="${!off}" aria-label="${off?'Turn animations on':'Pause animations'}" title="${off?'Turn animations on':'Pause animations'}">${icon('repeat',18)}</button><button type="button" class="miq-home" data-miq-action="home">${icon('home',21)}<span>Home</span></button></div></header>`;
 }
 function source({mode='example',period}={}){
  return `<div class="miq-source-row"><span class="miq-source-pill">${mode==='actual'?'Recorded Lumo activity':'Sample week'}</span>${period?.label?`<span class="miq-period">${esc(period.label)} · UTC</span>`:''}</div>`;
 }
 function lux({kind='welcome',line=''}={}){
- return `<div class="miq-lux-stage miq-lux-${esc(kind)}" aria-hidden="true">${line?`<span class="miq-lux-bubble"><small class="miq-lux-speaker">Lux:</small> ${esc(line)}</span>`:''}<span class="miq-lux-art"><img src="${LUX}" alt="" width="210" height="210"></span>${kind==='welcome'?`<span class="miq-receipt miq-receipt-one">${icon('receipt',27)}</span><span class="miq-receipt miq-receipt-two">${icon('receipt',23)}</span>`:kind==='question'?`<span class="miq-data-icon">${icon('phone',46)}<i></i></span>`:`<span class="miq-spark miq-spark-one">${icon('spark',20)}</span><span class="miq-spark miq-spark-two">${icon('spark',15)}</span>`}</div>`;
+ return `<div class="miq-lux-stage miq-lux-${esc(kind)}" aria-hidden="true">${line?`<span class="miq-lux-bubble"><small class="miq-lux-speaker">Lumo:</small> ${esc(line)}</span>`:''}<span class="miq-lux-art"><img src="${LUX}" alt="" width="210" height="210"></span>${kind==='welcome'?`<span class="miq-receipt miq-receipt-one">${icon('receipt',27)}</span><span class="miq-receipt miq-receipt-two">${icon('receipt',23)}</span>`:kind==='question'?`<span class="miq-data-icon">${icon('phone',46)}<i></i></span>`:`<span class="miq-spark miq-spark-one">${icon('spark',20)}</span><span class="miq-spark miq-spark-two">${icon('spark',15)}</span>`}</div>`;
 }
 function frame(ctx,body,kind='entry'){
  const content=body.replaceAll('<div class="miq-main ','<div tabindex="0" aria-label="Money IQ content" class="miq-main ');
@@ -35,7 +35,7 @@ function progress(session){
  return `<div class="miq-progress" role="progressbar" aria-label="Money IQ progress" aria-valuemin="0" aria-valuemax="${session.total}" aria-valuenow="${session.status==='completed'?session.total:session.index}" aria-valuetext="Question ${session.number} of ${session.total}"><div aria-hidden="true">${Array.from({length:session.total},(_,i)=>`<span class="${i<=session.index?'miq-filled':''}"></span>`).join('')}</div><span>${session.number} of ${session.total}</span></div>`;
 }
 function howThisWorks({alternates='' }={}){
- return `<details class="miq-details"><summary>Your round, your way ${icon('chevron',14)}</summary>${alternates}<p>Five spending clues and campus money moments. Points recognise taking part, never the size of your balance or whether you guess right.</p><p>This prototype uses activity stored on this device. Sample weeks are fictional. Your money stays put.</p>${link('Learning preferences','preferences')}${link('More with Lux · Stories and Campus Run','library')}</details>`;
+ return `<details class="miq-details"><summary>Your round, your way ${icon('chevron',14)}</summary>${alternates}<p>Five spending clues and campus money moments. Points recognise taking part, never the size of your balance or whether you guess right.</p><p>This prototype uses activity stored on this device. Sample weeks are fictional. Your money stays put.</p>${link('Learning preferences','preferences')}${link('More with Lumo · Stories and Campus Run','library')}</details>`;
 }
 function entry(ctx,data){
  const active=data.activeSessionId;
@@ -63,7 +63,7 @@ function comparison(info){
  return `<div class="miq-comparison" aria-label="Spending comparison">${[['previous',info.previous,info.previousLabel||'Last week'],['current',info.current,info.currentLabel||'This week']].map(([key,amount,label])=>`<div class="miq-comparison-row ${key==='current'?'miq-comparison-current':''}"><span>${esc(label)}</span><span class="miq-comparison-track" aria-hidden="true"><i style="width:${Math.max(0,Math.min(100,amount/max*100))}%"></i></span><strong>${money(amount)}</strong></div>`).join('')}</div>`;
 }
 function insightCard(info,{recap=false}={}){
- return `<article class="miq-insight-card ${recap?'miq-recap-card':''}">${info.eyebrow?`<p class="miq-eyebrow">${esc(info.eyebrow)}</p>`:''}${info.value?`<strong class="miq-reveal-value">${esc(info.value)}</strong>`:''}${info.title&&!recap?`<h2>${esc(info.title)}</h2>`:''}${info.body?`<p class="miq-insight-body">${esc(info.body)}</p>`:''}${comparison(info.comparison)}${info.lesson?`<div class="miq-lesson"><span>${recap?'One thing to try':'Lux’s take'}</span><p>${esc(info.lesson)}</p></div>`:''}</article>`;
+ return `<article class="miq-insight-card ${recap?'miq-recap-card':''}">${info.eyebrow?`<p class="miq-eyebrow">${esc(info.eyebrow)}</p>`:''}${info.value?`<strong class="miq-reveal-value">${esc(info.value)}</strong>`:''}${info.title&&!recap?`<h2>${esc(info.title)}</h2>`:''}${info.body?`<p class="miq-insight-body">${esc(info.body)}</p>`:''}${comparison(info.comparison)}${info.lesson?`<div class="miq-lesson"><span>${recap?'One thing to try':'Lumo’s take'}</span><p>${esc(info.lesson)}</p></div>`:''}</article>`;
 }
 function reveal(ctx,data,session){
  const info=session.reveal||{};

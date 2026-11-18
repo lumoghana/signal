@@ -103,7 +103,7 @@ export function renderInsights(ctx, route = {}) {
     </div>
     <div class="insights-ref-category-heading"><h2>Where your money went</h2>${insights.categories.length ? `<button type="button" data-insights-action="categories">See all ${icon('arrow', 17)}</button>` : ''}</div>
     <div class="insights-ref-categories">${insights.categories.length ? categoryRows(insights.categories.slice(0, 4), hidden) : '<div class="insights-ref-empty">No completed payments this month.<br>Your spending will appear here.</div>'}</div>
-    <button type="button" class="insights-ref-noticed" data-insights-action="noticed"><img src="/assets/lux-chat-2d.webp" width="52" height="52" alt=""><span><small>Lux noticed</small><strong>${hidden ? 'Show your balances to see your spending insight.' : esc(insights.noticed)}</strong></span>${icon('chevron', 18)}</button>`}
+    <button type="button" class="insights-ref-noticed" data-insights-action="noticed"><img src="/assets/lux-chat-2d.webp" width="52" height="52" alt=""><span><small>Lumo noticed</small><strong>${hidden ? 'Show your balances to see your spending insight.' : esc(insights.noticed)}</strong></span>${icon('chevron', 18)}</button>`}
   </section>`;
 }
 

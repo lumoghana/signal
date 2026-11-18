@@ -1,5 +1,7 @@
 # Lumo
 
+Current connected deployment and release information is in [READINESS.md](READINESS.md). The product and its assistant share one name, Lumo; the assistant entry point is **Ask Lumo**. Existing internal `lux` identifiers remain compatible with saved data and clients.
+
 A separate, fully interactive mobile-first Lumo prototype. Design references: Up's captured iOS interface and the interaction principles documented in [The Evolutionary Design of Up](https://up.com.au/blog/the-evolutionary-design-of-up/). Lumo uses an acid-lime accent, Ghanaian student context and its own feature set.
 
 ## Run and validate
@@ -17,7 +19,7 @@ Run `npm test` for financial, navigation, onboarding and camera lifecycle tests.
 - Collect with an actual encoded request QR, shareable demo payment URLs and expected-money tracking.
 - Complete incoming/outgoing IOU records, partial settlements, edits, cancellation and reminder text.
 - All Your Money includes manually recorded cash, bank and MoMo balances, with named accounts, update times, editing and removal. Guided allowance recovery, Money Story and state-grounded local Money Chat with three mini-lessons.
-- Lux is a lime-loop 2D companion throughout the app, with a black inner face, ivory features and a distinctive upper-right cut. The Pause Moment uses an amber screen, coral-orange worried Lux and one concise payment consequence. The same visual appears in Explore Lumo before signup and the signup tour. Full calculations remain in optional Payment details; payment rules, the three-second pause and PIN authentication are preserved.
+- Lumo's mascot is a lime-loop 2D companion throughout the app, with a black inner face, ivory features and a distinctive upper-right cut. The Pause Moment uses an amber screen, a coral-orange worried Lumo mascot and one concise payment consequence. The same visual appears in Explore Lumo before signup and the signup tour. Full calculations remain in optional Payment details; payment rules, the three-second pause and PIN authentication are preserved.
 - Group collections, member invitations/roles, contributions, reserved payouts, distinct approval thresholds, cancellation and final payout.
 
 ## Prototype boundary

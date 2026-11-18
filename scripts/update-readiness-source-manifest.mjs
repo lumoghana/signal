@@ -1,4 +1,4 @@
-import {writeReadinessManifest,verifyReadinessManifest} from '../backend/verification/readiness-2.14.0/source-manifest.mjs';
+import {writeReadinessManifest,verifyReadinessManifest} from '../backend/verification/branding-2.15.0/source-manifest.mjs';
 const args=new Set(process.argv.slice(2));
 for(const flag of args)if(!['--check','--write','--candidate','--frozen'].includes(flag))throw Error('Unknown flag: '+flag);
 if(args.has('--candidate')&&args.has('--frozen'))throw Error('Choose candidate or frozen status.');

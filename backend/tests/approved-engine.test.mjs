@@ -1,4 +1,4 @@
-import {readJson,readinessPath,currentFunctionDigest,hasCurrentFunctionDelta} from '../verification/readiness-2.14.0/source-manifest.mjs';
+import {readJson,readinessPath,currentFunctionDigest,hasCurrentFunctionDelta,brandingBaselinePath} from '../verification/branding-2.15.0/source-manifest.mjs';
 import {collectionReturnReview} from '../supabase/functions/lumo-approved/domain/group-policy.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -41,7 +41,7 @@ test('audit source matches explicit reviewed deltas while preserving immutable l
  const isolatedManifest=JSON.parse(await fs.readFile(new URL('isolated-function-source.json',evidence),'utf8'));
  const audit=JSON.parse(await fs.readFile(new URL('../verification/audit-2026-11-16/reviewed-source-delta.json',import.meta.url),'utf8'));
  const mainAudit=audit.functions['lumo-approved'],maintenanceAudit=audit.functions['lumo-maintenance'];
- const readiness=await readJson(readinessPath),release=readiness.functions['lumo-approved'];
+ const readiness=await readJson(readinessPath),release=readiness.functions['lumo-approved'],brandingBaseline=await readJson(brandingBaselinePath);
  assert.equal(baseline.function,'lumo-approved');assert.equal(baseline.functionVersion,18);
  assert.equal(baseline.captureNormalization.removedTrailingLfBytesPerFile,1);
  assert.equal(delta.version,'2.12.0');assert.equal(delta.baselineFunctionVersion,18);
@@ -95,10 +95,11 @@ test('audit source matches explicit reviewed deltas while preserving immutable l
  for(const [name,bytes]of isolated){
   const digest=createHash('sha256').update(bytes).digest('hex');
   const auditChange=maintenanceAudit.deltas[name];if(auditChange)assert.equal(auditChange.beforeSha256,isolatedManifest.files[name]);
-  assert.equal(digest,auditChange?.afterSha256||isolatedManifest.files[name],name+' must match historical source or its reviewed audit delta');
+  assert.equal(brandingBaseline.functions['lumo-maintenance'].files['backend/supabase/functions/lumo-maintenance/'+name],auditChange?.afterSha256||isolatedManifest.files[name],name+' immutable pre-branding source must match historical audit lineage');
+  assert.equal(digest,currentFunctionDigest(readiness,'lumo-maintenance',name),name+' must match the explicit current branding overlay');
   if(!name.startsWith('approved/'))continue;
   const original=name.slice('approved/'.length),expected=maintenanceAudit.deltas[name]?.afterSha256||delta.files[original]||baseline.files[original];
-  assert.ok(expected,'No unreviewed isolated dependency: '+name);assert.equal(digest,expected,name+' must match its baseline or explicit maintenance delta');
+  assert.ok(expected,'No unreviewed isolated dependency: '+name);assert.equal(brandingBaseline.functions['lumo-maintenance'].files['backend/supabase/functions/lumo-maintenance/'+name],expected,name+' pre-branding source must match its baseline or explicit maintenance delta');
   assert.ok(!original.startsWith('merchant/'));assert.notEqual(original,'index.ts');assert.notEqual(original,'operations.mjs');
   if(!Object.hasOwn(delta.files,original)&&!Object.hasOwn(mainAudit.deltas,original)&&!hasCurrentFunctionDelta(readiness,'lumo-approved',original))assert.deepEqual(bytes,main.get(original),name+' must preserve unchanged live18 bytes');
  }

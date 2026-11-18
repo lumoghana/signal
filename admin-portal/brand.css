@@ -68,7 +68,7 @@ th{background:#f7f8f3;color:#6f7380}
 .sidebar-foot .icon-btn{color:#b7b9c6}
 .sidebar-foot .icon-btn:hover{background:#30313c;color:#fff}
 
-/* Brand-led welcome, using the real wordmark and the current Lux artwork. */
+/* Brand-led welcome, using the real wordmark and the current Lumo artwork. */
 .auth-shell{background:#fff}
 .auth-story{background:var(--brand-charcoal);color:#f5f5f7}
 .auth-story:after{display:none}

@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "release": "2.15.0",
+  "path": "backend/supabase/functions/lumo-admin/summary.mjs",
+  "baselineCommit": "57ca03aa201240cbc03dbdb1c6ea1e46a839cfd1",
+  "beforeSha256": "b5dc6550a790e4a77bd2d64515aecd9ef1fa1c474b4babc708d8128bf4e11f80",
+  "afterSha256": "f2d6730fd450476491094775863cf64f9d16e83309d990e8427865e4729ec993",
+  "baselineAstSha256": "df2fd1b03b4667552bc2c67a5837916cfcbf05960884a231f62c9e9f5931d866",
+  "normalization": "Compare all parsed AST nodes and nonstring values exactly after restoring only enumerated string literal indices; ignore source offsets and raw quoting for strings. Numeric values, regex flags, identifiers, object keys, property order and executable structure are retained.",
+  "deltas": [
+    {
+      "stringLiteralIndex": 2622,
+      "before": "Chapter 06 · Lux is in your corner",
+      "after": "Chapter 06 · Lumo is in your corner"
+    },
+    {
+      "stringLiteralIndex": 2898,
+      "before": "Lux orbit",
+      "after": "Lumo orbit"
+    },
+    {
+      "stringLiteralIndex": 2941,
+      "before": "Classic Lux",
+      "after": "Classic Lumo"
+    },
+    {
+      "stringLiteralIndex": 2950,
+      "before": "Open Learn with Lux and choose your focus first.",
+      "after": "Open Learn with Lumo and choose your focus first."
+    },
+    {
+      "stringLiteralIndex": 2955,
+      "before": "Lux is ready for the next run.",
+      "after": "Lumo is ready for the next run."
+    },
+    {
+      "stringLiteralIndex": 3041,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3045,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3068,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3072,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3095,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3099,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3124,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3130,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3153,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3157,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3180,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3184,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3207,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3211,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3236,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3242,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3265,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3269,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3292,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3296,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3319,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3323,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3346,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3350,
+      "before": "Lux",
+      "after": "Lumo"
+    },
+    {
+      "stringLiteralIndex": 3532,
+      "before": "Try it with Lux.",
+      "after": "Try it with Lumo."
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "release": "2.15.0",
+  "scope": "Explicit naming and legacy presentation projection only. No migration, runtime import closure, authentication policy or financial behavior changes.",
+  "changes": {
+    "backend/supabase/functions/lumo-approved/domain/learning-content.js": {
+      "reason": "Replace only the retired assistant name in authored learning copy and labels with Lumo. All lesson, question, route and reward IDs, monetary examples, correct-answer choices, score thresholds and state transitions remain as reviewed for the prior release.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/domain/learning-game-content.js": {
+      "reason": "Replace only the retired assistant name in authored learning copy and labels with Lumo. All lesson, question, route and reward IDs, monetary examples, correct-answer choices, score thresholds and state transitions remain as reviewed for the prior release.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/domain/learning-game-model.js": {
+      "reason": "Use the Lumo reward and assistant display titles and project historical saved reward titles by their existing reward IDs when reading a campus run. All mission IDs, thresholds, stars, effects, history and persisted runs retain their financial and game behavior.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/domain/learning-model.js": {
+      "reason": "Replace only the retired assistant name in authored learning copy and labels with Lumo. All lesson, question, route and reward IDs, monetary examples, correct-answer choices, score thresholds and state transitions remain as reviewed for the prior release.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/engine.mjs": {
+      "reason": "Project only exact historical service-owned assistant sentences and known reward-ID titles to Lumo at the existing public result/state boundary. Retained transaction amounts, receipt links, idempotency outcomes, persisted records, source tags and arbitrary customer prose remain unchanged.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-maintenance/approved/domain/learning-content.js": {
+      "reason": "Replace only the retired assistant name in authored learning copy and labels with Lumo. All lesson, question, route and reward IDs, monetary examples, correct-answer choices, score thresholds and state transitions remain as reviewed for the prior release.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-maintenance/approved/domain/learning-game-content.js": {
+      "reason": "Replace only the retired assistant name in authored learning copy and labels with Lumo. All lesson, question, route and reward IDs, monetary examples, correct-answer choices, score thresholds and state transitions remain as reviewed for the prior release.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-maintenance/approved/domain/learning-game-model.js": {
+      "reason": "Use the Lumo reward and assistant display titles and project historical saved reward titles by their existing reward IDs when reading a campus run. All mission IDs, thresholds, stars, effects, history and persisted runs retain their financial and game behavior.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-maintenance/approved/domain/learning-model.js": {
+      "reason": "Replace only the retired assistant name in authored learning copy and labels with Lumo. All lesson, question, route and reward IDs, monetary examples, correct-answer choices, score thresholds and state transitions remain as reviewed for the prior release.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-maintenance/approved/engine.mjs": {
+      "reason": "Project only exact historical service-owned assistant sentences and known reward-ID titles to Lumo at the existing public result/state boundary. Retained transaction amounts, receipt links, idempotency outcomes, persisted records, source tags and arbitrary customer prose remain unchanged.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "tests/consumer-branding.test.js",
+        "tests/learning-game-world-integration.test.js"
+      ]
+    },
+    "backend/supabase/functions/lumo-admin/handler.mjs": {
+      "reason": "Normalize only two exact older SQL-owned assistant telemetry sentences in top-level definitions and limitations display arrays. Immutable SQL, command authorization, MFA, disabled recovery controls, account names, customer/staff prose and all financial fields retain their prior behavior.",
+      "evidence": [
+        "backend/tests/admin-readiness-gateway.test.mjs"
+      ]
+    },
+    "backend/supabase/functions/lumo-admin/summary.mjs": {
+      "reason": "Preserve the exact prior generated financial summary executable AST and replace only thirty enumerated assistant string literals. The independent literal-index inventory and AST equality proof retain all identifiers, numeric values, regex flags, object metadata and executable structure.",
+      "evidence": [
+        "backend/tests/branding-literal-delta.test.mjs",
+        "backend/tests/admin-summary.test.mjs",
+        "backend/verification/branding-2.15.0/admin-summary-literal-delta.json"
+      ]
+    }
+  }
+}

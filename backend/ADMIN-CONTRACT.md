@@ -77,7 +77,7 @@ The service-only `public.lumo_admin_summary(p_payload jsonb)` validates the same
 
 ## Current evidence limits
 
-No live bank, MoMo, NIA/SMS, external settlement, or statement feed is connected. Settlement and identity success must not be inferred from sandbox outcomes. Client app version, audio playback delivery, Pause triggers and Lux answer telemetry are not established by existing records. Internal balance reconciliation is real; external reconciliation is unavailable until provider integration exists. Product `availableMoney` equals canonical Everyday ledger balance, as in the consumer summary. `plannedRemaining` is the sum of unspent essentials only; the contract does not pretend that this alone is final left-after-plan, which also considers dated IOU obligations and the keep-back buffer.
+No live bank, MoMo, NIA/SMS, external settlement, or statement feed is connected. Settlement and identity success must not be inferred from sandbox outcomes. Client app version, audio playback delivery, Pause triggers and Lumo answer telemetry are not established by existing records. Internal balance reconciliation is real; external reconciliation is unavailable until provider integration exists. Product `availableMoney` equals canonical Everyday ledger balance, as in the consumer summary. `plannedRemaining` is the sum of unspent essentials only; the contract does not pretend that this alone is final left-after-plan, which also considers dated IOU obligations and the keep-back buffer.
 
 ## Verification
 

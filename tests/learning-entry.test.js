@@ -9,7 +9,7 @@ test('optional learning never adds a prompt to payment authorisation, Home or hu
 });
 test('relevant learning entries are amount-free, respect privacy and do not change a money record',()=>{
  const state=createDemoState();run(state,'learningEnroll',{goal:'allowance',personalised:true});const ctx={state,draft:{},route:{section:'plan',page:'home'}},before=JSON.stringify(state);
- const html=renderContextLearning(ctx);assert.match(html,/Learn with Lux/);assert.doesNotMatch(html,/GH[₵¢]|2,480|1,280/);assert.equal(JSON.stringify(state),before);
+ const html=renderContextLearning(ctx);assert.match(html,/Learn with Lumo/);assert.doesNotMatch(html,/GH[₵¢]|2,480|1,280/);assert.equal(JSON.stringify(state),before);
  state.account.privacy.personalisation=false;assert.equal(renderContextLearning(ctx),'');
 });
 test('return to practice requires a retained authorised session, including after opting out',()=>{
