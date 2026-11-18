@@ -1,0 +1,45 @@
+begin;
+create function pg_temp.bcheck(value boolean,label text) returns void language plpgsql as $$begin if value is distinct from true then raise exception 'Biometric retention check failed: %',label;end if;end $$;
+do $test$
+declare actor uuid:=gen_random_uuid();expired_user uuid:=gen_random_uuid();active_user uuid:=gen_random_uuid();tid uuid;rid uuid;row_data record;out jsonb;balance_before bigint;
+begin
+ insert into auth.users(id,email) values(actor,'retention-close@pilot.lumo.invalid'),(expired_user,'retention-expired@pilot.lumo.invalid'),(active_user,'retention-active@pilot.lumo.invalid');
+ insert into lumo_private.profiles(user_id,handle,display_name,pin_hash) values(actor,'retention_close','Synthetic',extensions.crypt('1234',extensions.gen_salt('bf',4))),(expired_user,'retention_expired','Synthetic',extensions.crypt('1234',extensions.gen_salt('bf',4))),(active_user,'retention_active','Synthetic',extensions.crypt('1234',extensions.gen_salt('bf',4)));
+ insert into lumo_private.accounts(owner_user_id,kind,balance) values(actor,'consumer',0),(actor,'merchant',500);
+ for row_data in select * from (values(actor,'consumer',false),(actor,'merchant',false),(expired_user,'consumer',true),(active_user,'consumer',false)) f(uid,mod,expired) loop
+  tid:=gen_random_uuid();rid:=gen_random_uuid();
+  insert into lumo_private.access_requests(id,module,purpose,method,user_id,reference_id,face_digests,state) values(rid,row_data.mod,'enrollment','sms',row_data.uid,tid,jsonb_build_array(repeat('a',64),repeat('b',64),repeat('c',64)),'completed');
+  insert into lumo_private.access_enrollments(module,user_id,phone,reference_id,face_digests) values(row_data.mod,row_data.uid,'+233240123456',tid,jsonb_build_array(repeat('a',64),repeat('b',64),repeat('c',64)));
+  insert into lumo_private.access_face_templates(id,module,user_id,enrollment_request_id,consent_version,model_id,model_sha256,key_version,ciphertext,state,activated_at,expires_at) values(tid,row_data.mod,row_data.uid,rid,'2026-11-16.face.1','opencv-sface-2021dec-v1','0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79','test-key',repeat('A',200),'active',clock_timestamp(),clock_timestamp()+case when row_data.expired then interval '-1 second' else interval '30 days' end);
+  insert into lumo_private.access_face_attempts(request_id,template_id,enrollment_revision,state,frame_digests,expires_at) values(rid,tid,1,'consumed','["synthetic-linkage"]',clock_timestamp()-interval '1 day');
+ end loop;
+ perform pg_temp.bcheck(lumo_private.access_enrollment_json('consumer',expired_user)->>'faceEnrolled'='false','expired consent hidden before scheduler runs');
+ perform pg_temp.bcheck(lumo_private.access_prototype_enrollment_json('consumer',expired_user)->>'faceEnrolled'='false','keyless projection uses same expiry');
+ rid:=gen_random_uuid();tid:=gen_random_uuid();
+ insert into lumo_private.access_requests(id,module,purpose,method,user_id,reference_id) values(rid,'consumer','enrollment','sms',active_user,tid);
+ insert into lumo_private.access_face_templates(id,module,user_id,enrollment_request_id,consent_version,created_at) values(tid,'consumer',active_user,rid,'2026-11-16.face.1',clock_timestamp()-interval '2 days');
+ out:=lumo_private.access_biometric_retention_sweep(100);
+ perform pg_temp.bcheck(out->>'templatesErased'='2','expired active and abandoned staging erased');
+ perform pg_temp.bcheck(not exists(select 1 from lumo_private.access_face_templates where user_id=expired_user and ciphertext is not null),'expired encrypted template removed');
+ perform pg_temp.bcheck((select state='active' and ciphertext is not null from lumo_private.access_face_templates where user_id=active_user and state='active'),'abandoned older capture does not erase newer active face');
+ perform pg_temp.bcheck(not exists(select 1 from lumo_private.access_face_attempts where frame_digests is not null),'expired comparison linkage scrubbed');
+ select sum(balance) into balance_before from lumo_private.accounts where owner_user_id=actor;
+ update lumo_private.accounts set status='closed' where owner_user_id=actor and kind='consumer';
+ perform pg_temp.bcheck(not exists(select 1 from lumo_private.access_face_templates where user_id=actor and module='consumer' and ciphertext is not null),'account closure erases consumer template');
+ perform pg_temp.bcheck((select ciphertext is not null and state='active' from lumo_private.access_face_templates where user_id=actor and module='merchant'),'closing personal account retains independently consented merchant face');
+ perform pg_temp.bcheck((select sum(balance)=balance_before from lumo_private.accounts where owner_user_id=actor),'no financial history or balance erased');
+ perform pg_temp.bcheck(not exists(select 1 from lumo_private.access_requests where user_id=actor and module='consumer' and face_digests<>'[]'::jsonb),'closure removes request biometric linkage');
+ insert into lumo_private.accounts(owner_user_id,kind,balance) values(active_user,'consumer',0);
+ rid:=gen_random_uuid();insert into lumo_private.access_requests(id,module,purpose,method,user_id,reference_id,state) values(rid,'consumer','recovery','face',active_user,gen_random_uuid(),'applying');
+ update lumo_private.access_face_templates set expires_at=clock_timestamp()-interval '1 second' where user_id=active_user and state='active';
+ out:=lumo_private.access_biometric_retention_sweep(100);perform pg_temp.bcheck((select ciphertext is not null from lumo_private.access_face_templates where user_id=active_user and state='active'),'sweep preserves templates while credential outcome is unresolved');
+ out:=lumo_private.access_erase_biometrics(active_user,'consumer','privacy.fulfilled');perform pg_temp.bcheck(out->>'code'='RESET_IN_PROGRESS','privacy fulfilment cannot abandon a pending Auth write');
+ begin update lumo_private.accounts set status='closed' where owner_user_id=active_user;raise exception 'Unsafe close accepted';exception when raise_exception then if sqlerrm='Unsafe close accepted' then raise;end if;end;
+ perform pg_temp.bcheck((select status='active' from lumo_private.accounts where owner_user_id=active_user),'pending reset prevents false completed account closure');
+ update lumo_private.access_requests set state='superseded' where id=rid;
+ out:=lumo_private.access_biometric_retention_sweep(100);perform pg_temp.bcheck(not exists(select 1 from lumo_private.access_face_templates where user_id=active_user and ciphertext is not null),'retention erasure resumes when pending reset is resolved');
+ perform pg_temp.bcheck(not has_function_privilege('authenticated','lumo_private.access_erase_biometrics(uuid,text,text)','execute') and not has_function_privilege('service_role','lumo_private.access_biometric_retention_sweep(integer)','execute'),'no direct erasure/sweep capability through Data API');
+ out:=lumo_private.access_erase_biometrics(actor,'merchant','privacy.fulfilled');perform pg_temp.bcheck(out->>'ok'='true','governed fulfiller may call private erasure helper');
+ out:=lumo_private.access_erase_biometrics(actor,'merchant','privacy.fulfilled');perform pg_temp.bcheck(out->>'templatesErased'='0','repeated fulfilment is harmless');
+end $test$;
+rollback;

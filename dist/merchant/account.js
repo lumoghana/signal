@@ -1,8 +1,9 @@
 import * as Shared from './shared.js';
-import {MERCHANT_CAPABILITIES} from './connected-service.js';
+import * as Connected from './connected-service.js';
 import {getState,getWorkspaceMode} from './store.js';
+const MERCHANT_CAPABILITIES=Connected.MERCHANT_CAPABILITIES;
 export const isShared=true;
-export const getCapabilities=()=>({...MERCHANT_CAPABILITIES});
+export const getCapabilities=()=>({...MERCHANT_CAPABILITIES,passwordRecoveryCentral:typeof Connected.accessRecovery==='function'});
 export const supportsCapability=name=>MERCHANT_CAPABILITIES[name]===true;
 function requireCapability(name){if(!supportsCapability(name))throw Object.assign(new Error('This account service is not available in the connected test yet. Your existing sign-in and account details have not changed.'),{status:503,code:'UNAVAILABLE_SERVICE',definitiveNoMutation:true})}
 
@@ -26,16 +27,18 @@ export function clearPendingInvitation(username){const value=readPendingInvitati
 function invitationMatches(value,current){return Boolean(value&&current&&value.username===String(current.username||'').toLowerCase()&&(!value.userId||value.userId===current.userId)&&(!value.businessId||value.businessId===current.businessId))}
 export function getInvitationRecoveryNotice(current=getSession()){
  const value=readPendingInvitation();if(!invitationMatches(value,current))return '';
+ if(typeof Connected.accessRecovery==='function'){clearPendingInvitation(current.username);return '';}
  return 'Your invitation account is signed in, but its private recovery key was not saved. Confirm your password to create a replacement key, then save it before continuing.';
 }
 export function getRecoveryKeyNotice(current=getSession()){
+ if(typeof Connected.accessRecovery==='function'){Shared.clearRecoveryKey();getInvitationRecoveryNotice(current);return '';}
  if(current&&Object.hasOwn(current,'recoveryKeyPending')&&!current.recoveryKeyPending){if(invitationMatches(readPendingInvitation(),current))clearPendingInvitation(current.username);return '';}
  if(current?.recoveryKeyPending&&!Shared.getRecoveryKey())return 'Your private recovery key still needs saving. Confirm your password to create a replacement key, then save it before continuing.';
  return getInvitationRecoveryNotice(current);
 }
 function rememberInvitationAccount(result){
  const value=readPendingInvitation(),current=result?.session||getSession();
- if(invitationMatches(value,current))writePendingInvitation({...value,stage:'needs-key',userId:current.userId,businessId:current.businessId});
+ if(invitationMatches(value,current)){if(typeof Connected.accessRecovery==='function')clearPendingInvitation(current.username);else writePendingInvitation({...value,stage:'needs-key',userId:current.userId,businessId:current.businessId});}
 }
 
 const randomId=()=>crypto.randomUUID();
@@ -54,10 +57,12 @@ export const listUsers=businessId=>Shared.getCache().users.filter(user=>!busines
 export const listInvitations=businessId=>Shared.getCache().invitations.filter(invite=>!businessId||invite.businessId===businessId);
 export const listSessions=()=>Shared.getCache().sessions;
 export const getAuthAudit=()=>Shared.getCache().audit;
+export const passwordRecoveryRequest=Connected.accessRecovery;
+export function recoveryCompleted(){Shared.lockLocal('password-recovered');}
 export const hasOwner=businessId=>Boolean(getSession()?.businessId===businessId||Shared.getCache().state?.business?.id===businessId||getState().business?.id===businessId&&isSharedBusiness(getState().business));
 export const subscribeAuth=fn=>Shared.subscribeShared(type=>{if(type==='account')fn()});
-export const getRecoveryKey=Shared.getRecoveryKey;
-export const getRecoveryKeyReference=Shared.getRecoveryKeyReference;
+export const getRecoveryKey=()=>typeof Connected.accessRecovery==='function'?'':Shared.getRecoveryKey();
+export const getRecoveryKeyReference=()=>typeof Connected.accessRecovery==='function'?'':Shared.getRecoveryKeyReference();
 export function clearRecoveryKey(){Shared.clearRecoveryKey();const current=getSession();if(invitationMatches(readPendingInvitation(),current))clearPendingInvitation(current.username)}
 export async function acknowledgeRecoveryKey({reference=Shared.getRecoveryKeyReference()}={}){
  const current=getSession();if(!current)throw new Error('Sign in again before confirming your recovery key.');

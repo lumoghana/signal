@@ -1,3 +1,4 @@
+import {createPasswordRecovery,syncFaceStorageConsent} from './password-recovery.js';
 const E=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const paths={
  arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',
@@ -47,7 +48,7 @@ function securityCard(i,title,text,action,label){
 export function securityPage({session,users=[],sessions=[],audit=[],capabilities={}}={}){
  if(!session)return `<div class="access-empty">${icon('shield')}<h2>Sign in to manage access.</h2>${button('Sign in','login','primary')}</div>`;
  const own=sessions.filter(s=>s.userId===session.userId&&accessSessionState(s)==='active'),activeUsers=users.filter(u=>u.active!==false&&u.status!=='suspended');
- return `<div class="access-security-page"><div class="page-heading"><div><div class="eyebrow">ACCOUNT & SECURITY</div><h1 class="page-title">Access you can account for.</h1><p class="subtitle">Your profile, password and signed-in sessions.</p></div><span class="access-role-badge">${E(roleLabel(session.role))}</span></div><section class="access-profile-summary"><span class="access-profile-avatar">${E(initial(session.name))}</span><span><strong>${E(session.name)}</strong><small>@${E(session.username)} · ${E(session.phone||'Phone not set')}</small></span>${button('View profile','profile','ghost small')}</section><div class="access-security-cards">${securityCard('key','Your password',capabilities.passwordChange===false?'Password changes are not available in this connected test. Your current password stays unchanged.':'Change your password with your current password.','password',capabilities.passwordChange===false?'Service availability':'Change password')}${securityCard('phone','Signed-in sessions',`${own.length} active session${own.length===1?'':'s'} for your account. Review current access and history.`, 'sessions','Review sessions')}${securityCard('phone','Your phone number','Update your account phone number after confirming your password.','phone','Update phone')}${securityCard('logout','Sign out','End this session without changing your business records.','sign-out','Sign out')}</div><section class="access-recovery-settings"><span class="access-security-card-icon">${icon('key')}</span><div><h3>Your private recovery key</h3><p>If your key is lost or exposed, replace it after confirming your password. Your previous key will stop working.</p></div>${button('Replace recovery key','regenerate-key','secondary small')}</section>${session.role==='owner'?`<div class="access-owner-note">${icon('team')}<span><strong>${activeUsers.length} active account${activeUsers.length===1?'':'s'}</strong> · Use Team & access to invite people and manage their roles and assigned shops.</span></div>`:''}<section class="panel section-gap"><div class="panel-heading"><h2 class="panel-title">Recent account activity</h2></div><div class="access-audit-list">${audit.length?audit.slice(0,8).map(a=>`<div class="access-audit-row"><span>${icon(a.type?.includes('PASSWORD')?'key':a.type?.includes('SIGN')?'user':'shield')}</span><div><strong>${E(a.description||String(a.type||'Account activity').replaceAll('_',' ').toLowerCase())}</strong><small>${E(a.username||a.actorUsername||a.actorName||'Account')} · ${when(a.createdAt||a.at)}</small></div></div>`).join(''):'<div class="access-empty"><p>Your account activity will appear here.</p></div>'}</div></section><p class="notice">Use a test password in this prototype. Bank and SMS services are not connected.</p></div>`;
+ return `<div class="access-security-page"><div class="page-heading"><div><div class="eyebrow">ACCOUNT & SECURITY</div><h1 class="page-title">Access you can account for.</h1><p class="subtitle">Your profile, password and signed-in sessions.</p></div><span class="access-role-badge">${E(roleLabel(session.role))}</span></div><section class="access-profile-summary"><span class="access-profile-avatar">${E(initial(session.name))}</span><span><strong>${E(session.name)}</strong><small>@${E(session.username)} · ${E(session.phone||'Phone not set')}</small></span>${button('View profile','profile','ghost small')}</section><div class="access-security-cards">${securityCard('key','Your password',capabilities.passwordChange===false?'Password changes are not available in this connected test. Your current password stays unchanged.':'Change your password with your current password.','password',capabilities.passwordChange===false?'Service availability':'Change password')}${securityCard('phone','Signed-in sessions',`${own.length} active session${own.length===1?'':'s'} for your account. Review current access and history.`, 'sessions','Review sessions')}${securityCard('phone','Your phone number','Update your account phone number after confirming your password.','phone','Update phone')}${securityCard('logout','Sign out','End this session without changing your business records.','sign-out','Sign out')}</div>${capabilities.passwordRecoveryCentral===true?`<section class="access-recovery-settings"><span class="access-security-card-icon">${icon('shield')}</span><div><h3>Recovery options</h3><p>Save your face for password recovery. Changes require your current password.</p></div>${button('Manage recovery','recovery-settings','secondary small')}</section>`:`<section class="access-recovery-settings"><span class="access-security-card-icon">${icon('key')}</span><div><h3>Your private recovery key</h3><p>If your key is lost or exposed, replace it after confirming your password. Your previous key will stop working.</p></div>${button('Replace recovery key','regenerate-key','secondary small')}</section>`}${session.role==='owner'?`<div class="access-owner-note">${icon('team')}<span><strong>${activeUsers.length} active account${activeUsers.length===1?'':'s'}</strong> · Use Team & access to invite people and manage their roles and assigned shops.</span></div>`:''}<section class="panel section-gap"><div class="panel-heading"><h2 class="panel-title">Recent account activity</h2></div><div class="access-audit-list">${audit.length?audit.slice(0,8).map(a=>`<div class="access-audit-row"><span>${icon(a.type?.includes('PASSWORD')?'key':a.type?.includes('SIGN')?'user':'shield')}</span><div><strong>${E(a.description||String(a.type||'Account activity').replaceAll('_',' ').toLowerCase())}</strong><small>${E(a.username||a.actorUsername||a.actorName||'Account')} · ${when(a.createdAt||a.at)}</small></div></div>`).join(''):'<div class="access-empty"><p>Your account activity will appear here.</p></div>'}</div></section><p class="notice">${capabilities.passwordRecoveryCentral===true?'Use a test password in this prototype. Bank services are not connected. Recovery availability is checked when you open your options.':'Use a test password in this prototype. Bank and SMS services are not connected.'}</p></div>`;
 }
 export function createAccess(config={}){
  const auth=config.auth||{};
@@ -55,13 +56,23 @@ export function createAccess(config={}){
  const unavailable=(title,back)=>heading(title,'This service is not available in the connected test yet. Your current account details and sign-in stay unchanged.')+button(back==='login'?'Back to sign in':'Back to my account',back,'secondary full');
  let active=false,view='login',phase='username',error='',notice='',busy=false,username='',remember=false,token='',invitation=null,challengeId='',recoveryCode='',maskedPhone='',securedCode=false,privacy=false,lastStage='';
  let phone='',recoveredUsernames=[],phoneChallenge=null,stepUp=null,stepUpResolve=null,invitationRequest=0,demoCode='123456',recoveryMethod='code',recoveryKey='',recoveryKeyReference='',recoveryIdentity='';
+ let centralRecovery=null;
  const shared=()=>typeof config.shared==='function'?Boolean(config.shared()):typeof auth.isShared==='function'?Boolean(auth.isShared()):Boolean(auth.isShared);
+ const centralAvailable=()=>shared()&&typeof auth.passwordRecoveryRequest==='function';
+ const centralView=()=>centralRecovery&&['recovery','recovery-settings'].includes(view);
+ function disposeCentral(){centralRecovery?.dispose();centralRecovery=null;}
+ function openCentral(mode){
+  disposeCentral();
+  let controller;controller=createPasswordRecovery({module:'merchant',request:(operation,values,options)=>auth.passwordRecoveryRequest(operation,values,options),onChange:()=>{if(centralRecovery===controller&&active&&centralView()){lastStage='';redraw();}},onBack:()=>{if(centralRecovery!==controller)return;if(mode==='settings')backToApp();else show('login',{username});},onComplete:()=>{if(centralRecovery===controller&&mode==='recover')auth.recoveryCompleted?.();}});
+  centralRecovery=controller;void controller.start(mode);
+ }
+ function centralContent(){return centralRecovery.render().replace(/<form\b/g,'<form data-form="access"').replace(/data-password-recovery-action="([^"]+)"/g,'data-password-recovery-action="$1" data-action="access-central-$1"');}
  const challengeHint=()=>demoCode?`Prototype code: <strong>${E(demoCode)}</strong>. No SMS is sent. Valid for five minutes.`:'Enter the verification code for this request.';
  function setChallenge(value={}){challengeId=value.challengeId||'';maskedPhone=value.maskedPhone||'your linked phone';recoveryMethod=value.method||(shared()?'recovery-key':'code');demoCode=value.demoCode===undefined?(shared()?'':'123456'):String(value.demoCode||'')}
  function settleStepUp(value=null){const resolve=stepUpResolve;stepUpResolve=null;stepUp=null;resolve?.(value)}
  function business(){return config.business?.()||{}}
  function session(){try{return auth.getSession?.()||null}catch{return null}}
- function recoveryRequired(){const current=session();return Boolean(current&&(current.recoveryKeyPending||auth.getRecoveryKey?.()||auth.getRecoveryKeyNotice?.(current)||auth.getInvitationRecoveryNotice?.(current)))}
+ function recoveryRequired(){if(centralAvailable())return false;const current=session();return Boolean(current&&(current.recoveryKeyPending||auth.getRecoveryKey?.()||auth.getRecoveryKeyNotice?.(current)||auth.getInvitationRecoveryNotice?.(current)))}
  function enforceRecoveryCheckpoint(){
   if(!recoveryRequired()){if(!session()){recoveryKey='';recoveryKeyReference='';recoveryIdentity='';if(['recovery-key','regenerate-key'].includes(view)){view='login';phase='username';busy=false;}}return false;}
   const current=session(),identity=[current?.businessId,current?.userId,current?.id].join(':'),key=String(auth.getRecoveryKey?.()||'');
@@ -75,7 +86,9 @@ export function createAccess(config={}){
  function fail(message){busy=false;error=message||'Something went wrong. Please try again.';redraw()}
  function info(message){notice=message;error='';redraw()}
  function show(next='login',params={}){
+  if(centralAvailable()&&['recovery-key','regenerate-key'].includes(next)){next='recovery-settings';params={};}
   if(recoveryRequired()&&!['recovery-key','regenerate-key'].includes(next)){enforceRecoveryCheckpoint();redraw();return}
+  disposeCentral();
   if(next!=='step-up')settleStepUp();invitationRequest++;
   active=true;view=next==='accept-invite'?'invite':next;phase=view==='secure'?'code':'username';error='';notice=String(params.notice||'');busy=false;lastStage='';
   if(params.username!==undefined)username=String(params.username);
@@ -90,12 +103,14 @@ export function createAccess(config={}){
   if(view==='username-recovery'){phase='phone';recoveredUsernames=[];challengeId='';phone=''}
   if(view==='phone'){phase='details';phoneChallenge=null;phone=''}
   if(view==='recovery-key'){const current=session();recoveryIdentity=[current?.businessId,current?.userId,current?.id].join(':');recoveryKey=String(params.recoveryKey||auth.getRecoveryKey?.()||'');recoveryKeyReference=String(params.recoveryKeyReference||auth.getRecoveryKeyReference?.()||'');phase='key'}
+  if(centralAvailable()&&['recovery','recovery-settings'].includes(view))openCentral(view==='recovery-settings'?'settings':'recover');
   redraw();
  }
- function hide(){if(enforceRecoveryCheckpoint()){redraw();return}settleStepUp();active=false;error='';notice='';busy=false;recoveryCode='';redraw()}
- function backToApp(){if(enforceRecoveryCheckpoint()){redraw();return}settleStepUp();active=false;error='';notice='';busy=false;if(config.onBack)config.onBack();else redraw()}
- async function finishInvitationAccess(value){
+ function hide(){if(enforceRecoveryCheckpoint()){redraw();return}disposeCentral();settleStepUp();active=false;error='';notice='';busy=false;recoveryCode='';redraw()}
+ function backToApp(){if(enforceRecoveryCheckpoint()){redraw();return}disposeCentral();settleStepUp();active=false;error='';notice='';busy=false;if(config.onBack)config.onBack();else redraw()}
+ async function finishInvitationAccess(value,{setupRecovery=false}={}){
   await authenticated(value?.session||value);
+  if(centralAvailable()){if(setupRecovery&&session())show('recovery-settings');return;}
   const message=auth.getRecoveryKeyNotice?.(session())||auth.getInvitationRecoveryNotice?.(session())||((value?.keyUnavailable||value?.recoveryKeyAvailable===false)&&session()?'Your invitation request was recovered. Confirm your password to replace the private recovery key, then save the new key.':'');
   if(message&&!auth.getRecoveryKey?.())show('regenerate-key',{notice:message});
  }
@@ -122,6 +137,7 @@ export function createAccess(config={}){
    `<div class="access-divider"><span>New to Lumo Merchant?</span></div><div class="access-form-footer">${legacy?button(pending?.targetBusinessId?'Continue saved prototype import':'Import a saved prototype','secure','secondary full'):''}${button(existing?'Create a different merchant account':'Create a merchant account','signup','secondary full')}${button('I have a staff invitation','invite','ghost full')}</div>`;
  }
  function recoveryScreen(){
+  if(centralView())return centralContent();
   if(!supports('passwordRecovery'))return unavailable('Password recovery','login');
   if(phase==='username')return heading('Let’s get you<br>back in.','Enter your username to start password recovery.')+form(usernameField()+`<p class="access-hint">${shared()?'You will need the private recovery key saved when your account was created.':'Use the phone linked to your local sample account to complete recovery.'} This prototype does not send SMS.</p>`,'Continue',{back:{label:'Sign in',action:'login'}});
   if(phase==='code')return heading('Check your<br>recovery code.',`Verify this request for <strong>${E(maskedPhone||'your linked phone')}</strong>.`)+form(field('Recovery code','code','','required type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" class="access-otp" autofocus',challengeHint())+`<div class="access-inline-row"><button type="button" class="access-link" data-action="access-resend-recovery">Get a new demo code</button><button type="button" class="access-link" data-action="access-recovery">Start again</button></div>`,'Continue',{back:{label:'Back',action:'recovery'}});
@@ -202,7 +218,7 @@ export function createAccess(config={}){
  function phoneScreen(){
   const s=session();if(!s)return loginScreen();
   if(phase==='success')return `<div class="access-success-icon">${icon('check')}</div>`+heading('Account phone<br>updated.','Your account, shops and transaction history stay in place.')+'<p class="access-hint">This change is authorised with your password. No carrier or SMS verification has taken place.</p>'+button('Back to my account','back','primary full');
-  return heading('A new number.<br>The same account.','Confirm your current password before replacing your account phone number.')+form(field('Current account phone','oldPhone',s.phone||'Not set','readonly')+field('New mobile number','newPhone',phone,'required type="tel" inputmode="tel" autocomplete="tel" maxlength="22" autofocus placeholder="024 000 0000"')+accessPasswordField('Current password','currentPassword',{autocomplete:'current-password',placeholder:'Your current test password'})+`<p class="access-hint">${supports('passwordRecovery')?'No SMS service is connected. Updating the number does not verify ownership of the SIM. Your private recovery key remains necessary for account recovery.':'No SMS service is connected. Updating the number does not verify ownership of the SIM. Account recovery is not available yet; keep your current sign-in details safe.'}</p>`,'Update account phone',{back:{label:'My account',action:'back'}});
+  return heading('A new number.<br>The same account.','Confirm your current password before replacing your account phone number.')+form(field('Current account phone','oldPhone',s.phone||'Not set','readonly')+field('New mobile number','newPhone',phone,'required type="tel" inputmode="tel" autocomplete="tel" maxlength="22" autofocus placeholder="024 000 0000"')+accessPasswordField('Current password','currentPassword',{autocomplete:'current-password',placeholder:'Your current test password'})+`<p class="access-hint">${centralAvailable()?'Updating this number does not verify SIM ownership. Manage your saved face from Recovery options; no SMS recovery service is connected.':supports('passwordRecovery')?'No SMS service is connected. Updating the number does not verify ownership of the SIM. Your private recovery key remains necessary for account recovery.':'No SMS service is connected. Updating the number does not verify ownership of the SIM. Account recovery is not available yet; keep your current sign-in details safe.'}</p>`,'Update account phone',{back:{label:'My account',action:'back'}});
  }
  function regenerateKeyScreen(){
   const s=session();if(!s)return loginScreen();
@@ -224,11 +240,12 @@ export function createAccess(config={}){
  }
  function render(){
   enforceRecoveryCheckpoint();
-  const content=({login:loginScreen,recovery:recoveryScreen,invite:invitationScreen,secure:secureScreen,password:passwordScreen,profile:profileScreen,sessions:sessionsScreen,'username-recovery':usernameRecoveryScreen,phone:phoneScreen,'step-up':stepUpScreen,'recovery-key':recoveryKeyScreen,'regenerate-key':regenerateKeyScreen,'resume-import':resumeImportScreen})[view]?.()||loginScreen();
-  const signedIn=Boolean(session()),lockedViews=['password','profile','sessions','phone','step-up','regenerate-key','resume-import'];
+  const content=({login:loginScreen,recovery:recoveryScreen,'recovery-settings':()=>centralView()?centralContent():unavailable('Recovery options','back'),invite:invitationScreen,secure:secureScreen,password:passwordScreen,profile:profileScreen,sessions:sessionsScreen,'username-recovery':usernameRecoveryScreen,phone:phoneScreen,'step-up':stepUpScreen,'recovery-key':recoveryKeyScreen,'regenerate-key':regenerateKeyScreen,'resume-import':resumeImportScreen})[view]?.()||loginScreen();
+  const signedIn=Boolean(session()),lockedViews=['password','profile','sessions','phone','step-up','regenerate-key','recovery-settings','resume-import'];
   return `<div class="access-shell" data-access-stage="${E(view+':'+phase)}"><aside class="access-aside"><div class="access-brand"><strong class="canonical-wordmark">lumo</strong><small class="brand-qualifier">merchant</small></div><div class="access-aside-copy"><div class="access-kicker">YOUR BUSINESS, IN GOOD HANDS</div><h2 class="access-aside-title">Your account.<br>Your team.<br>Your control<span>.</span></h2><p class="access-aside-subtitle">One sign-in for each person.<br>The right access for every shop.</p></div><div class="access-art" aria-hidden="true"><div class="access-art-shield">${icon('shield')}</div><div class="access-art-card"><span class="access-art-label">${icon('user')}INDIVIDUAL ACCOUNT</span><strong class="access-art-value">@your.username</strong><small>Access that follows your role.</small></div></div><div class="access-aside-note">${icon('shield')}Your business records stay in place when you sign out.</div></aside><main class="access-main"><header class="access-topbar"><span class="access-mobile-brand"><strong class="canonical-wordmark">lumo</strong><small class="brand-qualifier">merchant</small></span><button type="button" class="appearance-entry" data-action="appearance-settings" aria-label="Appearance"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A9 9 0 0 1 9.5 3.5a9 9 0 1 0 11 11Z"/></svg></button>${recoveryRequired()?button('Sign out','sign-out','ghost small'):view==='recovery-key'?'<span class="access-protected-label">Save before continuing</span>':signedIn&&lockedViews.includes(view)?button(icon('back')+' Back to business','back','ghost small'):button('Explore sample business '+icon('arrow'),'demo','ghost small')}</header><div class="access-content"><section class="access-card">${content}</section></div><footer class="access-footer"><span>© ${new Date().getFullYear()} Lumo Merchant</span><button type="button" class="access-link" data-action="access-privacy" aria-expanded="${privacy}">About account access</button>${privacy?`<p class="access-footer-note">${shared()?'This shared prototype stores account access on this site so authorised people can sign in on separate devices.':'This local sample stores account access in this browser.'} Use a test password. Bank, identity verification and SMS providers are not connected. Demo recovery is explicitly labelled when a code is shown.</p>`:''}</footer></main></div>`;
  }
  async function handleSubmit(formElement){
+  if(centralView()){await centralRecovery.submit(Object.fromEntries(new FormData(formElement)));return;}
   const capability=({password:'passwordChange',recovery:'passwordRecovery','username-recovery':'usernameRecovery'})[view];if(capability&&!supports(capability)){fail('This account service is not available in the connected test yet. Your details have not changed.');return}
   if(busy)return;
   const p=Object.fromEntries(new FormData(formElement));error='';notice='';
@@ -268,7 +285,7 @@ export function createAccess(config={}){
     const pending=auth.getPendingInvitation?.();
     if(pending&&(pending.token!==token||pending.username.toLowerCase()!==usernameValue.toLowerCase())){fail('Use the original username @'+pending.username+' for this request.');return}
     const password=phase==='resume'?p.password:p.newPassword,invalid=validateAccessCredentials(usernameValue,password,phase==='resume'?undefined:p.confirmPassword);if(invalid){fail(invalid);return}
-    busy=true;redraw();const result=await auth.acceptInvitation({token,username:usernameValue,password});token='';await finishInvitationAccess(result);return;
+    busy=true;redraw();const result=await auth.acceptInvitation({token,username:usernameValue,password});token='';await finishInvitationAccess(result,{setupRecovery:true});return;
    }
    if(view==='secure'){
     if(!auth.canMigrateLegacyBusiness?.(business())){fail('This business is already shared. Sign in with its existing account.');return}
@@ -344,6 +361,7 @@ export function createAccess(config={}){
  }
  async function handleClick(action,element){
   const a=String(action).replace(/^access-/,'');
+  if(a.startsWith('central-')&&centralView()){await centralRecovery.action(a.slice(8));return;}
   if(recoveryRequired()&&!['sign-out','privacy','copy-recovery-key','toggle-saved-key','toggle-password','regenerate-key'].includes(a)){enforceRecoveryCheckpoint();redraw();return}
   if(a==='toggle-password'){
    const form=element?.closest('form');const input=[...form?.querySelectorAll('input')||[]].find(x=>x.name===element.dataset.field);
@@ -353,12 +371,12 @@ export function createAccess(config={}){
   if(a==='copy-recovery-key'){try{await navigator.clipboard.writeText(recoveryKey);info('Recovery key copied. Store it somewhere private.')}catch{info('Clipboard is unavailable. Use Show key, then save the key privately.')}return}
   if(a==='toggle-saved-key'){const input=document.querySelector('[name="savedRecoveryKey"]');if(input){const visible=input.type==='password';input.type=visible?'text':'password';element.textContent=visible?'Hide key':'Show key'}return}
   if(a==='resume-invitation'){const pending=auth.getPendingInvitation?.();show('invite',{token:pending?.token||token,username:pending?.username||username});return}
-  if(a==='invitation-sign-in'){const pending=auth.getPendingInvitation?.(),original=pending?.username||username;show('login',{username:original,notice:'Sign in with the username and password chosen for your invitation. If its recovery key was not saved, you will be guided to replace it.'});return}
-  if(a==='signup'){active=false;config.onSignup?.();return}
-  if(a==='demo'){active=false;config.onDemo?.();return}
+  if(a==='invitation-sign-in'){const pending=auth.getPendingInvitation?.(),original=pending?.username||username;show('login',{username:original,notice:centralAvailable()?'Sign in with the username and password chosen for your invitation. You can save your face for password recovery after signing in.':'Sign in with the username and password chosen for your invitation. If its recovery key was not saved, you will be guided to replace it.'});return}
+  if(a==='signup'){disposeCentral();active=false;config.onSignup?.();return}
+  if(a==='demo'){disposeCentral();active=false;config.onDemo?.();return}
   if(a==='back'||a==='cancel-step-up'){backToApp();return}
   if(a==='use-username'){username=String(element?.dataset.username||'');show('login',{username});return}
-  if(a==='sign-out'){recoveryKey='';recoveryKeyReference='';recoveryIdentity='';active=true;view='login';phase='username';error='';busy=true;settleStepUp();config.onSignOut?.();redraw();try{const result=await auth.signOut?.();busy=false;notice=result?.localOnly?result.message||'This device is locked. Server sign-out will retry when connected.':'You have signed out on this device. Your business records are unchanged.';redraw()}catch(e){busy=false;notice='This device is locked. Server sign-out could not be confirmed while disconnected.';redraw()}return}
+  if(a==='sign-out'){disposeCentral();recoveryKey='';recoveryKeyReference='';recoveryIdentity='';active=true;view='login';phase='username';error='';busy=true;settleStepUp();config.onSignOut?.();redraw();try{const result=await auth.signOut?.();busy=false;notice=result?.localOnly?result.message||'This device is locked. Server sign-out will retry when connected.':'You have signed out on this device. Your business records are unchanged.';redraw()}catch(e){busy=false;notice='This device is locked. Server sign-out could not be confirmed while disconnected.';redraw()}return}
   if(a==='resend-recovery'){
    if(busy)return;
    try{busy=true;redraw();const result=await auth.beginRecovery(username);challengeId=result.challengeId;maskedPhone=result.maskedPhone;phase='code';busy=false;info('A new demo recovery code is ready: 123456.')}catch(e){fail(e.message)}return;
@@ -366,10 +384,11 @@ export function createAccess(config={}){
   if(a==='revoke-session'){
    try{const current=session();if(!current){show('login');return}await auth.revokeSession(element.dataset.id,current);if(element.dataset.id===current.id){config.onSignOut?.();show('login');notice='This session has ended.';redraw()}else info('The selected session has been revoked.')}catch(e){fail(e.message)}return;
   }
-  if(['login','recovery','invite','secure','password','profile','sessions','username-recovery','phone','regenerate-key','resume-import'].includes(a)){show(a,{username});return}
+  if(['login','recovery','recovery-settings','invite','secure','password','profile','sessions','username-recovery','phone','regenerate-key','resume-import'].includes(a)){show(a,{username});return}
  }
  function handleChange(element){
   if(!element?.name)return;
+  if(centralView()&&element.name==='faceConsent'){syncFaceStorageConsent(element,{busy:centralRecovery.view.busy});return;}
   if(element.name==='username')username=element.value;
   if(element.name==='remember')remember=element.checked;
   if(element.dataset.accessStrength){

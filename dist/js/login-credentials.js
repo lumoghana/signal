@@ -1,4 +1,5 @@
 /** Browser-local prototype credentials. Password text is never persisted. */
+import {newPasswordError} from './password-policy.js';
 export const LOGIN_ITERATIONS = 210000;
 const hex = bytes => Array.from(new Uint8Array(bytes), byte => byte.toString(16).padStart(2, '0')).join('');
 const unhex = value => Uint8Array.from(value.match(/../g) || [], byte => Number.parseInt(byte, 16));
@@ -7,10 +8,7 @@ export const normalizeUsername = value => String(value ?? '').trim().toLowerCase
 export const normalizeLumoUsername = value => normalizeUsername(value).replace(/^@/,'');
 export const validUsername = value => /^[a-z0-9][a-z0-9._-]{2,29}$/.test(normalizeUsername(value));
 export function validateLoginPassword(password) {
-  if (typeof password !== 'string' || password.length < 10) return 'Use at least 10 characters for your login password.';
-  if (password.length > 128) return 'Keep your password within 128 characters.';
-  if (!password.trim()) return 'Choose a password with more than spaces.';
-  return '';
+  return newPasswordError(password);
 }
 export function validLoginCredential(record) {
   return !!record && record.version === 1 && record.algorithm === 'PBKDF2-SHA-256' &&

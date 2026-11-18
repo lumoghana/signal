@@ -10,8 +10,8 @@ begin
  perform set_config('test.writer.checks','0',true);
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
  insert into auth.users(id,email,raw_app_meta_data) values(actor,'writer@pilot.lumo.invalid','{"lumo_pilot":true}');
- insert into lumo_private.profiles(user_id,status) values(actor,'active');
- insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'+233240123456');
+ insert into lumo_private.profiles(user_id,handle,display_name,pin_hash,status) values(actor,'actor_'||substr(replace(actor::text,'-',''),1,15),'Synthetic actor',extensions.crypt('1234',extensions.gen_salt('bf',4)),'active');
+ insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'0240123456');
  insert into lumo_private.access_enrollments(module,user_id,phone,reference_id,face_digests)
  values('consumer',actor,'+233240123456',tid,jsonb_build_array(repeat('1',64),repeat('2',64),repeat('3',64)));
  insert into lumo_private.access_requests(id,module,purpose,method,user_id,enrollment_revision,reference_id,state,reset_token_hash)

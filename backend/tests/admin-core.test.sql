@@ -1,5 +1,7 @@
 -- Behaviour and authorisation checks. Every fixture and action is rolled back.
 begin;
+-- Exercise the enforced production policy explicitly; the live pilot exception is tested separately.
+update lumo_private.admin_auth_policy set require_mfa=true where id;
 create function pg_temp.admin_assert(p_value boolean,p_label text) returns void language plpgsql as $$begin
  if p_value is distinct from true then raise exception 'Admin check failed: %',p_label;end if;
  perform set_config('lumo.admin.checks',(coalesce(nullif(current_setting('lumo.admin.checks',true),''),'0')::integer+1)::text,true);
@@ -78,14 +80,14 @@ begin
  out:=public.lumo_admin_service('incidents.get',base||jsonb_build_object('id',incident));perform pg_temp.admin_assert(out->>'ok'='true','incident detail');
  out:=public.lumo_admin_service('incidents.update',base||jsonb_build_object('id',incident,'status','resolved'));perform pg_temp.admin_assert(out->>'code'='RESOLUTION_REQUIRED','incident closure requires resolution');
  out:=public.lumo_admin_service('incidents.update',base||jsonb_build_object('id',incident,'status','resolved','resolution','Recovery verified'));perform pg_temp.admin_assert(out->>'ok'='true','incident resolution recorded');
- out:=public.lumo_admin_service('approvals.create',base||jsonb_build_object('action','account.suspend','entityId',c,'caseId',case_id,'reason','Suspected account takeover'));approval:=(out#>>'{data,id}')::uuid;perform pg_temp.admin_assert(out->>'ok'='true','controlled restriction requested');
+ out:=public.lumo_admin_service('approvals.create',base||jsonb_build_object('requestId',gen_random_uuid(),'action','account.suspend','entityId',c,'caseId',case_id,'reason','Suspected account takeover'));approval:=(out#>>'{data,id}')::uuid;perform pg_temp.admin_assert(out->>'ok'='true','controlled restriction requested');
  out:=public.lumo_admin_service('approvals.get',base||jsonb_build_object('id',approval));perform pg_temp.admin_assert(out->>'ok'='true' and out#>>'{data,record,status}'='pending','approval detail links request');
- out:=public.lumo_admin_service('approvals.decide',base||jsonb_build_object('id',approval,'decision','approve','reason','Self approval attempt'));perform pg_temp.admin_assert(out->>'code'='SELF_APPROVAL_FORBIDDEN','requester cannot approve own restriction');
+ out:=public.lumo_admin_service('approvals.decide',base||jsonb_build_object('id',approval,'expectedRevision',1,'requestId',gen_random_uuid(),'decision','approve','reason','Self approval attempt'));perform pg_temp.admin_assert(out->>'code'='SELF_APPROVAL_FORBIDDEN','requester cannot approve own restriction');
  select balance into balance_before from lumo_private.accounts where id=ca;
- out:=public.lumo_admin_service('approvals.decide',other||jsonb_build_object('id',approval,'decision','approve','reason','Identity checks support restriction'));perform pg_temp.admin_assert(out->>'ok'='true' and out#>>'{data,status}'='executed' and (select status from lumo_private.profiles where user_id=c)='suspended','independent approval executes supported restriction');
+ out:=public.lumo_admin_service('approvals.decide',other||jsonb_build_object('id',approval,'expectedRevision',1,'requestId',gen_random_uuid(),'decision','approve','reason','Identity checks support restriction'));perform pg_temp.admin_assert(out->>'ok'='true' and out#>>'{data,status}'='executed' and (select status from lumo_private.profiles where user_id=c)='suspended','independent approval executes supported restriction');
  perform pg_temp.admin_assert(not exists(select 1 from auth.sessions where user_id=c) and (select balance from lumo_private.accounts where id=ca)=balance_before,'restriction revokes sessions and preserves money');
- out:=public.lumo_admin_service('approvals.create',base||jsonb_build_object('action','payment.refund','entityId',payment,'caseId',case_id,'reason','Refund review requested'));approval:=(out#>>'{data,id}')::uuid;
- out:=public.lumo_admin_service('approvals.decide',other||jsonb_build_object('id',approval,'decision','approve','reason','Finance must execute original refund'));perform pg_temp.admin_assert(out->>'ok'='true' and out#>>'{data,status}'='approved_pending_execution' and out#>>'{data,result,moneyMoved}'='false','refund approval does not pretend to move money');
+ out:=public.lumo_admin_service('approvals.create',base||jsonb_build_object('requestId',gen_random_uuid(),'action','payment.refund','entityId',payment,'caseId',case_id,'reason','Refund review requested'));
+ perform pg_temp.admin_assert(out->>'code'='INVALID_INPUT','unbounded general refund action requires the separate bounded financial workflow');
  out:=public.lumo_admin_service('staff.update',base||jsonb_build_object('id',a,'role','support','reason','Self role mutation'));perform pg_temp.admin_assert(out->>'code'='SELF_CHANGE_FORBIDDEN','staff cannot mutate own administrative access');
  out:=public.lumo_admin_service('staff.invite',base||jsonb_build_object('email','invite-'||suffix||'@example.test','name','Invite fixture','role','support','tokenHash',encode(extensions.digest(tok,'sha256'),'hex')));perform pg_temp.admin_assert(out->>'ok'='true' and position(tok in out::text)=0,'invitation stores hash and does not return secret');
  insert into lumo_private.admin_setup_tokens(token_hash,email,display_name,role) values(tok,email,'Setup fixture','support');

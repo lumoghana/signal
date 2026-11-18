@@ -20,7 +20,7 @@ const at=value=>new Date(value).toISOString();
  * Only the verified account identity may join, link or spend its own reward.
  * Every write uses the existing canonical journal + metadata CAS fence.
  */
-export function createConsumerLoyalty({serviceRpc,now=()=>Date.now(),cryptoApi=globalThis.crypto}={}){
+export function createConsumerLoyalty({serviceRpc,now=()=>Date.now(),cryptoApi=globalThis.crypto,requestContextEnabled=false,retryDelay=attempt=>new Promise(resolve=>setTimeout(resolve,Math.min(20*2**attempt,250)+Math.floor(Math.random()*20)))}={}){
  if(typeof serviceRpc!=='function')throw Error('Loyalty service RPC is required.');
  const digest=async text=>Array.from(new Uint8Array(await cryptoApi.subtle.digest('SHA-256',new TextEncoder().encode(text))),n=>n.toString(16).padStart(2,'0')).join('');
  async function claimHash(code){if(typeof code!=='string'||!/^LC1-[A-F0-9]{48}$/i.test(code.trim()))fail('LOYALTY_CLAIM_INVALID','That private linking code is unavailable. Ask the shop team for a fresh code.');return digest(code.trim().toUpperCase());}
@@ -48,7 +48,7 @@ export function createConsumerLoyalty({serviceRpc,now=()=>Date.now(),cryptoApi=g
   const input=clone(payload);if(operation==='claim'||operation==='programme'&&payload.claimCode){input.claimHash=await claimHash(payload.claimCode);delete input.claimCode;}
   if(operation==='recover'&&!REF.test(input.attemptId||''))fail('LOYALTY_REFERENCE_REQUIRED','Use the original rewards reference.');
   const fingerprint=mutation?await digest(canonical({operation,payload:input,userId:identity.userId})):null;
-  for(let tries=0;tries<12;tries++){
+  for(let tries=0;tries<5;tries++){
    const raw=await read(identity),n=raw.state;let changed=false,entity=null,selected=null,programme=null,replayed=false;const timestamp=at(now());
    // A canonical payment/refund may have happened since either app last opened.
    for(const b of businesses(n))if(owned(b,identity.userId))changed=reconcile(b)||changed;
@@ -73,13 +73,23 @@ export function createConsumerLoyalty({serviceRpc,now=()=>Date.now(),cryptoApi=g
    }
    const result={ok:true,sandbox:true,currency:'GHS',loyalty:projection(n,identity.userId,{membershipId:selected||input.membershipId,programme,...(operation==='recover'?{receipt:receipt(n,identity.userId,input.attemptId)}:{})}),...(entity?{entity}:{}),...(replayed?{replayed:true}:{})};
    if(!changed)return result;
-   const committed=await serviceRpc('lumo_approved_merchant_commit',{p_actor:identity.userId,p_session:identity.sessionId,p_revision:raw.revision,p_ledger_stamp:raw.ledgerStamp,p_state:n,p_money_authorized:false});if(committed?.ok===true)return result;if(committed?.code==='CONCURRENT_UPDATE')continue;if(!plain(committed)||committed.ok!==false||typeof committed.code!=='string')fail('LOYALTY_OUTCOME_UNKNOWN','Your rewards request could not be confirmed. Keep its original reference.',503);fail(committed.code,'Your rewards request could not be confirmed. Keep its original reference.',committed.code==='SESSION_REVOKED'?401:409);
+   const committed=await serviceRpc('lumo_approved_merchant_commit',{p_actor:identity.userId,p_session:identity.sessionId,p_revision:raw.revision,p_ledger_stamp:raw.ledgerStamp,p_state:n,p_money_authorized:false});if(committed?.ok===true)return result;if(committed?.code==='CONCURRENT_UPDATE'){if(tries<4)await retryDelay(tries);continue;}if(!plain(committed)||committed.ok!==false||typeof committed.code!=='string')fail('LOYALTY_OUTCOME_UNKNOWN','Your rewards request could not be confirmed. Keep its original reference.',503);fail(committed.code,'Your rewards request could not be confirmed. Keep its original reference.',committed.code==='SESSION_REVOKED'?401:409);
   }
   fail('CONCURRENT_UPDATE','Your rewards changed while this request was checked. Retry the same reference.',409);
  }
  function saveAttempt(b,m,operation,fingerprint,attemptId,entity,timestamp,collectionId=null){const l=b.loyalty;if(Object.keys(l._consumerAttempts).length>=5800&&operation==='join')fail('LOYALTY_CAPACITY','This prototype reached its rewards request history limit. Contact support.',409);l._consumerAttempts[m._consumerUserId+':'+attemptId]={operation,fingerprint,membershipId:m.id,collectionId,entity:clone(entity),createdAt:timestamp};l.revision++;l.updatedAt=timestamp;}
  // Quote/payment guards are private gateway checks; the journal trigger repeats
  // the actor binding at the final canonical write, including direct RPC calls.
- handler.assertRequest=async(identity,requestId)=>{if(!requestId)return null;const {state:n}=await read(identity);for(const b of businesses(n)){const r=b.requests.find(r=>r.id===requestId);if(!r)continue;if(r._consumerUserId&&r._consumerUserId!==identity.userId)fail('REQUEST_UNAVAILABLE','This reward payment belongs to another Lumo account.',403);const c=array(b.loyalty?.collections).find(c=>c.requestId===requestId);if(c){const mine=b.loyalty.members.some(m=>m.id===c.memberId&&m._consumerUserId===identity.userId);return {grossAmount:c.grossAmount,discount:c.discount,amount:c.amount,...(mine?{membershipId:c.memberId,rewardId:c.rewardId}:{})};}}return null;};
+ handler.assertRequest=async(identity,requestId)=>{
+  if(!requestId)return null;
+  if(requestContextEnabled){
+   if(!UUID.test(requestId))fail('REQUEST_UNAVAILABLE','This reward payment is unavailable.',403);
+   const response=await serviceRpc('lumo_approved_reward_request_context',{p_actor:identity.userId,p_session:identity.sessionId,p_request:requestId});
+   if(response?.ok!==true)fail(response?.code||'LOYALTY_UNAVAILABLE','This reward payment could not be checked. Reconnect and try again.',response?.code==='SESSION_REVOKED'?401:response?.code==='REQUEST_UNAVAILABLE'?403:503);
+   if(response.loyalty!==null&&!plain(response.loyalty))fail('LOYALTY_UNAVAILABLE','This reward payment could not be checked. Reconnect and try again.',503);
+   return response.loyalty;
+  }
+  const {state:n}=await read(identity);for(const b of businesses(n)){const r=b.requests.find(r=>r.id===requestId);if(!r)continue;if(r._consumerUserId&&r._consumerUserId!==identity.userId)fail('REQUEST_UNAVAILABLE','This reward payment belongs to another Lumo account.',403);const c=array(b.loyalty?.collections).find(c=>c.requestId===requestId);if(c){const mine=b.loyalty.members.some(m=>m.id===c.memberId&&m._consumerUserId===identity.userId);return {grossAmount:c.grossAmount,discount:c.discount,amount:c.amount,...(mine?{membershipId:c.memberId,rewardId:c.rewardId}:{})};}}return null;
+ };
  return handler;
 }

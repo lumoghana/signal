@@ -5,7 +5,10 @@ create function pg_temp.planning_assert(v boolean,label text)returns void langua
  perform set_config('lumo.planning.checks',(coalesce(nullif(current_setting('lumo.planning.checks',true),''),'0')::integer+1)::text,true);
 end $$;
 create function pg_temp.planning_call(command text,payload jsonb default '{}')returns jsonb language plpgsql as $$declare r jsonb;begin
- execute 'set local role authenticated';r:=public.lumo_rpc(command,payload);execute 'reset role';return r;
+ execute 'set local role authenticated';r:=public.lumo_rpc(command,payload);execute 'reset role';
+ -- Explicit synthetic personal enrolment: legacy account.open alone is not a personal-payment identity.
+ if command='account.open' and r->>'ok'='true' then insert into lumo_private.approved_profiles(user_id,personal_account) values(auth.uid(),true) on conflict(user_id) do update set personal_account=true;end if;
+ return r;
  exception when others then execute 'reset role';raise;end $$;
 do $$
 declare a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();p uuid:=gen_random_uuid();x uuid:=gen_random_uuid();sa uuid:=gen_random_uuid();sb uuid:=gen_random_uuid();sp uuid:=gen_random_uuid();sx uuid:=gen_random_uuid();

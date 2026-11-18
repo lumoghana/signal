@@ -19,14 +19,16 @@ begin
  insert into auth.sessions(id,user_id,created_at,updated_at)values(session,actor,now(),now());
  insert into lumo_private.profiles(user_id,handle,display_name,pin_hash)values(actor,prefix||'actor','Synthetic Directory Sender','fixture-unused');
  insert into lumo_private.accounts(owner_user_id,kind)values(actor,'consumer');
+ insert into lumo_private.approved_profiles(user_id,personal_account) values(actor,true);
  for i in 1..24 loop
   other:=gen_random_uuid();handle:=prefix||lpad(i::text,2,'0');if i=1 then target:=other;end if;
   insert into auth.users(id,aud,role,email,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values(other,'authenticated','authenticated',handle||'@pilot.lumo.invalid','{"lumo_pilot":true}','{}',now(),now());
   insert into lumo_private.profiles(user_id,handle,display_name,pin_hash)values(other,handle,case when i<=2 then 'Synthetic Duplicate Name' else 'Synthetic Directory Person' end,'fixture-unused');
   insert into lumo_private.accounts(owner_user_id,kind)values(other,'consumer');
+  insert into lumo_private.approved_profiles(user_id,personal_account) values(other,true);
  end loop;
  insert into auth.sessions(id,user_id,created_at,updated_at)values(target_session,target,now(),now());
- insert into lumo_private.approved_profiles(user_id,phone)values(target,'0240009123');
+ update lumo_private.approved_profiles set phone='0240009123' where user_id=target;
  payload:=jsonb_build_object('actor',actor,'session',session,'query',prefix);
  select count(*) into before_money from lumo_private.journals;
  perform set_config('request.jwt.claims','{"role":"authenticated"}',true);

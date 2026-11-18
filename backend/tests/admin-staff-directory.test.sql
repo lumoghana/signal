@@ -1,5 +1,7 @@
 -- Transaction-only fixture checks. No identities, cases, sessions or audit rows persist.
 begin;
+-- Exercise the enforced production policy explicitly; the live pilot exception is tested separately.
+update lumo_private.admin_auth_policy set require_mfa=true where id;
 create function pg_temp.directory_assert(p_value boolean,p_label text) returns void language plpgsql as $$begin
  if p_value is distinct from true then raise exception 'Directory check failed: %',p_label;end if;
  perform set_config('lumo.admin.directory_checks',(coalesce(nullif(current_setting('lumo.admin.directory_checks',true),''),'0')::integer+1)::text,true);

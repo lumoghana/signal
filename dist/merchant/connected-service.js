@@ -54,7 +54,7 @@ export async function merchantBusinessRequest(body){
 /** Password recovery has its own authority boundary and never installs account data. */
 export async function accessRecovery(operation,values={},options={}){
  const publicOperations=new Set(['start','faceVerify','smsVerify','keyVerify','complete']);
- const protectedOperations=new Set(['enrollmentStart','enrollmentVerify','keyRotate']);
+ const protectedOperations=new Set(['enrollmentStart','enrollmentVerify','keyRotate','faceRemove']);
  if(operation!=='status'&&!publicOperations.has(operation)&&!protectedOperations.has(operation))throw Object.assign(new Error('That recovery step is unavailable.'),{code:'INVALID_INPUT'});
  const authenticated=protectedOperations.has(operation)||operation==='status'&&options.authenticated===true;
  if(publicOperations.has(operation)&&options.authenticated===true)throw Object.assign(new Error('Recovery verification must use its private recovery request.'),{code:'INVALID_INPUT'});

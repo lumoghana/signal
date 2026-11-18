@@ -13,7 +13,7 @@ export async function bootLedger({through='20261114999999',additional=[],log=()=
   await db.exec(`create role anon;create role authenticated;create role service_role bypassrls;
    create schema auth;
    create table auth.users(id uuid primary key,aud text,role text,email text,encrypted_password text,raw_app_meta_data jsonb default '{}',raw_user_meta_data jsonb default '{}',email_confirmed_at timestamptz,created_at timestamptz,updated_at timestamptz,deleted_at timestamptz,banned_until timestamptz,is_anonymous boolean default false);
-   create table auth.sessions(id uuid primary key,user_id uuid not null references auth.users(id),created_at timestamptz,updated_at timestamptz,refreshed_at timestamptz,not_after timestamptz);
+   create table auth.sessions(id uuid primary key,user_id uuid not null references auth.users(id),created_at timestamptz,updated_at timestamptz,refreshed_at timestamptz,aal text,not_after timestamptz);
    create table auth.mfa_factors(id uuid primary key,user_id uuid not null references auth.users(id),friendly_name text,factor_type text,status text,secret text,created_at timestamptz,updated_at timestamptz);
    create function auth.jwt() returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb$$;
    create function auth.uid() returns uuid language sql stable as $$select (auth.jwt()->>'sub')::uuid$$;

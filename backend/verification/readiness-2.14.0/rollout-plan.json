@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "meaning": "Public export matches the complete active59 migration release and the exact deployed3-function sources. Excluded private Auth DDL and its stage-only SQL tests are absent, not skipped by shipping CI. Literal recovery flags stay false. Actual hosted versions/bundles are recorded separately.",
+  "functions": {
+    "lumo-approved": {
+      "candidateDisposition": "independent-activation-after-verification",
+      "requiresExactHostedSourceVerification": true
+    },
+    "lumo-admin": {
+      "candidateDisposition": "independent-activation-after-verification",
+      "requiresExactHostedSourceVerification": true,
+      "capabilities": {
+        "recoveryResetResolutionEnabled": false
+      }
+    },
+    "lumo-access": {
+      "candidateDisposition": "compatible-fence-disabled-candidate",
+      "baselineVersion": 7,
+      "capabilities": {
+        "resetFenceEnabled": false
+      },
+      "stagedRecoveryFence": [
+        "managed-Auth execution marker",
+        "complete.reconcile.begin/confirm protocol",
+        "governed original-execution Auth write cancellation"
+      ],
+      "gate": "Only the access7-compatible password policy and signed browser context patch is eligible for independent deployment after compatibility proof. F05 managed Auth trigger/candidate reset protocol remain disabled; automatic approval review rejected hosted DDL because managed Auth and multi-process staging evidence is missing. Do not enable resetFenceEnabled or retry/bypass rejected DDL. Actual deployed version/source proof belongs to the release deployment record."
+    }
+  },
+  "profile": "active59-public",
+  "activeMigrationCount": 59,
+  "excludedPrivateWork": [
+    {
+      "path": "backend/supabase/migrations/20261118050029_recovery_reconciliation_and_biometric_retention.sql",
+      "classification": "private-unapplied-managed-Auth-DDL",
+      "included": false,
+      "reason": "Explicitly excluded from approved publication and live schema. Managed Auth and concurrent-process staging evidence and separate approval are still missing."
+    },
+    {
+      "path": "backend/tests/recovery-write-fence.test.sql",
+      "classification": "private-stage-only-SQL-acceptance",
+      "included": false,
+      "reason": "Requires the excluded Auth trigger/marker/helpers; retained only with the separate private candidate."
+    },
+    {
+      "path": "backend/tests/admin-recovery-controls.test.sql",
+      "classification": "private-stage-only-SQL-acceptance",
+      "included": false,
+      "reason": "Requires the excluded Auth trigger/marker/helpers; active public gateway rejects these unsupported commands before their RPC."
+    }
+  ]
+}

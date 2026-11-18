@@ -1,3 +1,4 @@
+import {readJson,readinessPath,currentFunctionDigest,hasCurrentFunctionDelta} from '../verification/readiness-2.14.0/source-manifest.mjs';
 import {collectionReturnReview} from '../supabase/functions/lumo-approved/domain/group-policy.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -40,6 +41,7 @@ test('audit source matches explicit reviewed deltas while preserving immutable l
  const isolatedManifest=JSON.parse(await fs.readFile(new URL('isolated-function-source.json',evidence),'utf8'));
  const audit=JSON.parse(await fs.readFile(new URL('../verification/audit-2026-11-16/reviewed-source-delta.json',import.meta.url),'utf8'));
  const mainAudit=audit.functions['lumo-approved'],maintenanceAudit=audit.functions['lumo-maintenance'];
+ const readiness=await readJson(readinessPath),release=readiness.functions['lumo-approved'];
  assert.equal(baseline.function,'lumo-approved');assert.equal(baseline.functionVersion,18);
  assert.equal(baseline.captureNormalization.removedTrailingLfBytesPerFile,1);
  assert.equal(delta.version,'2.12.0');assert.equal(delta.baselineFunctionVersion,18);
@@ -67,16 +69,22 @@ test('audit source matches explicit reviewed deltas while preserving immutable l
   await visit(entrypoint);return closure;
  }
  const main=await importedClosure(mainBase,baseline.entrypoint);
- assert.equal(main.size,43);assert.deepEqual([...main.keys()].sort(),Object.keys(mainAudit.files).sort());
+ assert.equal(Object.keys(mainAudit.files).length,43);
+ assert.deepEqual([...main.keys()].sort(),Object.keys(release.files).map(path=>path.replace('backend/supabase/functions/lumo-approved/','')).sort());
  assert.equal(mainAudit.baselineVersion,18);assert.equal(mainAudit.baselineBundleSha256,'d1ffe87e7c107af776bebbba35823e52404e3b2dc8506c4868f00a42f6032679');
  const reviewed=['consumer-loyalty.mjs','domain/box-partner-invitation.js','domain/box-protection.js','domain/partner-code.js','engine.mjs','handler.mjs','index.ts','merchant/dist/domain.js','merchant/dist/loyalty-model.js','merchant/handler.mjs','merchant/server/api.js','merchant/server/counter.js','merchant/server/loyalty.js','merchant/server/network.js','onboarding-receipt.mjs','operations.mjs','partners.mjs'];
  assert.deepEqual(Object.keys(mainAudit.deltas).sort(),reviewed.sort());
- assert.deepEqual([...main.keys()].filter(name=>!Object.hasOwn(baseline.files,name)).sort(),['consumer-loyalty.mjs','domain/partner-code.js','merchant/dist/loyalty-model.js','merchant/server/loyalty.js','onboarding-receipt.mjs']);
+ assert.deepEqual(Object.keys(mainAudit.files).filter(name=>!Object.hasOwn(baseline.files,name)).sort(),['consumer-loyalty.mjs','domain/partner-code.js','merchant/dist/loyalty-model.js','merchant/server/loyalty.js','onboarding-receipt.mjs']);
+ const currentAdded=Object.entries(release.deltas).filter(([,change])=>change.change==='added').map(([path])=>path.replace('backend/supabase/functions/lumo-approved/','')).sort();
+ assert.deepEqual([...main.keys()].filter(name=>!Object.hasOwn(mainAudit.files,name)).sort(),currentAdded);
  for(const [name,bytes]of main){
   const change=mainAudit.deltas[name],digest=createHash('sha256').update(bytes).digest('hex');
-  assert.equal(digest,mainAudit.files[name],name+' must match reviewed audit source');
-  if(change){assert.equal(change.beforeSha256,baseline.files[name]||null);assert.equal(change.afterSha256,digest);assert.ok(change.reason.length>20);for(const testPath of change.tests)await fs.access(new URL('../'+testPath,import.meta.url));}
-  else assert.equal(digest,baseline.files[name],name+' unchanged from original deployed live18');
+  assert.equal(digest,currentFunctionDigest(readiness,'lumo-approved',name),name+' must match explicit current readiness source');
+  const currentChange=release.deltas['backend/supabase/functions/lumo-approved/'+name];
+  if(currentChange){assert.equal(currentChange.beforeSha256,mainAudit.files[name]||null);assert.equal(currentChange.afterSha256,digest);assert.ok(currentChange.reason.length>=80);for(const evidence of currentChange.evidence)await fs.access(new URL('../../'+evidence,import.meta.url));}
+  else assert.equal(digest,mainAudit.files[name],name+' preserves the historical reviewed source');
+  if(change){assert.equal(change.beforeSha256,baseline.files[name]||null);assert.equal(change.afterSha256,mainAudit.files[name]);assert.ok(change.reason.length>20);for(const testPath of change.tests)await fs.access(new URL('../'+testPath,import.meta.url));}
+  else if(Object.hasOwn(mainAudit.files,name))assert.equal(mainAudit.files[name],baseline.files[name],name+' historical source unchanged from original deployed live18');
  }
  assert.equal(main.has('domain/partner-code.js'),true);
  assert.equal(main.has('domain/money-maintenance-model.js'),false);
@@ -92,7 +100,7 @@ test('audit source matches explicit reviewed deltas while preserving immutable l
   const original=name.slice('approved/'.length),expected=maintenanceAudit.deltas[name]?.afterSha256||delta.files[original]||baseline.files[original];
   assert.ok(expected,'No unreviewed isolated dependency: '+name);assert.equal(digest,expected,name+' must match its baseline or explicit maintenance delta');
   assert.ok(!original.startsWith('merchant/'));assert.notEqual(original,'index.ts');assert.notEqual(original,'operations.mjs');
-  if(!Object.hasOwn(delta.files,original)&&!Object.hasOwn(mainAudit.deltas,original))assert.deepEqual(bytes,main.get(original),name+' must preserve unchanged live18 bytes');
+  if(!Object.hasOwn(delta.files,original)&&!Object.hasOwn(mainAudit.deltas,original)&&!hasCurrentFunctionDelta(readiness,'lumo-approved',original))assert.deepEqual(bytes,main.get(original),name+' must preserve unchanged live18 bytes');
  }
  assert.equal([...isolated.keys()].filter(name=>name.startsWith('approved/')).length,29);
  assert.equal(isolated.has('approved/domain/partner-code.js'),false);

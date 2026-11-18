@@ -11,8 +11,8 @@ begin
  perform set_config('test.face.checks','0',true);
  insert into auth.users(id,email,raw_app_meta_data) values(actor,'face_'||substr(replace(actor::text,'-',''),1,16)||'@pilot.lumo.invalid','{"lumo_pilot":true}'),(other,'face_'||substr(replace(other::text,'-',''),1,16)||'@pilot.lumo.invalid','{"lumo_pilot":true}');
  insert into auth.sessions(id,user_id) values(sid,actor),(proof,actor),(other_sid,other);
- insert into lumo_private.profiles(user_id,status) values(actor,'active'),(other,'active');
- insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,phone),(other,true,'+233240654321');
+ insert into lumo_private.profiles(user_id,handle,display_name,pin_hash,status) values(actor,'actor_'||substr(replace(actor::text,'-',''),1,15),'Synthetic actor',extensions.crypt('1234',extensions.gen_salt('bf',4)),'active'),(other,'other_'||substr(replace(other::text,'-',''),1,15),'Synthetic other',extensions.crypt('1234',extensions.gen_salt('bf',4)),'active');
+ insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'0'||right(phone,9)),(other,true,'0240654321');
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
  base:=jsonb_build_object('module',mod,'actor',actor,'session',sid,'proofSession',proof);
  perform pg_temp.face_assert(not has_table_privilege('authenticated','lumo_private.access_face_templates','select'),'customers cannot fetch biometric ciphertext');
@@ -89,8 +89,8 @@ begin
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
  insert into auth.users(id,email,raw_app_meta_data) values(actor,'boundary@pilot.lumo.invalid','{"lumo_pilot":true}');
  insert into auth.sessions(id,user_id) values(sid,actor),(proof,actor);
- insert into lumo_private.profiles(user_id,status) values(actor,'active');
- insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'+233240123456');
+ insert into lumo_private.profiles(user_id,handle,display_name,pin_hash,status) values(actor,'actor_'||substr(replace(actor::text,'-',''),1,15),'Synthetic actor',extensions.crypt('1234',extensions.gen_salt('bf',4)),'active');
+ insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'0240765432');
  insert into lumo_private.access_requests(id,module,purpose,method,user_id,auth_session,reference_id,state) values(enroll,'consumer','enrollment','sms',actor,sid,tid,'completed');
  insert into lumo_private.access_enrollments(module,user_id,phone,reference_id,face_digests,capability_hash,key_reference) values('consumer',actor,'+233240123456',tid,frames,cap,gen_random_uuid());
  base:=jsonb_build_object('module','consumer','actor',actor,'session',sid,'proofSession',proof);

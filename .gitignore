@@ -43,3 +43,8 @@ face_service/models/*.download
 # Historical synthetic QA screenshots remain local, outside source publication.
 /verification/consumer-2.11.7/lumo-2.11.7-custom-groups.jpg
 /verification/consumer-2.11.7/lumo-2.11.7-reference-wrap.jpg
+
+# Generated isolated browser acceptance evidence and private release inputs.
+/verification/browser-results/
+/verification/browser/test-results/
+/release-private/

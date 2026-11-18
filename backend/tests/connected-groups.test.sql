@@ -4,7 +4,10 @@ create function pg_temp.group_assert(value boolean,label text) returns void lang
 begin if value is distinct from true then raise exception 'Connected groups failed: %',label;end if;perform set_config('lumo.group.checks',(coalesce(nullif(current_setting('lumo.group.checks',true),''),'0')::integer+1)::text,true);end $$;
 create function pg_temp.group_call(command text,payload jsonb default '{}') returns jsonb language plpgsql as $$
 declare result jsonb;
-begin execute 'set local role authenticated';result:=public.lumo_rpc(command,payload);execute 'reset role';return result;exception when others then execute 'reset role';raise;end $$;
+begin execute 'set local role authenticated';result:=public.lumo_rpc(command,payload);execute 'reset role';
+ -- Explicit synthetic personal enrolment: legacy account.open alone is not a personal-payment identity.
+ if command='account.open' and result->>'ok'='true' then insert into lumo_private.approved_profiles(user_id,personal_account) values(auth.uid(),true) on conflict(user_id) do update set personal_account=true;end if;
+ return result;exception when others then execute 'reset role';raise;end $$;
 create function pg_temp.group_as(p_user uuid,p_session uuid) returns void language plpgsql as $$begin perform set_config('request.jwt.claims',jsonb_build_object('sub',p_user,'role','authenticated','session_id',p_session)::text,true);end $$;
 do $$
 declare
@@ -118,7 +121,9 @@ begin
  select count(*) into before_count from lumo_private.journals;
  perform pg_temp.group_as(bob_id,bob_session);
  result:=pg_temp.group_call('group.payout.approve',jsonb_build_object('groupId',gid,'proposalId',pid,'pin',pin,'attemptId','group-failure-final-vote-'||suffix));
- perform pg_temp.group_assert(result->>'code'='ACCOUNT_UNAVAILABLE' and (select count(*) from lumo_private.group_approvals where proposal_id=pid)=1,'failed final posting rolls back that approval');
+ -- Current personal-recipient eligibility rejects the suspended target before
+ -- the generic balance/account gate, without disclosing its account status.
+ perform pg_temp.group_assert(result->>'code'='RECIPIENT_NOT_FOUND' and (select count(*) from lumo_private.group_approvals where proposal_id=pid)=1,'failed final posting rolls back that approval');
  perform pg_temp.group_assert((select count(*) from lumo_private.journals)=before_count and (select balance from lumo_private.accounts where id=group_account)=6000,'failed payout changes neither ledger nor group balance');
  update lumo_private.accounts set status='active' where id=outside_account;
  perform pg_temp.group_as(owner_id,owner_session);

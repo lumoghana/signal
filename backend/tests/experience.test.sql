@@ -8,7 +8,10 @@ end $$;
 create function pg_temp.call(command text,payload jsonb default '{}'::jsonb) returns jsonb language plpgsql as $$
 declare response jsonb;
 begin
- execute 'set local role authenticated';response:=public.lumo_rpc(command,payload);execute 'reset role';return response;
+ execute 'set local role authenticated';response:=public.lumo_rpc(command,payload);execute 'reset role';
+ -- Explicit synthetic personal enrolment: legacy account.open alone is not a personal-payment identity.
+ if command='account.open' and response->>'ok'='true' then insert into lumo_private.approved_profiles(user_id,personal_account) values(auth.uid(),true) on conflict(user_id) do update set personal_account=true;end if;
+ return response;
 exception when others then execute 'reset role';raise;
 end $$;
 create function pg_temp.actor(p_user uuid,p_session uuid) returns void language plpgsql as $$

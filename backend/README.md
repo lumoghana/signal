@@ -1,41 +1,41 @@
-# Lumo shared test-money backend
+# Lumo connected backend
 
-One authenticated account and ledger for the consumer and merchant channels. This is a bank-free pilot: balances represent test funds and no bank, MoMo, NIA or cash-out service is connected.
+Read [the current capability matrix](../READINESS.md) before changing or rebuilding the app. The 2.14.0 readiness candidate preserves simulated bank/MoMo/NIA/liveness boundaries; candidate implementation is not proof of publication or real-money acceptance.
 
-The hosted target is Supabase project `iwutbrljiiodamtyoorg` (`Lumo`). The API base is `https://iwutbrljiiodamtyoorg.supabase.co`. The only application Data API entry point is `POST /rest/v1/rpc/lumo_rpc` with `{ "p_command": "account.get", "p_payload": {} }`. Requests require a publishable API key and a valid user access token. Private ledger tables have no client read/write grants. Money is stored in integer pesewas in GHS.
+## Current entry points
 
-## Scope
+| Gateway | Authority |
+| --- | --- |
+| lumo-approved | Personal account snapshots, canonical test-money payments, groups/boxes/partners and shared merchant/loyalty services. |
+| lumo-access | Consented encrypted saved-face capture/comparison and bounded credential recovery. Keyless recovery is restricted to the approved prototype; genuine liveness is not established. |
+| lumo-admin | Invite-only staff roles, current-state/idempotent proposals, cases, financial review and governed recovery operations. MFA enforcement is deployment policy with an enrolment/readiness gate. |
+| lumo-maintenance / lumo-social / lumo-business | Scoped record-maintenance, friends/group/inbox and merchant planning services. |
+| lumo_rpc and guarded service RPCs | Canonical database operations and compatible legacy callers. They are not permission to trust client success flags or local wallet balances. |
 
-The first migration provides account setup, exact-handle recipient lookup, explicit test funding, consumer transfers, merchant/shop creation, fixed payment requests, static shop quotes/payments, partial or full merchant refunds, owner reporting and shop trading-day close. Payments create paired, immutable ledger entries and receipts. A close resets the shop's trading view without removing money from the merchant account.
+The consumer website uses a same-origin HttpOnly session boundary in the candidate; native Android retains its platform-protected direct transport. The merchant/cashier application hydrates the same canonical journals and does not maintain a second money ledger. Native source and original-certificate APK are delivered separately.
 
-All commands validate a live Supabase Auth session. Money moves verify the server-held transaction PIN and apply PIN throttling. The backend binds retry references to the signed-in user, command and original payload. `attempt.lookup` recovers committed or definitively rejected operations without storing a PIN on the device.
+Canonical amounts are integer pesewas. Expected IOUs, Money Boxes and group funds are distinct from personal available money. Successful and terminal declined request references retain their original financial outcome. PIN correction, transient conflicts and unknown responses have separate recovery rules. Fixed request expiry/amount/shop/payer checks apply at canonical write, including legacy routes.
 
-Consumer web, merchant web and Android 2.6.0 use these shared accounts and records. Android opens the connected experience by default. The optional Local preview retains its own simulated data; no local demo balances are imported as shared funds.
+## Database and tests
 
-Shared journeys include Essentials and keep-back, source-aware payments and refund restoration, actual Money Box accounts and Savings Hacks, partner codes and protected releases, consent-based IOUs and repayments, group membership/chat/contributions/mandated payouts and pro-rata cancellation refunds, grounded Money Chat/history, persisted late-allowance recovery, informational outside-money records, private favourites and fixed personal payment requests. The approved 12 lessons and six campus stories share versioned resume state across web and Android.
+All deployed baseline migrations, including the five previously absent definitions, are restored in supabase/migrations with their recorded identities. New changes must use a new migration and preserve the old history. A clean bootstrap executes the complete chain, not a cherry-picked fixture subset.
 
-Merchant operations include accepted shop staff roles, owner/staff shifts, cumulative refund approvals, consolidated owner balances, per-shop reporting, opt-in proximity discovery and private support tickets. User preferences, transaction PIN changes, own-session revocation and notification inboxes are server-backed. Internal scheduled transfers execute from explicit PIN-authorised bounded mandates using a private cron worker; failures stop the mandate without fabricating a payment.
+```
+npm ci --ignore-scripts
+npm test
+npm run check
+cd ..
+npm ci --ignore-scripts --prefix verification
+node scripts/verify-clean-database.mjs
+node scripts/verify-clean-database.mjs --fixtures
+```
 
-No bank, MoMo, bills, cards, NIA or SMS provider is connected. Synthetic handles do not verify a phone, email or identity. Password recovery, OS background push, group mandate changes/designated approver revisions and evidence uploads, and partner changes/verified-support releases remain unavailable. Existing group mandates cannot be changed to bypass consent. Money Chat computes actual ledger records; no external LLM or unseen finances are implied.
+The verifier runs isolated PostgreSQL with synthetic Auth. It never reads a hosted credential/URL. Fixture setup uses current personal/merchant enrollment and required Auth fields; HTTP-context SQL chunks seed actual synthetic gateway/merchant flows instead of depending on a developer's private QA session. Native toolchain, face inference and browser checks are additional release evidence.
 
-## Client
+For hosted changes, read current project metadata and review migrations before applying them. Retain previous executable bundles, use additive compatible rollout, check exact imported source closure and verify the live schema/ledger afterward. Managed-Auth write fences require independent order/COMMIT and rollback review. Never silently target another project, edit balances or delete journal/audit records.
 
-`src/client.mjs` has no runtime dependency. Host applications inject `fetch`, durable pending-reference storage and a secure session persistence callback. The client never persists a PIN or password. Host apps must provide payment review and explicit authorisation UI. Native Android requires an equivalent implementation of this HTTP contract; this JavaScript client is for web clients and API integration tests.
+## Operating boundaries
 
-Use only the project's publishable key in public apps. A secret/service-role key must never be bundled into a browser or APK. Do not log access tokens, refresh tokens, passwords or transaction PINs.
+No live bank, MoMo, NIA, SMS, external settlement or OS background push is implied. Foreground Money Box processing is separate from explicit stored transfer mandates. Simulated provider lookup is not customer verification. A programme budget is not a reserved merchant wallet balance.
 
-## Verification
-
-Run `npm ci --ignore-scripts`, `npm test` and `npm run check` from this directory. `tests/shared-ledger.test.sql` contains hosted database checks that run inside an explicit transaction and roll back their users, sessions and financial records. They simulate authenticated database requests; they do not replace real Auth HTTP or handset tests. See `verification/` for the exact checks completed against the hosted project.
-
-The Supabase CLI is pinned in the lockfile. Discover commands with `npm run supabase -- --help`; v3 defaults to the local stack. Hosted migrations must be applied deliberately against the recorded project. This source must not silently modify another project.
-
-## Release sequence
-
-1. Install the shared schema and verify accounting, access boundaries and replay behaviour.
-2. Connect consumer account identity, balance, transfer and payment screens to this API.
-3. Connect merchant sign-in, shops, requests, receipts and refunds to the same accounts.
-4. Verify the cross-device transfer → merchant payment → refund journey, including interrupted connections and simultaneous spending.
-5. Integrate the remaining product journeys and operational controls against shared state.
-
-Use controlled tester identities initially. Enabling email/SMS invitations or changing authentication settings is a separate explicit setup step. Bank integration remains outside this pilot.
+Operational procedures, restore objectives, evidence requirements and acceptance journeys are in [the operating runbook](../docs/OPERATIONS-RUNBOOK.md). [The historical 2.6.0 notes](LEGACY-2.6.0-NOTES.md) remain available for context and must not override current contracts.

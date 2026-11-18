@@ -1,5 +1,7 @@
 -- Entirely transactional verification: all principals, source reports and audit rows are rolled back.
 begin;
+-- Exercise the enforced production policy explicitly; the live pilot exception is tested separately.
+update lumo_private.admin_auth_policy set require_mfa=true where id;
 create function pg_temp.projection_assert(p_value boolean,p_label text) returns void language plpgsql as $$begin
  if p_value is distinct from true then raise exception 'Admin projection check failed: %',p_label;end if;
  perform set_config('lumo.admin.projection_checks',(coalesce(nullif(current_setting('lumo.admin.projection_checks',true),''),'0')::integer+1)::text,true);

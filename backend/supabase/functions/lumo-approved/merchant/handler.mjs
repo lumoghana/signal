@@ -22,15 +22,18 @@ function failure(code,status=400){return {ok:false,status,code,error:message(cod
 export function hydrateMerchantNetwork(raw){
  const state=clone(raw.state||emptyNetwork());
  const linkAttribution=new Map((raw.linkAttribution||[]).map(link=>[link.requestId,link]));
+ const ledgerByBusiness=new Map(),requestsByShop=new Map(),usersBySharedId=new Map();
+ for(const journal of raw.ledger||[]){if(!ledgerByBusiness.has(journal.merchantId))ledgerByBusiness.set(journal.merchantId,[]);ledgerByBusiness.get(journal.merchantId).push(journal);}
+ for(const request of raw.requests||[]){if(!requestsByShop.has(request.shopId))requestsByShop.set(request.shopId,[]);requestsByShop.get(request.shopId).push(request);}
+ for(const user of state.users||[])if(user._sharedUserId&&!usersBySharedId.has(user._sharedUserId+':'+user.businessId))usersBySharedId.set(user._sharedUserId+':'+user.businessId,user);
  for(const [businessId,b] of Object.entries(state.businesses||{})){
-  const ledger=(raw.ledger||[]).filter(j=>j.merchantId===businessId),balance=raw.balances?.[businessId];
+  const ledger=ledgerByBusiness.get(businessId)||[],balance=raw.balances?.[businessId];
   const oldPayments=new Map((b.transactions||[]).map(t=>[t.id,t]));
   const oldRefunds=new Map((b.refunds||[]).map(r=>[r.id,r]));
   const requests=new Map((b.requests||[]).map(r=>[r.id,r]));
-  const shopIds=new Set(b.shops.map(s=>s.id));
-  for(const request of (raw.requests||[]).filter(r=>shopIds.has(r.shopId))){
+  for(const request of b.shops.flatMap(s=>requestsByShop.get(s.id)||[])){
    const previous=requests.get(request.id)||{};
-   const operator=state.users.find(u=>u._sharedUserId===request.createdBySharedUserId);
+   const operator=usersBySharedId.get(request.createdBySharedUserId+':'+businessId);
    requests.set(request.id,{...previous,...request,staffId:previous.staffId||(operator?.role==='owner'?'owner-'+operator.id:operator?'access-'+operator.id:null),staffName:previous.staffName||operator?.name||null,createdByUserId:previous.createdByUserId||operator?.id||null});
   }
   b.requests=[...requests.values()].map(request=>{const link=linkAttribution.get(request.id);return link?.attribution==='shop'?{...request,staffId:null,staffName:null,shiftId:null,counterId:null,attribution:'shop',intentChannel:'online',publicPaymentLinkId:link.linkId}:request;});
@@ -38,9 +41,10 @@ export function hydrateMerchantNetwork(raw){
    const old=oldPayments.get(j.id)||{},request=requests.get(j.requestId),link=linkAttribution.get(j.requestId),shopAttributed=j.requestAttribution==='shop'||link?.attribution==='shop'||request?.attribution==='shop'||!!j.guestCollectionId&&!j.requestId;
    return {...old,id:j.id,_loyaltyActorUserId:j.guestCollectionId?null:j.actorUserId||null,_loyaltyPayerAccountId:j.payerAccountId||null,shopId:j.shopId,counterId:old.counterId||request?.counterId||null,staffId:old.staffId||request?.staffId||null,staffName:old.staffName||request?.staffName||null,shiftId:old.shiftId||request?.shiftId||null,payer:j.payerName||j.payerHandle||'Lumo customer',amount:j.amount,status:'paid',createdAt:j.createdAt,confirmedAt:j.createdAt,reference:j.reference,method:old.method||(j.requestId?'request':'qr'),requestId:j.requestId||null,sandbox:true,...(shopAttributed?{staffId:null,staffName:null,counterId:null,shiftId:null,attribution:'shop',intentChannel:j.requestId?'online':null,publicPaymentLinkId:j.publicPaymentLinkId||link?.linkId||null}:{}),...(j.guestCollectionId?{payer:j.payerName||'MoMo guest',rail:'momo',source:'guest-momo',linkId:j.guestLinkId,guestCollectionId:j.guestCollectionId,providerReference:j.providerReference,providerMode:'sandbox',settlementStatus:'sandbox-posted'}:{})};
   });
+  const paymentsById=new Map(b.transactions.map(t=>[t.id,t]));
   const canonicalRefunds=ledger.filter(j=>j.type==='refund').map(j=>{
    const key=j.refundId||j.id,old=oldRefunds.get(key)||{};
-   const payment=b.transactions.find(t=>t.id===j.originalPaymentId);
+   const payment=paymentsById.get(j.originalPaymentId);
    return {...old,id:key,transactionId:j.originalPaymentId,shopId:j.shopId,amount:j.amount,status:'paid',createdAt:old.createdAt||j.createdAt,paidAt:j.createdAt,payer:old.payer||payment?.payer||'Original payer',reason:old.reason||'Customer refund',by:old.by||'Merchant',_sharedJournalId:j.id};
   });
   const refundedIds=new Set(canonicalRefunds.map(r=>r.id));
@@ -57,7 +61,7 @@ export function hydrateMerchantNetwork(raw){
 /** Original v7 HTTP API behind the verified shared-auth boundary. No client state
  * is accepted: closures mutate a fresh service-only snapshot, committed with
  * canonical refund postings in one database transaction. */
-export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototypeFaceOnly=false}){
+export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototypeFaceOnly=false,readScalingEnabled=false,retryDelay=attempt=>new Promise(resolve=>setTimeout(resolve,Math.min(20*2**attempt,250)+Math.floor(Math.random()*20)))}){
  if(typeof serviceRpc!=='function')throw new Error('Merchant service RPC is required.');
  return async ({body,identity})=>{
   const path=normalizeMerchantPath(body.path),method=body.method||'GET',pathname=path?.split('?')[0],input=body.body||{};
@@ -68,12 +72,21 @@ export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototyp
   if(/^\/api\/(?:student|sandbox-fund|payments$)/.test(pathname))return failure('UNAVAILABLE_SERVICE',503);
   if(pathname==='/api/simulate'||pathname==='/api/action'&&['PAY','RESOLVE_PAYMENT','SETTLE','RESOLVE_SETTLEMENT'].includes(input.type))return failure('UNAVAILABLE_SERVICE',503);
   if(!(method==='GET'?GET_ROUTE:POST_ROUTE).test(pathname))return failure('INVALID_REQUEST',404);
+  // A directory read needs public shop fields, never a merchant network, ledger
+  // or session projection. The indexed projection is updated in the metadata
+  // transaction; payment approval always obtains its own fresh canonical quote.
+  if(readScalingEnabled&&method==='GET'&&pathname==='/api/directory'){
+   try{const result=await serviceRpc('lumo_approved_public_directory',{});return {...result,status:result?.ok?200:503,sandbox:true,bankConnected:false,smsConnected:false};}
+   catch{return failure('STORAGE_UNAVAILABLE',503);}
+  }
   let actor=identity?.userId||null,sessionId=identity?.sessionId||null;
   const merchantToken=typeof body.merchantToken==='string'&&/^[a-f0-9]{64}$/.test(body.merchantToken)?body.merchantToken:'';
   const tokenHash=await hashToken(merchantToken);
   let lastRead=null;
-  async function read(){
-   let raw=await serviceRpc('lumo_approved_merchant_read',{p_actor:actor,p_session:sessionId});
+  const scopedRead=readScalingEnabled&&method==='GET'&&['/api/session','/api/counter','/api/counter/receipts','/api/devices','/api/business-plan','/api/payment-links','/api/case-inbox'].includes(pathname);
+  async function read({full=false}={}){
+   const readSnapshot=()=>serviceRpc(scopedRead&&!full?'lumo_approved_merchant_read_scoped':'lumo_approved_merchant_read',{p_actor:actor,p_session:sessionId,...(scopedRead&&!full?{p_token_hash:tokenHash}:{})});
+   let raw=await readSnapshot();
    if(!raw?.ok)throw new APIError(message(raw?.code),raw?.code==='SESSION_REVOKED'?401:503,raw?.code||'STORAGE_UNAVAILABLE');
    let state=hydrateMerchantNetwork(raw),current=resolveSession(state,tokenHash);
    // A paired counter retains only its high-entropy merchant capability. The
@@ -83,7 +96,7 @@ export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototyp
    if(!identity&&current?.counter){
     const bound=current.session._counterSharedUserId,boundSession=current.session._counterSharedSessionId;
     if(!bound||!boundSession||bound!==current.anchorUser?._sharedUserId)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');
-    if(!actor){actor=bound;sessionId=boundSession;raw=await serviceRpc('lumo_approved_merchant_read',{p_actor:actor,p_session:sessionId});if(!raw?.ok)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');state=hydrateMerchantNetwork(raw);current=resolveSession(state,tokenHash);}
+    if(!actor){actor=bound;sessionId=boundSession;raw=await readSnapshot();if(!raw?.ok)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');state=hydrateMerchantNetwork(raw);current=resolveSession(state,tokenHash);}
     if(!current?.counter||current.session._counterSharedUserId!==actor||current.session._counterSharedSessionId!==sessionId)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');
    }
    if(!identity&&!PUBLIC_GET.test(path)&&!current?.counter)throw new APIError(message('SESSION_REVOKED'),401,'SESSION_REVOKED');
@@ -93,8 +106,9 @@ export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototyp
   let refreshedLoginPassword;
   async function update(mutate){
    if(!identity&&!merchantToken)throw new APIError('Sign in before changing a merchant record.',401,'SESSION_REVOKED');
-   for(let attempt=0;attempt<12;attempt++){
-    const {revision,state}=await read(),draft=clone(state);
+   let full=!scopedRead;
+   for(let attempt=0;attempt<5;attempt++){
+    const {revision,state}=await read({full}),draft=clone(state),readOnly=lastRead.readOnly===true;
     if(pathname==='/api/auth/login'){
      if(identity?.passwordVerified!==true)throw new APIError('Confirm the current shared-account password.',403,'STEP_UP_REQUIRED');
      const handle=String(identity.user?.email||'').split('@')[0].toLowerCase();
@@ -132,9 +146,14 @@ export function createMerchantHandler({serviceRpc,commerceEnabled=false,prototyp
     if(newPaid.length&&!moneyAuthorized)throw new APIError(message('STEP_UP_REQUIRED'),403,'STEP_UP_REQUIRED');
     if(moneyAuthorized){const current=resolveSession(draft,tokenHash);if(current)current.session._sharedStepUpVerified=false;}
     if(out?.unchanged&&!newPaid.length&&JSON.stringify(draft)===JSON.stringify(state))return {...out,revision};
+    // GET session normally only projects this tenant. If day-close, token
+    // preparation or loyalty reconciliation would change metadata, discard the
+    // display-only draft and rerun from complete current authority. A partial
+    // tenant document must never be submitted to the compatibility writer.
+    if(readOnly){full=true;continue;}
     const saved=await serviceRpc('lumo_approved_merchant_commit',{p_actor:actor,p_session:sessionId,p_revision:revision,p_ledger_stamp:lastRead.ledgerStamp,p_state:draft,p_money_authorized:moneyAuthorized});
     if(saved?.ok)return {...out,revision:saved.revision};
-    if(saved?.code==='CONCURRENT_UPDATE')continue;
+    if(saved?.code==='CONCURRENT_UPDATE'){if(attempt<4)await retryDelay(attempt);continue;}
     throw new APIError(message(saved?.code),saved?.code==='SESSION_REVOKED'?401:409,saved?.code||'MERCHANT_COMMIT_FAILED');
    }
    throw new APIError(message('CONCURRENT_UPDATE'),409,'CONCURRENT_UPDATE');

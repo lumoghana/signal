@@ -77,7 +77,7 @@ begin
  begin update lumo_private.admin_case_messages set body='tampered' where case_id=cid;exception when others then attempted:=true;end;
  perform pg_temp.support_check(attempted,'message stream rejects rewriting');
  perform pg_temp.support_check(not has_table_privilege('anon','lumo_private.admin_case_messages','select') and not has_table_privilege('authenticated','lumo_private.admin_case_messages','select'),'message storage remains private');
- perform pg_temp.support_check(strpos(pg_get_functiondef('public.lumo_admin_service(text,jsonb)'::regprocedure),'perform lumo_private.admin_lock_case_source(uid);select * into case_row')>0,'staff updates lock source before case');
+ perform pg_temp.support_check(strpos(pg_get_functiondef('lumo_private.lumo_admin_service_before_approval_controls(text,jsonb)'::regprocedure),'perform lumo_private.admin_lock_case_source(uid);select * into case_row')>0,'staff updates lock source before case');
 end $test$;
 select current_setting('lumo.support_checks')::integer as checks;
 rollback;

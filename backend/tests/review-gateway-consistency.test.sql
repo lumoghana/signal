@@ -10,9 +10,9 @@ begin
  (b,'authenticated','authenticated',hb||'@pilot.lumo.invalid',now(),'{"lumo_pilot":true}','{}',now(),now());
  insert into auth.sessions(id,user_id,created_at,updated_at) values(sa,a,now(),now()),(sb,b,now(),now());
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
- out:=pg_temp.approved('provision',jsonb_build_object('actor',a,'session',sa,'handle',ha,'displayName','Review A','pin','3159'));
+ out:=pg_temp.approved('provision',jsonb_build_object('actor',a,'session',sa,'handle',ha,'displayName','Review A','pin','3159','mode','consumer'));
  perform pg_temp.assert_approved(out->>'ok'='true','new review account A provisioned');
- out:=pg_temp.approved('provision',jsonb_build_object('actor',b,'session',sb,'handle',hb,'displayName','Review B','pin','2718'));
+ out:=pg_temp.approved('provision',jsonb_build_object('actor',b,'session',sb,'handle',hb,'displayName','Review B','pin','2718','mode','consumer'));
  perform pg_temp.assert_approved(out->>'ok'='true','new review account B provisioned');
  insert into lumo_private.accounts(owner_user_id,kind) values(a,'group') returning id into ga;
  insert into lumo_private.approved_groups(id,account_id,state) values(g,ga,jsonb_build_object('id',g,'name','Review group','creatorId',a,'status','open','members',jsonb_build_array(jsonb_build_object('id',a,'status','active','role','approver'),jsonb_build_object('id',b,'status','active','role','contributor')),'chat',jsonb_build_object('reports','[]'::jsonb,'messages',jsonb_build_array(jsonb_build_object('id','review-message','senderId',b,'status','sent','text','A test message')))));
@@ -62,8 +62,8 @@ begin
  (b,'authenticated','authenticated','rg-b-'||suffix||'@pilot.lumo.invalid',now(),'{"lumo_pilot":true}','{}',now(),now());
  insert into auth.sessions(id,user_id,created_at,updated_at) values(sa,a,now(),now()),(sb,b,now(),now());
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
- perform pg_temp.approved('provision',jsonb_build_object('actor',a,'session',sa,'handle','rg-a-'||suffix,'displayName','Refund creator','pin','3159'));
- perform pg_temp.approved('provision',jsonb_build_object('actor',b,'session',sb,'handle','rg-b-'||suffix,'displayName','Refund merchant','pin','2718'));
+ perform pg_temp.approved('provision',jsonb_build_object('actor',a,'session',sa,'handle','rg-a-'||suffix,'displayName','Refund creator','pin','3159','mode','consumer'));
+ perform pg_temp.approved('provision',jsonb_build_object('actor',b,'session',sb,'handle','rg-b-'||suffix,'displayName','Refund merchant','pin','2718','mode','merchant'));
  select id into wa from lumo_private.accounts where owner_user_id=a and kind='consumer';
  select id into funding from lumo_private.accounts where kind='test_funding';
  insert into lumo_private.accounts(owner_user_id,kind) values(a,'group') returning id into ga;

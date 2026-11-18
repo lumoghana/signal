@@ -37,6 +37,9 @@
     }
   ],
   "functions": {
+    "api/web-session.mjs": {
+      "maxDuration": 30
+    },
     "api/face.py": {
       "maxDuration": 30,
       "includeFiles": "face_service/{*.py,models/**,model-manifest.json}",

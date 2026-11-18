@@ -1,3 +1,4 @@
+import {trustedWebProxyIp} from './web-proxy-context.mjs';
 import {createConsumerLoyalty} from './consumer-loyalty.mjs';
 import {createAvailability,servicesForAction} from './availability.mjs';
 import {externalRecipient,EXTERNAL_SIMULATION_FEES} from './external-transfer.mjs';
@@ -6,9 +7,11 @@ import {savingsAutomaticWork} from './domain/savings-parity-model.js';
 import {partnerRespond,publicPartnerInbox} from './partners.mjs';
 import {actionFingerprint,buildState,clone,envelope,prepareMutation,sha256,canonicalJson} from './engine.mjs';
 import {onboardingReceipt} from './onboarding-receipt.mjs';
+import {createPasswordPolicy} from './password-policy.mjs';
 const HANDLE=/^[a-z0-9][a-z0-9._-]{2,29}$/;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const plain=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
+const terminalFinancialActions=new Set(['payment','fund','contributeBox','withdrawBox','contributeGroup','requestPayout','approvePayout','executePayout','closeGroup','settleIOU','requestBoxProtection','completeBoxProtectionChange','accountClose','accountRemoveDevice']);
 const phone=value=>String(value||'').replace(/[\s()-]/g,'').replace(/^\+233/,'0');
 const failure=(code,message,status=400)=>Object.assign(new Error(message||code),{code,status});
 const messages={HANDLE_TAKEN:'That Lumo username is already taken. Choose another.',HANDLE_UNAVAILABLE:'That Lumo username is already taken. Choose another.',REGISTRATION_PENDING:'That username is temporarily reserved. Try again shortly or choose another.',PERSONAL_ACCOUNT_REQUIRED:'This login is for merchant staff access. Open the merchant app, or create your own personal Lumo account to send and receive money.',AUTH_REQUIRED:'Sign in before continuing.',SESSION_REVOKED:'Sign in again to use your shared Lumo account.',PIN_REQUIRED:'Check your transaction PIN. After five incorrect attempts wait one minute.',RECIPIENT_NOT_FOUND:'This handle or phone is not registered in the connected pilot.',REVISION_CONFLICT:'Your records changed. Open the current details and try again.',IDEMPOTENCY_CONFLICT:'That send reference belongs to different details.',ALIAS_UNAVAILABLE:'That username or phone is already registered.',CREDENTIALS_INCORRECT:'That username and password could not be verified.',DEVICE_PROOF_INVALID:'Device verification expired or did not match. Use your PIN.',SERVICE_UNAVAILABLE:'Lumo could not confirm this request. Keep the send reference and try again.',REQUEST_UNAVAILABLE:'This merchant request is unavailable or already paid.',FORBIDDEN:'Use your own signed-in account.',INVALID_INPUT:'Check the details and try again.',INSUFFICIENT_FUNDS:'There is not enough available money for this action.',WALLET_LIMIT:'This amount exceeds the pilot account limit.'};
@@ -36,7 +39,7 @@ async function boundedJson(request){
  const bytes=new Uint8Array(size);let n=0;for(const part of parts){bytes.set(part,n);n+=part.byteLength;}
  let body;try{body=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{throw failure('INVALID_INPUT');}if(!plain(body))throw failure('INVALID_INPUT');return body;
 }
-export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,merchantHandler=null,availabilityEnabled=false,onIdentified=null}={}){
+export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,merchantHandler=null,availabilityEnabled=false,onIdentified=null,passwordPolicyMode='pilot',checkPasswordBreach,webProxyPublicKeys,loyaltyReadScalingEnabled=false}={}){
  const base=new URL(supabaseUrl);if(base.protocol!=='https:'||base.pathname!=='/'||!serviceRoleKey)throw Error('Invalid gateway configuration');
  const origins=new Set(allowedOrigins);
  async function upstream(path,body,{token=serviceRoleKey,method='POST',allowFailure=false}={}){
@@ -46,7 +49,8 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  }
  async function serviceRpc(name,args){const {data}=await upstream('/rest/v1/rpc/'+name,args);if(!plain(data))throw failure('SERVICE_UNAVAILABLE',null,503);return data;}
  const availability=availabilityEnabled?createAvailability({serviceRpc}):null;
- const consumerLoyalty=createConsumerLoyalty({serviceRpc,cryptoApi});
+ const consumerLoyalty=createConsumerLoyalty({serviceRpc,cryptoApi,requestContextEnabled:loyaltyReadScalingEnabled});
+ const assertNewPassword=createPasswordPolicy({mode:passwordPolicyMode,checkBreach:checkPasswordBreach});
  async function service(command,payload){return serviceRpc('lumo_approved_service',{p_command:command,p_payload:payload});}
  const requireOk=value=>{if(!value?.ok){const error=failure(value?.code||'SERVICE_UNAVAILABLE',messages[value?.code],value?.code==='SESSION_REVOKED'?401:400);if(value?.code==='SERVICE_PAUSED')error.noMutation=true;throw error;}return value;};
  async function identify(token){
@@ -77,7 +81,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
  async function authenticate(body,request){
   const handle=String(body.handle||'').trim().replace(/^@/,'').toLowerCase(),password=body.password;
   if(!HANDLE.test(handle)||typeof password!=='string'||password.length<(body.action==='register'?10:8)||password.length>128||!password.trim())throw failure('INVALID_INPUT');
-  const ip=(request.headers.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';const ipHash=await sha256('lumo-pilot-auth:'+ip,cryptoApi);
+  const ip=await trustedWebProxyIp(request,body,{cryptoApi,publicKeys:webProxyPublicKeys})||(request.headers.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';const ipHash=await sha256('lumo-pilot-auth:'+ip,cryptoApi);
   const bootstrap=async(action,payload)=>requireOk(await serviceRpc('lumo_pilot_bootstrap',{p_action:action,p_payload:payload}));
   if(body.action==='login'){
    await bootstrap('login.check',{handle,ipHash});const session=await passwordSession(handle,password),identity=await identify(session.access_token),repo=repository(identity);
@@ -85,6 +89,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
   }
   const displayName=typeof body.displayName==='string'?body.displayName.trim():'',registeredPhone=phone(body.phone);
   const isMerchant=body.mode==='merchant',onboarding=isMerchant?undefined:onboardingReceipt(body.onboarding);let pin=body.pin;
+  await assertNewPassword(password,{handle,module:isMerchant?'merchant':'consumer'});
   if(isMerchant)pin=String(100000+cryptoApi.getRandomValues(new Uint32Array(1))[0]%900000);
   if(!displayName||displayName.length>80||/[\p{Cc}<>]/u.test(displayName)||!isMerchant&&!/^0\d{9}$/.test(registeredPhone)||typeof pin!=='string'||!/^\d{4,6}$/.test(pin))throw failure('INVALID_INPUT');
   const reservation=await bootstrap('register.reserve',{handle,ipHash});
@@ -111,7 +116,11 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    if(committed.code==='REVISION_CONFLICT'){snapshot=requireOk(await repo.service('load'));continue;}requireOk(committed);return committed.snapshot;
   }return requireOk(await repo.service('load'));
  }
- const guestCheckout=createGuestCheckout({serviceRpc,crypto:cryptoApi});
+ const guestCheckout=createGuestCheckout({serviceRpc,crypto:cryptoApi,webProxyPublicKeys});
+ // A cached failure must remain a failure on action and recovery endpoints.
+ // Only authenticated terminal business results are retained; PIN and transient
+ // failures remain correctable under the original request reference.
+ const attemptEnvelope=(record,extra={})=>envelope(record.snapshot,record.result.result,{replayed:true,postedReceipts:record.result.receipts||[],...(record.result.terminal===true?{terminal:true,noMutation:true}:{}),...extra});
  let merchant=null;
  return async request=>{
   const origin=request.headers.get('origin');const cors={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',Vary:'Origin',...(origin&&origins.has(origin)?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'apikey, authorization, content-type, x-client-info','Access-Control-Max-Age':'600'}:{})};
@@ -152,7 +161,7 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
     const handle=identity.user.email?.split('@')[0];
     if(!HANDLE.test(handle||'')||identity.user.email!==`${handle}@pilot.lumo.invalid`)throw failure('FORBIDDEN');
     const begun=requireOk(await repo.repair('begin'));
-    const ip=(request.headers.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';
+    const ip=await trustedWebProxyIp(request,body,{cryptoApi,publicKeys:webProxyPublicKeys})||(request.headers.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';
     requireOk(await serviceRpc('lumo_pilot_bootstrap',{p_action:'login.check',p_payload:{handle,ipHash:await sha256('lumo-pilot-auth:'+ip,cryptoApi)}}));
     let proof;
     try{
@@ -184,19 +193,19 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
     const merchantPassword=merchantLogin?body.body?.password:body.password;
     if(merchantLogin||merchantPassword){
      if(typeof merchantPassword!=='string'||merchantPassword.length<8||merchantPassword.length>128)throw failure('INVALID_INPUT');
-     const handle=identity.user.email.split('@')[0],ip=request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim()||'anonymous';
+     const handle=identity.user.email.split('@')[0],ip=await trustedWebProxyIp(request,body,{cryptoApi,publicKeys:webProxyPublicKeys})||request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim()||'anonymous';
      if(merchantLogin&&(typeof body.body?.username!=='string'||body.body.username.trim().toLowerCase()!==handle))throw failure('FORBIDDEN');
      requireOk(await serviceRpc('lumo_pilot_bootstrap',{p_action:'login.check',p_payload:{handle,ipHash:await sha256('lumo-pilot-auth:'+ip,cryptoApi)}}));
      const stepup=await passwordSession(handle,merchantPassword);try{if(stepup.user?.id!==identity.userId)throw failure('FORBIDDEN');identity.passwordVerified=true;}finally{await revoke(stepup);}
     }
     if(!merchantHandler)throw failure('SERVICE_UNAVAILABLE',null,503);merchant||=merchantHandler({serviceRpc,commerceEnabled:true});return respond(await merchant({body,identity,repo}));
    }
-   if(body.action==='recover'){if(typeof body.type!=='string'||!plain(body.payload)||!/^[A-Za-z0-9_.:-]{10,100}$/.test(body.attemptId||''))throw failure('INVALID_INPUT');const fingerprint=await actionFingerprint(body.type,body.payload,body.attemptId),replay=requireOk(await repo.service('attempt',{attemptId:body.attemptId,fingerprint}));return respond(envelope(replay.found?replay.snapshot:requireOk(await repo.service('load')),replay.found?replay.result.result:{ok:true,message:'This reference is still being checked. Retry only these same details.'},{found:replay.found===true,replayed:replay.found===true,postedReceipts:replay.result?.receipts||[]}));}
+   if(body.action==='recover'){if(typeof body.type!=='string'||!plain(body.payload)||!/^[A-Za-z0-9_.:-]{10,100}$/.test(body.attemptId||''))throw failure('INVALID_INPUT');const fingerprint=await actionFingerprint(body.type,body.payload,body.attemptId),replay=requireOk(await repo.service('attempt',{attemptId:body.attemptId,fingerprint}));return respond(replay.found?attemptEnvelope(replay,{found:true}):envelope(requireOk(await repo.service('load')),{ok:true,message:'This reference is still being checked. Retry only these same details.'},{found:false,replayed:false,postedReceipts:[]}));}
    if(body.action!=='action'||typeof body.type!=='string'||body.type.length>80||!plain(body.payload)||!/^[A-Za-z0-9_.:-]{10,100}$/.test(body.attemptId||''))throw failure('INVALID_INPUT');
    if(Object.keys(body).some(k=>!['action','type','payload','attemptId','pin','deviceProof'].includes(k)))throw failure('INVALID_INPUT');
    const fingerprint=await actionFingerprint(body.type,body.payload,body.attemptId);
    const cached=await repo.service('attempt',{attemptId:body.attemptId,fingerprint});
-   if(cached?.ok&&cached.found)return respond(envelope(cached.snapshot,cached.result.result,{replayed:true,postedReceipts:cached.result.receipts||[]}));
+   if(cached?.ok&&cached.found)return respond(attemptEnvelope(cached));
    if(cached?.code==='IDEMPOTENCY_CONFLICT')requireOk(cached);
    if(availability)await availability.gate(body);
    let verifiedChallengeId;
@@ -206,13 +215,19 @@ export function createApprovedHandler({supabaseUrl,serviceRoleKey,allowedOrigins
    }
    for(let retry=0;retry<4;retry++){
     const replay=await repo.service('attempt',{attemptId:body.attemptId,fingerprint});
-    if(replay?.ok&&replay.found)return respond(envelope(replay.snapshot,replay.result.result,{replayed:true,postedReceipts:replay.result.receipts||[]}));
+    if(replay?.ok&&replay.found)return respond(attemptEnvelope(replay));
     if(replay?.code==='IDEMPOTENCY_CONFLICT')requireOk(replay);
     const snapshot=await runAutomatic(repo,requireOk(await repo.service('load')));
     const prepared=await prepareMutation(snapshot,body.type,body.payload,body.attemptId,repo);
-    if(!prepared.ok)return respond({...envelope(snapshot),ok:false,code:'DOMAIN_REJECTED',message:prepared.result.message,result:prepared.result});
+    if(!prepared.ok){
+     if(!terminalFinancialActions.has(body.type))return respond({...envelope(snapshot),ok:false,code:'DOMAIN_REJECTED',message:prepared.result.message,result:prepared.result});
+     const declined=await repo.service('decline',{type:body.type,attemptId:body.attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:snapshot.account.balance,code:'DOMAIN_REJECTED',result:{ok:false,message:String(prepared.result.message||'This payment was declined.').slice(0,1000)},pin:body.pin,...(verifiedChallengeId?{verifiedChallengeId}:{})});
+     if(declined.code==='REVISION_CONFLICT')continue;
+     requireOk(declined);return respond(attemptEnvelope(declined,{replayed:declined.replayed===true}));
+    }
     const committed=await repo.service('commit',{attemptId:body.attemptId,fingerprint,expectedRevision:snapshot.revision,expectedWallet:prepared.expectedWallet,state:prepared.durableState,groups:prepared.groups,boxes:prepared.boxes,intents:prepared.intents,requiresAuth:prepared.requiresAuth,requests:prepared.requests,privateReports:prepared.privateReports,closeAccount:prepared.closeAccount,partners:prepared.partners,profileChange:prepared.profileChange,result:prepared.result,pin:body.pin,...(verifiedChallengeId?{verifiedChallengeId}:{})});
     if(committed.code==='REVISION_CONFLICT')continue;
+    if(committed.terminal===true&&committed.result?.ok===false)return respond(attemptEnvelope({snapshot:committed.snapshot||snapshot,result:committed}));
     requireOk(committed);if(availability&&monitored.length)await availability.observe(monitored);return respond(envelope(committed.snapshot,committed.result,{postedReceipts:committed.receipts||[],replayed:committed.replayed===true}));
    }
    throw failure('REVISION_CONFLICT',null,409);

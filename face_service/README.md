@@ -22,14 +22,40 @@ database retention policy; removal does not claim immediate backup erasure.
 
 ## Recovery boundary
 
-The existing private recovery key remains required. The access service checks
-the account, key, request revision, and attempt limit before fetching the
-encrypted template. A database attempt is reserved before inference. A signed
-successful comparison yields a single-use database proof; the client cannot
-supply a score or verdict. Password reset and recovery-key rotation preserve
-the face template while invalidating old requests and grants. Removal preserves
-the private-key and simulated-SMS routes, including creation of a replacement
-key after a completed reset.
+The approved sandbox uses saved-face recovery without a recovery key. It is
+selected only by trusted server configuration for the approved pilot project
+with sandbox providers. Key and simulated-SMS paths remain disabled in that
+prototype flow. The separate protected recovery service retains its existing
+key requirements; clients cannot select or downgrade the service.
+
+The access service checks the account, request revision and attempt limit before
+fetching the encrypted template. A database attempt is reserved before inference.
+A signed successful comparison yields a single-use database proof; the client
+cannot supply a score or verdict. Password reset preserves the face template and
+invalidates old requests, grants and sessions. Explicit removal requires a fresh
+password proof and clears template ciphertext and biometric digest linkage.
+
+A separately staged 2.14 capability additionally binds a reset execution to
+server-only Auth metadata. It is disabled by default and explicitly disabled in
+the active access entrypoint (`resetFenceEnabled:false`). Its managed Auth DDL
+was rejected by automatic approval review pending hosted Auth and multiprocess
+staging proof. The compatible release keeps the original guarded access7 reset
+protocol and does not send execution markers or reconciliation commands.
+
+When that separate capability is enabled after approval, a deferred database fence confirms the original password write in the
+same Auth transaction, so a lost HTTP acknowledgement can finish session cleanup
+without a second password write. Governed MFA-protected support operations can
+finalize an exactly matched applied execution or cancel an unapplied marked
+execution. Unmarked legacy uncertainty remains locked for investigation. These
+changes require reviewed migrations and coordinated release before use; this
+document does not establish that a hosted deployment has applied them.
+
+The candidate adds immediate template expiry checks, hourly bounded cleanup,
+abandoned-capture cleanup, consent-withdrawal erasure and consumer-account-close
+erasure. Its engineering defaults are 365 days for active enrollment and one day
+for abandoned staging. Production retention periods, backup expiry and encryption
+key destruction remain operational policy decisions. Closing a personal account
+does not erase an independently consented merchant enrollment or financial records.
 
 Exact reuse of enrolled JPEG bytes is rejected. This is not a presentation
 attack detection system: an altered photo, video, mask, or injected camera feed
@@ -80,7 +106,8 @@ timestamp within 60 seconds. Its response HMAC additionally binds the request
 ID and request-body hash. The Edge client pins the exact HTTPS endpoint,
 rejects redirects, limits response size, and fails closed on timeout or any
 invalid response. Missing configuration disables face enrollment and recovery
-without falling back to simulated face approval. Key/SMS recovery remains.
+without falling back to simulated face approval. In the keyless sandbox, recovery
+remains unavailable until saved-face processing is restored.
 
 Apply the reviewed stored-face migration before replacing `lumo-access`, then
 deploy the matcher with configured secrets and test an authorized synthetic

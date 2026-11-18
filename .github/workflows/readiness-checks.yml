@@ -1,0 +1,90 @@
+name: Lumo readiness checks
+
+on:
+  pull_request:
+  push:
+    branches: [main, feat/readiness-2.14.0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readiness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  application-and-database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            verification/package-lock.json
+      - name: Install pinned verification dependencies
+        run: |
+          npm ci --ignore-scripts --prefix backend
+          npm ci --ignore-scripts --prefix verification
+      - name: Consumer journeys and contracts
+        run: npm test
+      - name: Merchant, cashier and loyalty
+        run: npm test --prefix merchant-approved
+      - name: Backend controls
+        run: npm test --prefix backend
+      - name: Complete clean schema and transactional SQL fixtures
+        run: |
+          node scripts/verify-clean-database.mjs
+          node scripts/verify-clean-database.mjs --fixtures
+      - name: Actual financial and merchant SQL plus HTTP regressions
+        env:
+          LUMO_PGLITE_MODULE: ${{ github.workspace }}/verification/node_modules/@electric-sql/pglite/dist/index.js
+        run: |
+          node backend/verification/readiness-2.14.0/financial-regressions.mjs
+          node backend/verification/readiness-2.14.0/merchant-read-scaling.mjs
+          node backend/verification/readiness-2.14.0/independent-security-rollout.mjs
+      - name: Install pinned browser
+        working-directory: verification
+        run: npx playwright install --with-deps chromium
+      - name: Browser acceptance with synthetic local data
+        working-directory: verification
+        run: npx playwright test --config browser/playwright.config.mjs
+      - name: Public-shell generation and source hygiene
+        run: |
+          node scripts/build-offline-shell.mjs
+          git diff --exit-code -- dist/sw.js
+          git diff --check
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: synthetic-browser-evidence
+          path: verification/browser-results
+          if-no-files-found: ignore
+          retention-days: 14
+  face-boundaries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Real model inference and signed internal protocol
+        run: |
+          python -m pip install -r requirements.txt
+          python scripts/fetch-face-models.py
+          python scripts/fetch-face-test-fixtures.py
+          python -m unittest face_service.tests.test_face_service -v
+          FACE_TEST_PYTHON=python node face_service/tests/test_provider_integration.mjs

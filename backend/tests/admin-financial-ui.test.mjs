@@ -39,3 +39,19 @@ test('the owned queue can render before its generation-checked parent is attache
  const strings=[];const walk=n=>{if(typeof n==='string')strings.push(n);else for(const c of n.children||[])walk(c);};walk(main);
  assert.ok(strings.some(s=>s.includes('No exceptions recorded')));assert.ok(!strings.includes('Loading accountable records…'));
 });
+test('refund queue pagination is independent and every one of 101 outstanding rows is reachable',async()=>{
+ const calls=[],seen=new Set(),main=el('main');
+ const financial=createFinancialConsole({rpc:async(command,payload)=>{
+  calls.push({command,payload});const start=(payload.refundPage-1)*25;
+  return {rows:[],total:0,refundTotal:101,refundPage:payload.refundPage,refundHasMore:payload.refundPage<5,refunds:Array.from({length:Math.min(25,101-start)},(_,i)=>({id:'refund-'+(start+i),amount:start+i+1,status:'pending'}))};
+ },el,button,field,money:String,date:String,badge:String,openDialog(){},closeDialog(){},toast(){},reload(){},getStaff:()=>({id:actorA,role:'finance'})});
+ const strings=()=>{const out=[];const walk=n=>{if(typeof n==='string')out.push(n);else for(const c of n?.children||[])walk(c);};walk(main);return out;};
+ const next=()=>{let found;const walk=n=>{if(n?.tag==='button'&&n.children.includes('Next refunds'))found=n;for(const c of n?.children||[])walk(c);};walk(main);return found;};
+ await financial.renderQueue(main);
+ for(let page=1;page<=5;page++){
+  assert.ok(strings().includes('Refund page '+page+' · 101 outstanding refunds'));
+  for(const v of strings())if(/^\d+$/.test(v))seen.add(Number(v));
+  if(page<5)await next().onclick();else assert.equal(next(),undefined);
+ }
+ assert.equal(seen.size,101);assert.deepEqual(calls.map(x=>x.payload.refundPage),[1,2,3,4,5]);assert.ok(calls.every(x=>x.payload.page===1&&x.payload.refundPageSize===25));
+});

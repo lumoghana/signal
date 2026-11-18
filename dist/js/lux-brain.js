@@ -4,6 +4,7 @@ import { paymentTransactions, merchantRefundTransactions, getSpendingPeriod, get
 import { readChatAmount, stampFinancialAnswer, financialInputAmbiguity } from './chat-action-model.js';
 import { cash, dateLabel } from './ui.js';
 import { getMaintenanceChatAnswer, maintenanceQuestionTask } from './chat-maintenance.js';
+import {parseIouQuestion} from './iou-question.js';
 
 // A language model may select a read tool. Only this module calculates money,
 // chooses app routes, and creates answer cards. No tool can commit an action.
@@ -79,6 +80,7 @@ export function validateLuxPlan(input, question, context = {}) {
 export function planLuxQuestion(question, { messages = [] } = {}) {
   const maintenanceTask = maintenanceQuestionTask(question);
   if (maintenanceTask) return { task: maintenanceTask };
+  if(parseIouQuestion(question,{previousDirection:previousAnswer(messages)?.context?.iouDirection}))return {task:'legacy'};
   const q = normal(numericWords(question)), prior = previousPlan(messages), amounts = amountsIn(question);
   const follow = /^(?:and|what about|how about|instead|actually|make (?:it|that)|just|only|why|how|what if|so|then|yes|no)\b/.test(q) || /^\d[\d.,]*(?:\s*cedis?)?[?.!]*$/.test(q);
   let subject = /lunch|breakfast|dinner|food|g[oɔ]b[eɛ]|waakye|jollof|trotro|tro tro|transport|bolt|uber|data|airtime|internet|bundle/.exec(q)?.[0] || '';
@@ -165,7 +167,8 @@ export function executeLuxPlan(state,question,plan,{messages=[],now=new Date(),m
   if(isPrivateLuxQuestion(question)) return {...clarify('Keep that detail private.', 'Use Lumo’s secure account controls for PINs, passwords and identity details. Don’t put them in the chat.'),engine:mode};
   const maintenance = getMaintenanceChatAnswer(state, question, { now });
   if (maintenance) return { ...stampFinancialAnswer(state, maintenance, question, now), sourceQuestion: question, luxPlan: { task: maintenanceQuestionTask(question) }, engine: mode };
-  let p=financialInputAmbiguity(question)==='currency'?{task:'legacy'}:plan||planLuxQuestion(question,{messages}),answer;
+  const iou=parseIouQuestion(question,{now,previousDirection:previousAnswer(messages)?.context?.iouDirection});
+  let p=financialInputAmbiguity(question)==='currency'||iou?{task:'legacy'}:plan||planLuxQuestion(question,{messages}),answer;
   if(p.task==='compare') answer=compare(state,p,now);
   else if(p.task==='recurring') answer=recurring(state,p,now);
   else if(p.task==='patterns') answer=patterns(state,p,now);

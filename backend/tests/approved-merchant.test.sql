@@ -17,11 +17,11 @@ begin
  (staff_id,'authenticated','authenticated','ms_'||suffix||'@pilot.lumo.invalid','{"lumo_pilot":true}',now(),now(),now());
  insert into auth.sessions(id,user_id,created_at,updated_at) values(owner_session,owner_id,now(),now()),(payer_session,payer_id,now(),now()),(staff_session,staff_id,now(),now());
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
- out:=public.lumo_approved_service('provision',jsonb_build_object('actor',owner_id,'session',owner_session,'handle','mo_'||suffix,'displayName','Merchant Owner','pin',pin));
+ out:=public.lumo_approved_service('provision',jsonb_build_object('mode','merchant','actor',owner_id,'session',owner_session,'handle','mo_'||suffix,'displayName','Merchant Owner','pin',pin));
  perform pg_temp.merchant_assert(out->>'ok'='true','owner shared identity provisioned');
- out:=public.lumo_approved_service('provision',jsonb_build_object('actor',payer_id,'session',payer_session,'handle','mp_'||suffix,'displayName','Payer','pin',pin));
+ out:=public.lumo_approved_service('provision',jsonb_build_object('mode','consumer','actor',payer_id,'session',payer_session,'handle','mp_'||suffix,'displayName','Payer','pin',pin));
  perform pg_temp.merchant_assert(out->>'ok'='true','consumer shared identity provisioned');
- out:=public.lumo_approved_service('provision',jsonb_build_object('actor',staff_id,'session',staff_session,'handle','ms_'||suffix,'displayName','Cashier','pin',pin));
+ out:=public.lumo_approved_service('provision',jsonb_build_object('mode','merchant','actor',staff_id,'session',staff_session,'handle','ms_'||suffix,'displayName','Cashier','pin',pin));
  perform pg_temp.merchant_assert(out->>'ok'='true','staff shared identity provisioned');
  loaded:=public.lumo_approved_merchant_read(owner_id,owner_session);doc:=loaded->'state';
  business:=jsonb_build_object('version',1,'business',jsonb_build_object('id',merchant_id,'name','Merchant fixture','ownerName','Owner','accountNumber','9900'||suffix,'sandbox',true),

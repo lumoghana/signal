@@ -1,0 +1,52 @@
+{
+  "consumerExperience": "2.14.0",
+  "apkVersion": "2.14.0",
+  "apkVersionCode": 21400,
+  "apkSha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b",
+  "apkBytes": 4645839,
+  "apkDownload": "/downloads/Lumo-Test-Android.apk",
+  "providerMode": "sandbox",
+  "liveProviderLookup": false,
+  "physicalHandsetVerified": false,
+  "passwordRecovery": {
+    "cameraCapture": "actual-camera-jpeg",
+    "faceMatching": "stored-template",
+    "faceSimulation": false,
+    "faceTemplateStorage": "server-only-aes-256-gcm",
+    "rawSelfieImagesRetained": false,
+    "livenessVerified": false,
+    "productionIdentityVerified": false,
+    "requiresPrivateRecoveryKey": false,
+    "legacyReEnrollmentRequired": true,
+    "faceRemovalRequiresCurrentPassword": true,
+    "niaMode": "simulation",
+    "sms": "disabled-for-prototype-recovery",
+    "livenessSimulation": true,
+    "livenessMode": "prototype-simulation",
+    "recoveryMode": "prototype-face-only",
+    "prototypeOnly": true,
+    "productionKeylessRecoveryAllowed": false
+  },
+  "loyalty": {
+    "version": "1.1.0",
+    "consumerTracking": true,
+    "explicitMembershipConsent": true,
+    "marketingConsentSeparate": true,
+    "existingMembershipLink": "merchant-issued-one-time-code",
+    "claimCodeMinutes": 10,
+    "autoEarningIdentity": "authenticated-purchaser",
+    "discountPayments": "canonical-positive-net-request",
+    "guestPhoneMatching": false,
+    "merchantOwnedProgramme": true
+  },
+  "readiness": {
+    "release": "2.14.0",
+    "providerMode": "sandbox",
+    "productionFundsEnabled": false,
+    "browserSession": "canonical-origin-http-only",
+    "terminalDeclinesDurable": true,
+    "scheduledWorkerMandateGuard": true,
+    "liveLaunchEvidence": "required-before-live-funds",
+    "physicalHandsetVerified": false
+  }
+}

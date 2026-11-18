@@ -13,6 +13,23 @@ const prepare=(saved,payload)=>prepareMutation(saved,'activationCheckpoint',payl
 function funded(){const saved=snapshot(50000);saved.receipts=[receipt('first-top-up','test_funding',{transactionId:'first-funding',amount:50000})];saved.state.transactions=[{id:'first-funding',type:'income',direction:'in',amount:50000,status:'success',merchant:'Pilot test funds',category:'Income',rail:'internal',at:'2026-11-13T10:00:00.000Z',note:'Added to your available money'}];return saved;}
 function persist(saved,prepared){assert.equal(prepared.ok,true);assert.deepEqual(prepared.intents,[]);assert.deepEqual(prepared.groups,[]);saved.state=clone(prepared.durableState);saved.revision++;return saved;}
 
+test('long receipt history hydrates once by journal identity while authored notes and categories survive',()=>{
+ const saved=snapshot(750);saved.receipts=Array.from({length:750},(_,i)=>receipt('history-'+i,'transfer',{amount:1,payerName:'Synthetic sender'}));
+ const first=buildState(saved),authored=first.transactions.filter((_,i)=>i%10===0);
+ for(const [i,tx]of authored.entries()){tx.id='authored-history-'+i;tx.note='Personal note '+i;tx.category='Education';tx.reaction='💚';}
+ saved.state=first;saved.account.balance=775;saved.receipts.unshift(receipt('new-history','transfer',{amount:25,payerName:'New sender'}));
+ // An overlapping feed page contains the same canonical journal twice.
+ saved.receipts.push(clone(saved.receipts[30]));
+ const refreshed=buildState(saved);
+ assert.equal(refreshed.transactions.length,751);assert.equal(new Set(refreshed.transactions.map(tx=>tx.ledgerJournalId)).size,751);
+ assert.equal(refreshed.transactions[0].ledgerJournalId,'new-history');assert.equal(refreshed.wallet,775);
+ for(const [i,tx]of authored.entries()){
+  const actual=refreshed.transactions.find(row=>row.ledgerJournalId===tx.ledgerJournalId);
+  assert.equal(actual.id,tx.id);assert.equal(actual.note,'Personal note '+i);assert.equal(actual.category,'Education');assert.equal(actual.reaction,'💚');
+ }
+ assert.equal(saved.state.transactions.length,750,'Hydration does not mutate the original snapshot');
+});
+
 test('incoming Activity uses the real counterparty and sender note with approved Income vocabulary',()=>{
  const saved=snapshot(1700);saved.receipts=[receipt('transfer-1','transfer',{amount:1700,payerName:'Kojo Mensah',payerHandle:'kojo.2',note:'Lunch share'})];
  const tx=buildState(saved).transactions[0];

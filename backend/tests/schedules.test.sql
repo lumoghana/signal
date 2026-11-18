@@ -5,7 +5,10 @@ begin if p_value is distinct from true then raise exception 'Schedule integratio
 create function pg_temp.schedule_call(p_command text,p_payload jsonb default '{}') returns jsonb language plpgsql as $$
 declare r jsonb;begin
  if p_command not in ('account.open','account.get','schedule.list') and not(p_payload?'attemptId') then p_payload:=p_payload||jsonb_build_object('attemptId','schedule-'||gen_random_uuid()::text);end if;
- execute 'set local role authenticated';r:=public.lumo_rpc(p_command,p_payload);execute 'reset role';return r;
+ execute 'set local role authenticated';r:=public.lumo_rpc(p_command,p_payload);execute 'reset role';
+ -- Explicit synthetic personal enrolment: legacy account.open alone is not a personal-payment identity.
+ if p_command='account.open' and r->>'ok'='true' then insert into lumo_private.approved_profiles(user_id,personal_account) values(auth.uid(),true) on conflict(user_id) do update set personal_account=true;end if;
+ return r;
  exception when others then execute 'reset role';raise;end $$;
 create function pg_temp.schedule_actor(p_user uuid,p_session uuid) returns void language sql as $$select set_config('request.jwt.claims',jsonb_build_object('sub',p_user,'role','authenticated','session_id',p_session)::text,true);$$;
 do $$

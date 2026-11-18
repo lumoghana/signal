@@ -1,5 +1,7 @@
+import {trustedWebProxyIp} from '../lumo-approved/web-proxy-context.mjs';
 import {createSandboxProviders} from './sandbox-providers.mjs';
 import {createFaceTemplateProvider} from './face-template-provider.mjs';
+import {createPasswordPolicy} from '../lumo-approved/password-policy.mjs';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 const HEX=/^[a-f0-9]{64}$/;
@@ -19,7 +21,8 @@ const messages={
  SESSION_REVOKED:'Your session ended. Sign in again.',
  FORBIDDEN:'This account cannot use that recovery module.',
  PASSWORD_INCORRECT:'Your current password could not be confirmed.',
- PASSWORD_REJECTED:'Use a longer password containing letters and numbers.',
+ PASSWORD_REJECTED:'Choose a longer, less predictable password. Try a few unrelated words.',
+ PASSWORD_POLICY_UNAVAILABLE:'Password screening is unavailable. Try again later.',
  RECOVERY_FAILED:'This recovery proof could not be confirmed. Check your saved recovery key or start again.',
  RECOVERY_UNAVAILABLE:'Recovery is not set up for these details. Sign in or contact Lumo support.',
  RECOVERY_EXPIRED:'This recovery request expired. Start again.',
@@ -47,10 +50,6 @@ function claims(token){
  try{const part=token.split('.')[1];if(!part||part.length>12000)throw Error();return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(part.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))));}
  catch{throw failure('AUTH_REQUIRED',401);}
 }
-function validPassword(value,module){
- return typeof value==='string'&&value.length>=(module==='admin'?12:10)&&value.length<=(module==='admin'?72:128)
-  &&(module!=='admin'||encoder.encode(value).byteLength<=72)&&/[A-Za-z]/.test(value)&&/[0-9]/.test(value);
-}
 function backup(value){return typeof value==='string'&&value.length>=16&&value.length<=512&&!/[\u0000-\u001f\u007f]/.test(value);}
 function photoInput(value){
  if(!Array.isArray(value)||value.length!==3||value.some(photo=>typeof photo!=='string'||photo.length>349551||!photo.startsWith('data:image/jpeg;base64,')))throw failure('INVALID_INPUT');
@@ -75,12 +74,18 @@ async function jsonBody(request){
  * logged or returned. Reset grants are account-bound and one-use.
  */
 export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[],providerMode='disabled',
- fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,providers,faceTemplateProvider,faceProcessorUrl='',faceProcessorSecret='',prototypeFaceOnly=false,now=Date.now,timeoutMs=15000,maxResponseBytes=65536}={}){
+ fetch:transport=globalThis.fetch,crypto:cryptoApi=globalThis.crypto,providers,faceTemplateProvider,faceProcessorUrl='',faceProcessorSecret='',prototypeFaceOnly=false,now=Date.now,timeoutMs=15000,maxResponseBytes=65536,passwordPolicyMode='pilot',checkPasswordBreach,webProxyPublicKeys,resetFenceEnabled=false}={}){
  const base=new URL(supabaseUrl);
  if(base.protocol!=='https:'||base.pathname!=='/'||base.search||base.hash||!serviceRoleKey||!cryptoApi?.subtle||!Number.isSafeInteger(timeoutMs)||timeoutMs<10||timeoutMs>15000||!Number.isSafeInteger(maxResponseBytes)||maxResponseBytes<1024||maxResponseBytes>262144)throw Error('Invalid access service configuration.');
  const origins=new Set(allowedOrigins);
+ const assertNewPassword=createPasswordPolicy({mode:passwordPolicyMode,checkBreach:checkPasswordBreach});
  const prototypeAllowed=prototypeFaceOnly===true&&providerMode==='sandbox'&&base.hostname==='iwutbrljiiodamtyoorg.supabase.co';
  const keyless=prototypeAllowed;
+ // F05 is staged only. A browser payload cannot enable the Auth write fence.
+ // Keep the deployed access7 single-writer protocol until managed Auth staging
+ // and its separately reviewed database capability are approved.
+ if(typeof resetFenceEnabled!=='boolean')throw Error('Invalid reset fence configuration.');
+ const fencedReset=keyless&&resetFenceEnabled;
  const unavailablePrototype=prototypeFaceOnly===true&&!prototypeAllowed;
  const provider=providerMode==='sandbox'?(providers||createSandboxProviders({enabled:true,crypto:cryptoApi,now})):null;
  const ready=!unavailablePrototype&&providerMode==='sandbox'&&provider?.available===true&&provider.environment==='sandbox'&&provider.simulation===true;
@@ -174,7 +179,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
    if(!MODULES.has(module)||typeof operation!=='string')throw failure('INVALID_INPUT');
    if(!ready)throw failure('IDENTITY_UNAVAILABLE',503);
    if(keyless&&['smsVerify','keyVerify','keyRotate'].includes(operation))throw failure('RECOVERY_UNAVAILABLE');
-   const ip=request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim()||'native-or-unknown';
+   const ip=await trustedWebProxyIp(request,body,{now,cryptoApi,publicKeys:webProxyPublicKeys})||request.headers.get('cf-connecting-ip')||request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim()||'native-or-unknown';
    const rateKey=await hash('lumo-access-client-v1\0'+ip.slice(0,160));
    const authenticated=PRIVATE.has(operation)||operation==='status'&&request.headers.has('authorization');
    const who=authenticated?await identify(request.headers.get('authorization')?.match(/^Bearer (.+)$/)?.[1],module):null;
@@ -182,7 +187,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
    const values=keys=>{if(!exact(body,['module','operation',...keys]))throw failure('INVALID_INPUT');};
    if(operation==='status'){
     values([]);const status=who?await rpc('status',who.identity):null;
-    return respond({ok:true,...labels,smsAvailable:!keyless,faceAvailable:faceProvider.available===true,backupKeyAvailable:!keyless,passwordPolicy:{minLength:module==='admin'?12:10,maxLength:module==='admin'?72:128,...(module==='admin'?{maxBytes:72}:{}),lettersAndNumbers:true},...(who?{enrollment:publicEnrollment(status.enrollment)}:{})});
+    return respond({ok:true,...labels,smsAvailable:!keyless,faceAvailable:faceProvider.available===true,backupKeyAvailable:!keyless,passwordPolicy:{minLength:module==='admin'?12:10,maxLength:module==='admin'?72:128,...(module==='admin'?{maxBytes:72}:{}),lettersAndNumbers:false,commonPasswordsBlocked:true},...(who?{enrollment:publicEnrollment(status.enrollment)}:{})});
    }
    if(operation==='enrollmentStart'){
     values(['currentPassword','photos','phone','faceConsent']);photoInput(body.photos);
@@ -264,16 +269,37 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
    }
    if(operation==='complete'){
     values(['requestId','resetToken','newPassword']);
-    if(!UUID.test(body.requestId||'')||typeof body.resetToken!=='string'||!TOKEN.test(body.resetToken)||!validPassword(body.newPassword,module))throw failure('INVALID_INPUT');
+    if(!UUID.test(body.requestId||'')||typeof body.resetToken!=='string'||!TOKEN.test(body.resetToken))throw failure('INVALID_INPUT');
+    await assertNewPassword(body.newPassword,{module});
     const payload={module,requestId:body.requestId,resetTokenHash:await resetHash(module,body.requestId,body.resetToken),passwordFingerprint:await passwordFingerprint(module,body.requestId,body.newPassword)};
-    const begun=await rpc(keyless?'complete.claim':'complete.begin',{...payload,...(keyless?{executionId:cryptoApi.randomUUID()}:{})});
+    let begun;
+    try{begun=await rpc(keyless?'complete.claim':'complete.begin',{...payload,...(keyless?{executionId:cryptoApi.randomUUID(),...(fencedReset?{markerVersion:1}:{})}:{})});}
+    catch(error){
+     if(!fencedReset||error.code!=='RESET_IN_PROGRESS')throw error;
+     // Observe the same external write; never issue another password PUT. The
+     // database first requires its server-only atomic Auth execution marker.
+     const observed=await rpc('complete.reconcile.begin',{...payload,rateKey});
+     if(!UUID.test(observed.ownerId||'')||!UUID.test(observed.executionId||'')||typeof observed.email!=='string'
+      ||module!=='admin'&&(!HANDLE.test(observed.handle||'')||observed.email!==observed.handle+'@pilot.lumo.invalid'))throw failure('RESET_IN_PROGRESS',409);
+     let proof;
+     try{
+      const checked=await upstream('/auth/v1/token?grant_type=password',{email:observed.email,password:module==='admin'?body.newPassword:await approvedPassword(observed.handle,body.newPassword)},{allowFailure:true});
+      if(!checked.ok||typeof checked.data?.access_token!=='string')throw failure('RESET_IN_PROGRESS',409);
+      proof=checked.data.access_token;const claim=claims(proof);
+      if(claim.sub!==observed.ownerId||!UUID.test(claim.session_id||''))throw failure('RESET_IN_PROGRESS',409);
+      await rpc('complete.reconcile.confirm',{...payload,rateKey,executionId:observed.executionId,proofSession:claim.session_id});
+      begun={resetState:'completed'};
+     }finally{if(proof)try{await upstream('/auth/v1/logout?scope=local',{}, {token:proof,allowFailure:true});}catch{/* finish revokes this proof with all other sessions. */}}
+    }
     if(begun.resetState!=='completed'){
      if(!UUID.test(begun.ownerId||'')||typeof begun.email!=='string'||module!=='admin'&&(!HANDLE.test(begun.handle||'')||begun.email!==begun.handle+'@pilot.lumo.invalid'))throw failure('RESET_IN_PROGRESS',409);
      if(keyless&&(!UUID.test(begun.executionId||'')||!['applying','confirming'].includes(begun.resetState)))throw failure('RESET_IN_PROGRESS',409);
      const executionPayload={...payload,...(keyless?{executionId:begun.executionId}:{})};
      try{
       if(!keyless||begun.resetState!=='confirming'){
-       const changed=await upstream('/auth/v1/admin/users/'+begun.ownerId,{password:module==='admin'?body.newPassword:await approvedPassword(begun.handle,body.newPassword)},{method:'PUT',allowFailure:true});
+       // Auth merges app_metadata keys; only our marker is updated, never a
+       // stale copy of roles/provider flags. Password and marker commit together.
+       const changed=await upstream('/auth/v1/admin/users/'+begun.ownerId,{password:module==='admin'?body.newPassword:await approvedPassword(begun.handle,body.newPassword),...(fencedReset?{app_metadata:{lumo_reset_execution:begun.executionId}}:{})},{method:'PUT',allowFailure:true});
        if(!changed.ok||changed.data?.id!==begun.ownerId){
         // Only a definite Auth rejection releases execution authority. A timeout,
         // 5xx or malformed success can conceal an applied/pending write.
@@ -291,7 +317,7 @@ export function createAccessHandler({supabaseUrl,serviceRoleKey,allowedOrigins=[
   }catch(error){
    const code=error?.code==='SANDBOX_INVALID_INPUT'?'INVALID_INPUT':Object.hasOwn(messages,error?.code)?error.code:'SERVICE_UNAVAILABLE';
    const status=Number.isInteger(error?.status)&&error.status>=400&&error.status<=599?error.status:503;
-   return respond({ok:false,...(ready?labels:{}),code,message:keyless&&['RECOVERY_FAILED','FACE_SETUP_REQUIRED','IDENTITY_UNAVAILABLE','RECOVERY_UNAVAILABLE','RESET_IN_PROGRESS'].includes(code)?({RECOVERY_FAILED:'Your saved face could not be confirmed. Retake your selfies or contact Lumo support.',FACE_SETUP_REQUIRED:'Sign in and save a new face profile before using face recovery.',IDENTITY_UNAVAILABLE:'Face verification is unavailable. Try again later.',RECOVERY_UNAVAILABLE:'Face recovery is unavailable for these details. Sign in or contact Lumo support.',RESET_IN_PROGRESS:'A password update is awaiting confirmation. Wait a moment and retry this step. If it stays pending, contact Lumo support.'}[code]):messages[code],...(Number.isSafeInteger(error?.retryAfter)?{retryAfter:Math.max(1,Math.min(error.retryAfter,3600))}:{})},status);
+   return respond({ok:false,...(ready?labels:{}),code,message:code==='PASSWORD_REJECTED'&&typeof error.message==='string'?error.message:keyless&&['RECOVERY_FAILED','FACE_SETUP_REQUIRED','IDENTITY_UNAVAILABLE','RECOVERY_UNAVAILABLE','RESET_IN_PROGRESS'].includes(code)?({RECOVERY_FAILED:'Your saved face could not be confirmed. Retake your selfies or contact Lumo support.',FACE_SETUP_REQUIRED:'Sign in and save a new face profile before using face recovery.',IDENTITY_UNAVAILABLE:'Face verification is unavailable. Try again later.',RECOVERY_UNAVAILABLE:'Face recovery is unavailable for these details. Sign in or contact Lumo support.',RESET_IN_PROGRESS:'A password update is awaiting confirmation. Wait a moment and retry this step. If it stays pending, contact Lumo support.'}[code]):messages[code],...(Number.isSafeInteger(error?.retryAfter)?{retryAfter:Math.max(1,Math.min(error.retryAfter,3600))}:{})},status);
   }
  };
 }

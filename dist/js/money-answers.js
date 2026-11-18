@@ -2,6 +2,7 @@ import { getSummary, getGuidanceHorizon, evaluatePayment, budgetCategoryKey } fr
 import { cash, dateLabel } from './ui.js';
 import { readChatAmount, financialInputAmbiguity, clarifyFinancialInput } from './chat-action-model.js';
 import { getOutsideFreshness } from './money-maintenance-model.js';
+import {parseIouQuestion,getIouMoneyAnswer} from './iou-question.js';
 
 function n(value) { return Number.isFinite(Number(value)) ? Number(value) : 0; }
 function sum(items, fn) { return items.reduce((total, item) => total + n(fn(item)), 0); }
@@ -177,6 +178,8 @@ export function getMoneyAnswer(state, question, now = new Date()) {
   const q = String(question).trim().toLowerCase();
   const generalSpendQuestion = /^(?:what|how much)(?: money)? can i (?:spend|use)(?:(?: in| from)? lumo)?(?: now)?[.!?\s]*$/.test(q);
   if (financialInputAmbiguity(q) === 'currency') return clarifyFinancialInput('currency');
+  const iou=parseIouQuestion(question,{now});
+  if(iou)return getIouMoneyAnswer(state,iou);
   const summary = summaryOf(state, now);
   const amount = amountIn(q);
   const buffer = n(state.buffer);

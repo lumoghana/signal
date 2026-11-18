@@ -1,3 +1,4 @@
+import {trustedWebProxyIp} from './web-proxy-context.mjs';
 import {lookupGuestPayer} from './guest-payer-lookup.mjs';
 
 const TOKEN=/^[a-f0-9]{64}$/;
@@ -16,7 +17,7 @@ export function validateGuestProviderResult(result,attempt){
  return ['approved','declined','cancelled','pending'].includes(result.status);
 }
 
-export function createGuestCheckout({serviceRpc,crypto:cryptoApi=globalThis.crypto}){
+export function createGuestCheckout({serviceRpc,crypto:cryptoApi=globalThis.crypto,webProxyPublicKeys}){
  if(typeof serviceRpc!=='function')throw Error('Guest checkout needs its private service RPC.');
  return async(body,request)=>{
   const operation=body.operation,allowed=fields[operation];
@@ -39,7 +40,7 @@ export function createGuestCheckout({serviceRpc,crypto:cryptoApi=globalThis.cryp
    if(!['approve','decline','delay','cancel'].includes(body.outcome))throw failure('INVALID_INPUT');
    payload.outcome=body.outcome;
   }
-  const ip=(request?.headers?.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';
+  const ip=await trustedWebProxyIp(request,body,{cryptoApi,publicKeys:webProxyPublicKeys})||(request?.headers?.get('x-forwarded-for')||'unknown').split(',').at(-1).trim().slice(0,160)||'unknown';
   payload.rateKey=await guestHash('lumo-guest-rate-v1:'+ip,cryptoApi);
   const result=await serviceRpc('lumo_guest_checkout',{p_operation:operation,p_payload:payload});
   if(!result?.ok)throw failure(result?.code||'PROVIDER_UNAVAILABLE',errors[result?.code],result?.code==='RATE_LIMITED'?429:result?.code==='RECOVERY_REQUIRED'?403:400);

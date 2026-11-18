@@ -6,10 +6,14 @@ export const MAIN_TAB_RESUME_MS=5000;
 const tabs=new Set(MAIN_TABS);
 const root=section=>({section,page:'home'});
 const scalarKeys=['section','page','id','step','filter','month','hubTab','list','mode','boxId','edit','editing'];
+const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const membershipId=/^loyalty-member-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function copyRoute(value,depth=0){
   if(!value||typeof value!=='object'||Array.isArray(value)||depth>3)return null;
   const out={};
   for(const key of scalarKeys){const v=value[key];if(typeof v==='string')out[key]=v.slice(0,180);else if(typeof v==='boolean'||Number.isSafeInteger(v))out[key]=v;}
+  for(const key of ['shopId','businessId'])if(typeof value[key]==='string'&&uuid.test(value[key]))out[key]=value[key];
+  if(typeof value.membershipId==='string'&&membershipId.test(value.membershipId))out.membershipId=value.membershipId;
   for(const key of ['backTo','returnTo']){const r=copyRoute(value[key],depth+1);if(r)out[key]=r;}
   return typeof out.section==='string'?out:null;
 }

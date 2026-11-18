@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "scope": "Explicit per-file active59 public-release rationale and evidence. The private unapplied Auth migration and its two stage-only SQL fixtures are not in this export. Active assertion strength and immutable historical baselines are retained.",
+  "changes": {
+    "backend/supabase/functions/lumo-approved/engine.mjs": {
+      "reason": "F18: Index original payment activity by canonical journal ID and prepend hydrated receipt activity once, preserving first-match refund linkage, authored annotations, transaction order and overlap deduplication. This bounds repeated hydration work without truncating canonical history.",
+      "evidence": [
+        "backend/tests/approved-experience.test.mjs",
+        "backend/tests/approved-engine.test.mjs"
+      ],
+      "findings": [
+        "F18"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/handler.mjs": {
+      "reason": "F01/F07/F08/F18: Persist authenticated terminal financial declines under the original actor, reference and fingerprint; preserve correctable PIN/signature failures and revision retries. Apply new-secret policy only to registration, consume verified browser proxy rate context, and gate indexed consumer loyalty reads behind the explicit migration flag.",
+      "evidence": [
+        "backend/tests/terminal-decline-handler.test.mjs",
+        "backend/tests/approved-password-policy.test.mjs",
+        "backend/verification/readiness-2.14.0/financial-regressions.mjs",
+        "tests/web-proxy-context.test.js",
+        "backend/tests/consumer-loyalty-read-scaling.test.mjs"
+      ],
+      "findings": [
+        "F01",
+        "F07",
+        "F08",
+        "F18"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/index.ts": {
+      "reason": "F01/F07/F08/F18: Wire reviewed password environment policy, trusted public proxy verification and migration-gated merchant/loyalty read projections in the deploy entrypoint while retaining existing origins, pilot scope, telemetry and canonical handler.",
+      "evidence": [
+        "backend/tests/approved-password-policy.test.mjs",
+        "tests/web-proxy-context.test.js",
+        "backend/tests/merchant-read-scaling.test.mjs",
+        "backend/tests/consumer-loyalty-read-scaling.test.mjs"
+      ],
+      "findings": [
+        "F01",
+        "F07",
+        "F08",
+        "F18"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/merchant/handler.mjs": {
+      "reason": "F18: Read the normalized public directory and GET-only tenant projection through explicit feature gates while mutations retain the complete compatibility read, revision and ledger-stamp writer. Keep scoped history and private reward binding rules in the existing authenticated path.",
+      "evidence": [
+        "backend/tests/merchant-read-scaling.test.mjs",
+        "backend/verification/readiness-2.14.0/merchant-read-scaling.mjs",
+        "backend/tests/approved-merchant-handler.test.mjs"
+      ],
+      "findings": [
+        "F18"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/consumer-loyalty.mjs": {
+      "reason": "F18: Replace repeated full-network hydration for fixed reward-request context with a migration-gated, indexed service-only point lookup, preserving original purchaser ownership, request amount/status/expiry checks and baseline compatibility when disabled.",
+      "evidence": [
+        "backend/tests/consumer-loyalty-read-scaling.test.mjs",
+        "backend/tests/consumer-loyalty-adversarial.test.mjs",
+        "backend/tests/consumer-loyalty-payer.test.sql"
+      ],
+      "findings": [
+        "F18"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/password-policy.mjs": {
+      "reason": "F07: Enforce new-secret strength and account-context checks without breaking legacy login. Production requires an available breach checker and fails closed on missing/unavailable policy evidence.",
+      "evidence": [
+        "backend/tests/approved-password-policy.test.mjs",
+        "tests/password-policy.test.js"
+      ],
+      "findings": [
+        "F07"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/domain/password-policy.js": {
+      "reason": "F07: Share deterministic password checks for common, repeated, numeric and account-related secrets with the web mirror; apply the rule to newly chosen passwords while preserving existing credential verification.",
+      "evidence": [
+        "tests/password-policy.test.js",
+        "backend/tests/approved-password-policy.test.mjs"
+      ],
+      "findings": [
+        "F07"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/password-denylist.mjs": {
+      "reason": "F07: Provide the explicit local common-password denylist used by the new-secret policy so weak predictable secrets are rejected without an unavailable external dependency or a silent production bypass.",
+      "evidence": [
+        "tests/password-policy.test.js",
+        "backend/tests/approved-password-policy.test.mjs"
+      ],
+      "findings": [
+        "F07"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/web-proxy-context.mjs": {
+      "reason": "F08: Verify the browser proxy assertion signature, timestamp, request path and exact body binding before deriving an opaque rate-limit identity. Untrusted or expired assertions cannot replace native request context; the Edge function contains only public verification material.",
+      "evidence": [
+        "tests/web-proxy-context.test.js"
+      ],
+      "findings": [
+        "F08"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/web-proxy-public-keys.mjs": {
+      "reason": "F08: Pin public ES256 verification keys for short-lived browser proxy context. No proxy signing private key or credential enters Edge source, static assets or the reviewed import closure.",
+      "evidence": [
+        "tests/web-proxy-context.test.js"
+      ],
+      "findings": [
+        "F08"
+      ]
+    },
+    "backend/supabase/functions/lumo-access/handler.mjs": {
+      "reason": "F05/F07/F08: Add new-password policy and verified browser rate context while retaining the access7 claim/apply/finish protocol by default. Keep resetFenceEnabled false for deployment compatibility; the original-execution marker and reconciliation protocol are explicitly gated staged code until managed Auth migration approval and staging evidence exist.",
+      "evidence": [
+        "backend/tests/prototype-reset-serialization.test.mjs",
+        "tests/password-policy.test.js",
+        "tests/web-proxy-context.test.js",
+        "backend/tests/access7-compatible-rollout.test.mjs",
+        "backend/verification/readiness-2.14.0/independent-security-rollout.mjs",
+        "backend/tests/admin-readiness-gateway.test.mjs"
+      ],
+      "findings": [
+        "F05",
+        "F07",
+        "F08"
+      ]
+    },
+    "backend/supabase/functions/lumo-access/index.ts": {
+      "reason": "F05/F07/F08: Wire reviewed new-password screening and browser proxy verification while explicitly passing resetFenceEnabled:false, preserving the access7-compatible recovery protocol, existing sandbox-only face mode, origins and upstream authentication boundary. Do not activate the unapproved managed Auth fence from an environment or client override.",
+      "evidence": [
+        "backend/tests/prototype-reset-serialization.test.mjs",
+        "tests/password-policy.test.js",
+        "tests/web-proxy-context.test.js",
+        "backend/tests/access7-compatible-rollout.test.mjs",
+        "backend/verification/readiness-2.14.0/independent-security-rollout.mjs",
+        "backend/tests/admin-readiness-gateway.test.mjs"
+      ],
+      "findings": [
+        "F05",
+        "F07",
+        "F08"
+      ]
+    },
+    "backend/supabase/functions/lumo-admin/handler.mjs": {
+      "reason": "F02/F03/F05/F10: Route exact-revision approvals and MFA policy controls through verified staff identity, role and factor checks. Keep recovery.resets operations disabled by default/index until the staged F05 schema is approved, stopping unsupported requests before SQL. Preserve requester/decider separation and original operational idempotency.",
+      "evidence": [
+        "backend/tests/admin-readiness-gateway.test.mjs",
+        "backend/tests/admin-readiness-controls.test.sql",
+        "backend/verification/readiness-2.14.0/independent-security-rollout.mjs"
+      ],
+      "findings": [
+        "F02",
+        "F03",
+        "F05",
+        "F10"
+      ]
+    },
+    "backend/supabase/functions/lumo-admin/index.ts": {
+      "reason": "F03/F05: Preserve the reviewed admin origins and production MFA override while literally passing recoveryResetsEnabled:false. Unsupported recovery resolution remains stopped at the authenticated gateway until the managed Auth schema is approved; environment or browser payloads cannot activate it.",
+      "evidence": [
+        "backend/tests/admin-readiness-gateway.test.mjs",
+        "backend/verification/readiness-2.14.0/independent-security-rollout.mjs"
+      ],
+      "findings": [
+        "F03",
+        "F05"
+      ]
+    },
+    "backend/supabase/migrations/20261118053952_admin_approval_revision_controls.sql": {
+      "reason": "F02/F10: Bind a financial approval to an exact target revision and consumed execution record, preserve requester/decider separation, and reject stale, self-approved, changed and already-executed targets at the canonical database boundary.",
+      "evidence": [
+        "backend/tests/admin-readiness-controls.test.sql",
+        "backend/tests/review-financial-operations.test.sql"
+      ],
+      "findings": [
+        "F02",
+        "F10"
+      ]
+    },
+    "backend/supabase/migrations/20261118054008_admin_refund_queue_pagination.sql": {
+      "reason": "F12: Paginate and filter the admin refund review queue using scoped canonical payment/refund rows and bounded result pages, retaining role restrictions and truthful counts without truncating financial authority.",
+      "evidence": [
+        "backend/tests/admin-readiness-controls.test.sql"
+      ],
+      "findings": [
+        "F12"
+      ]
+    },
+    "backend/supabase/migrations/20261118054014_admin_mfa_rollout_policy.sql": {
+      "reason": "F03/F05: Add explicit pilot/production MFA policy with fail-closed production enforcement, readiness checks and audited idempotency. Its dormant recovery-resolution branches require private unapplied F05 schema; both active gateways explicitly disable that capability and reject unsupported requests before those RPCs. This migration adds no managed Auth write trigger.",
+      "evidence": [
+        "backend/tests/admin-readiness-controls.test.sql",
+        "backend/tests/admin-readiness-gateway.test.mjs",
+        "backend/verification/readiness-2.14.0/independent-security-rollout.mjs"
+      ],
+      "findings": [
+        "F03",
+        "F05"
+      ]
+    },
+    "backend/supabase/migrations/20261118054020_financial_terminal_declines.sql": {
+      "reason": "F01: Atomically retain authenticated final financial/domain declines under the same actor, request reference and fingerprint as successful outcomes. Verify current snapshot/PIN/device proof and retain only bounded result text, never raw PIN/signature or the full private payload.",
+      "evidence": [
+        "backend/verification/readiness-2.14.0/financial-regressions.mjs",
+        "backend/tests/terminal-decline-handler.test.mjs"
+      ],
+      "findings": [
+        "F01"
+      ]
+    },
+    "backend/supabase/migrations/20261118054212_merchant_read_scaling_boundaries.sql": {
+      "reason": "F18: Maintain allowlisted normalized public-shop and private request indexes, expose service-only GET tenant projections, and align changed-business/staff account prelocks with canonical write skipping. Retain global metadata revision and refund-payer lock union; do not claim independent tenant writes.",
+      "evidence": [
+        "backend/verification/readiness-2.14.0/merchant-read-scaling.mjs",
+        "backend/tests/merchant-read-scaling.test.mjs",
+        "backend/tests/consumer-loyalty-read-scaling.test.mjs"
+      ],
+      "findings": [
+        "F18"
+      ]
+    },
+    "backend/supabase/migrations/20261118054257_scheduled_transfer_worker_proof.sql": {
+      "reason": "F11: Authorize a no-JWT scheduled journal only through its exact posted immutable occurrence and current stored mandate, matching actor, active accounts, amount, due window, completion count and expiry. Arbitrary journals remain rejected and private worker/helper grants stay restricted.",
+      "evidence": [
+        "backend/verification/readiness-2.14.0/financial-regressions.mjs",
+        "backend/tests/schedules.test.sql"
+      ],
+      "findings": [
+        "F11"
+      ]
+    },
+    "backend/supabase/migrations/20261118054343_biometric_retention_and_withdrawal.sql": {
+      "reason": "F21: Add bounded indexed encrypted-biometric retention and consent withdrawal cleanup, skip unresolved external Auth writes, and keep existing prototype liveness disclosures. Retain durable audit evidence while retiring only eligible stored templates, attempts, rate hashes and capability material.",
+      "evidence": [
+        "backend/tests/biometric-retention.test.sql"
+      ],
+      "findings": [
+        "F21"
+      ]
+    },
+    "backend/supabase/migrations/20261114200646_lumo_admin_password_signin.sql": {
+      "reason": "F04: Restore the exact already-applied existing pilot admin password/MFA policy migration omitted from the previous repository export. Preserve live source bytes and migration ordering so a clean database reconstructs the actual baseline; this is source recovery, not a newly applied hosted schema change.",
+      "evidence": [
+        "scripts/verify-clean-database.mjs",
+        "backend/verification/consumer-loyalty-2.13.0/local-ledger.mjs"
+      ],
+      "findings": [
+        "F04"
+      ]
+    },
+    "backend/supabase/migrations/20261114213323_lumo_case_notifications.sql": {
+      "reason": "F04: Restore the exact already-applied existing canonical case notification hooks migration omitted from the previous repository export. Preserve live source bytes and migration ordering so a clean database reconstructs the actual baseline; this is source recovery, not a newly applied hosted schema change.",
+      "evidence": [
+        "scripts/verify-clean-database.mjs",
+        "backend/verification/consumer-loyalty-2.13.0/local-ledger.mjs"
+      ],
+      "findings": [
+        "F04"
+      ]
+    },
+    "backend/supabase/migrations/20261114215411_lumo_case_inbox_recipient_index.sql": {
+      "reason": "F04: Restore the exact already-applied existing case inbox recipient index migration omitted from the previous repository export. Preserve live source bytes and migration ordering so a clean database reconstructs the actual baseline; this is source recovery, not a newly applied hosted schema change.",
+      "evidence": [
+        "scripts/verify-clean-database.mjs",
+        "backend/verification/consumer-loyalty-2.13.0/local-ledger.mjs"
+      ],
+      "findings": [
+        "F04"
+      ]
+    },
+    "backend/supabase/migrations/20261115163214_lumo_access_recovery_sandbox.sql": {
+      "reason": "F04: Restore the exact already-applied existing recovery state machine and credential guards migration omitted from the previous repository export. Preserve live source bytes and migration ordering so a clean database reconstructs the actual baseline; this is source recovery, not a newly applied hosted schema change.",
+      "evidence": [
+        "scripts/verify-clean-database.mjs",
+        "backend/verification/consumer-loyalty-2.13.0/local-ledger.mjs"
+      ],
+      "findings": [
+        "F04"
+      ]
+    },
+    "backend/supabase/migrations/20261115173717_lumo_business_console.sql": {
+      "reason": "F04: Restore the exact already-applied existing staff-scoped business console migration omitted from the previous repository export. Preserve live source bytes and migration ordering so a clean database reconstructs the actual baseline; this is source recovery, not a newly applied hosted schema change.",
+      "evidence": [
+        "scripts/verify-clean-database.mjs",
+        "backend/verification/consumer-loyalty-2.13.0/local-ledger.mjs"
+      ],
+      "findings": [
+        "F04"
+      ]
+    },
+    "backend/supabase/functions/lumo-approved/guest-checkout.mjs": {
+      "reason": "F08: Apply verified signed browser proxy identity to guest checkout rate buckets, preserving exact request-body/path/time binding, native fallback and existing guest payment validation, original-attempt recovery and sandbox provider restrictions.",
+      "evidence": [
+        "tests/web-proxy-context.test.js",
+        "backend/tests/guest-checkout.test.mjs"
+      ],
+      "findings": [
+        "F08"
+      ]
+    }
+  }
+}

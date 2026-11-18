@@ -1,17 +1,25 @@
 begin;
+update lumo_private.admin_auth_policy set require_mfa=true where id;
 create function pg_temp.check_ops(value boolean,label text) returns void language plpgsql as $$begin if value is distinct from true then raise exception 'Operations assertion: %',label;end if;perform set_config('lumo.review.ops_checks',(coalesce(nullif(current_setting('lumo.review.ops_checks',true),''),'0')::int+1)::text,true);end$$;
 do $test$
 #variable_conflict use_variable
-declare actor uuid:=gen_random_uuid();sid uuid:=gen_random_uuid();payer uuid:=gen_random_uuid();other_user uuid:=gen_random_uuid();account_id uuid:=gen_random_uuid();other_account uuid:=gen_random_uuid();payment_id uuid:=gen_random_uuid();case_id uuid;result jsonb;version_before bigint;notification_id uuid;payload jsonb;
+declare actor uuid:=gen_random_uuid();sid uuid:=gen_random_uuid();payer uuid:=gen_random_uuid();other_user uuid:=gen_random_uuid();account_id uuid:=gen_random_uuid();other_account uuid:=gen_random_uuid();payment_id uuid:=gen_random_uuid();case_id uuid;result jsonb;version_before bigint;notification_id uuid;payload jsonb;payer_sid uuid:=gen_random_uuid();other_sid uuid:=gen_random_uuid();funding uuid;payee uuid:=gen_random_uuid();payee_sid uuid:=gen_random_uuid();payee_account uuid:=gen_random_uuid();
 begin
  perform set_config('lumo.review.ops_checks','0',true);
- insert into auth.users(id,email) values(actor,'ops-review@example.test'),(payer,'payer-review@example.test'),(other_user,'other-review@example.test');
- insert into auth.sessions(id,user_id) values(sid,actor);
+ insert into auth.users(id,email,raw_app_meta_data) values(actor,'ops-review@example.test','{}'),(payer,'payer-review@example.test','{"lumo_pilot":true}'),(other_user,'other-review@example.test','{"lumo_pilot":true}'),(payee,'payee-review@example.test','{"lumo_pilot":true}');
+ insert into auth.sessions(id,user_id) values(sid,actor),(payer_sid,payer),(other_sid,other_user),(payee_sid,payee);
+ insert into auth.mfa_factors(id,user_id,factor_type,status) values(gen_random_uuid(),actor,'totp','verified');
  insert into lumo_private.admin_staff(user_id,display_name,email,role) values(actor,'Review operator','ops-review@example.test','super_admin');
- insert into lumo_private.profiles(user_id,handle,display_name) values(payer,'ops_payer','Payer fixture'),(other_user,'ops_other','Other fixture');
- insert into lumo_private.accounts(id,owner_user_id,kind) values(account_id,payer,'consumer'),(other_account,other_user,'consumer');
- insert into lumo_private.journals(id,reference,payer_account_id,payee_account_id) values(payment_id,'ops-review-payment',account_id,account_id);
- perform set_config('request.jwt.claims','{"role":"service_role"}',true);payload:=jsonb_build_object('actor',actor,'session',sid,'aal','aal1');
+ insert into lumo_private.profiles(user_id,handle,display_name,pin_hash) values(payer,'ops_payer','Payer fixture','synthetic'),(other_user,'ops_other','Other fixture','synthetic'),(payee,'ops_payee','Payee fixture','synthetic');
+ insert into lumo_private.approved_profiles(user_id,personal_account) values(payer,true),(other_user,true),(payee,true);
+ insert into lumo_private.accounts(id,owner_user_id,kind) values(account_id,payer,'consumer'),(other_account,other_user,'consumer'),(payee_account,payee,'consumer');
+ perform set_config('request.jwt.claims','{"role":"service_role"}',true);
+ perform lumo_private.approved_actor_context(payer,payer_sid);
+ select id into funding from lumo_private.accounts where kind='test_funding';
+ perform lumo_private.post_money(payer,'test_funding',1000,funding,account_id);
+ payment_id:=lumo_private.post_money(payer,'transfer',500,account_id,payee_account);
+ set constraints all immediate;set constraints all deferred;
+ perform set_config('request.jwt.claims','{"role":"service_role"}',true);payload:=jsonb_build_object('actor',actor,'session',sid,'aal','aal2');
  result:=public.lumo_admin_service('cases.create',payload||jsonb_build_object('subject','Private payment complaint','transactionId',payment_id));
  perform pg_temp.check_ops(result->>'ok'='false','transaction case requires explicit contact');
  result:=public.lumo_admin_service('cases.create',payload||jsonb_build_object('subject','Wrong person complaint','transactionId',payment_id,'customerId',other_user));

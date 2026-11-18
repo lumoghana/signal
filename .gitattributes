@@ -1,0 +1,9 @@
+# Preserve exact captured source bytes, including their final empty line.
+# Immutable hash checks cover these files; other whitespace checks still apply.
+backend/supabase/migrations/20261114200646_lumo_admin_password_signin.sql whitespace=-blank-at-eof
+backend/supabase/migrations/20261114213323_lumo_case_notifications.sql whitespace=-blank-at-eof
+backend/supabase/migrations/20261114215411_lumo_case_inbox_recipient_index.sql whitespace=-blank-at-eof
+backend/supabase/migrations/20261115163214_lumo_access_recovery_sandbox.sql whitespace=-blank-at-eof
+backend/supabase/migrations/20261115173717_lumo_business_console.sql whitespace=-blank-at-eof
+backend/verification/readiness-2.14.0/access7-baseline/handler.mjs whitespace=-blank-at-eof
+backend/verification/readiness-2.14.0/access7-baseline/sandbox-providers.mjs whitespace=-blank-at-eof

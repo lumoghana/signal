@@ -53,6 +53,7 @@ export function createCashier(config = {}) {
     const status = config.getConnectivity?.();
     return globalThis.navigator?.onLine !== false && status !== false && !['offline', 'disconnected', 'error'].includes(typeof status === 'string' ? status : status?.status);
   };
+  const loyaltyEnabled = () => typeof config.onLoyalty === 'function' && config.isSample?.() !== true && !!config.getSession?.() && !!actor().staffId;
   const redraw = () => config.onChange?.();
   const storage = () => {try {return config.storage || globalThis.sessionStorage;} catch {return null;}};
   const attemptKey = () => `lumo-cashier-request-v1:${config.getSession?.()?.businessId || snapshot().business?.id || ''}:${counter()?.id || ''}:${actor().staffId || ''}:${actor().shopId || ''}`;
@@ -146,8 +147,9 @@ export function createCashier(config = {}) {
 
   function amountView() {
     const s = shop(), summary = cashierShiftSummary(snapshot(), actor(), counter());
-    const ready = s.accepting !== false && s.open !== false && online() && !!summary.shift;
-    return `${shiftSummary()}${s.accepting === false || s.open === false ? '<div class="cashier-message warning" role="status">This shop is paused. Ask your manager to resume collections.</div>' : ''}<section class="cashier-amount-entry" aria-label="Create a payment request"><div class="cashier-amount"><label for="cashier-amount">Amount to collect · GH₵</label><input id="cashier-amount" name="cashierAmount" inputmode="decimal" type="text" value="${E(amount)}" placeholder="0.00" autocomplete="off" aria-label="Amount to collect in Ghana cedis" ${busy || attempt ? 'readonly' : ''}></div><input class="cashier-note" name="cashierNote" value="${E(note)}" maxlength="80" placeholder="Add a note (optional)" aria-label="Payment note, optional" ${busy || attempt ? 'readonly' : ''}><div class="cashier-keypad">${['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map(digit => `<button type="button" data-action="cashier-key" data-value="${digit}" aria-label="${digit === '⌫' ? 'Delete digit' : digit === '.' ? 'Decimal point' : digit}" ${busy || attempt ? 'disabled' : ''}>${digit === '⌫' ? icon('back') || digit : digit}</button>`).join('')}</div><button type="button" class="btn primary full cashier-primary" data-action="cashier-create" ${!ready || !Number(amount) || busy ? 'disabled' : ''}>${busy ? 'Creating QR…' : attempt ? 'Retrieve payment QR' : 'Show payment QR'} ${icon('arrow')}</button><div class="cashier-amount-foot">${button('Shop QR', 'shop-qr', 'ghost')}${amount && !attempt ? button('Clear', 'clear', 'ghost') : '<span>Customer confirms in Lumo</span>'}</div></section>${config.onSharePayment?button('Share payment link','share-amount','ghost full cashier-share-entry',busy||!online()?'disabled':''):''}${receiverStatus()}${pendingQueue()}`;
+    const pendingLoyalty = config.hasPendingLoyaltyCollection?.() === true;
+    const ready = s.accepting !== false && s.open !== false && online() && !!summary.shift && !pendingLoyalty;
+    return `${shiftSummary()}${pendingLoyalty?'<div class="cashier-message warning" role="status">A saved loyalty payment request needs an outcome. Open Customer loyalty to retrieve it before creating another QR.</div>':''}${s.accepting === false || s.open === false ? '<div class="cashier-message warning" role="status">This shop is paused. Ask your manager to resume collections.</div>' : ''}<section class="cashier-amount-entry" aria-label="Create a payment request"><div class="cashier-amount"><label for="cashier-amount">Amount to collect · GH₵</label><input id="cashier-amount" name="cashierAmount" inputmode="decimal" type="text" value="${E(amount)}" placeholder="0.00" autocomplete="off" aria-label="Amount to collect in Ghana cedis" ${busy || attempt ? 'readonly' : ''}></div><input class="cashier-note" name="cashierNote" value="${E(note)}" maxlength="80" placeholder="Add a note (optional)" aria-label="Payment note, optional" ${busy || attempt ? 'readonly' : ''}><div class="cashier-keypad">${['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map(digit => `<button type="button" data-action="cashier-key" data-value="${digit}" aria-label="${digit === '⌫' ? 'Delete digit' : digit === '.' ? 'Decimal point' : digit}" ${busy || attempt ? 'disabled' : ''}>${digit === '⌫' ? icon('back') || digit : digit}</button>`).join('')}</div><button type="button" class="btn primary full cashier-primary" data-action="cashier-create" ${!ready || !Number(amount) || busy ? 'disabled' : ''}>${busy ? 'Creating QR…' : attempt ? 'Retrieve payment QR' : 'Show payment QR'} ${icon('arrow')}</button><div class="cashier-amount-foot">${button('Shop QR', 'shop-qr', 'ghost')}${amount && !attempt ? button('Clear', 'clear', 'ghost') : '<span>Customer confirms in Lumo</span>'}</div></section>${config.onSharePayment?button('Share payment link','share-amount','ghost full cashier-share-entry',busy||!online()?'disabled':''):''}${loyaltyEnabled()?button(`${icon('users')} Customer loyalty`,'loyalty','secondary full',busy||attempt||!online()?'disabled':''):''}${receiverStatus()}${pendingQueue()}`;
   }
 
   function pendingQueue() {
@@ -161,11 +163,11 @@ export function createCashier(config = {}) {
     const expired = ['expired', 'cancelled', 'failed'].includes(status.status);
     const checking = status.status === 'processing' || status.status === 'paid' || !online();
     const title = !online() ? 'Checking connection' : expired ? status.status === 'cancelled' ? 'Request cancelled' : 'QR expired' : checking ? 'Checking payment' : 'Ready to scan';
-    return `<section class="cashier-request-view" aria-label="Payment request"><span class="cashier-state ${expired ? 'warning' : ''}">${icon(expired ? 'clock' : checking ? 'refresh' : 'qr')} ${title}</span><h2>${money(request.amount)}</h2><p>${E(request.description || (config.isSample?.() ? 'Preview a customer payment in this browser.' : shop().published===true?'Customer scans with any phone camera. Choose Lumo or test MoMo at checkout.':'Open this private test QR in the Lumo app.'))}</p>${!expired ? `${!config.isSample?.()&&shop().published===true?'<p class="cashier-lock-note">Test MoMo works without a Lumo account. The fixed amount stays locked.</p>':''}<div class="cashier-qr">${config.qrSvg?.(config.paymentLink?.(request.shopId, request) || '') || ''}</div><p class="cashier-qr-caption">${E(shop().name)} <span>·</span> ${E(shop().code || '')}${config.isSample?.() ? '<br><small>Sample QR · this browser only</small>' : ''}</p>` : `<div class="cashier-result-mark warning">${icon('clock')}</div>`}<div class="cashier-request-status" role="status">${checking ? 'Keep this request open. Wait for confirmation from Lumo.' : expired ? 'Check receipts before making another request for this purchase.' : config.isSample?.() ? 'Waiting for the sample customer payment.' : 'Waiting for payment. This screen updates when Lumo confirms it.'}</div><small class="cashier-attribution">Requested by ${E(request.staffName || 'Original cashier')} · ${time(request.createdAt)}</small>${config.isSample?.() && config.onPreviewPayment && !expired && !checking ? button('Preview customer payment', 'preview-payment', 'primary full') : ''}${!expired&&!checking&&config.onSharePayment?button('Share payment link','share-request','secondary full'):''}${button(expired ? 'Back to collect' : 'Serve another customer', 'next', 'secondary full')}<p class="cashier-lock-note">${expired ? 'A screenshot from a customer is not a payment receipt.' : 'This request stays in pending payments when you leave this screen.'}</p></section>`;
+    return `<section class="cashier-request-view" aria-label="Payment request"><span class="cashier-state ${expired ? 'warning' : ''}">${icon(expired ? 'clock' : checking ? 'refresh' : 'qr')} ${title}</span><h2>${money(request.amount)}</h2><p>${E(request.description || (config.isSample?.() ? 'Preview a customer payment in this browser.' : shop().published===true?'Customer scans with any phone camera. Choose Lumo or test MoMo at checkout.':'Open this private test QR in the Lumo app.'))}</p>${!expired ? `${!config.isSample?.()&&shop().published===true?'<p class="cashier-lock-note">Test MoMo works without a Lumo account. The fixed amount stays locked.</p>':''}<div class="cashier-qr">${config.qrSvg?.(config.paymentLink?.(request.shopId, request) || '') || ''}</div><p class="cashier-qr-caption">${E(shop().name)} <span>·</span> ${E(shop().code || '')}${config.isSample?.() ? '<br><small>Sample QR · this browser only</small>' : ''}</p>` : `<div class="cashier-result-mark warning">${icon('clock')}</div>`}<div class="cashier-request-status" role="status">${checking ? 'Keep this request open. Wait for confirmation from Lumo.' : expired ? 'Check receipts before making another request for this purchase.' : config.isSample?.() ? 'Waiting for the sample customer payment.' : 'Waiting for payment. This screen updates when Lumo confirms it.'}</div><small class="cashier-attribution">Requested by ${E(request.staffName || 'Original cashier')} · ${time(request.createdAt)}</small>${config.isSample?.() && config.onPreviewPayment && !expired && !checking ? button('Preview customer payment', 'preview-payment', 'primary full') : ''}${!expired&&!checking&&config.onSharePayment?button('Share payment link','share-request','secondary full'):''}${loyaltyEnabled()&&!expired&&!checking?button('Link a loyalty member','loyalty-request','ghost full'):''}${button(expired ? 'Back to collect' : 'Serve another customer', 'next', 'secondary full')}<p class="cashier-lock-note">${expired ? 'A screenshot from a customer is not a payment receipt.' : 'This request stays in pending payments when you leave this screen.'}</p></section>`;
   }
 
   function confirmedView(receipt, request) {
-    return `<section class="cashier-confirmed" aria-label="Confirmed payment" data-pilot-receipt="${E(receipt.id)}"><div class="cashier-result-mark">${icon('check')}</div><p class="cashier-confirmed-label">Payment received</p><h2>${money(receipt.amount)}</h2><p>${E(receipt.payer || 'Lumo customer')}</p><div class="cashier-confirmation-meta"><strong>Confirmed by Lumo</strong><span>${time(receipt.confirmedAt || receipt.createdAt)}</span><small>${E(receipt.reference || receipt.id)}</small></div>${request?.staffId !== actor().staffId ? `<p class="cashier-lock-note">${E(request?.staffName || receipt.staffName || 'Original cashier')}’s request. Its original attribution is kept.</p>` : ''}${button('Next customer', 'next', 'primary full')}${button('View receipt', 'receipt', 'ghost full', `data-id="${E(receipt.id)}"`)}</section>`;
+    return `<section class="cashier-confirmed" aria-label="Confirmed payment" data-pilot-receipt="${E(receipt.id)}"><div class="cashier-result-mark">${icon('check')}</div><p class="cashier-confirmed-label">Payment received</p><h2>${money(receipt.amount)}</h2><p>${E(receipt.payer || 'Lumo customer')}</p><div class="cashier-confirmation-meta"><strong>Confirmed by Lumo</strong><span>${time(receipt.confirmedAt || receipt.createdAt)}</span><small>${E(receipt.reference || receipt.id)}</small></div>${request?.staffId !== actor().staffId ? `<p class="cashier-lock-note">${E(request?.staffName || receipt.staffName || 'Original cashier')}’s request. Its original attribution is kept.</p>` : ''}${button('Next customer', 'next', 'primary full')}${button('View receipt', 'receipt', 'ghost full', `data-id="${E(receipt.id)}"`)}${loyaltyEnabled()&&remainingRefund(receipt)>0?button('Link this purchase to loyalty','loyalty-receipt','ghost full',`data-id="${E(receipt.id)}"`):''}</section>`;
   }
 
   function receiptsView() {
@@ -179,7 +181,7 @@ export function createCashier(config = {}) {
     if (!receipt) return '<p class="cashier-empty">This receipt is no longer available to this counter.</p>';
     const refunds = receiptRefunds(receipt);
     const remaining = remainingRefund(receipt);
-    return `<div class="cashier-receipt-detail"><span class="cashier-state">${icon(receipt.status === 'paid' ? 'check' : 'clock')} ${receipt.status === 'paid' ? 'Confirmed by Lumo' : 'Checking payment'}</span><h3>${money(receipt.amount)}</h3><p>${E(receipt.payer || 'Lumo customer')}</p><dl><div><dt>Reference</dt><dd>${E(receipt.reference || receipt.id)}</dd></div><div><dt>Time</dt><dd>${E(new Date(receipt.confirmedAt || receipt.createdAt).toLocaleString('en-GH', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}))}</dd></div><div><dt>Cashier</dt><dd>${E(receipt.staffName || (receipt.intentChannel==='online'||receipt.method==='online-request'?'Online request · no cashier assigned':'Shop QR · no cashier assigned'))}</dd></div></dl>${refunds.length ? `<div class="cashier-refund-status">${refunds.map(refund => `<p>${refund.status === 'requested' ? 'Refund requested' : refund.status === 'paid' ? 'Refunded' : E(refund.status)} · ${money(refund.amount)}</p>`).join('')}</div>` : ''}${receipt.status === 'paid' && remaining > 0 ? button('Request a refund', 'refund', 'secondary full') : ''}${button('Get help with this payment', 'help-receipt', 'ghost full')}</div>`;
+    return `<div class="cashier-receipt-detail"><span class="cashier-state">${icon(receipt.status === 'paid' ? 'check' : 'clock')} ${receipt.status === 'paid' ? 'Confirmed by Lumo' : 'Checking payment'}</span><h3>${money(receipt.amount)}</h3><p>${E(receipt.payer || 'Lumo customer')}</p><dl><div><dt>Reference</dt><dd>${E(receipt.reference || receipt.id)}</dd></div><div><dt>Time</dt><dd>${E(new Date(receipt.confirmedAt || receipt.createdAt).toLocaleString('en-GH', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}))}</dd></div><div><dt>Cashier</dt><dd>${E(receipt.staffName || (receipt.intentChannel==='online'||receipt.method==='online-request'?'Online request · no cashier assigned':'Shop QR · no cashier assigned'))}</dd></div></dl>${refunds.length ? `<div class="cashier-refund-status">${refunds.map(refund => `<p>${refund.status === 'requested' ? 'Refund requested' : refund.status === 'paid' ? 'Refunded' : E(refund.status)} · ${money(refund.amount)}</p>`).join('')}</div>` : ''}${receipt.status === 'paid' && remaining > 0 ? button('Request a refund', 'refund', 'secondary full') : ''}${loyaltyEnabled()&&receipt.status==='paid'&&remaining>0?button('Link this purchase to loyalty','loyalty-receipt','secondary full',busy||!online()?'disabled':''):''}${button('Get help with this payment', 'help-receipt', 'ghost full')}</div>`;
   }
 
   function refundView() {
@@ -240,7 +242,7 @@ export function createCashier(config = {}) {
   function sheetView() {
     if (!sheet) return '';
     const titles = {menu: 'Your counter', receipt: 'Payment receipt', refund: 'Request a refund', help: 'Get help', 'help-requests': 'My help requests', handover: 'Shift handover', 'shop-qr': 'Shop QR', 'shop-receipts': 'Shop payments'};
-    const content = sheet === 'menu' ? `<div class="cashier-menu">${button(`${icon('sound')} Sound & receiving phone`, 'sound', 'secondary full')}${button(`${icon('help')} Get help`, 'help', 'secondary full')}${button('My help requests', 'help-requests', 'secondary full')}${config.onSharedLinks?button(`${icon('link')} Shared payment links`,'shared-links','secondary full'):''}${counter() ? button(`${icon('shield')} Lock phone`, 'lock', 'secondary full', busy ? 'disabled' : '') : ''}${button(`${icon('people')} ${counter()?.mode === 'shared' ? 'Switch cashier / end shift' : 'End my shift'}`, 'handover', 'secondary full', busy || !online() ? 'disabled' : '')}${config.isSample?.() && config.onDemoRoles ? button('Explore sample roles', 'demo-roles', 'ghost full') : ''}${config.onSignOut || config.onExit ? button('Sign out of this phone', 'exit', 'ghost full') : ''}</div>` : sheet === 'receipt' ? receiptView() : sheet === 'refund' ? refundView() : sheet === 'help' ? helpView() : sheet === 'help-requests' ? helpRequestsView() : sheet === 'handover' ? handoverView() : sheet === 'shop-receipts' ? shopReceiptsView() : shopQRView();
+    const content = sheet === 'menu' ? `<div class="cashier-menu">${button(`${icon('sound')} Sound & receiving phone`, 'sound', 'secondary full')}${button(`${icon('help')} Get help`, 'help', 'secondary full')}${!config.isSample?.()&&!counter()&&config.getSession?.()&&config.onRecoverySettings?button(`${icon('shield')} Password recovery`,'recovery-settings','secondary full'):counter()?'<p class="cashier-lock-note">To manage password recovery, sign in to your own account. This counter phone cannot save a face profile.</p>':''}${loyaltyEnabled()?button(`${icon('users')} Customer loyalty`,'loyalty','secondary full',busy||attempt||!online()?'disabled':''):''}${button('My help requests', 'help-requests', 'secondary full')}${config.onSharedLinks?button(`${icon('link')} Shared payment links`,'shared-links','secondary full'):''}${counter() ? button(`${icon('shield')} Lock phone`, 'lock', 'secondary full', busy ? 'disabled' : '') : ''}${button(`${icon('people')} ${counter()?.mode === 'shared' ? 'Switch cashier / end shift' : 'End my shift'}`, 'handover', 'secondary full', busy || !online() ? 'disabled' : '')}${config.isSample?.() && config.onDemoRoles ? button('Explore sample roles', 'demo-roles', 'ghost full') : ''}${config.onSignOut || config.onExit ? button('Sign out of this phone', 'exit', 'ghost full') : ''}</div>` : sheet === 'receipt' ? receiptView() : sheet === 'refund' ? refundView() : sheet === 'help' ? helpView() : sheet === 'help-requests' ? helpRequestsView() : sheet === 'handover' ? handoverView() : sheet === 'shop-receipts' ? shopReceiptsView() : shopQRView();
     return `<div class="cashier-sheet-backdrop"><section class="cashier-sheet" role="dialog" aria-modal="true" aria-labelledby="cashier-sheet-title"><header><h2 id="cashier-sheet-title">${titles[sheet]}</h2><button class="icon-btn" data-action="cashier-close" aria-label="Close ${titles[sheet].toLowerCase()}" ${busy ? 'disabled' : ''}>${icon('close') || '×'}</button></header>${content}${feedback()}</section></div>`;
   }
 
@@ -275,7 +277,34 @@ export function createCashier(config = {}) {
     if (command === 'share-amount' && !attempt && online()) {sheet='';config.onSharePayment?.({amount:Number(amount)>0?Math.round(Number(amount)*100):undefined,description:note});}
     if (command === 'share-shop') {sheet='';config.onSharePayment?.({});}
     if (command === 'share-request') {const request=currentRequest();if(request&&requestPresentation({transactions:array(snapshot().transactions)},request).canPay){sheet='';config.onSharePayment?.({requestId:request.id});}}
+    if (['loyalty','loyalty-request','loyalty-receipt'].includes(command)) {
+      if (!loyaltyEnabled() || !online()) return true;
+      if (attempt) {error = 'Retrieve the outstanding payment QR before opening loyalty.'; redraw(); return true;}
+      const request = currentRequest(), status = request && requestPresentation({transactions: array(snapshot().transactions)}, request);
+      if (request && (status.status === 'processing' || status.status === 'paid' && !status.transaction) && command !== 'loyalty-receipt') {error = 'Wait for this payment to be confirmed before linking loyalty.'; redraw(); return true;}
+      const payload = {shopId: actor().shopId, returnTo: 'cashier'};
+      if (command === 'loyalty-receipt') {
+        const candidate = element.dataset.id ? [...cashierReceipts(snapshot(), actor(), counter()), ...readOnlyReceipts()].find(value => value.id === element.dataset.id) : currentReceipt();
+        if (!candidate || candidate.status !== 'paid' || remainingRefund(candidate) <= 0) return true;
+        payload.transactionId = candidate.id;
+      } else if (request && status.transaction) {
+        if (command === 'loyalty-request') return true;
+        if (remainingRefund(status.transaction) > 0) payload.transactionId = status.transaction.id;
+      } else if (request && status.canPay) {
+        payload.requestId = request.id; payload.amount = request.amount; payload.description = request.description || '';
+      } else {
+        if (command === 'loyalty-request') return true;
+        const cents = Math.round(Number(amount) * 100);
+        if (Number.isSafeInteger(cents) && cents > 0) payload.amount = cents;
+        if (note.trim()) payload.description = note.trim();
+      }
+      sheet = ''; error = ''; notice = '';
+      // The loyalty service owns member checks, discounts and request creation.
+      // This callback does not alter a payment amount or consume a reward.
+      config.onLoyalty(payload); return true;
+    }
     if (command === 'shared-links') {sheet='';config.onSharedLinks?.();}
+    if (command === 'recovery-settings') {if(!config.isSample?.()&&!counter()&&config.getSession?.()){sheet = '';config.onRecoverySettings?.();}return;}
     if (command === 'sound') {sheet = ''; config.onSound?.();}
     if (command === 'exit') await (config.onSignOut || config.onExit)?.();
     if (command === 'demo-roles' && config.isSample?.()) config.onDemoRoles?.();
@@ -289,13 +318,19 @@ export function createCashier(config = {}) {
     if (command === 'lock') await run(() => config.onLock?.({endShift: false}));
     if (command === 'start-shift') await run(() => config.onStartShift ? config.onStartShift({shopId: actor().shopId}) : config.act?.('START_SHIFT', {shopId: actor().shopId}));
     if (command === 'create') {
+      if (config.hasPendingLoyaltyCollection?.() === true) {error = 'Check the saved loyalty payment request before creating another QR. Open Customer loyalty to retrieve its outcome.'; redraw(); return true;}
       if (!online() || !cashierShiftSummary(snapshot(), actor(), counter()).shift) return true;
       const cents = Math.round(Number(amount) * 100);
       if (!Number.isSafeInteger(cents) || cents <= 0) return true;
       attempt ||= {shopId: actor().shopId, amount: cents, description: note.trim(), attemptId: identifier()};
       saveAttempt();
       await run(async current => {
-        const result = await (config.onCreateRequest ? config.onCreateRequest({...attempt}) : config.act?.('CREATE_REQUEST', {...attempt}));
+        let result;
+        try {result = await (config.onCreateRequest ? config.onCreateRequest({...attempt}) : config.act?.('CREATE_REQUEST', {...attempt}));}
+        catch (failure) {
+          if (current() && failure?.code === 'LOYALTY_COLLECTION_PENDING' && failure.definitiveNoMutation === true) {attempt = null; saveAttempt();}
+          throw failure;
+        }
         if (!current()) return;
         const request = result?.entity || result?.request || result;
         if (!request?.id) throw new Error('Lumo did not return a payment QR. Tap Retrieve to check the same request.');
@@ -396,5 +431,12 @@ export function createCashier(config = {}) {
     if (!sheet) focusedSheet = '';
   }
 
-  return {render, handleClick, handleSubmit, handleChange, handleKeydown, afterRender, reset() {clear(); context = '';}, openReceipt(id) {receiptId = id; sheet = 'receipt'; redraw();}, setPage(value) {page = value === 'receipts' ? value : 'collect'; sheet = '';}, isOpen: () => !!sheet, close() {if (!busy) {sheet = ''; redraw();}}};
+  return {render, handleClick, handleSubmit, handleChange, handleKeydown, afterRender,
+    openRequest(id) {
+      ensureContext();
+      if (busy || attempt || counter()?.locked) return false;
+      const request = array(snapshot().requests).find(value => value.id === id && value.shopId === actor().shopId && (value.staffId === actor().staffId || counter()?.id && value.counterId === counter().id));
+      if (!request) return false;
+      requestId = request.id; page = 'collect'; sheet = ''; amount = ''; note = ''; error = ''; notice = ''; redraw(); return true;
+    }, reset() {clear(); context = '';}, openReceipt(id) {receiptId = id; sheet = 'receipt'; redraw();}, setPage(value) {page = value === 'receipts' ? value : 'collect'; sheet = '';}, isOpen: () => !!sheet, close() {if (!busy) {sheet = ''; redraw();}}};
 }

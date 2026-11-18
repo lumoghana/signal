@@ -8,4 +8,5 @@ const supabaseUrl=Deno.env.get('SUPABASE_URL')||'';
 const providerMode=Deno.env.get('LUMO_ACCESS_MODE')||'sandbox';
 const recoveryMode=Deno.env.get('LUMO_ACCESS_RECOVERY_MODE')||'prototype-face-only';
 const prototypeFaceOnly=providerMode==='sandbox'&&supabaseUrl.replace(/\/$/,'')==='https://iwutbrljiiodamtyoorg.supabase.co'&&recoveryMode==='prototype-face-only';
-Deno.serve(createAccessHandler({supabaseUrl,serviceRoleKey:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'',providerMode,prototypeFaceOnly,faceProcessorUrl:Deno.env.get('LUMO_FACE_PROCESSOR_URL')||'',faceProcessorSecret:Deno.env.get('LUMO_FACE_PROCESSOR_SECRET')||'',allowedOrigins:[...new Set([...defaults,...(Deno.env.get('LUMO_ACCESS_ORIGINS')||'').split(',').map(value=>value.trim()).filter(Boolean)])]}));
+const passwordPolicyMode=supabaseUrl.replace(/\/$/,'')==='https://iwutbrljiiodamtyoorg.supabase.co'&&providerMode==='sandbox'?'pilot':'production';
+Deno.serve(createAccessHandler({supabaseUrl,serviceRoleKey:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||'',providerMode,prototypeFaceOnly,passwordPolicyMode,resetFenceEnabled:false,faceProcessorUrl:Deno.env.get('LUMO_FACE_PROCESSOR_URL')||'',faceProcessorSecret:Deno.env.get('LUMO_FACE_PROCESSOR_SECRET')||'',allowedOrigins:[...new Set([...defaults,...(Deno.env.get('LUMO_ACCESS_ORIGINS')||'').split(',').map(value=>value.trim()).filter(Boolean)])]}));

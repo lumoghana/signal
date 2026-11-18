@@ -30,10 +30,10 @@ begin
  (evil,'authenticated','authenticated','repair.e.'||suffix||'@pilot.lumo.invalid',now(),'{}','{"lumo_pilot":true}',now(),now());
  insert into auth.sessions(id,user_id,created_at,updated_at) values(sa,a,now(),now()),(sb,b,now(),now()),(sc,c,now(),now()),(se,evil,now(),now()),(sa2,a,now(),now()),(old_proof,a,now()-interval '1 hour',now());
  perform set_config('request.jwt.claims','{"role":"service_role"}',true);
- result:=pg_temp.approved_pin('provision',jsonb_build_object('actor',a,'session',sa,'handle',ha,'displayName','Legacy fixture','phone','0248889901','pin','3159'));
+ result:=pg_temp.approved_pin('provision',jsonb_build_object('mode','consumer','actor',a,'session',sa,'handle',ha,'displayName','Legacy fixture','phone','0248889901','pin','3159'));
  perform pg_temp.assert_pin_repair(result->>'ok'='true','first new registration still provisions');
- perform pg_temp.approved_pin('provision',jsonb_build_object('actor',b,'session',sb,'handle',hb,'displayName','New fixture','phone','0248889902','pin','2653'));
- perform pg_temp.approved_pin('provision',jsonb_build_object('actor',c,'session',sc,'handle',hc,'displayName','Rate fixture','phone','0248889903','pin','4762'));
+ perform pg_temp.approved_pin('provision',jsonb_build_object('mode','consumer','actor',b,'session',sb,'handle',hb,'displayName','New fixture','phone','0248889902','pin','2653'));
+ perform pg_temp.approved_pin('provision',jsonb_build_object('mode','consumer','actor',c,'session',sc,'handle',hc,'displayName','Rate fixture','phone','0248889903','pin','4762'));
  select pin_hash into hash_before from lumo_private.profiles where user_id=a;
  select balance into wallet_before from lumo_private.accounts where owner_user_id=a and kind='consumer';
  domain_before:='{"wallet":0,"groups":[],"settings":{},"account":{"status":"active"}}';
@@ -46,7 +46,7 @@ begin
  update lumo_private.approved_states set state=jsonb_set(state,'{account,status}','"closed"') where user_id=a;
  result:=pg_temp.repair('begin',jsonb_build_object('actor',a,'session',sa));perform pg_temp.assert_pin_repair(result->>'code'='PIN_REPAIR_UNAVAILABLE','canonical closed state cannot repair a PIN');
  update lumo_private.approved_states set state=domain_before where user_id=a;
- result:=pg_temp.approved_pin('provision',jsonb_build_object('actor',a,'session',sa,'handle',ha,'displayName','Legacy fixture','phone','0248889901','pin',new_pin));
+ result:=pg_temp.approved_pin('provision',jsonb_build_object('mode','consumer','actor',a,'session',sa,'handle',ha,'displayName','Legacy fixture','phone','0248889901','pin',new_pin));
  perform pg_temp.assert_pin_repair(result->>'code'='EXISTING_ACCOUNT' and (select pin_hash=hash_before from lumo_private.profiles where user_id=a),'repeated registration cannot silently ignore a different newly chosen PIN');
  result:=pg_temp.approved_pin('pin.change',jsonb_build_object('actor',a,'session',sa,'oldPin','1111','newPin',new_pin));
  perform pg_temp.assert_pin_repair(result->>'code'='PIN_REQUIRED' and (select pin_hash=hash_before from lumo_private.profiles where user_id=a),'ordinary PIN change still requires existing PIN');

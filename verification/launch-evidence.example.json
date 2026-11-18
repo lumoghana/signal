@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "product": "Lumo",
+  "target": "real-money",
+  "release": "2.14.0",
+  "sourceCommit": "REPLACE_WITH_ACTUAL_REVIEWED_COMMIT",
+  "apkSha256": "REPLACE_WITH_ORIGINAL_CERTIFICATE_SIGNED_APK_DIGEST",
+  "backendBundleSha256": "REPLACE_WITH_EXACT_DEPLOYED_BUNDLE_DIGEST",
+  "reportRequirements": "Every private gate report must repeat this index's release, sourceCommit, apkSha256 and backendBundleSha256 exactly. Replacing either accepted artifact requires matching new acceptance reports; a version label alone is insufficient.",
+  "gates": [
+    {"id":"providers","status":"pending","syntheticOnly":true,"required":"Connected rails, signed callbacks, failures/reversals and matched settlement evidence."},
+    {"id":"liveness-identity","status":"pending","syntheticOnly":true,"required":"Validated actual PAD/identity, population/device calibration and safe fallback."},
+    {"id":"privileged-access","status":"pending","syntheticOnly":true,"required":"Actual staff factors/enforcement, maker-checker and governed recovery acceptance."},
+    {"id":"restore-recovery","status":"pending","syntheticOnly":true,"required":"Timed isolated hosted restore including keys, ledger reconciliation and reset uncertainty."},
+    {"id":"installed-devices","status":"pending","syntheticOnly":true,"required":"Representative signed handset installation/upgrade and critical journey matrix."},
+    {"id":"security-capacity","status":"pending","syntheticOnly":true,"required":"Independent security assessment and measured declared launch/growth workload."}
+  ]
+}

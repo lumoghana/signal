@@ -4,7 +4,7 @@ do $test$
 declare actor uuid:=gen_random_uuid();sid uuid:=gen_random_uuid();invalid_actor uuid:=gen_random_uuid();invalid_sid uuid:=gen_random_uuid();metadata jsonb;payload jsonb;result jsonb;rejected boolean:=false;received_at timestamptz;
 begin
  perform set_config('lumo.review.signup_checks','0',true);perform set_config('request.jwt.claims','{"role":"service_role"}',true);
- insert into auth.users(id,email) values(actor,'signup.receipt@pilot.lumo.invalid'),(invalid_actor,'signup.bad@pilot.lumo.invalid');
+ insert into auth.users(id,email,raw_app_meta_data) values(actor,'signup.receipt@pilot.lumo.invalid','{"lumo_pilot":true}'),(invalid_actor,'signup.bad@pilot.lumo.invalid','{"lumo_pilot":true}');
  insert into auth.sessions(id,user_id) values(sid,actor),(invalid_sid,invalid_actor);
  metadata:=jsonb_build_object('termsAcceptance',jsonb_build_object('version','2026-11-08.1','acceptedAt',clock_timestamp()-interval '2 days'),
   'verification',jsonb_build_object('mode','simulation','capture','live-camera','status','complete','method','ghana-card-number','liveness','guided-camera','sampleIdentity',true,'detailsConfirmed',true,'completedAt',clock_timestamp()));

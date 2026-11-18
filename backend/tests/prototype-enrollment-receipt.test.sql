@@ -13,8 +13,8 @@ begin
  protected_definition:=pg_get_functiondef('public.lumo_access_service(text,jsonb)'::regprocedure);
  insert into auth.users(id,email,raw_app_meta_data) values(actor,'receipt@pilot.lumo.invalid','{"lumo_pilot":true}'),(other,'receipt_other@pilot.lumo.invalid','{"lumo_pilot":true}');
  insert into auth.sessions(id,user_id) values(sid,actor),(other_sid,other);
- insert into lumo_private.profiles(user_id,status) values(actor,'active'),(other,'active');
- insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'+233240123456'),(other,true,'+233240654321');
+ insert into lumo_private.profiles(user_id,handle,display_name,pin_hash,status) values(actor,'actor_'||substr(replace(actor::text,'-',''),1,15),'Synthetic actor',extensions.crypt('1234',extensions.gen_salt('bf',4)),'active'),(other,'other_'||substr(replace(other::text,'-',''),1,15),'Synthetic other',extensions.crypt('1234',extensions.gen_salt('bf',4)),'active');
+ insert into lumo_private.approved_profiles(user_id,personal_account,phone) values(actor,true,'0240123456'),(other,true,'0240654321');
  insert into lumo_private.access_requests(id,module,purpose,method,user_id,auth_session,reference_id,face_digests,otp_hash,phone)
  values(rid,'consumer','enrollment','sms',actor,sid,tid,frames,repeat('a',64),'+233240123456');
  insert into lumo_private.access_face_templates(id,module,user_id,enrollment_request_id,consent_version,model_id,model_sha256,key_version,ciphertext,state)

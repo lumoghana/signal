@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "release": "2.14.0",
+  "status": "candidate-pending-production-approval",
+  "baselineCommit": "99b7b1024978ba0dc3a143c0033db0af5e3ebc4e",
+  "method": "SHA-256 of exact actual public file bytes compared directly with git show of the reviewed baseline; all changed/new assets have reasons, and merchant exports must byte-match canonical source. No historical baseline is rewritten.",
+  "publicManifest": "dist-sha256.json",
+  "publicAssetCount": 282,
+  "changedOrAddedAssets": [
+    {
+      "path": "dist/consumer-release.json",
+      "change": "modified",
+      "baselineSha256": "2535df7704d71c86c7bb57d8fd80267560ce111665e442b5bed7186d14099f8f",
+      "candidateSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "previousManifestSha256": "2535df7704d71c86c7bb57d8fd80267560ce111665e442b5bed7186d14099f8f",
+      "reason": "Candidate 2.14.0 / 21400 signed APK identity, sandbox capability boundaries and prepared readiness metadata. This local metadata does not establish a production release."
+    },
+    {
+      "path": "dist/js/approved-service.js",
+      "change": "modified",
+      "baselineSha256": "11d46117ac2d07bd8d9eae675a6cbfcf9e88b230f50816885c5b0937bcb4d85f",
+      "candidateSha256": "c08c762770cc6f7811eae64f03353c824ea2b8a701fe3546123c6e426a4225b4",
+      "previousManifestSha256": "11d46117ac2d07bd8d9eae675a6cbfcf9e88b230f50816885c5b0937bcb4d85f",
+      "reason": "F08 canonical consumer same-origin HttpOnly session transport, acknowledged cookie issuance and account/generation fences; direct native transport remains compatible. Candidate paired deployment remains pending."
+    },
+    {
+      "path": "dist/js/chat-language.js",
+      "change": "modified",
+      "baselineSha256": "25f14227668f1b3b640591fb1e025d03946e1948dc0592e430005017ef30c0cf",
+      "candidateSha256": "6d9d18aa92951c66b0a79cf70378b3785fef9025dbc459d4c6e67f64d7454193",
+      "previousManifestSha256": "25f14227668f1b3b640591fb1e025d03946e1948dc0592e430005017ef30c0cf",
+      "reason": "F06 classify explicit recorded incoming/outgoing IOU questions and supported date scopes before unrelated daily/balance interpretation."
+    },
+    {
+      "path": "dist/js/iou-question.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "8c1027046135cdbded2a46ebf3e9dd4d3e7237c35ef3f186123692878fcfc18d",
+      "previousManifestSha256": null,
+      "reason": "F06 shared read-only IOU direction/date parser, clarification boundaries and canonical follow-up context; tested on actual recorded answer paths and mirrored natively."
+    },
+    {
+      "path": "dist/js/login-credentials.js",
+      "change": "modified",
+      "baselineSha256": "e73492ae25a2b2c386431e722e05a1fc4a419217588251f33f6ed26202b5638d",
+      "candidateSha256": "8a2b9c6ef0238211a94eca2276e2c2af15bfb170105a975c205fc38464e01a80",
+      "previousManifestSha256": "e73492ae25a2b2c386431e722e05a1fc4a419217588251f33f6ed26202b5638d",
+      "reason": "F07 screen the original new secret before Auth derivation while preserving existing login compatibility."
+    },
+    {
+      "path": "dist/js/lux-brain.js",
+      "change": "modified",
+      "baselineSha256": "46ec2e7cfb67317b273ae9064d1dec083d903de670bef2bfc1df52e82fdf3926",
+      "candidateSha256": "3bdbb57d61f8e49abc3b902e071f7f4dfcbd670843089a31663665d00113be3b",
+      "previousManifestSha256": "46ec2e7cfb67317b273ae9064d1dec083d903de670bef2bfc1df52e82fdf3926",
+      "reason": "F06 apply the shared explicit IOU question path before general guidance or external interpretation plans."
+    },
+    {
+      "path": "dist/js/main-tab-state.js",
+      "change": "modified",
+      "baselineSha256": "ae4e1bb42efb8bf1bf63cfc17b2311459d43517eccbb1b8c154c5e10cd03e1bc",
+      "candidateSha256": "6fe099d5c25dc0065806dc77c6147f3a2780d82df33de1bc9c32791fad5e0673",
+      "previousManifestSha256": "ae4e1bb42efb8bf1bf63cfc17b2311459d43517eccbb1b8c154c5e10cd03e1bc",
+      "reason": "F09 preserve validated shop/business/member identities in bounded nested reward return routes without private linking codes or cross-account draft leakage."
+    },
+    {
+      "path": "dist/js/money-answers.js",
+      "change": "modified",
+      "baselineSha256": "03f256f85edd56801672f212496187040e7bf566f3ec191fda7118b95d9a9f6b",
+      "candidateSha256": "2e830002f1c96bea3ab46db0a1bf9085d8463989da59f3ce4734a612aa01f540",
+      "previousManifestSha256": "03f256f85edd56801672f212496187040e7bf566f3ec191fda7118b95d9a9f6b",
+      "reason": "F06 answer explicit IOU direction/date questions from recorded positive open remainders, with ambiguity clarification and expected-money boundaries."
+    },
+    {
+      "path": "dist/js/password-policy.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "d7734ff36d374d490c20ab95a6c83c9799f78db09eb1318a004fb3e332e538e5",
+      "previousManifestSha256": null,
+      "reason": "F07 shared original-secret common/repeated/account-derived screening, mirrored in native; a small pilot screen does not claim full production breach coverage."
+    },
+    {
+      "path": "dist/js/password-recovery.js",
+      "change": "modified",
+      "baselineSha256": "4ee0ae6eaac9018b0d07c5115a9d775ccfcc0cfbd2d6a38edc9dc32ada6decdc",
+      "candidateSha256": "a9e4df4ca97f5536c7d789f5e21d3cd5af166eb01bd31b09a1ed855e3f9ff9c2",
+      "previousManifestSha256": "4ee0ae6eaac9018b0d07c5115a9d775ccfcc0cfbd2d6a38edc9dc32ada6decdc",
+      "reason": "F07 apply original-secret screening to new recovery passwords before derivation. Existing sandbox saved-face/keyless policy is retained; F05 hosted fencing remains excluded."
+    },
+    {
+      "path": "dist/merchant/access.js",
+      "change": "modified",
+      "baselineSha256": "fdeb24110a2f2b9210292c2ec8f7d313a202a47974fe95091b0dfe723b39f4a0",
+      "candidateSha256": "6ab8b788168c4ee14adf6e03993329b1dc6c6e279531392738ae09be401ef507",
+      "previousManifestSha256": "fdeb24110a2f2b9210292c2ec8f7d313a202a47974fe95091b0dfe723b39f4a0",
+      "canonicalSource": "merchant-approved/dist/access.js",
+      "canonicalSourceSha256": "6ab8b788168c4ee14adf6e03993329b1dc6c6e279531392738ae09be401ef507",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/access.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/account.js",
+      "change": "modified",
+      "baselineSha256": "936253ad4c6dbccd6b7ff990f98b5e7584104fa9d1f3f047a01084ccfe5c4b47",
+      "candidateSha256": "f6a3a538f54424cded8ec002918f34bf729de0f4df06928fa0ab046c8bc3c63e",
+      "previousManifestSha256": "936253ad4c6dbccd6b7ff990f98b5e7584104fa9d1f3f047a01084ccfe5c4b47",
+      "canonicalSource": "merchant-approved/dist/account.js",
+      "canonicalSourceSha256": "f6a3a538f54424cded8ec002918f34bf729de0f4df06928fa0ab046c8bc3c63e",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/account.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/app.html",
+      "change": "modified",
+      "baselineSha256": "fe96a9d2995587838872075f8d55396a29e4074c8bb3f11754515f840efbdd30",
+      "candidateSha256": "e38334d7a908ecfe8168c96de0282424e58336d7b6b76bcdc39f6acd4f43d90d",
+      "previousManifestSha256": "fe96a9d2995587838872075f8d55396a29e4074c8bb3f11754515f840efbdd30",
+      "canonicalSource": "merchant-approved/dist/app.html",
+      "canonicalSourceSha256": "e38334d7a908ecfe8168c96de0282424e58336d7b6b76bcdc39f6acd4f43d90d",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/app.html bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/app.js",
+      "change": "modified",
+      "baselineSha256": "64517785bf94857d09748907eb2956481ab758270be85cbae20fc01dc4ef16bd",
+      "candidateSha256": "892b14337fe7c37d02ab73944c45b9f9425531c1b61ba7c9df4facfddcdcdfde",
+      "previousManifestSha256": "64517785bf94857d09748907eb2956481ab758270be85cbae20fc01dc4ef16bd",
+      "canonicalSource": "merchant-approved/dist/app.js",
+      "canonicalSourceSha256": "892b14337fe7c37d02ab73944c45b9f9425531c1b61ba7c9df4facfddcdcdfde",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/app.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/cashier.js",
+      "change": "modified",
+      "baselineSha256": "ee457429d4934307103219fae1f293b965635f2d5c5b0ed1082e94de9924e71a",
+      "candidateSha256": "b185de1a8499d24db9d652a64dedc4337ac3b588e61b9ccb6413137d73ef6724",
+      "previousManifestSha256": "ee457429d4934307103219fae1f293b965635f2d5c5b0ed1082e94de9924e71a",
+      "canonicalSource": "merchant-approved/dist/cashier.js",
+      "canonicalSourceSha256": "b185de1a8499d24db9d652a64dedc4337ac3b588e61b9ccb6413137d73ef6724",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/cashier.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/collections-ui.js",
+      "change": "modified",
+      "baselineSha256": "b0682a47227c3e944ea07d9b05ee7d86299854e02e37907e3ee069e43aba818e",
+      "candidateSha256": "36c55022d9a1a9f7a5587079444fedbf44e8b335e52930ba47f25a5d9fcc03e3",
+      "previousManifestSha256": "b0682a47227c3e944ea07d9b05ee7d86299854e02e37907e3ee069e43aba818e",
+      "canonicalSource": "merchant-approved/dist/collections-ui.js",
+      "canonicalSourceSha256": "36c55022d9a1a9f7a5587079444fedbf44e8b335e52930ba47f25a5d9fcc03e3",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/collections-ui.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/connected-service.js",
+      "change": "modified",
+      "baselineSha256": "0df7523d7c818b2a66471c15d89be1ffe23919b4531f5d87d34634a0bc0f0670",
+      "candidateSha256": "641c8aaea9c77c7ce7c3cc9af97db81643af5a447e6054817e77e8e5b88fe2c6",
+      "previousManifestSha256": "0df7523d7c818b2a66471c15d89be1ffe23919b4531f5d87d34634a0bc0f0670",
+      "canonicalSource": "merchant-approved/dist/connected-service.js",
+      "canonicalSourceSha256": "641c8aaea9c77c7ce7c3cc9af97db81643af5a447e6054817e77e8e5b88fe2c6",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/connected-service.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/consumer-release.json",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/consumer-release.json",
+      "canonicalSourceSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "canonicalSourceUnchangedFromBaseline": false,
+      "reason": "Canonical merchant candidate export: copy exact merchant-approved/dist/consumer-release.json bytes. Changes are original-secret screening/recovery parity or 2.14 signed-artifact and sandbox release metadata, verified against canonical source and the merchant suite."
+    },
+    {
+      "path": "dist/merchant/downloads/consumer-release.json",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/downloads/consumer-release.json",
+      "canonicalSourceSha256": "fbe177ac7d773e52b45e38b639f94a60d98e0da07070fc7ff3936efb8205ea18",
+      "canonicalSourceUnchangedFromBaseline": false,
+      "reason": "Canonical merchant candidate export: copy exact merchant-approved/dist/downloads/consumer-release.json bytes. Changes are original-secret screening/recovery parity or 2.14 signed-artifact and sandbox release metadata, verified against canonical source and the merchant suite."
+    },
+    {
+      "path": "dist/merchant/loyalty-model.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "111f9c5b2b5d753e6cf618def41af6bc896b9b406642ff8e57526845298ebee9",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/loyalty-model.js",
+      "canonicalSourceSha256": "111f9c5b2b5d753e6cf618def41af6bc896b9b406642ff8e57526845298ebee9",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/loyalty-model.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/loyalty.css",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "700c2a2d35907086fe4215239c379da4342a070b19f7366c7f677bfe92971e3c",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/loyalty.css",
+      "canonicalSourceSha256": "700c2a2d35907086fe4215239c379da4342a070b19f7366c7f677bfe92971e3c",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/loyalty.css bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/loyalty.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "7c995be47f7018dbcd8ab2bce3bc2f821e9f46f04057e7aa607f6024c32e9af6",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/loyalty.js",
+      "canonicalSourceSha256": "7c995be47f7018dbcd8ab2bce3bc2f821e9f46f04057e7aa607f6024c32e9af6",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/loyalty.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/merchant-release.json",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "eb62d0774fb764617645fc2b57996de93694692aa99afd07a7a4802069d0f837",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/merchant-release.json",
+      "canonicalSourceSha256": "eb62d0774fb764617645fc2b57996de93694692aa99afd07a7a4802069d0f837",
+      "canonicalSourceUnchangedFromBaseline": false,
+      "reason": "Canonical merchant candidate export: copy exact merchant-approved/dist/merchant-release.json bytes. Changes are original-secret screening/recovery parity or 2.14 signed-artifact and sandbox release metadata, verified against canonical source and the merchant suite."
+    },
+    {
+      "path": "dist/merchant/password-policy.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "d7734ff36d374d490c20ab95a6c83c9799f78db09eb1318a004fb3e332e538e5",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/password-policy.js",
+      "canonicalSourceSha256": "d7734ff36d374d490c20ab95a6c83c9799f78db09eb1318a004fb3e332e538e5",
+      "canonicalSourceUnchangedFromBaseline": false,
+      "reason": "Canonical merchant candidate export: copy exact merchant-approved/dist/password-policy.js bytes. Changes are original-secret screening/recovery parity or 2.14 signed-artifact and sandbox release metadata, verified against canonical source and the merchant suite."
+    },
+    {
+      "path": "dist/merchant/password-recovery.css",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "8bd6ee34aadd57d2c1699a5d0ebcdd8842db99100c29789a40379960ae8db4a5",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/password-recovery.css",
+      "canonicalSourceSha256": "8bd6ee34aadd57d2c1699a5d0ebcdd8842db99100c29789a40379960ae8db4a5",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/password-recovery.css bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/password-recovery.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "a9e4df4ca97f5536c7d789f5e21d3cd5af166eb01bd31b09a1ed855e3f9ff9c2",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/password-recovery.js",
+      "canonicalSourceSha256": "a9e4df4ca97f5536c7d789f5e21d3cd5af166eb01bd31b09a1ed855e3f9ff9c2",
+      "canonicalSourceUnchangedFromBaseline": false,
+      "reason": "Canonical merchant candidate export: copy exact merchant-approved/dist/password-recovery.js bytes. Changes are original-secret screening/recovery parity or 2.14 signed-artifact and sandbox release metadata, verified against canonical source and the merchant suite."
+    },
+    {
+      "path": "dist/merchant/people.js",
+      "change": "modified",
+      "baselineSha256": "7cec6dafd4fa90814e155ed5c56cda876c5f3ff58378ab695e69a4cf3c3f6119",
+      "candidateSha256": "953b64425ce403290e1cc27ffe90a487fba52462de86c907a4bed723f8133b6d",
+      "previousManifestSha256": "7cec6dafd4fa90814e155ed5c56cda876c5f3ff58378ab695e69a4cf3c3f6119",
+      "canonicalSource": "merchant-approved/dist/people.js",
+      "canonicalSourceSha256": "953b64425ce403290e1cc27ffe90a487fba52462de86c907a4bed723f8133b6d",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/people.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/recovery-camera.js",
+      "change": "added",
+      "baselineSha256": null,
+      "candidateSha256": "e3d9d1cc9c257368697a146718c4daab968b0079e3995b0e803bea62bc9f917f",
+      "previousManifestSha256": null,
+      "canonicalSource": "merchant-approved/dist/recovery-camera.js",
+      "canonicalSourceSha256": "e3d9d1cc9c257368697a146718c4daab968b0079e3995b0e803bea62bc9f917f",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/recovery-camera.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/share-payment-link.js",
+      "change": "modified",
+      "baselineSha256": "1c4cab892a9d597e6ece2f538801e3b3d15ba0c878e99af1953c899536099a64",
+      "candidateSha256": "c279a5e1afc6d300241a75b08f259a41b1e3457fb630612284bcd07906cc0e44",
+      "previousManifestSha256": "1c4cab892a9d597e6ece2f538801e3b3d15ba0c878e99af1953c899536099a64",
+      "canonicalSource": "merchant-approved/dist/share-payment-link.js",
+      "canonicalSourceSha256": "c279a5e1afc6d300241a75b08f259a41b1e3457fb630612284bcd07906cc0e44",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/share-payment-link.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/merchant/signup.js",
+      "change": "modified",
+      "baselineSha256": "9abc2cf060ffaf3f197003f495e4ff4478c70b414f9dfa5467fda16dc7e45175",
+      "candidateSha256": "319ab27bb9bf88204002e3ba2adfe3e50e163474829c5f14b91f1ca0cbd9f822",
+      "previousManifestSha256": "9abc2cf060ffaf3f197003f495e4ff4478c70b414f9dfa5467fda16dc7e45175",
+      "canonicalSource": "merchant-approved/dist/signup.js",
+      "canonicalSourceSha256": "319ab27bb9bf88204002e3ba2adfe3e50e163474829c5f14b91f1ca0cbd9f822",
+      "canonicalSourceUnchangedFromBaseline": true,
+      "reason": "Canonical merchant export reconciliation: copy exact merchant-approved/dist/signup.js bytes unchanged from reviewed baseline source. The old combined /merchant export was stale or incomplete; this is not new candidate functionality."
+    },
+    {
+      "path": "dist/sw.js",
+      "change": "modified",
+      "baselineSha256": "f270907f80911aa3473e9ee29a1b0a117ab1f5008da0784b28b38d7dbb9902ac",
+      "candidateSha256": "f648850f55e1de06d60f51baa4279081cc3d0f96132443163d46192b4fb2f531",
+      "previousManifestSha256": "f270907f80911aa3473e9ee29a1b0a117ab1f5008da0784b28b38d7dbb9902ac",
+      "reason": "Regenerated deterministic public offline shell after consumer freeze and canonical merchant export reconciliation. Includes new IOU/password-policy modules; financial responses, customer state, URL queries and APK bytes are not cached."
+    }
+  ],
+  "unchangedBaselineAssetCount": 251,
+  "unchangedBaselineFilesAddedToCoverage": [
+    {
+      "path": "dist/js/chat-maintenance.js",
+      "sha256": "a9be68429093875b1a7c51c5b4a206d95bef8b9b688c6d9a778dc072109f7fc5",
+      "baselineSha256": "a9be68429093875b1a7c51c5b4a206d95bef8b9b688c6d9a778dc072109f7fc5",
+      "reason": "Exact reviewed baseline source bytes are unchanged; prior active asset manifest omitted this public file. Adding coverage does not introduce a code change."
+    },
+    {
+      "path": "dist/js/money-maintenance-model.js",
+      "sha256": "7fb92d499b8175fe58ddd2a48596831bf1132bf6dd1d4c9f369fa4eea8d9fcc3",
+      "baselineSha256": "7fb92d499b8175fe58ddd2a48596831bf1132bf6dd1d4c9f369fa4eea8d9fcc3",
+      "reason": "Exact reviewed baseline source bytes are unchanged; prior active asset manifest omitted this public file. Adding coverage does not introduce a code change."
+    },
+    {
+      "path": "dist/js/money-maintenance-ui.js",
+      "sha256": "044e142d29fcd080c54abb7deab2d7c794d9195ff233e80a40c142bb7dd6acc8",
+      "baselineSha256": "044e142d29fcd080c54abb7deab2d7c794d9195ff233e80a40c142bb7dd6acc8",
+      "reason": "Exact reviewed baseline source bytes are unchanged; prior active asset manifest omitted this public file. Adding coverage does not introduce a code change."
+    },
+    {
+      "path": "dist/money-maintenance.css",
+      "sha256": "9c2af3e94a0f05d12d401d3a1407a7deb82ca39d4edc931326d03687fff0cf63",
+      "baselineSha256": "9c2af3e94a0f05d12d401d3a1407a7deb82ca39d4edc931326d03687fff0cf63",
+      "reason": "Exact reviewed baseline source bytes are unchanged; prior active asset manifest omitted this public file. Adding coverage does not introduce a code change."
+    }
+  ],
+  "previousManifestDigestsDifferentFromActualBaseline": [],
+  "removedBaselineAssets": [],
+  "apkBytesExcludedFromManifestAndGit": true,
+  "qaOrPrivateFilesIncluded": false
+}

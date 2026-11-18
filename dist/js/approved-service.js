@@ -4,12 +4,14 @@ export const APPROVED_CONFIG = Object.freeze({
   url: 'https://iwutbrljiiodamtyoorg.supabase.co',
   publishableKey: 'sb_publishable_4dmChQek8k-opkVhO4N_KA_TCGVjWi6',
   luxUrl: 'https://lumo-connected-pilot.vercel.app/api/lux',
+  webSessionUrl: '/api/web-session',
+  webSessionOrigin: 'https://lumo-connected-pilot.vercel.app',
 });
 const SESSION_KEY = 'lumo-approved-session-v1';
 const PENDING_KEY = 'lumo-approved-pending-v1';
 const MODE_KEY = 'lumo-approved-sample-v1';
 const terminalAuth = new Set(['SESSION_REVOKED','SESSION_INVALID','SESSION_EXPIRED','USER_BANNED','USER_DELETED','ACCOUNT_DISABLED']);
-const sessionStamp = value => value?.access_token && value?.user?.id ? JSON.stringify([value.user.id,value.lumoAuthGeneration || `legacy:${value.refresh_token || value.access_token}`]) : '';
+const sessionStamp = value => (value?.access_token||value?.webSessionId) && value?.user?.id ? JSON.stringify([value.user.id,value.lumoAuthGeneration || value.webSessionId || `legacy:${value.refresh_token || value.access_token}`]) : '';
 const newAttempt = () => `approved-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
 const failure = (message, code = 'UNAVAILABLE', extra = {}) => ({ ok: false, message, code, ...extra });
 const read = (storage, key, fallback) => { try { return JSON.parse(storage?.getItem(key) || 'null') ?? fallback; } catch { return fallback; } };
@@ -23,7 +25,11 @@ const withoutSecrets = value => Array.isArray(value) ? value.map(withoutSecrets)
 const finalRejections = new Set(['MAINTENANCE_ACTION_REQUIRED','ORIGIN_NOT_ALLOWED','REQUEST_TOO_LARGE','SERVICE_PAUSED','DOMAIN_REJECTED','INVALID_INPUT','FORBIDDEN','AUTH_REQUIRED','SESSION_REVOKED','PILOT_REQUIRED','ACCOUNT_REQUIRED','ACCOUNT_UNAVAILABLE','PIN_REQUIRED','INSUFFICIENT_FUNDS','WALLET_LIMIT','RECIPIENT_NOT_FOUND','PROVIDER_UNAVAILABLE','PROVIDER_OUTCOME_FORBIDDEN','SELF_TRANSFER','SELF_REQUEST','INVALID_MEMBER','FEE_CHANGED','AMOUNT_CHANGED','REQUEST_UNAVAILABLE','MERCHANT_DETAILS_CHANGED','PAYOUT_CHANGED','REFUND_SOURCE_UNAVAILABLE','PILOT_LIMIT','CONFIRMED_RECEIPT_REQUIRED','RECEIPT_ALREADY_MATCHED','PARTNER_NOT_FOUND','PARTNER_CHANGED','INVALID_PARTNER','DEVICE_PROOF_INVALID','UNBACKED_STATE','STATE_RECOVERY_REQUIRED','INVALID_ACTIVATION_CHECKPOINT','ACTIVATION_STEP_UNAVAILABLE','ACTIVATION_ALREADY_COMPLETE']);
 
 export function createApprovedService({ config = APPROVED_CONFIG, fetch: transport = globalThis.fetch, storage = globalThis.localStorage, modeStorage = globalThis.sessionStorage, lockManager = globalThis.navigator?.locks, eventTarget = globalThis.window, onSnapshot = () => {} } = {}) {
-  let session = read(storage, SESSION_KEY, null), sample = read(modeStorage, MODE_KEY, false) === true;
+  const cookieMode=config.webSession===true||config.webSession!==false&&config.webSessionUrl&&globalThis.location?.origin===config.webSessionOrigin;
+  const cookieSession=value=>object(value)&&value.transport==='http-only'&&/^[a-f0-9]{32}$/.test(value.webSessionId||'')&&/^[a-f0-9]{24}$/.test(value.webSessionVersion||'')&&typeof value.user?.id==='string';
+  const hydrate=value=>cookieMode&&cookieSession(value)?{...value,access_token:'http-only',refresh_token:'http-only:'+value.webSessionVersion}:value;
+  const publicStored=value=>cookieMode&&cookieSession(value)?Object.fromEntries(Object.entries(value).filter(([key])=>!['access_token','refresh_token'].includes(key))):value;
+  let session = hydrate(read(storage, SESSION_KEY, null)), sample = read(modeStorage, MODE_KEY, false) === true;
   let account=null,partnerRequests=[],capabilities={};
   let queue = Promise.resolve(), refreshing = null, authEpoch = 0;
   let storedStamp = sessionStamp(session);
@@ -37,12 +43,13 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     const saved=read(storage,SESSION_KEY,null),stamp=sessionStamp(saved);
     if(stamp!==storedStamp){storedStamp=stamp;clearLocalAuth('ACCOUNT_CHANGED');return false;}
     // A refresh in another tab may rotate tokens without changing the login generation.
-    if(session && saved && sessionStamp(session)===stamp)session=saved;
+    if(session && saved && sessionStamp(session)===stamp)session=hydrate(saved);
     return true;
   }
   async function saveSession(value,{newIdentity=false,epoch=authEpoch,expectedStamp=storedStamp,expectedRefreshToken}={}) {
     if(typeof lockManager?.request!=='function')return false;
-    const next=value===null?null:{...value,lumoAuthGeneration:newIdentity?newAttempt():session?.lumoAuthGeneration || (session ? `legacy:${session.refresh_token || session.access_token}` : newAttempt())};
+    const generation=session?.lumoAuthGeneration&&!session.lumoAuthGeneration.startsWith('legacy:')?session.lumoAuthGeneration:cookieMode?newAttempt():session?`legacy:${session.refresh_token||session.access_token}`:newAttempt();
+    const next=value===null?null:publicStored({...value,lumoAuthGeneration:newIdentity?newAttempt():generation});
     try {
       let entered=false;
       const saved=await lockManager.request(SESSION_KEY,{mode:'exclusive'},()=>{
@@ -51,11 +58,11 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
         const raw=storage.getItem(SESSION_KEY),persisted=raw===null?null:JSON.parse(raw);
         if(sessionStamp(persisted)!==expectedStamp){syncAuth();return false;}
         // Another tab may have rotated this same login while our HTTP request ran.
-        if(expectedRefreshToken!==undefined&&persisted?.refresh_token!==expectedRefreshToken){session=persisted;return !!session?.access_token;}
+        if(expectedRefreshToken!==undefined&&hydrate(persisted)?.refresh_token!==expectedRefreshToken){session=hydrate(persisted);return !!session?.access_token;}
         const encoded=next===null?null:JSON.stringify(next);
         if(next===null)storage.removeItem(SESSION_KEY);else storage.setItem(SESSION_KEY,encoded);
         if(storage.getItem(SESSION_KEY)!==encoded)return false;
-        session=next;storedStamp=sessionStamp(next);return true;
+        session=hydrate(next);storedStamp=sessionStamp(next);return true;
       });
       return entered&&saved===true;
     }catch{return false;}
@@ -96,9 +103,59 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     } catch { return false; }
   }
   const headers = token => ({ 'Content-Type': 'application/json', apikey: config.publishableKey, ...(token ? { Authorization: `Bearer ${token}` } : {}) });
+  async function cookieRequest(path,body,authenticated,options={}) {
+    if(typeof lockManager?.request!=='function')throw Error('Secure browser session needs Web Locks.');
+    const epoch=authEpoch,initialOwner=currentOwner(),savedIdentity=options.webSessionIdentity;
+    return lockManager.request('lumo-web-cookie-network-v1',{mode:'exclusive'},async()=>{
+      if(epoch!==authEpoch||!syncAuth()||!savedIdentity&&initialOwner!==currentOwner())return new Response(JSON.stringify(accountChanged()),{status:409});
+      const send=async values=>transport(config.webSessionUrl,{method:'POST',headers:{'Content-Type':'application/json','X-Lumo-Web':'1'},body:JSON.stringify(values),signal:options.signal||AbortSignal.timeout(28000),credentials:'same-origin',cache:'no-store',redirect:'error'});
+      if(path==='/auth/v1/token?grant_type=refresh_token'&&cookieSession(session)&&body?.refresh_token&&body.refresh_token!==session.refresh_token){
+        return new Response(JSON.stringify(publicStored(session)),{status:200});
+      }
+      if(options.legacyLogout){
+        const result=await send({operation:'logout-legacy',legacy:options.legacyLogout});
+        return new Response(JSON.stringify(await result.json()),{status:result.status});
+      }
+      const preflight=async()=>{
+        const result=await send({operation:'probe'});if(!result.ok)return null;
+        const data=await result.json();if(typeof data.probe!=='string')return null;
+        const ack=await send({operation:'probe-ack',probe:data.probe});
+        return ack.ok&&(await ack.json()).ok===true?data.probe:null;
+      };
+      const acknowledge=async next=>{
+        const ack=await send({operation:'ack',generation:next.webSessionId,version:next.webSessionVersion,owner:next.user.id});
+        return ack.ok&&(await ack.json()).ok===true;
+      };
+      const cookiesRequired=()=>new Response(JSON.stringify(failure('Open Lumo directly in your browser and allow its secure cookies to sign in.','WEB_COOKIES_REQUIRED')),{status:401});
+      if(authenticated&&!savedIdentity&&!cookieSession(session)){
+        const old=session;if(!old?.access_token||!old.refresh_token)throw Error('Sign in again.');
+        const probe=await preflight();if(!probe)return cookiesRequired();
+        const response=await send({operation:'migrate',probe,legacy:{access_token:old.access_token,refresh_token:old.refresh_token,user:{id:old.user.id}}});
+        const data=await response.json();
+        if(!response.ok||!data.ok||!cookieSession(data.session))return new Response(JSON.stringify(data),{status:response.status});
+        // Raw legacy credentials are removed only after the server validated the
+        // same account/session, rotated Auth and acknowledged its HttpOnly cookie.
+        if(!await acknowledge(data.session))return cookiesRequired();
+        if(epoch!==authEpoch||!await saveSession(data.session,{epoch}))return new Response(JSON.stringify(accountChanged()),{status:409});
+      }
+      const selected=savedIdentity||session;
+      const needsProbe=path==='/functions/v1/lumo-approved'&&['login','register'].includes(body?.action);
+      const probe=needsProbe?await preflight():null;if(needsProbe&&!probe)return cookiesRequired();
+      const response=await send({operation:'proxy',path,...probe?{probe}:{},body:body||{},authenticated:!!authenticated,...cookieSession(selected)?{generation:selected.webSessionId,version:selected.webSessionVersion,owner:selected.user.id}:{}});
+      if(response.status===204)return response;
+      const data=await response.json();
+      const next=cookieSession(data.session)?data.session:cookieSession(data)?data:null;
+      if(next){
+        if(!await acknowledge(next))return cookiesRequired();
+        const newIdentity=path==='/functions/v1/lumo-approved'&&['login','register'].includes(body.action);
+        if(epoch!==authEpoch||!await saveSession(next,{epoch,newIdentity}))return new Response(JSON.stringify(accountChanged()),{status:409});
+      }
+      return new Response(JSON.stringify(data),{status:response.status,headers:{'Content-Type':'application/json'}});
+    });
+  }
   async function post(path, body, token, options = {}) {
     try {
-      const response = await transport(config.url + path, { method: 'POST', headers: headers(token), body: JSON.stringify(body), signal: AbortSignal.timeout(25000), ...options });
+      const response = cookieMode?await cookieRequest(path,body,!!token||path.startsWith('/auth/v1/'),options):await transport(config.url + path, { method: 'POST', headers: headers(token), body: JSON.stringify(body), signal: AbortSignal.timeout(25000), ...options });
       if (response.status === 204) return { ok: true };
       const data = await response.json();
       if (!data || typeof data !== 'object') return failure('The shared service returned an unreadable response. Try again.');
@@ -153,8 +210,8 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     if (!valid()) return accountChanged();
     if(authenticated&&terminalAuth.has(data.code)){await expireSession();return data;}
     if(authenticated&&authRetried&&['UNAUTHENTICATED','AUTH_REQUIRED','INVALID_JWT','JWT_EXPIRED'].includes(data.code)){await expireSession();return data;}
-    if(installSnapshot&&data.session?.access_token){
-      if(!await saveSession(data.session,{newIdentity:!authenticated,epoch}))return valid()?failure('Lumo could not safely save your sign-in. Keep this browser open and try signing in again.','SESSION_STORAGE_UNAVAILABLE'):accountChanged();
+    if(installSnapshot&&(data.session?.access_token||cookieMode&&cookieSession(data.session))){
+      if(!(cookieMode&&data.session.webSessionId===session?.webSessionId&&data.session.webSessionVersion===session?.webSessionVersion)&&!await saveSession(data.session,{newIdentity:!authenticated,epoch}))return valid()?failure('Lumo could not safely save your sign-in. Keep this browser open and try signing in again.','SESSION_STORAGE_UNAVAILABLE'):accountChanged();
       if(!valid())return accountChanged();
     }
     if (installSnapshot && data.account) account=data.account;
@@ -240,13 +297,15 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
     async signOut() {
       syncAuth();
       const token = session?.access_token;
+      const webSessionIdentity=cookieMode&&cookieSession(session)?publicStored(session):null;
+      const legacyLogout=cookieMode&&!webSessionIdentity&&session?.user?.id?{access_token:session.access_token,refresh_token:session.refresh_token,user:{id:session.user.id}}:null;
       const expectedStamp=storedStamp;
       clearLocalAuth('SIGNED_OUT');
       const epoch=authEpoch;
       const localCleanup=token?saveSession(null,{epoch,expectedStamp}):Promise.resolve(true);
       // The journal is already scoped by immutable account ID. A late or unknown
       // payment must keep its original reference across sign-out and account switches.
-      const [localCleared,remote]=await Promise.all([localCleanup,token?post('/auth/v1/logout?scope=local',{},token):{ok:true}]);
+      const [localCleared,remote]=await Promise.all([localCleanup,token?post('/auth/v1/logout?scope=local',{},token,webSessionIdentity?{webSessionIdentity}:legacyLogout?{legacyLogout}:{}):{ok:true}]);
       if (epoch !== authEpoch) return accountChanged();
       if (!localCleared) return failure('Lumo could not clear the saved session. Keep this browser private and try again before leaving it.', 'SIGNOUT_UNCONFIRMED', { remoteRevoked: remote.ok === true });
       return { ok: true, pendingLogout: !remote.ok, localCleared };
@@ -262,7 +321,7 @@ export function createApprovedService({ config = APPROVED_CONFIG, fetch: transpo
           const timeout=AbortSignal.timeout(28000);
           const combined=signal && typeof AbortSignal.any==='function'?AbortSignal.any([signal,timeout]):timeout;
           if(signal?.aborted) return failure('Question cancelled.', 'CANCELLED');
-          const response=await transport(config.luxUrl||APPROVED_CONFIG.luxUrl,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({question,context}),signal:combined,redirect:'error'});
+          const response=cookieMode?await cookieRequest('/api/lux',{question,context},true,{signal:combined}):await transport(config.luxUrl||APPROVED_CONFIG.luxUrl,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({question,context}),signal:combined,redirect:'error'});
           const data=await response.json();
           return object(data) ? data : failure('Lux could not read that reply. Try again.', 'UNAVAILABLE');
         } catch { return failure('I couldn’t connect to Lux. Try again; your question has not moved any money.', signal?.aborted?'CANCELLED':'LUX_UNAVAILABLE'); }

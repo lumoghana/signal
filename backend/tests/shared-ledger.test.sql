@@ -13,6 +13,8 @@ begin
  execute 'set local role authenticated';
  response:=public.lumo_rpc(command,payload);
  execute 'reset role';
+ -- Explicit synthetic personal enrolment mirrors the current approved consumer gateway.
+ if command='account.open' and response->>'ok'='true' then insert into lumo_private.approved_profiles(user_id,personal_account) values(auth.uid(),true) on conflict(user_id) do update set personal_account=true;end if;
  return response;
 exception when others then execute 'reset role';raise;
 end $$;

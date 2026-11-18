@@ -2,6 +2,7 @@ import { getMoneyAnswer, getSpendingPeriod, getSpendingScope } from './money-ans
 import { cash } from './ui.js';
 import { getPreparedChatAction, stampFinancialAnswer, readChatAmount, financialInputAmbiguity, clarifyFinancialInput } from './chat-action-model.js';
 import { getMaintenanceChatAnswer } from './chat-maintenance.js';
+import {parseIouQuestion,getIouMoneyAnswer} from './iou-question.js';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_RE = new RegExp(`\\b(${MONTHS.join('|')})(?:\\s+((?:19|20|21)\\d{2}))?\\b`, 'i');
@@ -36,6 +37,7 @@ function previousContext(messages) {
       amount: safeAmount(value.amount) && value.amount > 0 ? value.amount : null,
       subject: typeof value.subject === 'string' ? value.subject.slice(0, 60) : '',
       canonicalQuestion: typeof value.canonicalQuestion === 'string' ? value.canonicalQuestion.slice(0, 400) : '',
+      iouDirection: ['incoming','outgoing'].includes(value.iouDirection) ? value.iouDirection : null,
       month: /^\d{4}-(?:0[1-9]|1[0-2])$/.test(value.month || '') ? value.month : '',
       period: ['today', 'this month', 'this week', 'last week', 'yesterday', 'this year', 'last year', 'history'].includes(value.period) ? value.period : '',
       spendingScope: typeof value.spendingScope === 'string' ? value.spendingScope.slice(0, 200) : '',
@@ -168,6 +170,8 @@ function conversationAnswer(state, question, { messages = [], now = new Date() }
   const prepared = getPreparedChatAction(state, original);
   if (prepared) return prepared;
   if (financialInputAmbiguity(original) === 'currency') return clarifyFinancialInput('currency');
+  const iou=parseIouQuestion(original,{now,previousDirection:previous?.iouDirection});
+  if(iou)return getIouMoneyAnswer(state,iou);
   if (!original) return smallReply('clarify', 'I’m listening.', ['A payment, a goal, or just making sense of your money. Where shall we start?'], ['Can I afford lunch?', 'Where did my money go?', 'Help me save']);
   if (/^(?:(?:hi|hello|hey)(?: there)?|good (?:morning|afternoon|evening))(?:[,!\s]+(?:lux|lumo))?[.!?\s]*$/.test(q)) return smallReply('greeting', `Hey ${name}.`, ['Lux here. What’s the money question today?'], ['Can I afford lunch?', 'My allowance is late', 'Help me save']);
   if (/^(?:thanks|thank you|cheers)(?: so much| a lot)?(?:[,!\s]+(?:lux|lumo))?[.!?\s]*$/.test(q)) return smallReply('thanks', 'Anytime.', ['A little clearer is a good place to be. I’m here for the next question.'], ['How much can I spend today?', 'Help me save']);
@@ -242,7 +246,7 @@ function conversationAnswer(state, question, { messages = [], now = new Date() }
     return financialReply(state, 'spending', canonical, now);
   }
   if (/\b(?:today|daily|per day|a day|each day)\b|how much.*spend/.test(q)) return financialReply(state, 'daily', 'How much can I spend today?', now);
-  if (/who.*owe.*me|\b(?:owed to me|expected|on the way|coming in|next allowance|next income)\b|when.*allowance/.test(q)) return financialReply(state, 'expected', 'Who owes me? What income is expected?', now);
+  if (/who.*owe.*me|\b(?:owed to me|expected|on the way|coming in|next allowance|next income)\b|when.*allowance/.test(q)) return financialReply(state, 'expected', 'What income is expected?', now);
   if (/\b(?:what.*owe|i owe|owe someone|owe people|my debt|debts|repay)\b/.test(q)) return financialReply(state, 'debts', 'What do I owe?', now);
   if (/\b(?:outside|other bank|another bank|cash|all my money|total|net worth)\b|how much.*have|my (?:momo|mobile money).*(?:balance|money)/.test(q)) return financialReply(state, 'outside', original, now);
   if (/why|spendable|left after|available|budget|plan|buffer|balance|what.*left|what can i spend in lumo/.test(q)) return financialReply(state, 'balance', 'Explain my available balance', now);
