@@ -4,7 +4,7 @@
   "repository": "lumoghana/signal",
   "release": "2.14.0",
   "release_date": "2026-11-18",
-  "status": "published-apps-active59-public-source-export-ready",
+  "status": "published-and-runtime-CI-verified",
   "productionReleasePublished": true,
   "approved_live_url": "https://lumo-connected-pilot.vercel.app/",
   "export_target": "GitHub / Vercel",
@@ -19,11 +19,32 @@
     "priorReleaseRecordSha256": "3c669630d43085c45dd1aaad53b6c1b99d877cd905b197f0bb9b2c17e0a4a543"
   },
   "assessment": {
-    "scope": "Reviewed2.14 active prototype release with exact backend source, public artifact checks and anonymous hosted browser-session acceptance. Conservative ratings do not establish real-money launch approval; public-source CI is recorded separately.",
-    "prototypeQuality": 8.6,
-    "realMoneyReadiness": 4.6,
+    "scope": "Independent engineering assessment of the published2.14 prototype after successful runtime/source CI. This is not certification or real-money launch approval.",
+    "prototypeQuality": 8.8,
+    "realMoneyReadiness": 4.7,
     "targetsMet": false,
-    "launchApproval": false
+    "launchApproval": false,
+    "criteriaWeightsPercent": {
+      "prototype": {
+        "journeys": 35,
+        "controlledCorrectness": 30,
+        "crossPlatformAcceptance": 20,
+        "rebuildAndRelease": 15
+      },
+      "realMoney": {
+        "financialControls": 30,
+        "securityAndIdentity": 25,
+        "providers": 15,
+        "operationsAndAssurance": 20,
+        "devicesAndCapacity": 10
+      }
+    },
+    "earlierCandidateEstimate": {
+      "date": "2026-11-18",
+      "prototypeQuality": 8.6,
+      "realMoneyReadiness": 4.6,
+      "scope": "Prepared candidate before observed publication and successful hosted CI."
+    }
   },
   "android": {
     "version": "2.14.0",
@@ -179,28 +200,13 @@
     "privateStagedWorkIncluded": false
   },
   "hostedReadOnlyVerification": {
-    "cacheMismatches": {
-      "shop_access": 0,
-      "reward_context": 0,
-      "consumer_binding": 0,
-      "public_directory": 0
-    },
-    "ledger": {
-      "accounts": 56,
-      "journals": 99,
-      "entries": 198,
-      "balance_mismatches": 0,
-      "unbalanced_journals": 0,
-      "negative_customer_or_merchant_accounts": 0
-    },
+    "consistencyChecksPassed": true,
+    "privateExecutionGrantsChecked": true,
     "blockedAuthFenceNotInstalled": true,
-    "retentionIndexes": 3,
-    "hourlyRetentionCronRegistered": true,
-    "adminMfaRequired": false,
-    "activeAdminStaff": 1,
-    "verifiedTotpStaff": 0,
-    "customerRecordsReturned": false,
-    "financialOrAuthWritesDuringCheck": false
+    "retentionControlsPresent": true,
+    "customerRecordsPublished": false,
+    "privateAccountOrLedgerAggregatesPublished": false,
+    "scope": "Read-only operating checks passed. No private account, ledger, staff or customer aggregates are included in this public handover."
   },
   "previewArtifact": {
     "deployment": "dpl_5SFCW6FmsacnBVqMVseoRSMtKtWJ",
@@ -225,11 +231,14 @@
     "processorPython": 14,
     "processorIntegration": 4,
     "browserJourneysDiscovered": 8,
-    "standardRunnerBrowserExecution": "unverified-local-environment-blocked",
+    "standardRunnerBrowserExecution": "passed-8-journeys-in-hosted-CI",
     "physicalHandsetAcceptance": false,
     "activeSqlFixtures": 37,
     "activeSqlMigrations": 59,
-    "activeSecuritySqlHttpChecks": 11
+    "activeSecuritySqlHttpChecks": 11,
+    "browserJourneysPassed": 8,
+    "hostedCiRunId": 44254857611,
+    "hostedCiRuntimeCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb"
   },
   "assetManifestReconciliation": {
     "path": "verification/readiness-2.14.0/asset-reconciliation.json",
@@ -257,13 +266,13 @@
   },
   "limitations": [
     "No 9/10 prototype or 8/10 real-money readiness claim.",
-    "Production gateway replacement and coordinated web/native acceptance remain pending explicit approval.",
     "Admin MFA remains off; real operator enrollment and a second verified access administrator remain required.",
     "F05 managed Auth reconciliation/write fencing is staged and excluded pending independent hosted Auth/concurrency acceptance.",
     "Providers, liveness/identity, hosted restore, independent security/capacity and installed-handset evidence are incomplete.",
     "Global merchant metadata writes and whole tenant histories remain; loyalty lifetime caps and private claim/attempt history are preserved.",
     "Background OS push and historical URL sunset acceptance remain open.",
-    "Supabase leaked-password-protection warning remains; pilot screening is not full production breach coverage."
+    "Supabase leaked-password-protection warning remains; pilot screening is not full production breach coverage.",
+    "Successful synthetic CI and published apps do not replace signed-in operational approval, installed-handset, provider, genuine liveness or real-money launch acceptance."
   ],
   "historicalWebHotfix": {
     "recordStatus": "dated-history-only",
@@ -286,14 +295,23 @@
     }
   },
   "sourcePublication": {
-    "status": "active59-export-prepared-awaiting-publication-and-CI",
+    "status": "published-active59-runtime-CI-success",
     "explicitApprovalReceived": true,
-    "candidateCommitPushed": false,
-    "branchBaselineCommit": "99b7b1024978ba0dc3a143c0033db0af5e3ebc4e",
+    "runtimeSourceCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb",
+    "runtimeSourceTree": "d3ac3f8c9b2464d44ac17ee62d81cc964088b526",
     "privateCandidateParentIncluded": false,
     "excludedAuthFenceSourceIncluded": false,
-    "hostedCiExecutedForThisExport": false,
-    "reasonSummary": "The full private candidate tree was rejected because it contained explicitly excluded Auth-write-fence source. This materially narrower public export contains the active59 release and exact active runtime source only. Publication uses the original public baseline parent."
+    "hostedCiExecutedForThisExport": true,
+    "ci": {
+      "runId": 44254857611,
+      "url": "https://github.com/lumoghana/signal/actions/runs/44254857611",
+      "status": "completed",
+      "conclusion": "success",
+      "testedRuntimeCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb"
+    },
+    "acceptanceReceipt": "verification/readiness-2.14.0/published-acceptance.json",
+    "receiptScope": "Attests the original tested runtime commit. A later metadata-only handover commit is not represented as the runtime commit tested by this receipt.",
+    "runtimeCommitParent": "99b7b1024978ba0dc3a143c0033db0af5e3ebc4e"
   },
   "localRuntimeAcceptance": {
     "nodeVersion": "22.23.5",
@@ -311,9 +329,10 @@
     "privateAuthFenceIncluded": false
   },
   "interimCompatibility": {
-    "adminGeneralApprovalWrites": "The reviewed gateway and matching Admin Site13 are published together; original request/revision bindings remain enforced. Complete signed-in staff workflow acceptance is still separate.",
-    "basis": "Exact deployed gateway source plus reviewed published Admin Site identity; no live operational or account mutation was used for acceptance.",
-    "resolution": "Retain current-state binding and idempotency; accept the full MFA-backed staff journey with controlled identities before real-money operation."
+    "status": "resolved-by-paired-publication",
+    "adminGeneralApprovalPayloadGapResolved": true,
+    "basis": "Admin Site13 and lumo-admin8 are published together with the reviewed request/revision payload contract.",
+    "scope": "The former deployment payload gap is resolved. No signed-in real operational approval was exercised or claimed; current-state binding and idempotency remain enforced."
   },
   "deployments": {
     "vercel": {
@@ -361,9 +380,9 @@
       "scope": "Server-side anonymous acceptance only; not a browser Strict-cookie or authenticated account journey, and no backend Auth/database action was exercised."
     },
     "publicConsumerSourceBytes": {
-      "checks": 7,
+      "checks": 31,
       "mismatches": 0,
-      "deployment": "dpl_9vZTbJijcMhZFG2bkXozfrACo9Yn"
+      "scope": "All changed consumer assets compared after publication; no signed-in acceptance is inferred."
     },
     "productionApkDownloads": {
       "surfaces": 2,

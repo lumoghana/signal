@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "release": "2.14.0",
+  "status": "published-runtime-acceptance-verified",
+  "date": "2026-11-18",
+  "attestedRuntimeCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb",
+  "attestedRuntimeTree": "d3ac3f8c9b2464d44ac17ee62d81cc964088b526",
+  "publicRuntimeCommitParent": "99b7b1024978ba0dc3a143c0033db0af5e3ebc4e",
+  "ci": {
+    "runId": 44254857611,
+    "url": "https://github.com/lumoghana/signal/actions/runs/44254857611",
+    "status": "completed",
+    "conclusion": "success",
+    "testedCommit": "ebd0f684c8381b6d8dba98caa0c7db68dab6b6cb",
+    "checks": {
+      "consumerTests": 1910,
+      "merchantTests": 734,
+      "backendTests": 445,
+      "browserJourneys": 8,
+      "activeSqlFixtures": 37,
+      "activeMigrations": 59,
+      "financialSqlHttpChecks": 38,
+      "merchantScalingChecks": 67,
+      "securitySqlHttpChecks": 11,
+      "facePythonTests": 14,
+      "faceProcessorIntegrationChecks": 4
+    }
+  },
+  "gateways": [
+    {
+      "name": "lumo-approved",
+      "version": 25,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "bundleSha256": "aa747c93b356a91f512cf5c9cdd3a480fad5545f175b0b6415aaf80b3800d09f",
+      "allSourceFilesMatch": true,
+      "disabledRecoveryFlags": {}
+    },
+    {
+      "name": "lumo-access",
+      "version": 8,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "bundleSha256": "e2814704ff8b9fe0ecc107bcf812a12f4a095fc32db7b4300f5dad15b1a304b2",
+      "allSourceFilesMatch": true,
+      "disabledRecoveryFlags": {
+        "resetFenceEnabled": false
+      }
+    },
+    {
+      "name": "lumo-admin",
+      "version": 8,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "bundleSha256": "7b6bde211de28979a4fb9b8fc24aae16b76b63a6b4747f49ae717e4d90567ad2",
+      "allSourceFilesMatch": true,
+      "disabledRecoveryFlags": {
+        "recoveryResetsEnabled": false
+      }
+    }
+  ],
+  "applications": {
+    "vercel": {
+      "consumer": {
+        "id": "dpl_9vZTbJijcMhZFG2bkXozfrACo9Yn",
+        "state": "READY",
+        "url": "https://lumo-connected-pilot.vercel.app/",
+        "immutableUrl": "https://lumo-connected-pilot-33zduegrx-williedark-6795.vercel.app",
+        "runtime": "22.x"
+      },
+      "merchant": {
+        "id": "dpl_4syC6BiW2igTLcfgn4cSmDaydr3j",
+        "state": "READY",
+        "url": "https://lumo-merchant.vercel.app/",
+        "immutableUrl": "https://lumo-merchant-f7zyvs7eh-williedark-6795.vercel.app",
+        "runtime": "26.x"
+      }
+    },
+    "sites": {
+      "merchant": {
+        "version": 41,
+        "sourceCommit": "e1411f0cc0104c3b4b2b1ad6200615b4ebf581cf",
+        "deploymentId": "appgdep_6afd45f5a1808191af4ab132f155ca07",
+        "status": "succeeded",
+        "url": "https://lumo-merchant-mobile.oness15.chatgpt.site",
+        "audience": "public"
+      },
+      "admin": {
+        "version": 13,
+        "sourceCommit": "ff0ee6cf5949db309f4a7c1e3ffaaaabb934dd6e",
+        "deploymentId": "appgdep_6afd4621e44881918ec6de978fc5e36a",
+        "status": "succeeded",
+        "url": "https://lumo-admin-operations.oness15.chatgpt.site",
+        "audience": "custom"
+      }
+    }
+  },
+  "artifacts": {
+    "androidVersion": "2.14.0",
+    "apkSha256": "8ad3880e9d73587e733f200e734d7c68c171a50e0ef083915b2e8b50b986fa0b",
+    "apkBytes": 4645839,
+    "originalSigningCertificateSha256": "64f2301aa4b55db94c2748d67bf66b56bda7569f528455969c575b8603338a6c",
+    "sourcePackageSha256": "e27011dca71aaadc0743665fd357598d7b5dfa8b7af0d5ea2089788db27a8373",
+    "bothCanonicalApkDownloadsByteVerified": true
+  },
+  "activeReleaseBoundary": {
+    "migrationCount": 59,
+    "excludedFiles": [
+      "backend/supabase/migrations/20261118050029_recovery_reconciliation_and_biometric_retention.sql",
+      "backend/tests/recovery-write-fence.test.sql",
+      "backend/tests/admin-recovery-controls.test.sql"
+    ],
+    "managedAuthFenceInstalled": false,
+    "resetFenceEnabled": false,
+    "adminRecoveryResetsEnabled": false
+  },
+  "engineeringAssessment": {
+    "prototypeQuality": 8.8,
+    "realMoneyReadiness": 4.7,
+    "targetsMet": false,
+    "realMoneyLaunchApproved": false
+  },
+  "scope": "Technical source/deployment identities and synthetic acceptance counts only. The receipt attests the original tested runtime commit, avoiding a metadata-CI self-reference loop. It does not claim physical-device, real-provider, genuine liveness, or signed-in operational approval acceptance."
+}
